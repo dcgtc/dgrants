@@ -6,12 +6,12 @@
 
 <script>
 // @ is an alias to /src
-import GrantExplorer from '@/components/GrantExplorer.vue'
+import GrantExplorer from '@/components/GrantExplorer.vue';
 
 export default {
   name: 'grantExplorer',
   components: {
-    GrantExplorer
-  }
-}
+    GrantExplorer,
+  },
+};
 </script>

@@ -37,48 +37,48 @@
 </template>
 
 <script>
-import PaymentsService from '../domain/PaymentsService.js'
+import PaymentsService from '../domain/PaymentsService.js';
 
 export default {
-    data: function () {
-        return {
-            balance: 0,
-            network: '',
-            logged: '',
-            payments: [],
-            loading: false
-        }
+  data() {
+    return {
+      balance: 0,
+      network: '',
+      logged: '',
+      payments: [],
+      loading: false,
+    };
+  },
+  computed: {
+    address() {
+      return this.$store.state.contract;
     },
-    computed: {
-        address: function() {
-            return this.$store.state.contract
-        }
-    },
-    created: async function () {
-        const address = this.$store.state.contract
-        const paymentsService = new PaymentsService()
-        this.network = await paymentsService.getNetwork() 
-        this.logged = await paymentsService.getLoggedAccount()
-        if (address) {
-            this.balance = await paymentsService.getBalance(address, 'ether')
-            this.payments = await paymentsService.getPaymentsOfAccount(address, this.logged, 'ether')
-        }
-    },
-    methods: {
-        withdraw: async function() {
-            const address = this.$store.state.contract
-            const paymentsService = new PaymentsService()
-            if (address) {
-                this.loading = true
-                try {
-                    await paymentsService.withdraw(address)
-                    this.balance = await paymentsService.getBalance(address, 'ether')
-                } catch (e) {
-                    console.log(e)
-                }
-                this.loading = false
-            }
-        }
+  },
+  async created() {
+    const address = this.$store.state.contract;
+    const paymentsService = new PaymentsService();
+    this.network = await paymentsService.getNetwork();
+    this.logged = await paymentsService.getLoggedAccount();
+    if (address) {
+      this.balance = await paymentsService.getBalance(address, 'ether');
+      this.payments = await paymentsService.getPaymentsOfAccount(address, this.logged, 'ether');
     }
-}
+  },
+  methods: {
+    async withdraw() {
+      const address = this.$store.state.contract;
+      const paymentsService = new PaymentsService();
+      if (address) {
+        this.loading = true;
+        try {
+          await paymentsService.withdraw(address);
+          this.balance = await paymentsService.getBalance(address, 'ether');
+        } catch (e) {
+          console.log(e);
+        }
+        this.loading = false;
+      }
+    },
+  },
+};
 </script>

@@ -6,12 +6,12 @@
 
 <script>
 // @ is an alias to /src
-import Basket from '@/components/Basket.vue'
+import Basket from '@/components/Basket.vue';
 
 export default {
   name: 'shoppingCart',
   components: {
-    Basket
-  }
-}
+    Basket,
+  },
+};
 </script>

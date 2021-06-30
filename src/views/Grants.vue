@@ -2,24 +2,24 @@
   <div class='container'>
     <div class="mb-4">
       <router-link to="/">Home</router-link> |
-      <router-link to="/shopping">Shopping Cart</router-link> |
+      <router-link to="/grantExplorer">Grant Explorer</router-link> |
       <a href="javascript:void(0)" @click="changeContract">Change Payments contract</a>
     </div>
 
-    <PaymentsLoad v-if="!hasContract" />
-    <PaymentsDetail v-if="hasContract" />
+    <GrantsLoad v-if="!hasContract" />
+    <GrantDetail v-if="hasContract" />
   </div>
 </template>
 
 <script>
-import PaymentsLoad from '@/components/PaymentsLoad.vue';
-import PaymentsDetail from '@/components/PaymentsDetail.vue';
+import GrantsLoad from '@/components/GrantsLoad.vue';
+import GrantDetail from '@/components/GrantDetail.vue';
 
 export default {
-  name: 'Payments',
+  name: 'Grants',
   components: {
-    PaymentsLoad,
-    PaymentsDetail,
+    GrantsLoad,
+    GrantDetail,
   },
   computed: {
     contract() {

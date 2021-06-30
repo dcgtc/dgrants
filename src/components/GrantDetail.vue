@@ -23,36 +23,36 @@
 
 <script>
 export default {
-    name: 'GrantDetail',
-    props:{
-        grant: Object,
-        name: String,
-        image: String,
-        price: String,
-        description: String
+  name: 'GrantDetail',
+  props: {
+    grant: Object,
+    name: String,
+    image: String,
+    price: String,
+    description: String,
+  },
+  data() {
+    return {
+      unitsX: 0,
+    };
+  },
+  computed: {
+    subtotal() {
+      return this.units * parseFloat(this.price);
     },
-    data: function() {
-        return {
-            unitsX: 0
-        }
+    imagePath() {
+      return `/assets/${this.image}`;
     },
-    computed: {
-        subtotal: function() {
-            return this.units*parseFloat(this.price)
-        },
-        imagePath: function() {
-            return '/assets/' + this.image
-        },
-        units: {
-            get: function() {
-                return this.$store.getters.getFruitUnits(this.name)
-            },
-            set: function(newValue) {
-                this.$store.commit('setFruitUnits', {name: this.name, units: newValue})
-            }
-        }
-    }
-}
+    units: {
+      get() {
+        return this.$store.getters.getGrantUnits(this.name);
+      },
+      set(newValue) {
+        this.$store.commit('setGrantUnits', { name: this.name, units: newValue });
+      },
+    },
+  },
+};
 </script>
 
 <style>

@@ -3,7 +3,7 @@
         <div id="loadContract" class="d-flex justify-content-center align-items-center">
             <div class="text-center" style="width:60%">
             <button type="button" class="btn btn-primary mb-4" @click="createContract">
-                Create payments contract
+                Create grants contract
             </button>
             <hr>
             <input id="address" v-model="address" type="text" placeholder="Existing contract.." class="mr-3 mt-4" /><button type="button" class="btn btn-primary" @click="loadContract">Load</button>
@@ -18,33 +18,33 @@
 </template>
 
 <script>
-import PaymentsService from '../domain/PaymentsService.js'
+import GrantService from '../domain/GrantService.js';
 
 export default {
-    name: 'PaymentsLoad',
-    data: function() {
-        return {
-            address: '',
-            loading: false
-        }
+  name: 'GrantsLoad',
+  data() {
+    return {
+      address: '',
+      loading: false,
+    };
+  },
+  methods: {
+    async createContract() {
+      const GrantService = new GrantService();
+      this.loading = true;
+      try {
+        const contract = await GrantService.createContract();
+        this.$store.commit('setContract', contract.options.address);
+      } catch (e) {
+        console.log(e);
+      }
+      this.loading = false;
     },
-    methods: {
-        createContract: async function() {
-            const paymentsService = new PaymentsService()
-            this.loading = true
-            try {
-                const contract = await paymentsService.createContract()
-                this.$store.commit('setContract', contract.options.address)
-            } catch (e) {
-                console.log(e)
-            }
-            this.loading = false
-        },
-        loadContract: function() {
-            this.$store.commit('setContract', this.address)
-        }
-    }
-}
+    loadContract() {
+      this.$store.commit('setContract', this.address);
+    },
+  },
+};
 </script>
 
 <style scoped>

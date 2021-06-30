@@ -1,1 +1,1 @@
-module.exports.Payments = require('./build/Payments')
+module.exports.GrantRegistry = require('./build/GrantRegistry')

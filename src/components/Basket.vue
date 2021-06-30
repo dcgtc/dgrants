@@ -5,7 +5,7 @@
             <router-link to="/payments">Payments</router-link>
         </div>
         <div>
-            <FruitDetail v-for="(fruit, index) in fruits" :key="index" :name="fruit.name" :description="fruit.description" :price="fruit.price" v-bind:image="fruit.image" />
+            <GrantDetail v-for="(grant, index) in grantss" :key="index" :name="grant.name" :description="grant.description" :price="grant.price" v-bind:image="grant.image" />
             <form v-on:submit.prevent="">
                 <div v-if="address" class='row mt-4 bg-light text-left p-4 border border-secondary'>
                     <div class='col-sm text-right'>
@@ -29,48 +29,46 @@
 </template>
 
 <script>
-import FruitDetail from './FruitDetail.vue'
-import { mapState } from 'vuex' // Creates getter for properties in vuex state
-import PaymentsService from '../domain/PaymentsService.js'
+import { mapState } from 'vuex'; // Creates getter for properties in vuex state
+import GrantDetail from './GrantDetail.vue';
+import GrantService from '../domain/GrantService.js';
 
 export default {
-    name: 'Basket',
-    props: {},
-    computed: mapState({
-        fruits: state => state.fruits,
-        total: state => {
-            return state.fruits.reduce((accumulator, currentValue) => (accumulator + Number(currentValue.units) * parseFloat(currentValue.price)), 0)
-        },
-        address: state => state.contract
-    }),
-    data: function() {
-        return {
-            loading: false
-        }
-    },
-    components: {
-        FruitDetail
-    },
-    methods: {
-        pay: async function() {
-            const address = this.$store.state.contract
-            const reference = 'SC-' + new Date().getTime()
-            const amount = this.$store.getters.totalAmount
-            
-            const paymentsService = new PaymentsService()
+  name: 'Basket',
+  props: {},
+  computed: mapState({
+    grants: (state) => state.grants,
+    total: (state) => state.grants.reduce((accumulator, currentValue) => (accumulator + Number(currentValue.units) * parseFloat(currentValue.price)), 0),
+    address: (state) => state.contract,
+  }),
+  data() {
+    return {
+      loading: false,
+    };
+  },
+  components: {
+    GrantDetail,
+  },
+  methods: {
+    async pay() {
+      const address = this.$store.state.contract;
+      const reference = `SC-${new Date().getTime()}`;
+      const amount = this.$store.getters.totalAmount;
 
-            this.loading = true
-            try {
-                await paymentsService.pay(address, reference, amount)
-            } catch (e) {
-                console.log(e)
-            }
-            this.loading = false
-            this.$store.commit('clearFruitUnits')
-            this.$router.push('/payments')
-        }
-    }
-}
+      const paymentsService = new PaymentsService();
+
+      this.loading = true;
+      try {
+        await paymentsService.pay(address, reference, amount);
+      } catch (e) {
+        console.log(e);
+      }
+      this.loading = false;
+      this.$store.commit('clearGrantUnits');
+      this.$router.push('/grantExplorer');
+    },
+  },
+};
 </script>
 
 <style lang="scss" scoped>
