@@ -1,7 +1,7 @@
 <template>
   <div id="main" class="d-flex justify-content-center align-items-center">
     <div id="nav">
-      <router-link to="/payments"><button type="button" class="btn btn-primary">Go to Payments</button></router-link>
+      <router-link to="/grantExplorer"><button type="button" class="btn btn-primary">Grant Explorer</button></router-link>
       <p></p>
       <router-link to="/shopping"><button type="button" class="btn btn-primary mt-4">Got to Shopping</button></router-link>
     </div>

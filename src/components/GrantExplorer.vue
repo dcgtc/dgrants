@@ -2,7 +2,7 @@
     <div>
         <div class="mb-4">
             <router-link to="/">Home</router-link> |
-            <router-link to="/grantsExplorer">GrantsExplorer</router-link>
+            <router-link to="/grantExplorer">GrantExplorer</router-link>
         </div>
         <div>
             <FruitDetail v-for="(fruit, index) in fruits" :key="index" :name="fruit.name" :description="fruit.description" :price="fruit.price" v-bind:image="fruit.image" />
@@ -17,7 +17,7 @@
                 </div>
             </form>
             <div v-if="!address" class='text-center mt-4 p-4 bg-light border border-secondary'>
-                <router-link to="/grantsExplorer"><h5>Please, load or create a GrantsRegistry contract </h5></router-link>
+                <router-link to="/grantExplorer"><h5>Please, load or create a GrantsRegistry contract </h5></router-link>
             </div>
         </div>
         <div v-if="loading" class="loading d-flex justify-content-center align-items-center">
@@ -34,7 +34,7 @@ import { mapState } from 'vuex' // Creates getter for properties in vuex state
 import PaymentsService from '../domain/PaymentsService.js'
 
 export default {
-    name: 'GrantsExplorer',
+    name: 'GrantExplorer',
     props: {},
     computed: mapState({
         fruits: state => state.fruits,

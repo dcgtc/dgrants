@@ -23,9 +23,9 @@
 
 <script>
 export default {
-    name: 'FruitDetail',
+    name: 'GrantDetail',
     props:{
-        fruit: Object,
+        grant: Object,
         name: String,
         image: String,
         price: String,
