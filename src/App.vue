@@ -1,57 +1,34 @@
 <template>
-  <div v-if="isDrizzleInitialized" id="app">
-    <h1>Sign the Guestbook</h1>
-    <drizzle-contract-form
-      contractName="GrantRegistry"
-      method="getGrants"
-      :placeholders="['Grant']"
-    />
-    <h2>Guests:</h2>
-    <ul v-if="getGrants">
-      <li v-for="(grant, i) in getGrants" :key="i">{{ utils.toUtf8(grant) }}</li>
-    </ul>
-  </div>
-  <div v-else>
-    Loading application...
+  <div id="app">
+    <router-view/>
   </div>
 </template>
 
-<script>
-import { mapGetters } from "vuex"
-export default {
-  name: "app",
-  computed: {
-    ...mapGetters("drizzle", ["drizzleInstance", "isDrizzleInitialized"]),
-    ...mapGetters("contracts", ["getContractData"]),
-    getNames() {
-      let data = this.getContractData({
-        contract: "GrantRegistry",
-        method: "getGrants"
-      });
-      if (data === "loading") return false;
-      return data
-    },
-    utils() {
-      return this.drizzleInstance.web3.utils
-    }
-  },
-  created() {
-    this.$store.dispatch("drizzle/REGISTER_CONTRACT", {
-      contractName: "GrantRegistry",
-      method: "getGrants",
-      methodArgs: []
-    })
-  }
-}
-</script>
+<style lang="scss">
+  @import '/assets/css/vendor/bootstrap.min.css';
 
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+  #app {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    color: #2c3e50;
+    margin-top: 32px;
+    margin-bottom: 32px;
+  }
+
+  .loading {
+    content: '';
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.3);
+  }
+
+  .spinner-border {
+    @extend .spinner-border;
+    height:4rem;
+    width:4rem;
+  }
 </style>
