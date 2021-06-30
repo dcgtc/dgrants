@@ -33,6 +33,7 @@ contract GrantRegistry {
   // TODO: Implement safemath for avoiding overflows with ints
   uint256 public grantCount = 0;
   mapping(bytes32 => Grant) public grants;
+  bytes32[] public grantIds;
 
   struct Grant {
     bytes32 id;
@@ -70,6 +71,25 @@ contract GrantRegistry {
     return grantCount;
   }
 
+  function getAllGrantIds() public view returns (bytes32[] memory) {
+    bytes32[] memory ret = new bytes32[](grantCount);
+    for (uint i = 0; i < grantCount; i++) {
+      ret[i] = grantIds[i];
+    }
+    return grantIds;
+  }
+
+  function getAllGrants() public view returns (Grant[] memory) {
+    Grant[] memory ret = new Grant[](grantCount);
+    bytes32 grantId;
+    for (uint i = 0; i < grantCount; i++) {
+      grantId = grantIds[i];
+      ret[i] = grants[grantId];
+    }
+    return ret;
+  }
+
+/*
   function getAllGrants() public view returns (myGrant[] memory) {
     grantCount = getGrantCount();
     myGrant[] memory ret = new myGrant[](grantCount);
@@ -78,6 +98,7 @@ contract GrantRegistry {
     }
     return ret;
   }
+*/
 
   // Events
   // When a great is created
@@ -90,6 +111,7 @@ contract GrantRegistry {
   function _mint(bytes32 _id, address _owner, address _payout, string memory _metaPtr, State _state, bytes32 _replaces) public {
     incrementGrantCount();
     grants[_id] = Grant(_id, _owner, _payout, _metaPtr, _state, _replaces);
+    grantIds.push(_id);
     // Emit an event here for grant minted
     emit NewGrant(_id, _owner, _payout, _replaces);
   }
