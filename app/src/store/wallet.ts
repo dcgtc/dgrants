@@ -20,7 +20,7 @@
  *     - https://v3.vuejs.org/api/basic-reactivity.html#markraw
  */
 
-import { computed, ref, readonly, markRaw } from 'vue';
+import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
 import { JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
