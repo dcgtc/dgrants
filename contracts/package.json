@@ -57,5 +57,8 @@
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
     "test": "hardhat test",
     "typechain": "hardhat typechain"
+  },
+  "volta": {
+    "extends": "../package.json"
   }
 }

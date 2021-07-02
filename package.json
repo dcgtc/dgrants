@@ -19,6 +19,7 @@
   "scripts": {
     "build": "lerna run build",
     "clean": "lerna run clean",
+    "dev": "lerna run dev",
     "lint": "lerna run lint",
     "prettier": "lerna run prettier",
     "prepare": "lerna run prepare && husky install",
