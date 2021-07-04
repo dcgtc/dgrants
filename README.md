@@ -13,20 +13,18 @@ To ensure that everyone is using the same version of nodejs on this project, [vo
 
 ### Set your env files
 
-```sh
-cp app/.env.template app/.env
-nano app/.env
+Copy **app/.env.template** to **app/.env** and edit, providing your own env vars
 
-cp contracts/.env.template contracts/.env
-nano contracts/.env
-```
+Copy **contracts/.env.template** to **contracts/.env** and edit, providing your own env vars
+
+````
 
 ### Develop
 
 ```sh
 yarn
 yarn dev
-```
+````
 
 ### Lint
 
@@ -40,9 +38,8 @@ yarn lint
 yarn test
 ```
 
-### Serve
+### Build
 
 ```sh
 yarn build
-yarn start
 ```

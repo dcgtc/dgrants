@@ -11,7 +11,7 @@
     "test:e2e": "vue-cli-service test:e2e",
     "lint": "eslint --ext .ts,.js,.vue .",
     "precommit": "lint-staged",
-    "prettier": "prettier --write"
+    "prettier": "prettier --write ."
   },
   "dependencies": {
     "@headlessui/vue": "^1.2.0",
