@@ -53,7 +53,7 @@
     "lint:ts": "eslint --config ./.eslintrc.yaml --ignore-path ./.eslintignore --ext .js,.ts .",
     "precommit": "lint-staged",
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
-    "test": "hardhat test",
+    "test": "yarn typechain && hardhat test",
     "typechain": "hardhat typechain"
   },
   "volta": {
