@@ -5,55 +5,33 @@ export default createStore({
     contract: '',
     grants: [
       {
-        name: 'Apple',
-        description: 'An apple a day keeps the doctor away.',
-        price: '0.008',
-        image: 'apple.jpg',
-        units: 0,
+        id: '3lkjfl2kjelfkjl2kj3lfkj2lkejflk2jelkfjl2kjelfkj',
+        owner: '0x0f02je0fij20eijffijfeijiefj',
+        payout: '0x000s0002130f23e0f0wdf02e0eef',
+        metaPtr: 'lk2j3ljlf2kjelfkjl2kejfl',
+        state: 1,
+        replaces: '',
       },
       {
-        name: 'Orange',
-        description: 'Oranges are low in calories and full of nutrients, they promote clear, healthy and skin.',
-        price: '0.019',
-        image: 'orange.jpg',
-        units: 0,
-      },
-      {
-        name: 'Banana',
-        description: 'Bananas are one of the most widely consumed fruits in the world for good reason.',
-        price: '0.015',
-        image: 'banana.jpg',
-        units: 0,
+        id: '3984823lkj23jl2kjelfkj',
+        owner: '0x0f023jflkj3je0fij20eijffijfeijiefj',
+        payout: '0x000s000jl2k3jf2130f23e0f0wdf02e0eef',
+        metaPtr: 'lk2jlkjlflkj3ljf3ljlf2kjelfkjl2kejfl',
+        state: 1,
+        replaces: '',
       },
     ],
   },
   mutations: {
-    setGrantUnits(state, grantUnits) {
-      const grant = state.grants.filter((item) => (item.name == grantUnits.name));
-      if (grant && grant.length > 0) {
-        grant[0].units = grantUnits.units;
-      }
-    },
     setContract(state, address) {
       state.contract = address;
     },
-    clearGrantUnits(state) {
-      const newGrants = state.grants.map((grant) => {
-        grant.units = 0;
-        return grant;
-      });
-      state.grants = newGrants;
+    setGrants(state, grants) {
+      state.grants = grants;
     },
   },
   getters: {
     totalAmount: (state) => state.grants.reduce((accumulator, currentValue) => (accumulator + Number(currentValue.units) * parseFloat(currentValue.price)), 0),
-    getGrantUnits: (state) => (name) => {
-      const grant = state.grants.filter((item) => (item.name == name));
-      if (grant && grant.length > 0) {
-        return grant[0].units;
-      }
-      return 0;
-    },
   },
   actions: {
 

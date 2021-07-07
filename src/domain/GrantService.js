@@ -3,6 +3,54 @@ import { GrantRegistry } from '../../dapp';
 import Web3 from './web3';
 
 class GrantService {
+  getAllGrants = async function (address) {
+    const web3 = await Web3();
+    if (!web3) {
+      return undefined;
+    }
+
+    let error;
+    try {
+      const contract = await new web3.eth.Contract(GrantRegistry.abi, address);
+      console.log('Created contract');
+      const grantCount = await contract.methods.getGrantCount().call();
+      console.log('Grant count: %s', grantCount);
+      debugger;
+      const grants = await contract.methods.getAllGrants().call();
+      console.log('Grants is:');
+      console.log(grants);
+      return grants;
+    } catch (e) {
+      error = e.message;
+    }
+
+    return error;
+  }
+
+  getAllGrantIds = async function (address) {
+    console.log('TESTING THIS');
+    const web3 = await Web3();
+    if (!web3) {
+      console.log('Failed to get web3 instance');
+      return undefined;
+    }
+    console.log('Created web3');
+
+    const contract = await new web3.eth.Contract(JSON.parse(GrantRegistry.abi), address);
+    console.log('Created contract from ABI');
+    const rawGrantIds = await contract.methods.getAllGrantIds().call();
+    console.log('HERE WE GO');
+    console.log(rawGrantIds);
+    var grantIds;
+
+    rawGrantIds.forEach((grantId, index) => {
+      grantIds[index] = web3.utils.hexToAscii(grantId)
+    })
+
+    return grantIds;
+  }
+
+
     createContract = async function () {
       const web3 = await Web3();
       if (!web3) {
@@ -10,8 +58,8 @@ class GrantService {
       }
 
       const accounts = await web3.eth.getAccounts();
-      const contract = await new web3.eth.Contract(JSON.parse(Payments.abi))
-        .deploy({ data: Payments.bytecode })
+      const contract = await new web3.eth.Contract(JSON.parse(GrantRegistry.abi))
+        .deploy({ data: GrantRegistry.bytecode })
         .send({ from: accounts[0] });
       return contract;
     }
@@ -35,7 +83,7 @@ class GrantService {
       let error;
       try {
         const accounts = await web3.eth.getAccounts();
-        const contract = await new web3.eth.Contract(JSON.parse(Payments.abi), address);
+        const contract = await new web3.eth.Contract(JSON.parse(GrantRegistry.abi), address);
         const value = web3.utils.toWei(String(amount), 'ether');
         await contract.methods.pay(reference, value).send({ from: accounts[0], value });
       } catch (e) {
@@ -54,7 +102,7 @@ class GrantService {
       let error;
       try {
         const accounts = await web3.eth.getAccounts();
-        const contract = await new web3.eth.Contract(JSON.parse(Payments.abi), address);
+        const contract = await new web3.eth.Contract(JSON.parse(GrantRegistry.abi), address);
         await contract.methods.withdraw().send({ from: accounts[0] });
       } catch (e) {
         error = e.message;
@@ -69,7 +117,7 @@ class GrantService {
         return undefined;
       }
 
-      const contract = await new web3.eth.Contract(JSON.parse(Payments.abi), address);
+      const contract = await new web3.eth.Contract(JSON.parse(GrantRegistry.abi), address);
       const count = await contract.methods.paymentsOf(account).call();
       const payments = await Promise.all(
         Array(parseInt(count))
@@ -121,4 +169,4 @@ class GrantService {
     }
 }
 
-export default GrantRegistry;
+export default GrantService;

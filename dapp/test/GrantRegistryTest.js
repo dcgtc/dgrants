@@ -1,6 +1,6 @@
 const assert = require('assert')
 const Web3 = require('web3')
-const Payments = require('../build/Payments')
+const Payments = require('../build/GrantRegistry')
 
 let web3 = new Web3(require('ganache-cli').provider())
 let accounts
@@ -10,8 +10,8 @@ beforeEach(async () => {
     assert(accounts);
 })
 
-describe('Dapp Payments', () => {
-    it ('Given Payment contract When pay then balance of contract increases the value of the payment', async () => {
+describe('Dapp GrantRegistry', () => {
+    it ('Given GrantRegistry contract When pay then balance of contract increases the value of the payment', async () => {
         const owner = accounts[0]
         const payer = accounts[1]
 
@@ -119,5 +119,5 @@ givenPaymentContract = async(creator) => {
             gas: estimatedGas + 1000
         })
 
-    return contract 
+    return contract
 }

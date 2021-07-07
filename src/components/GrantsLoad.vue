@@ -42,6 +42,7 @@ export default {
     },
     loadContract() {
       this.$store.commit('setContract', this.address);
+      console.log('Loading contract %s', this.address);
     },
   },
 };
