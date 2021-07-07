@@ -2,8 +2,6 @@
  * @dev User settings are managed here and persisted with localStorage
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { computed, ref } from 'vue';
 import nightwind from 'nightwind/helper';
 
@@ -15,7 +13,9 @@ const settings = {
 
 // Helper methods to load save items from local storage
 const load = (key: string) => window.localStorage.getItem(key);
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const save = (key: string, value: any) => window.localStorage.setItem(key, value);
+/* eslint-enable @typescript-eslint/no-explicit-any */
 
 // Shared state
 const lastWallet = ref<string>(); // name of last wallet used

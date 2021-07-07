@@ -10,8 +10,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/unbound-method */
-
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -19,7 +17,9 @@ export default defineComponent({
   name: 'Error404',
   setup() {
     const router = useRouter();
+    /* eslint-disable @typescript-eslint/unbound-method */
     return { routerPush: router.push, routerGo: router.go };
+    /* eslint-enable @typescript-eslint/unbound-method */
   },
 });
 </script>

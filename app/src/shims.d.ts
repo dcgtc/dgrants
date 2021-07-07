@@ -1,9 +1,9 @@
 // Shim for Vue composition API
-
-/* eslint-disable @typescript-eslint/no-explicit-any */
 declare module '*.vue' {
   import type { DefineComponent } from 'vue';
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>;
+  /* eslint-enable @typescript-eslint/no-explicit-any */
   export default component;
 }
 

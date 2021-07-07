@@ -20,8 +20,6 @@
  *     - https://v3.vuejs.org/api/basic-reactivity.html#markraw
  */
 
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
@@ -39,7 +37,9 @@ const defaultProvider = new JsonRpcProvider(RPC_URL);
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
 const supportedChainIds = [1, 4]; // chain IDs supported by this app
+/* eslint-disable @typescript-eslint/no-explicit-any */
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
+/* eslint-enable @typescript-eslint/no-explicit-any */
 const provider = ref<Web3Provider | JsonRpcProvider>(defaultProvider); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
@@ -114,9 +114,11 @@ export default function useWalletStore() {
   // ----------------------------------------------------- Actions -----------------------------------------------------
 
   // When user connects their wallet, we call this method to update the provider
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   function setProvider(p: any) {
     rawProvider.value = p;
   }
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 
   // Any actions or data to fetch dependent on user's wallet are done here
   async function configureProvider() {
