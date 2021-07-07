@@ -2,6 +2,8 @@
  * @dev User settings are managed here and persisted with localStorage
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { computed, ref } from 'vue';
 import nightwind from 'nightwind/helper';
 

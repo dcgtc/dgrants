@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 module.exports = {
   configureWebpack: {

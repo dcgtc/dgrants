@@ -42,7 +42,7 @@ export default function useDataStore() {
   // Call this method to poll now, then poll on each new block
   function startPolling() {
     const multicall = new Contract(MULTICALL_ADDRESS, MULTICALL_ABI, provider.value);
-    provider.value.on('block', () => void poll(multicall));
+    provider.value.on('block', (/* block: number */) => void poll(multicall));
   }
 
   return {

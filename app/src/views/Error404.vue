@@ -10,6 +10,8 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/unbound-method */
+
 import { defineComponent } from 'vue';
 import { useRouter } from 'vue-router';
 

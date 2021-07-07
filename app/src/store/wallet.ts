@@ -20,6 +20,8 @@
  *     - https://v3.vuejs.org/api/basic-reactivity.html#markraw
  */
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
