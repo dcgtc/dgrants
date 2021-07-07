@@ -1,6 +1,6 @@
 # Ethereum App Template
 
-Ethereum frontend app template with the following features:
+Ethereum frontend app built with the following stack:
 
 - [Vue 3](https://v3.vuejs.org/) as the foundation
 - [Tailwind CSS](https://tailwindcss.com) for styling
