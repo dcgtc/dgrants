@@ -1,69 +1,37 @@
 {
-  "name": "grant-explorer",
-  "version": "0.1.0",
+  "name": "dcgrants",
+  "version": "0.0.1",
   "private": true,
-  "scripts": {
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint",
-    "dapp:build": "node dapp/compile.js; mocha dapp/test",
-    "dapp:test": "mocha dapp/test"
-  },
-  "dependencies": {
-    "bootstrap": "^5.0.2",
-    "core-js": "^3.6.5",
-    "moment": "^2.29.1",
-    "vue": "^3.0.0",
-    "vue-router": "^4.0.10",
-    "vuex": "^4.0.0-0",
-    "web3": "^1.3.6"
-  },
-  "devDependencies": {
-    "@vue/cli-plugin-babel": "~4.5.0",
-    "@vue/cli-plugin-eslint": "~4.5.0",
-    "@vue/cli-plugin-router": "~4.5.0",
-    "@vue/cli-plugin-unit-mocha": "~4.5.0",
-    "@vue/cli-plugin-vuex": "~4.5.0",
-    "@vue/cli-service": "~4.5.0",
-    "@vue/compiler-sfc": "^3.0.0",
-    "@vue/eslint-config-airbnb": "^5.0.2",
-    "@vue/test-utils": "^2.0.0-0",
-    "babel-eslint": "^10.1.0",
-    "chai": "^4.1.2",
-    "eslint": "^6.7.2",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-vue": "^7.0.0",
-    "mocha": "^6.2.3",
-    "node-sass": "^6.0.1",
-    "sass-loader": "^10",
-    "solc": "^0.8.6"
-  },
-  "eslintConfig": {
-    "root": true,
-    "env": {
-      "node": true
-    },
-    "extends": [
-      "plugin:vue/essential",
-      "eslint:recommended"
-    ],
-    "rules": {
-      "no-console": "warn"
-    },
-    "parserOptions": {
-      "parser": "babel-eslint"
-    }
-  },
-  "postcss": {
-    "plugins": {
-      "autoprefixer": {}
-    }
-  },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions"
+  "workspaces": [
+    "contracts",
+    "app"
   ],
-  "keywords": [],
-  "license": "MIT"
+  "devDependencies": {
+    "eslint": "^7.24.0",
+    "eslint-config-prettier": "^8.2.0",
+    "husky": "^7.0.0",
+    "lerna": "^4.0.0",
+    "lint-staged": "^10.5.4",
+    "prettier": "^2.2.1",
+    "rimraf": "^3.0.2",
+    "typescript": "<4.1.0"
+  },
+  "scripts": {
+    "build": "lerna run build",
+    "clean": "lerna run clean",
+    "dev": "lerna run dev",
+    "lint": "lerna run lint",
+    "prettier": "lerna run prettier",
+    "prepare": "lerna run prepare && husky install",
+    "test": "lerna run test"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lerna run precommit"
+    }
+  },
+  "volta": {
+    "node": "14.16.1",
+    "yarn": "1.22.10"
+  }
 }

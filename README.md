@@ -1,56 +1,71 @@
-# grants
+# dcgrants
 
-## Project setup
-### Truffle
-`$ truffle develop`
+## Development
 
-or
+This project is a monorepo with two packages:
 
-Run Ganache
-then
-`$ truffle console --network ganache`
+- `contracts/` contains the smart contracts
+- `app/` is a frontend
 
-`$ truffle compile`
-and
-`$ truffle migrate`--reset
+### Dependencies
 
-or
+To ensure that everyone is using the same version of nodejs on this project, [volta](https://volta.sh) is recommended!
 
-`$ truffle migrate`--reset --compile-all
+### Set your env files
 
-### Vue
-```
-npm install
+Copy `app/.env.template` to `app/.env` and edit, providing your own env vars. You will have to supply a [Blocknative](https://www.blocknative.com/) API key and an [Infura](https://infura.io/) identifier. Both services have free tiers which are sufficient for development.
 
-To install the drizzle/vue-plugin you may have to do the following
-`$ npm install --legacy-peer-deps @drizzle/vue-plugin`
-`$ npm install --legacy-peer-deps vuex`
+```bash
+cp app/.env.template app/.env
 ```
 
-#### Compiles and hot-reloads for development
-```
-npm run serve
+Copy `contracts/.env.template` to `contracts/.env` and edit, providing your own env vars
+
+```bash
+cp contracts/.env.template contracts/.env
 ```
 
-#### Compiles and minifies for production
-```
-npm run build
-```
+You will have to supply an [Infura](https://infura.io/) identifier. An account with their free tier is sufficient for development.
 
-#### Run your unit tests
-```
-npm run test:unit
-```
+### Develop
 
-#### Lints and fixes files
-```
-npm run lint
+```sh
+yarn
+yarn dev
 ```
 
-#### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Lint
 
+```sh
+yarn lint
+```
 
-"0xCdF0b25D17356ccb34ACe7e27418DA1Bd81298fA","0x7d39759ec589ca32d75f86a4d25697132d9fea82f68d5dc9c254836340182b88","http://blah.com/hi.json"
+### Test
 
-"0x7d39759ec589ca32d75f86a4d25697132d9fea82f68d5dc9c254836340182b88","0xCdF0b25D17356ccb34ACe7e27418DA1Bd81298fA","0xCdF0b25D17356ccb34ACe7e27418DA1Bd81298fA","https://blah.com/blah.json","0","0x7de9759ece89ca92c7538624d25697132d9fea82f68d5dc9c254836340182b87"
+```sh
+yarn test
+```
+
+### Build
+
+```sh
+yarn build
+```
+
+#### Note: Subdirectory Development
+
+If you are working on one component or the other, you can `cd` into the appropriate subdirectory, and run commands defined in the corresponding `package.json` independently.
+
+For example, to run smart contract tests only:
+
+```bash
+cd contracts
+yarn test
+```
+
+or to start the frontend locally in development mode:
+
+```bash
+cd app
+yarn dev
+```

@@ -1,0 +1,37 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Use this directive to control where Tailwind injects the responsive variations of each utility */
+/* If omitted, Tailwind will append these classes to the very end of your stylesheet by default */
+@tailwind screens;
+
+/* Add styles to the base styles: https://tailwindcss.com/docs/adding-base-styles */
+@layer base {
+  #app-main {
+    @apply text-gray-700; /* Default font color */
+  }
+}
+
+/* Add styles to components */
+@layer components {
+  .btn {
+    @apply inline-block px-4 py-2 text-base font-medium border border-transparent rounded-md;
+  }
+  .btn-primary {
+    @apply font-medium text-white bg-primary-500 hover:bg-opacity-75 focus:outline-none;
+  }
+  .btn-secondary {
+    @apply font-medium text-primary-700 bg-primary-100 hover:bg-primary-200;
+  }
+  .btn-outline {
+    @apply font-medium text-primary-600 border border-primary-600 hover:bg-primary-50;
+  }
+  .btn-flat {
+    @apply font-medium text-primary-600 hover:bg-primary-50;
+  }
+}
+
+/* Add styles to utilities */
+@layer utilities {
+}
