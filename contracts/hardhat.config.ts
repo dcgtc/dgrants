@@ -28,7 +28,7 @@ const chainIds = {
 let mnemonic = process.env.MNEMONIC as string;
 if (!mnemonic) {
   console.warn('Please set your MNEMONIC in a .env file');
-  mnemonic = 'taxi taxi taxi taxi taxi taxi taxi taxi taxi taxi taxi taxi';
+  mnemonic = 'test test test test test test test test test test test junk';
 }
 
 let infuraApiKey = process.env.INFURA_ID as string;
