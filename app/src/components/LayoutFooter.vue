@@ -16,7 +16,7 @@
       <div class="mt-8 md:mt-0 md:order-1">
         <SunIcon v-if="isDark" @click="toggleDarkMode" class="h-5 w-5 text-gray-400 cursor-pointer" />
         <MoonIcon v-else @click="toggleDarkMode" class="h-5 w-5 text-gray-400 cursor-pointer" />
-        <p class="text-sm text-center text-gray-400 mt-2">&copy; 2020 ScopeLift. All rights reserved.</p>
+        <p class="text-sm text-center text-gray-400 mt-2">&copy; 2021 Gitcoin. All rights reserved.</p>
       </div>
     </div>
   </footer>
@@ -31,7 +31,7 @@ import useSettingsStore from 'src/store/settings';
 const navigation = [
   {
     name: 'Twitter',
-    href: 'https://twitter.com/ScopeLift',
+    href: 'https://twitter.com/gitcoin',
     icon: defineComponent({
       render: () =>
         h('svg', { fill: 'currentColor', viewBox: '0 0 24 24' }, [
@@ -43,7 +43,7 @@ const navigation = [
   },
   {
     name: 'GitHub',
-    href: 'https://github.com/ScopeLift',
+    href: 'https://github.com/dcgtc',
     icon: defineComponent({
       render: () =>
         h('svg', { fill: 'currentColor', viewBox: '0 0 24 24' }, [
