@@ -30,12 +30,13 @@ type Grant = GrantObject | GrantEthers;
 
 // --- GrantRegistry tests ---
 describe('GrantRegistry', function () {
-  let deployer: SignerWithAddress, user1: SignerWithAddress;
+  let deployer: SignerWithAddress, user1: SignerWithAddress, user2: SignerWithAddress;
   let registry: GrantRegistry;
 
   // Helper method to create a grant and return the data used to create it
-  async function createGrant(owner: string, payee: string, metaPtr: string) {
-    await registry.createGrant(owner, payee, metaPtr);
+  async function createGrant(owner: string, payee: string, metaPtr: string, user?: SignerWithAddress) {
+    user = user ? user : deployer; // if a signer, `user`, is not specified we use the `deployer` account
+    await registry.connect(user).createGrant(owner, payee, metaPtr);
     return { owner, payee, metaPtr };
   }
 
@@ -48,7 +49,7 @@ describe('GrantRegistry', function () {
   }
 
   beforeEach(async () => {
-    [deployer, user1] = await ethers.getSigners();
+    [deployer, user1, user2] = await ethers.getSigners();
 
     const grantRegistryArtifact: Artifact = await artifacts.readArtifact('GrantRegistry');
     registry = <GrantRegistry>await deployContract(deployer, grantRegistryArtifact);
@@ -61,10 +62,10 @@ describe('GrantRegistry', function () {
     });
   });
 
-  describe('Grant Creation', () => {
+  describe('Create Grants', () => {
     it('creates new grants', async function () {
       // Test first grant
-      const { owner, payee, metaPtr } = await createGrant(user1.address, randomAddress(), 'http://meta.com');
+      const { owner, payee, metaPtr } = await createGrant(user1.address, randomAddress(), randomPtr());
       const grantData = await registry.grants(0); // this is the first grant so has ID of 0
       expect(await registry.grantCount()).to.equal('1'); // 1 total grant
       expectEqualGrants(grantData, { id: BN(0), owner, payee, metaPtr });
@@ -88,10 +89,67 @@ describe('GrantRegistry', function () {
     });
 
     it('logs when grant is created', async function () {
-      const [owner, payee, metaPtr] = [user1.address, randomAddress(), 'http://meta.com'];
+      const [owner, payee, metaPtr] = [user1.address, randomAddress(), randomPtr()];
       await expect(registry.createGrant(owner, payee, metaPtr))
         .to.emit(registry, 'GrantCreated')
         .withArgs(0, owner, payee, metaPtr);
+    });
+  });
+
+  describe('Update Grants', () => {
+    // Define initial grant parameters
+    const id = BN(0);
+    let owner: string; // need to set in beforeEach hook (user1 is undefined here)
+    const payee = randomAddress();
+    const metaPtr = randomPtr();
+
+    beforeEach(async () => {
+      // Create grant with user1
+      owner = user1.address;
+      await createGrant(owner, payee, metaPtr, user1);
+      expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr });
+    });
+
+    it('reverts if unauthorized user tries to edit a grant', async () => {
+      const registryUser2 = await registry.connect(user2); // instance of registry contract with `user1` as signer
+      await expect(registryUser2.updateGrantOwner(id, owner)).to.be.revertedWith('Not authorized');
+      await expect(registryUser2.updateGrantPayee(id, payee)).to.be.revertedWith('Not authorized');
+      await expect(registryUser2.updateGrantMetaPtr(id, metaPtr)).to.be.revertedWith('Not authorized');
+      await expect(registryUser2.updateGrant(id, owner, payee, metaPtr)).to.be.revertedWith('Not authorized');
+    });
+
+    it('lets owner update owner', async () => {
+      const newOwner = randomAddress();
+      const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
+      const tx = await registryUser.updateGrantOwner(id, newOwner);
+      expectEqualGrants(await registry.grants(0), { id, owner: newOwner, payee, metaPtr });
+      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, newOwner, payee, metaPtr);
+    });
+
+    it('lets owner update payee', async () => {
+      const newPayee = randomAddress();
+      const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
+      const tx = await registryUser.updateGrantPayee(id, newPayee);
+      expectEqualGrants(await registry.grants(0), { id, owner, payee: newPayee, metaPtr });
+      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, owner, newPayee, metaPtr);
+    });
+
+    it('lets owner update metadata pointer', async () => {
+      const newMetaPtr = randomPtr();
+      const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
+      const tx = await registryUser.updateGrantMetaPtr(id, newMetaPtr);
+      expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr: newMetaPtr });
+      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, owner, payee, newMetaPtr);
+    });
+
+    it('lets owner update all grant fields at once', async () => {
+      const newGrant = { id: BN(0), owner: randomAddress(), payee: randomAddress(), metaPtr: randomPtr() };
+      const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
+      const tx = await registryUser.updateGrant(id, newGrant.owner, newGrant.payee, newGrant.metaPtr);
+      expectEqualGrants(await registry.grants(0), newGrant);
+      await expect(tx)
+        .to.emit(registry, 'GrantUpdated')
+        .withArgs(newGrant.id, newGrant.owner, newGrant.payee, newGrant.metaPtr);
     });
   });
 

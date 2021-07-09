@@ -14,11 +14,14 @@ contract GrantRegistry {
   }
 
   /// @notice Mapping from Grant ID to grant data
-  mapping(uint96 => Grant) public grants; // TODO use an array instead with ID to index it? Which is better?
+  mapping(uint96 => Grant) public grants; // TODO use an array instead with ID to index it? Which is better? Will array copy full array to memory in `getAllGrants`?
 
   // --- Events ---
   /// @notice Emitted when a new grant is created
   event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, string metaPtr);
+
+  /// @notice Emitted when a grant's owner is changed
+  event GrantUpdated(uint96 indexed id, address indexed owner, address indexed payee, string metaPtr);
 
   // --- Core methods ---
   /**
@@ -36,6 +39,64 @@ contract GrantRegistry {
     grants[_id] = Grant(_id, _owner, _payee, _metaPtr);
     emit GrantCreated(_id, _owner, _payee, _metaPtr);
     grantCount += 1;
+  }
+
+  /**
+   * @notice Update the owner of a grant
+   * @param _id ID of grant to update
+   * @param _owner New owner address
+   */
+  function updateGrantOwner(uint96 _id, address _owner) external {
+    Grant storage grant = grants[_id];
+    require(msg.sender == grant.owner, "Not authorized");
+    grant.owner = _owner;
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+  }
+
+  /**
+   * @notice Update the payee of a grant
+   * @param _id ID of grant to update
+   * @param _payee New payee address
+   */
+  function updateGrantPayee(uint96 _id, address _payee) external {
+    Grant storage grant = grants[_id];
+    require(msg.sender == grant.owner, "Not authorized");
+    grant.payee = _payee;
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+  }
+
+  /**
+   * @notice Update the payee of a grant
+   * @param _id ID of grant to update
+   * @param _metaPtr New URL that points to grant metadata
+   */
+  function updateGrantMetaPtr(uint96 _id, string calldata _metaPtr) external {
+    Grant storage grant = grants[_id];
+    require(msg.sender == grant.owner, "Not authorized");
+    grant.metaPtr = _metaPtr;
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+  }
+
+  /**
+   * @notice Update multiple fields of a grant at once
+   * @dev To leave a field unchanged, you must pass in the same value as the current value
+   * @param _id ID of grant to update
+   * @param _owner New owner address
+   * @param _payee New payee address
+   * @param _metaPtr New URL that points to grant metadata
+   */
+  function updateGrant(
+    uint96 _id,
+    address _owner,
+    address _payee,
+    string calldata _metaPtr
+  ) external {
+    Grant storage grant = grants[_id];
+    require(msg.sender == grant.owner, "Not authorized");
+    grant.owner = _owner;
+    grant.payee = _payee;
+    grant.metaPtr = _metaPtr;
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
   }
 
   // --- View functions ---
