@@ -2,69 +2,62 @@ pragma solidity ^0.8.5;
 
 contract GrantRegistry {
   // --- Data ---
-  // Grant ID - The hash of the grants meetadata
-  bytes32 public grantRegistryId;
+  /// @notice Number of grants stored in this registry
+  uint96 public grantCount;
 
-  // Metadata Pointer
-  string public metaPtr;
-
-  // Grant Pointer Object
+  /// @notice Grant object
   struct Grant {
-    bytes32 id;
-    address owner;
-    address payee;
-    string metaPtr;
-    bytes32 replaces;
+    uint96 id; // grant ID, as uint96 to pack into same slot as owner (this implies a max of 2^96-1 = 7.9e28 grants)
+    address owner; // grant owner (has permissions to modify grant information)
+    address payee; // address that receives funds donated to this grant
+    string metaPtr; // URL pointing to grant metadata (for off-chain use)
   }
 
-  // Mapping from GrantID to set of Owner Address, Payout Address, Metadata Pointer, Replaces Grant (optional)
-  // TODO: Implement safemath for avoiding overflows with ints
-  uint256 public grantCount = 0;
-  mapping(bytes32 => Grant) public grants;
-  bytes32[] public grantIds;
+  /// @notice Mapping from Grant ID to grant data
+  mapping(uint96 => Grant) public grants; // TODO use an array instead with ID to index it? Which is better?
 
   // --- Events ---
-  // When a great is created
-  event NewGrant(bytes32 indexed _id, address indexed _owner, address indexed _payout, bytes32 _replaces);
+  /// @notice Emitted when a new grant is created
+  event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, string metaPtr);
 
-  // --- Constructor ---
-  constructor(bytes32 _grantRegistryId, string memory _metaPtr) {
-    grantRegistryId = _grantRegistryId;
-    metaPtr = _metaPtr;
-  }
-
-  // --- Functions ---
-
-  function getAllGrantIds() public view returns (bytes32[] memory) {
-    bytes32[] memory ret = new bytes32[](grantCount);
-    for (uint256 i = 0; i < grantCount; i++) {
-      ret[i] = grantIds[i];
-    }
-    return grantIds;
-  }
-
-  function getAllGrants() public view returns (Grant[] memory) {
-    Grant[] memory ret = new Grant[](grantCount);
-    bytes32 grantId;
-    for (uint256 i = 0; i < grantCount; i++) {
-      grantId = grantIds[i];
-      ret[i] = grants[grantId];
-    }
-    return ret;
-  }
-
-  // Allow creation of a grant and setting the initial parameters
-  function _mint(
-    bytes32 _id,
+  // --- Core methods ---
+  /**
+   * @notice Create a new grant in the registry
+   * @param _owner Grant owner (has permissions to modify grant information)
+   * @param _payee Address that receives funds donated to this grant
+   * @param _metaPtr URL pointing to grant metadata (for off-chain use)
+   */
+  function createGrant(
     address _owner,
-    address _payout,
-    string memory _metaPtr,
-    bytes32 _replaces
-  ) public {
+    address _payee,
+    string memory _metaPtr
+  ) external {
+    uint96 _id = grantCount;
+    grants[_id] = Grant(_id, _owner, _payee, _metaPtr);
+    emit GrantCreated(_id, _owner, _payee, _metaPtr);
     grantCount += 1;
-    grants[_id] = Grant(_id, _owner, _payout, _metaPtr, _replaces);
-    grantIds.push(_id);
-    // Emit an event here for grant minted
-    emit NewGrant(_id, _owner, _payout, _replaces);
+  }
+
+  // --- View functions ---
+  /**
+   * @notice Returns an array of all grants and their on-chain data
+   * @dev May run out of gas for large values `grantCount`, depending on the node's RpcGasLimit. In these cases,
+   * `getGrants` can be used to fetch a subset of grants and aggregate the results of various calls off-chain
+   */
+  function getAllGrants() public view returns (Grant[] memory) {
+    return getGrants(0, grantCount);
+  }
+
+  /**
+   * @notice Returns a range of grants and their on-chain data
+   * @param _startId Grant ID of first grant to return, inclusive, i.e. this grant ID is included in return data
+   * @param _endId Grant ID of last grant to return, exclusive, i.e. this grant ID is NOT included in return data
+   */
+  function getGrants(uint96 _startId, uint96 _endId) public view returns (Grant[] memory) {
+    Grant[] memory returnData = new Grant[](_endId - _startId);
+    for (uint96 i = _startId; i < _endId; i++) {
+      returnData[i - _startId] = grants[i]; // use index of `i - _startId` so index starts at zero
+    }
+    return returnData;
   }
 }
