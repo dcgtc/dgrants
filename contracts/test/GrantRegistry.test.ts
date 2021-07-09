@@ -18,7 +18,7 @@ describe('GrantRegistry', function () {
     [owner] = await hre.ethers.getSigners();
 
     const grantRegistryArtifact: Artifact = await hre.artifacts.readArtifact('GrantRegistry');
-    registry = <GrantRegistry>await deployContract(owner, grantRegistryArtifact, [owner.address, EMPTY_BYTES32, '']);
+    registry = <GrantRegistry>await deployContract(owner, grantRegistryArtifact, [EMPTY_BYTES32, '']);
   });
 
   it('should be properly deployed', async function () {
