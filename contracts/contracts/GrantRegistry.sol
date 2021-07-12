@@ -1,5 +1,13 @@
 pragma solidity ^0.8.5;
 
+/**
+ * @notice The Gitcoin GrantRegistry contract keeps track of all grants that have been created.
+ * It is designed to be a singleton, i.e. there is only one instance of a GrantRegistry which
+ * tracks all grants. It behaves as follows:
+ *   - Anyone can create a grant by calling `createGrant`
+ *   - A grant's `owner` can edit their grant using the `updateGrant` family of method
+ *   - The `getAllGrants` and `getGrants` view methods are used to fetch grant data
+ */
 contract GrantRegistry {
   // --- Data ---
   /// @notice Number of grants stored in this registry
@@ -66,7 +74,7 @@ contract GrantRegistry {
   }
 
   /**
-   * @notice Update the payee of a grant
+   * @notice Update the metadata pointer of a grant
    * @param _id ID of grant to update
    * @param _metaPtr New URL that points to grant metadata
    */
@@ -105,7 +113,7 @@ contract GrantRegistry {
    * @dev May run out of gas for large values `grantCount`, depending on the node's RpcGasLimit. In these cases,
    * `getGrants` can be used to fetch a subset of grants and aggregate the results of various calls off-chain
    */
-  function getAllGrants() public view returns (Grant[] memory) {
+  function getAllGrants() external view returns (Grant[] memory) {
     return getGrants(0, grantCount);
   }
 
@@ -115,10 +123,10 @@ contract GrantRegistry {
    * @param _endId Grant ID of last grant to return, exclusive, i.e. this grant ID is NOT included in return data
    */
   function getGrants(uint96 _startId, uint96 _endId) public view returns (Grant[] memory) {
-    Grant[] memory returnData = new Grant[](_endId - _startId);
+    Grant[] memory grantList = new Grant[](_endId - _startId);
     for (uint96 i = _startId; i < _endId; i++) {
-      returnData[i - _startId] = grants[i]; // use index of `i - _startId` so index starts at zero
+      grantList[i - _startId] = grants[i]; // use index of `i - _startId` so index starts at zero
     }
-    return returnData;
+    return grantList;
   }
 }
