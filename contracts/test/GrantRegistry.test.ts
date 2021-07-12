@@ -7,6 +7,7 @@ import { expect } from 'chai';
 
 // --- Our imports ---
 import { GrantRegistry } from '../typechain/GrantRegistry';
+import { expectEqualGrants } from './utils';
 
 // --- Parse and define helpers ---
 const { deployContract } = waffle;
@@ -14,19 +15,6 @@ const { isAddress } = ethers.utils;
 const randomAddress = () => ethers.Wallet.createRandom().address;
 const randomPtr = () => String(Math.random()); // doesn't need to be a valid URL for testing
 const BN = (x: BigNumberish) => BigNumber.from(x);
-
-// --- Type definitions ---
-// The output from ethers/typechain allows array or object access to grant data, so we must define types for
-// handling the Grant struct as done below
-type GrantObject = {
-  id: BigNumber;
-  owner: string;
-  payee: string;
-  metaPtr: string;
-};
-type GrantArray = [BigNumber, string, string, string];
-type GrantEthers = GrantArray & GrantObject;
-type Grant = GrantObject | GrantEthers;
 
 // --- GrantRegistry tests ---
 describe('GrantRegistry', function () {
@@ -38,14 +26,6 @@ describe('GrantRegistry', function () {
     user = user ? user : deployer; // if a signer, `user`, is not specified we use the `deployer` account
     await registry.connect(user).createGrant(owner, payee, metaPtr);
     return { owner, payee, metaPtr };
-  }
-
-  // Helper method to verify that two Grant objects are equal
-  function expectEqualGrants(grant1: Grant, grant2: Grant) {
-    expect(grant1.id).to.equal(grant2.id);
-    expect(grant1.owner).to.equal(grant2.owner);
-    expect(grant1.payee).to.equal(grant2.payee);
-    expect(grant1.metaPtr).to.equal(grant2.metaPtr);
   }
 
   beforeEach(async () => {
