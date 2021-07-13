@@ -3,6 +3,7 @@ export const RPC_URL = `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFU
 
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ADDRESS = '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696'; // applies to mainnet, rinkeby, goerli, ropsten, kovan
+
 export const MULTICALL_ABI = [
   'function getCurrentBlockTimestamp() view returns (uint256 timestamp)',
   'function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)',

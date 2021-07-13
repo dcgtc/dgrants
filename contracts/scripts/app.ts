@@ -10,9 +10,6 @@
 import { ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
 
-// --- Our imports ---
-import { GrantRegistry } from '../typechain/GrantRegistry';
-
 // --- Constants ---
 // Define grants to create (addresses are random)
 const grants = [
@@ -38,16 +35,16 @@ async function main(): Promise<void> {
   // Only run on Hardhat network
   if (network.name !== 'localhost') throw new Error('This script is for use with a running local node');
 
+  // --- GrantRegistry Setup ---
   // Deploy contract
-  const GrantRegistryFactory: ContractFactory = await ethers.getContractFactory('GrantRegistry');
-  const registry = <GrantRegistry>await GrantRegistryFactory.deploy();
-  await registry.deployed();
+  const [deployer] = await ethers.getSigners();
+  const GrantRegistryFactory: ContractFactory = await ethers.getContractFactory('GrantRegistry', deployer);
+  const registry = await (await GrantRegistryFactory.deploy()).deployed();
   console.log(`Deployed GrantRegistry to ${registry.address}`);
 
   // Create the grants
   await Promise.all(grants.map((grant) => registry.createGrant(grant.owner, grant.payee, grant.metaPtr)));
   console.log(`Created ${grants.length} dummy grants`);
-  console.log('✅ Setup complete!');
 }
 
 // --- Execute main() ---

@@ -16,13 +16,10 @@ Ethereum frontend app built with the following stack:
 # Install packages
 yarn install
 
-# Start local node and fill contract with dummy data (must be run before `yarn dev`)
+# Run in development mode (start local node and fills contract with dummy data)
 cd ../contracts
 yarn app:node
-yarn app:setup
 cd ../app
-
-# Run in development mode
 yarn dev
 
 # Compiles and minifies for production
