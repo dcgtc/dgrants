@@ -54,18 +54,16 @@ yarn build
 
 #### Note: Subdirectory Development
 
-If you are working on one component or the other, you can `cd` into the appropriate subdirectory, and run commands defined in the corresponding `package.json` independently.
+If you are working on one component or the other, you can use workspace aliases to run commands defined in the corresponding `package.json` independently.
 
 For example, to run smart contract tests only:
 
 ```bash
-cd contracts
-yarn test
+yarn contracts test
 ```
 
 or to start the frontend locally in development mode:
 
 ```bash
-cd app
-yarn dev
+yarn app dev
 ```
