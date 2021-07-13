@@ -1,7 +1,7 @@
 {
-    "packages": ["contracts", "app"],
-    "npmClient": "yarn",
-    "version": "independent",
-    "useWorkspaces": true,
-    "stream": true
+  "packages": ["app", "contracts", "types"],
+  "npmClient": "yarn",
+  "version": "independent",
+  "useWorkspaces": true,
+  "stream": true
 }

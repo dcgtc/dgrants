@@ -1,4 +1,4 @@
-# dcgrants
+# dgrants
 
 ## Development
 

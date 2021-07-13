@@ -1,4 +1,4 @@
-# @dcgrants/contracts
+# @dgrants/contracts
 
 ## Usage
 
