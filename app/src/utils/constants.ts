@@ -3,7 +3,6 @@ export const RPC_URL = `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFU
 
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ADDRESS = '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696'; // applies to mainnet, rinkeby, goerli, ropsten, kovan
-
 export const MULTICALL_ABI = [
   'function getCurrentBlockTimestamp() view returns (uint256 timestamp)',
   'function aggregate(tuple(address target, bytes callData)[] calls) view returns (uint256 blockNumber, bytes[] returnData)',
@@ -16,3 +15,7 @@ export const MULTICALL_ABI = [
   'function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) public view returns (tuple(bool success, bytes returnData)[] returnData)',
   'function tryBlockAndAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) public view returns (uint256 blockNumber, bytes32 blockHash, tuple(bool success, bytes returnData)[] returnData)',
 ];
+
+// Data for Grants contracts
+export const GRANT_REGISTRY_ADDRESS = '0x70e0bA845a1A0F2DA3359C97E0285013525FFC49';
+export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
