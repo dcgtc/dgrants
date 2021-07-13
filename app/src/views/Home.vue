@@ -4,7 +4,6 @@
   <div v-if="userDisplayName">
     <div>Block number: {{ blockNumber }}</div>
     <div>Date: {{ date }}</div>
-    <div>Balance: {{ balance }} ETH</div>
   </div>
 
   <div class="mt-3">
@@ -29,13 +28,12 @@ export default defineComponent({
       router.push({ name });
     }
 
-    const { lastBlockNumber, lastBlockTimestamp, ethBalance } = useDataStore();
+    const { lastBlockNumber, lastBlockTimestamp } = useDataStore();
     const { userDisplayName, network } = useWalletStore();
 
     const blockNumber = computed(() => commify(lastBlockNumber.value));
     const date = computed(() => new Date(lastBlockTimestamp.value * 1000).toLocaleString());
-    const balance = computed(() => (ethBalance.value ? Number(formatUnits(ethBalance.value)).toFixed(4) : 0));
-    return { push, userDisplayName, network, blockNumber, date, balance, formatUnits };
+    return { push, userDisplayName, network, blockNumber, date, formatUnits };
   },
 });
 </script>
