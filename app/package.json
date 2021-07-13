@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
-    "dev": "cd ../contracts && yarn app:setup && cd ../app && vite",
+    "dev": "vite",
     "build": "vue-tsc --noEmit && vite build",
     "serve": "vite preview",
     "test:unit": "vue-cli-service test:unit",
