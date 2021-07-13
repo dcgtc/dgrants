@@ -36,7 +36,7 @@ const defaultProvider = new JsonRpcProvider(RPC_URL);
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
-const supportedChainIds = [1, 4]; // chain IDs supported by this app
+const supportedChainIds = [1, 4, 31337]; // chain IDs supported by this app
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
 /* eslint-enable @typescript-eslint/no-explicit-any */
