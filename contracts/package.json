@@ -58,7 +58,9 @@
     "precommit": "lint-staged",
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
     "test": "hardhat test",
-    "typechain": "hardhat typechain"
+    "typechain": "hardhat typechain",
+    "app:node": "hardhat node",
+    "app:setup": "hardhat run scripts/app.ts --network localhost"
   },
   "volta": {
     "extends": "../package.json"
