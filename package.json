@@ -24,7 +24,10 @@
     "lint": "lerna run lint",
     "prettier": "lerna run prettier",
     "prepare": "lerna run prepare && husky install",
-    "test": "lerna run test"
+    "test": "lerna run test",
+    "app": "yarn workspace @dgrants/app",
+    "contracts": "yarn workspace @dgrants/contracts",
+    "types": "yarn workspace @dgrants/types"
   },
   "husky": {
     "hooks": {

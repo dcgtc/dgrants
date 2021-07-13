@@ -1,12 +1,13 @@
 {
   "name": "@dgrants/types",
   "version": "0.0.1",
-  "types": "./index.d.ts",
+  "types": "src/index.d.ts",
   "scripts": {
     "build": "tsc -b .",
     "clean": "rimraf dist *.tsbuildinfo",
-    "lint": "eslint src --ext js,ts,vue",
-    "prettier": "prettier --write ."
+    "lint": "eslint src --ext ts",
+    "prettier": "prettier --write .",
+    "precommit": "lint-staged"
   },
   "devDependencies": {
     "ethers": "^5.0.32",
