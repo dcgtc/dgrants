@@ -35,8 +35,11 @@
     "typechain": "^4.0.1"
   },
   "files": [
-    "/contracts"
+    "artifacts",
+    "contracts",
+    "typechain"
   ],
+  "types": "typechain/index.ts",
   "keywords": [
     "blockchain",
     "ethereum",
