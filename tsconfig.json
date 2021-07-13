@@ -1,8 +1,9 @@
 {
   "files": [],
   "references": [
+    { "path": "app" },
     { "path": "contracts" },
-    { "path": "app" }
+    { "path": "types" }
   ],
   "exclude": ["node_modules"]
 }

@@ -1,10 +1,11 @@
 {
-  "name": "dcgrants",
+  "name": "dgrants",
   "version": "0.0.1",
   "private": true,
   "workspaces": [
+    "app",
     "contracts",
-    "app"
+    "types"
   ],
   "devDependencies": {
     "eslint": "^7.24.0",
