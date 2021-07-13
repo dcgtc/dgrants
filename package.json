@@ -8,6 +8,7 @@
     "types"
   ],
   "devDependencies": {
+    "concurrently": "^6.2.0",
     "eslint": "^7.24.0",
     "eslint-config-prettier": "^8.2.0",
     "husky": "^7.0.0",
@@ -20,7 +21,8 @@
   "scripts": {
     "build": "lerna run build",
     "clean": "lerna run clean",
-    "dev": "lerna run dev",
+    "node": "yarn contracts app:node",
+    "dev": "concurrently --kill-others \"yarn run node\" \"yarn contracts app:setup && yarn app dev\"",
     "lint": "lerna run lint",
     "prettier": "lerna run prettier",
     "prepare": "lerna run prepare && husky install",

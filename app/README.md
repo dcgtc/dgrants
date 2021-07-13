@@ -12,14 +12,17 @@ Ethereum frontend app built with the following stack:
 
 ## Setup
 
+For local testing, add a network to MetaMask with the following information:
+
+- Name: Hardhat
+- New RPC URL: https://127.0.0.1:8545
+- Chain ID: 31337
+
 ```sh
 # Install packages
 yarn install
 
-# Run in development mode (start local node and fills contract with dummy data)
-cd ../contracts
-yarn app:node
-cd ../app
+# Run in development mode (run this fom the repo root)
 yarn dev
 
 # Compiles and minifies for production
