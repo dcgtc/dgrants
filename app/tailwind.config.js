@@ -15,5 +15,5 @@ module.exports = {
   variants: {
     extend: {},
   },
-  plugins: [require('nightwind')],
+  plugins: [require('@tailwindcss/forms'), require('nightwind')],
 };
