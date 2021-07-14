@@ -43,7 +43,7 @@ const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP
 const provider = ref<Web3Provider | JsonRpcProvider>(defaultProvider); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
-const userEns = ref<string>(); // user's ENS name
+const userEns = ref<string | null>(); // user's ENS name
 const network = ref<Network>(); // connected network, derived from provider
 
 // Reset state when, e.g.user switches wallets. Provider/signer are automatically updated by ethers so are not cleared
@@ -146,8 +146,8 @@ export default function useWalletStore() {
       return;
     }
 
-    // Get ENS name
-    const _userEns = await _provider.lookupAddress(_userAddress);
+    // Get ENS name if we're on mainnet
+    const _userEns = _network.chainId === 1 ? await _provider.lookupAddress(_userAddress) : null;
 
     // Now we save the user's info to the store. We don't do this earlier because the UI is reactive based on these
     // parameters, and we want to ensure this method completed successfully before updating the UI

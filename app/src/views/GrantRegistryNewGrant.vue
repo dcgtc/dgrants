@@ -11,10 +11,10 @@
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
       <div class="py-8 px-4 border shadow sm:rounded-lg sm:px-6">
-        <form class="space-y-6" action="#" method="POST">
+        <form class="space-y-6" @submit.prevent="createGrant">
           <!-- Owner address -->
           <BaseInput
-            v-model="owner"
+            v-model="form.owner"
             description="The owner has permission to edit the grant"
             id="owner-address"
             label="Owner address"
@@ -23,7 +23,7 @@
 
           <!-- Payee address -->
           <BaseInput
-            v-model="payee"
+            v-model="form.payee"
             description="The address contributions and matching funds are sent to"
             id="payee-address"
             label="Payee address"
@@ -32,7 +32,7 @@
 
           <!-- Metadata pointer -->
           <BaseInput
-            v-model="metaPtr"
+            v-model="form.metaPtr"
             description="URL containing additional details about this grant"
             id="metadata-url"
             label="Metadata URL"
@@ -50,16 +50,56 @@
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
 import BaseInput from 'src/components/BaseInput.vue';
+// --- Store ---
+import useDataStore from 'src/store/data';
+import useWalletStore from 'src/store/wallet';
+// --- Methods and Data ---
+import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
+import { Contract } from 'src/utils/ethers';
+import { pushRoute } from 'src/utils/utils';
+// --- Types ---
+import { GrantRegistry } from '@dgrants/contracts';
+
+function useNewGrant() {
+  const { signer } = useWalletStore();
+  const { poll } = useDataStore();
+
+  // Define form fields
+  const form = ref<{ owner: string | undefined; payee: string | undefined; metadata: string | undefined }>({
+    owner: undefined,
+    payee: undefined,
+    metaPtr: undefined,
+  });
+
+  /**
+   * @notice Creates a new grant, parses logs for the Grant ID, and navigates to that grant's page
+   */
+  async function createGrant() {
+    // Send transaction
+    if (!signer.value) throw new Error('Please connect a wallet');
+    const { owner, payee, metaPtr } = form.value;
+    // TODO validate form inputs
+    const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
+    const tx = await registry.createGrant(owner, payee, metaPtr);
+    await tx.wait();
+
+    // Parse receipt to find the grant ID
+    const receipt = await signer.value.provider.getTransactionReceipt(tx.hash);
+    const log = registry.interface.parseLog(receipt.logs[0]); // there is only one emitted event
+
+    // Poll so the store has the latest data, then navigate to the grant page
+    await poll();
+    await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
+  }
+
+  return { createGrant, form };
+}
 
 export default defineComponent({
   name: 'GrantRegistryNewGrant',
   components: { BaseInput },
   setup() {
-    const isOwnerValid = ref(false);
-    const owner = ref();
-    const payee = ref();
-    const metaPtr = ref();
-    return { isOwnerValid, owner, payee, metaPtr };
+    return { ...useNewGrant() };
   },
 });
 </script>
