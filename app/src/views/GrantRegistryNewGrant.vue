@@ -12,33 +12,35 @@
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
       <div class="py-8 px-4 border shadow sm:rounded-lg sm:px-6">
         <form class="space-y-6" action="#" method="POST">
-          <div>
-            <label for="owner" class="block text-sm font-medium text-gray-700"> Owner address </label>
-            <p class="text-gray-500 text-sm">The owner has permission to edit the grant</p>
-            <div class="mt-1">
-              <input id="owner" name="owner" type="owner" required class="input" />
-            </div>
-          </div>
+          <!-- Owner address -->
+          <BaseInput
+            v-model="owner"
+            description="The owner has permission to edit the grant"
+            id="owner-address"
+            label="Owner address"
+            errorMsg="Please enter a valid address"
+          />
 
-          <div>
-            <label for="payee" class="block text-sm font-medium text-gray-700"> Payee address </label>
-            <p class="text-gray-500 text-sm">The address contributions and matching funds are sent to</p>
-            <div class="mt-1">
-              <input id="payee" name="payee" type="payee" required class="input" />
-            </div>
-          </div>
+          <!-- Payee address -->
+          <BaseInput
+            v-model="payee"
+            description="The address contributions and matching funds are sent to"
+            id="payee-address"
+            label="Payee address"
+            errorMsg="Please enter a valid address"
+          />
 
-          <div>
-            <label for="metadataUrl" class="block text-sm font-medium text-gray-700"> Metadata URL </label>
-            <p class="text-gray-500 text-sm">URL containing additional details about this grant</p>
-            <div class="mt-1">
-              <input id="metadataUrl" name="metadataUrl" type="metadataUrl" required class="input" />
-            </div>
-          </div>
+          <!-- Metadata pointer -->
+          <BaseInput
+            v-model="metaPtr"
+            description="URL containing additional details about this grant"
+            id="metadata-url"
+            label="Metadata URL"
+            errorMsg="Please enter a valid URL"
+          />
 
-          <div>
-            <button type="submit" class="btn btn-primary w-full">Create Grant</button>
-          </div>
+          <!-- Submit button -->
+          <button type="submit" class="btn btn-primary w-full">Create Grant</button>
         </form>
       </div>
     </div>
@@ -46,9 +48,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref } from 'vue';
+import BaseInput from 'src/components/BaseInput.vue';
 
 export default defineComponent({
   name: 'GrantRegistryNewGrant',
+  components: { BaseInput },
+  setup() {
+    const isOwnerValid = ref(false);
+    const owner = ref();
+    const payee = ref();
+    const metaPtr = ref();
+    return { isOwnerValid, owner, payee, metaPtr };
+  },
 });
 </script>
