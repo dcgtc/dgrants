@@ -15,7 +15,7 @@
  * Read more at https://github.com/vitejs/vite/issues/731
  */
 
-export { getAddress } from '@ethersproject/address';
+export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
 export { Contract } from '@ethersproject/contracts';
 export type { Network } from '@ethersproject/networks';

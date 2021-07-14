@@ -18,6 +18,7 @@
             description="The owner has permission to edit the grant"
             id="owner-address"
             label="Owner address"
+            :rules="isAddress"
             errorMsg="Please enter a valid address"
           />
 
@@ -27,6 +28,7 @@
             description="The address contributions and matching funds are sent to"
             id="payee-address"
             label="Payee address"
+            :rules="isAddress"
             errorMsg="Please enter a valid address"
           />
 
@@ -36,11 +38,19 @@
             description="URL containing additional details about this grant"
             id="metadata-url"
             label="Metadata URL"
+            :rules="isValidUrl"
             errorMsg="Please enter a valid URL"
           />
 
           <!-- Submit button -->
-          <button type="submit" class="btn btn-primary w-full">Create Grant</button>
+          <button
+            type="submit"
+            class="btn btn-primary w-full"
+            :class="{ 'btn-primary-disabled': !isFormValid }"
+            :disabled="!isFormValid"
+          >
+            Create Grant
+          </button>
         </form>
       </div>
     </div>
@@ -48,14 +58,14 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import BaseInput from 'src/components/BaseInput.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
-import { Contract } from 'src/utils/ethers';
+import { Contract, isAddress } from 'src/utils/ethers';
 import { pushRoute } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
@@ -64,12 +74,16 @@ function useNewGrant() {
   const { signer } = useWalletStore();
   const { poll } = useDataStore();
 
-  // Define form fields
+  // Define form fields and parameters
   const form = ref<{ owner: string | undefined; payee: string | undefined; metadata: string | undefined }>({
     owner: undefined,
     payee: undefined,
     metaPtr: undefined,
   });
+  const isValidUrl = (val: string) => val && val.includes('://'); // TODO more robust URL validation
+  const isFormValid = computed(
+    () => isAddress(form.value.owner) && isAddress(form.value.payee) && isValidUrl(form.value.metaPtr)
+  );
 
   /**
    * @notice Creates a new grant, parses logs for the Grant ID, and navigates to that grant's page
@@ -92,7 +106,7 @@ function useNewGrant() {
     await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
-  return { createGrant, form };
+  return { createGrant, isAddress, isValidUrl, isFormValid, form };
 }
 
 export default defineComponent({
