@@ -7,7 +7,7 @@
   </div>
 
   <div class="mt-3">
-    <button @click="pushRoute('dgrants')" class="btn btn-primary mr-3">Grants Registry</button>
+    <button @click="pushRoute({ name: 'dgrants' })" class="btn btn-primary mr-3">Grants Registry</button>
   </div>
 </template>
 

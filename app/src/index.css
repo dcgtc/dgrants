@@ -30,6 +30,10 @@
   .btn-flat {
     @apply font-medium text-primary-600 hover:bg-primary-50;
   }
+
+  .link {
+    @apply text-primary-600 underline cursor-pointer;
+  }
 }
 
 /* Add styles to utilities */
