@@ -4,7 +4,7 @@
     <p :for="id" class="text-gray-500 text-sm">{{ description }}</p>
     <div class="mt-1 relative">
       <input
-        v-model="value"
+        v-model="val"
         @input="onInput"
         :class="{ 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': !isValid }"
         class="
@@ -27,7 +27,7 @@
         :type="type"
       />
       <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-        <ExclamationCircleIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+        <ExclamationCircleIcon class="h-5 w-5 text-red-500" />
       </div>
     </div>
     <p v-if="!isValid" class="mt-2 text-sm text-red-600" :id="`${id}-error`">{{ errorMsg }}</p>
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { computed, defineComponent, ref } from 'vue';
 import { ExclamationCircleIcon } from '@heroicons/vue/solid';
 
 export default defineComponent({
@@ -52,7 +52,7 @@ export default defineComponent({
     placeholder: { type: String, required: false, default: undefined }, // input placeholder text
     type: { type: String, required: false, default: 'text' }, // input type
     rules: {
-      // Validation rules, as a function that returns a bool
+      // Validation rules, as a function that takes one input and returns a bool
       type: Function,
       required: false,
       default: () => true,
@@ -60,11 +60,12 @@ export default defineComponent({
   },
 
   setup(props, context) {
-    const isValid = ref(true);
+    const val = ref<any>(); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const isValid = computed(() => (val.value ? props.rules(val.value) : true)); // assume valid if field is empty
     function onInput() {
-      context.emit('update:modelValue', this.value);
+      context.emit('update:modelValue', val.value);
     }
-    return { onInput, isValid };
+    return { onInput, isValid, val };
   },
 });
 </script>
