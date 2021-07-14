@@ -7,8 +7,7 @@
   </div>
 
   <div class="mt-3">
-    <button @click="push('dgrants')" class="btn btn-primary mr-3">Grants Registry</button>
-    <button @click="push('dgrants-new')" class="btn btn-secondary">Create New Grant</button>
+    <button @click="pushRoute('dgrants')" class="btn btn-primary mr-3">Grants Registry</button>
   </div>
 </template>
 
@@ -17,23 +16,17 @@ import { computed, defineComponent } from 'vue';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 import { commify, formatUnits } from 'src/utils/ethers';
-import { useRouter } from 'vue-router';
+import { pushRoute } from 'src/utils/utils';
 
 export default defineComponent({
   name: 'Home',
   setup() {
-    // Router navigation
-    const router = useRouter();
-    function push(name: string) {
-      router.push({ name });
-    }
-
     const { lastBlockNumber, lastBlockTimestamp } = useDataStore();
     const { userDisplayName, network } = useWalletStore();
 
     const blockNumber = computed(() => commify(lastBlockNumber.value));
     const date = computed(() => new Date(lastBlockTimestamp.value * 1000).toLocaleString());
-    return { push, userDisplayName, network, blockNumber, date, formatUnits };
+    return { formatUnits, pushRoute, blockNumber, date, network, userDisplayName };
   },
 });
 </script>

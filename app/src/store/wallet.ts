@@ -24,7 +24,7 @@ import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
 import { JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
-import { formatAddress } from 'src/utils/formatters';
+import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
 import { API as OnboardAPI } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from 'src/utils/ethers';

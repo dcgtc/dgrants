@@ -1,5 +1,14 @@
 <template>
+  <!-- Create New Grant -->
+  <!-- Create New Grant -->
+  <div class="mb-10">
+    <h1 class="text-lg mb-3">Create New Grant</h1>
+    <div class="mb-1">Click the button below to create a new grant</div>
+    <button @click="pushRoute('dgrants-new')" class="btn btn-secondary">Create Grant</button>
+  </div>
+  <!-- View Existing Grants -->
   <h1 class="text-lg mb-3">Grant Registry List</h1>
+  <div class="mb-1">Below is all grants read from the GrantRegistry contract</div>
   <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
     <li v-for="grant in grants" :key="grant.id" class="col-span-1 bg-white rounded-lg shadow divide-y divide-gray-200">
       <div class="w-full flex items-center justify-between p-6 space-x-6">
@@ -38,14 +47,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { formatAddress } from 'src/utils/formatters';
+import { formatAddress, pushRoute } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 
 export default defineComponent({
   name: 'GrantRegistryList',
   setup() {
     const { grants } = useDataStore();
-    return { formatAddress, grants };
+    return { formatAddress, pushRoute, grants };
   },
 });
 </script>
