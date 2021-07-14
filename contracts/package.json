@@ -1,7 +1,9 @@
 {
   "name": "@dgrants/contracts",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.2.0"
+  },
   "devDependencies": {
     "@dgrants/types": "^0.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",

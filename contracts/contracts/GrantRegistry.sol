@@ -129,4 +129,14 @@ contract GrantRegistry {
     }
     return grantList;
   }
+
+  function isGrantInRegistry(uint96 _id) public view returns (bool) {
+    Grant storage grant = grants[_id];
+    return grant.id == _id;
+  }
+
+  function getGrantPayee(uint96 _id) public view returns (address) {
+    Grant storage grant = grants[_id];
+    return grant.payee;
+  }
 }
