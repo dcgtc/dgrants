@@ -198,5 +198,29 @@ describe('GrantRegistry', function () {
       const someGrants = await registry.getGrants(0, await registry.grantCount());
       expect(allGrants).to.deep.equal(someGrants);
     });
+    it('returns grant status', async () => {
+      const { owner: o1, payee: p1, metaPtr: m1 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
+      const data = [{ id: BN(0), owner: o1, payee: p1, metaPtr: m1 }];
+
+      data.map(async (grant, index) => {
+        let grantStatus = await registry.isGrantInRegistry(grant.id);
+        expect(grantStatus).to.be.true;
+
+        if (index == data.length - 1) {
+          // Supply a non-existent grant id
+          grantStatus = await registry.isGrantInRegistry(BN(index + 1));
+          expect(grantStatus).to.be.false;
+        }
+      });
+    });
+    it('returns grant payee', async () => {
+      const { owner: o1, payee: p1, metaPtr: m1 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
+      const data = [{ id: BN(0), owner: o1, payee: p1, metaPtr: m1 }];
+
+      data.map(async (grant, _) => {
+        const payee = await registry.getGrantPayee(grant.id);
+        expect(payee).to.equal(grant.payee);
+      });
+    });
   });
 });

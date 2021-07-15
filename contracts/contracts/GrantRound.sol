@@ -7,42 +7,42 @@ import "./GrantRegistry.sol";
 contract GrantRound {
   using SafeERC20 for IERC20;
   // @notice Unix timestamp of the start of the round
-  uint256 startTime;
+  uint256 public startTime;
   // @notice Unix timestamp of the end of the round
-  uint256 endTime;
+  uint256 public endTime;
   // @notice Contract owner
-  address owner;
+  address public owner;
   // @notice GrantsRegistry
-  address registry;
+  address public registry;
   // @notice ERC20 token that accepts pool donations
-  address donationToken;
+  address public donationToken;
   // @notice URL pointing to grant round metadata (for off-chain use)
-  string metaPtr;
+  string public metaPtr;
   // @notice minimum contribution amt that can be made
-  uint256 minContribution;
+  uint256 public minContribution;
   // @notice Set to true if grant round has ended and payouts have been released
-  bool hasPaidOut;
+  bool public hasPaidOut;
 
   /// @notice Emitted when a grant receives a donation
   event DonationSent(uint96 indexed id, address indexed token, uint256 amount, address dest, address indexed donor);
 
   modifier onlyOwner() {
-    require(msg.sender == owner);
+    require(msg.sender == owner, "Only owner can call this method");
     _;
   }
 
   modifier beforeRoundEnd() {
-    require(block.timestamp < endTime);
+    require(block.timestamp < endTime, "Time has passed to complete this tx");
     _;
   }
 
   modifier activeRound() {
-    require(block.timestamp >= startTime && block.timestamp < endTime);
+    require(block.timestamp >= startTime && block.timestamp < endTime, "Donations must be sent during an active round");
     _;
   }
 
   modifier roundEnd() {
-    require(block.timestamp >= endTime);
+    require(block.timestamp >= endTime, "Method must be called after the active round has ended");
     _;
   }
 
