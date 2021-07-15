@@ -60,7 +60,7 @@ export default defineComponent({
   },
 
   setup(props, context) {
-    const val = ref<any>(); // eslint-disable-line @typescript-eslint/no-explicit-any
+    const val = ref<any>(props.modelValue); // eslint-disable-line @typescript-eslint/no-explicit-any
     const isValid = computed(() => (val.value ? props.rules(val.value) : true)); // assume valid if field is empty
     function onInput() {
       context.emit('update:modelValue', val.value);

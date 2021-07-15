@@ -18,7 +18,7 @@
             description="The owner has permission to edit the grant"
             id="owner-address"
             label="Owner address"
-            :rules="isAddress"
+            :rules="isValidAddress"
             errorMsg="Please enter a valid address"
           />
 
@@ -28,7 +28,7 @@
             description="The address contributions and matching funds are sent to"
             id="payee-address"
             label="Payee address"
-            :rules="isAddress"
+            :rules="isValidAddress"
             errorMsg="Please enter a valid address"
           />
 
@@ -65,8 +65,8 @@ import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
-import { Contract, isAddress } from 'src/utils/ethers';
-import { pushRoute } from 'src/utils/utils';
+import { Contract } from 'src/utils/ethers';
+import { isValidAddress, isValidUrl, pushRoute } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
 
@@ -75,14 +75,13 @@ function useNewGrant() {
   const { poll } = useDataStore();
 
   // Define form fields and parameters
-  const form = ref<{ owner: string | undefined; payee: string | undefined; metadata: string | undefined }>({
+  const form = ref<{ owner: string | undefined; payee: string | undefined; metaPtr: string | undefined }>({
     owner: undefined,
     payee: undefined,
     metaPtr: undefined,
   });
-  const isValidUrl = (val: string) => val && val.includes('://'); // TODO more robust URL validation
   const isFormValid = computed(
-    () => isAddress(form.value.owner) && isAddress(form.value.payee) && isValidUrl(form.value.metaPtr)
+    () => isValidAddress(form.value.owner) && isValidAddress(form.value.payee) && isValidUrl(form.value.metaPtr)
   );
 
   /**
@@ -92,7 +91,6 @@ function useNewGrant() {
     // Send transaction
     if (!signer.value) throw new Error('Please connect a wallet');
     const { owner, payee, metaPtr } = form.value;
-    // TODO validate form inputs
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
     const tx = await registry.createGrant(owner, payee, metaPtr);
     await tx.wait();
@@ -106,7 +104,7 @@ function useNewGrant() {
     await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
-  return { createGrant, isAddress, isValidUrl, isFormValid, form };
+  return { createGrant, isValidAddress, isValidUrl, isFormValid, form };
 }
 
 export default defineComponent({

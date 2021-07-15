@@ -3,6 +3,7 @@
  */
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
+import { isAddress } from 'src/utils/ethers';
 
 // Returns an address with the following format: 0x1234...abcd
 export function formatAddress(address: string) {
@@ -13,4 +14,14 @@ export function formatAddress(address: string) {
 // Navigates to the specified page and pushes a new entry into the history stack
 export async function pushRoute(to: RouteLocationRaw) {
   await router.push(to);
+}
+
+// Returns true if the provided URL is a valid URL
+export function isValidUrl(val: string) {
+  return val && val.includes('://'); // TODO more robust URL validation
+}
+
+// Returns true if the provided address is valid (TODO support ENS)
+export function isValidAddress(val: string) {
+  return isAddress(val);
 }
