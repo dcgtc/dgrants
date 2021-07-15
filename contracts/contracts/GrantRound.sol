@@ -6,25 +6,25 @@ import "./GrantRegistry.sol";
 
 contract GrantRound {
   using SafeERC20 for IERC20;
-  // Unix timestamp of the start of the round
+  // @notice Unix timestamp of the start of the round
   uint256 startTime;
-  // Unix timestamp of the end of the round
+  // @notice Unix timestamp of the end of the round
   uint256 endTime;
-  // Contract owner
+  // @notice Contract owner
   address owner;
-  // GrantsRegistry
+  // @notice GrantsRegistry
   address registry;
-  // ERC20 token that accepts pool donations
+  // @notice ERC20 token that accepts pool donations
   address donationToken;
-  // URL pointing to grant metadata (for off-chain use)
+  // @notice URL pointing to grant round metadata (for off-chain use)
   string metaPtr;
-  // minimum contribution amt that can be made
+  // @notice minimum contribution amt that can be made
   uint256 minContribution;
-  // Set to true if grant round has ended and payouts have been released
+  // @notice Set to true if grant round has ended and payouts have been released
   bool hasPaidOut;
 
   /// @notice Emitted when a grant receives a donation
-  event GrantDonation(uint96 indexed id, address indexed payee, uint256 donationAmount);
+  event DonationSent(uint96 indexed id, address indexed token, uint256 amount, address dest, address indexed donor);
 
   modifier onlyOwner() {
     require(msg.sender == owner);
@@ -46,6 +46,16 @@ contract GrantRound {
     _;
   }
 
+  /**
+   * @notice Instantiates a new grant round
+   * @param _owner Grant round owner that has permission to payout the matching pool
+   * @param _registry Address that contains the grant metadata
+   * @param _donationToken Address of the ERC20 token in which donations are made
+   * @param _startTime Unix timestamp of the start of the round
+   * @param _endTime Unix timestamp of the end of the round
+   * @param _metaPtr URL pointing to the grant round metadata
+   * @param _minContribution Miniumum donation amount that can be made using the given donation token
+   */
   constructor(
     address _owner,
     address _registry,
@@ -65,37 +75,56 @@ contract GrantRound {
     minContribution = _minContribution;
   }
 
-  function acceptMatchingPool(uint256 donationAmount) external beforeRoundEnd {
-    _safeTransferDonationToken(donationAmount);
+  /**
+   * @notice Before the round ends this method accepts matching pool funds
+   * @param _amount The amount of donation token that can be sent to the contract for the matching pool
+   */
+  function acceptMatchingPool(uint256 _amount) external beforeRoundEnd {
+    _safeTransferDonationToken(msg.sender, address(this), _amount);
   }
 
-  function donateToGrant(uint256 donationAmount, uint96 grantId) external activeRound {
-    require(donationAmount >= minContribution, "Donation amount must be greater than minimum contribution");
+  /**
+   * @notice During an active round users can use this method to send donation tokens to a specified grant
+   * @param _donationAmount The number of tokens to be sent to grant receipient
+   * @param _grantId The id of the grant in the registry
+   */
+  function donateToGrant(uint256 _donationAmount, uint96 _grantId) external activeRound {
+    require(_donationAmount >= minContribution, "Donation amount must be greater than minimum contribution");
 
     GrantRegistry gRegistry = GrantRegistry(registry);
+    require(gRegistry.isGrantInRegistry(_grantId), "Grant with given id does not exist in registry provided");
 
-    require(gRegistry.isGrantInRegistry(grantId), "Grant with given id does not exist in registry provided");
+    address payee = gRegistry.getGrantPayee(_grantId);
+    require(payee != address(0), "Payee not set in the grant metadata");
+    _safeTransferDonationToken(msg.sender, payee, _donationAmount);
 
-    _safeTransferDonationToken(donationAmount);
-
-    address payee = gRegistry.getGrantPayee(grantId);
-
-    IERC20 token = IERC20(donationToken);
-    token.safeTransfer(payee, donationAmount);
-
-    emit GrantDonation(grantId, payee, donationAmount);
+    emit DonationSent(_grantId, donationToken, _donationAmount, payee, msg.sender);
   }
 
-  function payoutGrant(address payoutAddress) external roundEnd onlyOwner {
+  /**
+   * @notice When the round ends the owner can send the remaining matching pool funds to a given address
+   * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
+   */
+  function payoutGrant(address _payoutAddress) external roundEnd onlyOwner {
     IERC20 token = IERC20(donationToken);
     uint256 balance = token.balanceOf(address(this));
-    token.safeTransfer(payoutAddress, balance);
+    token.safeTransfer(_payoutAddress, balance);
 
     hasPaidOut = true;
   }
 
-  function _safeTransferDonationToken(uint256 amount) internal {
+  /**
+   * @notice Helper function that wraps safeTransferFrom for the ERC20 donation token
+   * @param _from Address that sends to tokens to a particular address
+   * @param _to Address that receives the donation token
+   * @param _amount The amount of donation token to be sent to a given address
+   */
+  function _safeTransferDonationToken(
+    address _from,
+    address _to,
+    uint256 _amount
+  ) internal {
     IERC20 token = IERC20(donationToken);
-    token.safeTransferFrom(msg.sender, address(this), amount);
+    token.safeTransferFrom(_from, _to, _amount);
   }
 }
