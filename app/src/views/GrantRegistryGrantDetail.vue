@@ -23,7 +23,7 @@
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
-      <div class="py-8 px-4 border shadow sm:rounded-lg sm:px-6">
+      <div class="py-8 px-4 border border-gray-200 shadow sm:rounded-lg sm:px-6 bg-gray-50">
         <form class="space-y-6" @submit.prevent="saveEdits">
           <!-- Owner address -->
           <BaseInput

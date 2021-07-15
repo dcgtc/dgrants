@@ -10,6 +10,7 @@
         class="
           hy
           appearance-none
+          bg-white
           block
           w-full
           px-3

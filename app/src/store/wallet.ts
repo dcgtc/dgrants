@@ -31,7 +31,7 @@ import { getAddress } from 'src/utils/ethers';
 import { RPC_URL } from 'src/utils/constants';
 
 const { startPolling } = useDataStore();
-const { setLastWallet } = useSettingsStore();
+const { setLastWallet, isDark } = useSettingsStore();
 const defaultProvider = new JsonRpcProvider(RPC_URL);
 
 // State variables
@@ -71,7 +71,7 @@ export default function useWalletStore() {
   function initializeOnboard() {
     onboard = Onboard({
       dappId: import.meta.env.VITE_BLOCKNATIVE_API_KEY,
-      darkMode: false,
+      darkMode: isDark.value,
       networkId: 1,
       walletSelect: { wallets },
       walletCheck: walletChecks,
