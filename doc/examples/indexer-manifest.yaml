@@ -1,0 +1,32 @@
+description: Gitcoin Grants
+schema:
+  file: ./schema.graphql
+
+dataSources:
+  - kind: ethereum/contract
+    name: Grants
+    source:
+      address: '0x'
+      abi: ..
+    mapping:
+      kind: ethereum/events
+      entities:
+        - Grant
+      eventHandlers:
+        - event: TransferSingle(address, address, address, uint256, uint256)
+          handler: handleTransferOrNewGrant
+        - event: URI(string, uint256)
+          handler: updateGrant
+
+  - kind: ethereum/contract
+    name: BulkCheckout
+    source:
+      address: '0x'
+      abi: ..
+    mapping:
+      kind: ethereum/events
+      entities:
+        - Contribution
+      eventHandlers:
+        - event: DonationSent(address, uint256, address, address)
+          handler: handleNewContribution

@@ -1,0 +1,74 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://gitcoin.co/grant-metadata.schema.json",
+    "title": "Gitcoin Grant Metadata",
+    "description": "Schema for the metadata for a single grant",
+    "type": "object",
+    "required": ["name", "description"],
+    "properties": {
+        "name": {
+            "type": "string",
+            "description": "Primary human readable grant identifier",
+        },
+        "description": {
+            "type": "string",
+            "description": "Describes the grant. This is the main content displayed on the grant page."
+        },
+        "image": {
+            "type": "string",
+            "description": "A URI pointing to a resource with mime type image/*. A logo representing the grant. This thumbnail is displayed when browsing grants. Consider making any images at a width between 320 and 1080 pixels and aspect ratio between 1.91:1 and 4:5 inclusive."
+        },
+        "properties": {
+            "type": "object",
+            "description": "Additional properties. Nested to maintain compatibility with ERC721 token metadata",
+            "properties": {
+                "projectWebsite": {
+                    "type": "string",
+                    "description": "URL for project website where more info on the project can be found"
+                },
+                "projectGithub": {
+                    "type": "string",
+                    "description": "Github URL for project Github organization or repo"
+                },
+                "bannerImage": {
+                    "type": "string",
+                    "description": "A URI pointing to a resource with mime type image/*. A banner image to display at the top of the grant page."
+                },
+                "twitterHandle": {
+                    "type": "string",
+                    "description": "Twitter handle (without the @ symbol) for the project"
+                },
+                "keywords": {
+                    "type": "array",
+                    "description": "Keywords or tags to help find this project.",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "endDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "Date on which grant funding ends. Given in UTC."
+                },
+            }
+        },
+        "localization": {
+            "type": "object",
+            "required": ["uri", "default", "locales"],
+            "properties": {
+                "uri": {
+                    "type": "string",
+                    "description": "The URI pattern to fetch localized data from. This URI should contain the substring `{locale}` which will be replaced with the appropriate locale value before sending the request."
+                },
+                "default": {
+                    "type": "string",
+                    "description": "The locale of the default data within the base JSON"
+                },
+                "locales": {
+                    "type": "array",
+                    "description": "The list of locales for which data is available. These locales should conform to those defined in the Unicode Common Locale Data Repository (http://cldr.unicode.org/)."
+                }
+            }
+        }
+    }
+}

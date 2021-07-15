@@ -1,0 +1,54 @@
+# ---------------------------------------------------------
+# Grants --------------------------------------------------
+# ---------------------------------------------------------
+
+# A grant is an NFT on the gitcoin ERC-1155 contract.
+# Most of the grant details live in the metadata.json on IPFS
+
+type Grant @entity {
+    id: ID!, # Grant identifier in contract
+    owner: Account!,
+    recipient: Bytes!,
+    active: Boolean!,
+    createdAt: BigInt!,
+    replacedBy: Grant,
+    metaURI: String!, # URI to metadata.json
+
+    contributions: [Contribution!] @derivedFrom(field: "to"),
+
+    # populated from metadata.json on IPFS
+    name: String,
+    description: String,
+    image: String,
+    projectGithub: String,
+    bannerGmage: String,
+    twitterHandle: String,
+    keywords: [String!],
+    endDate: String,
+}
+
+# ---------------------------------------------------------
+# Accounts ------------------------------------------------
+# ---------------------------------------------------------
+
+# An ethereum account that can own a grant or contribute
+
+type Account @entity {
+  id: ID! # ETH addr
+  address: Bytes!
+  grants: [Grant!] @derivedFrom(field: "owner"),
+}
+
+# ---------------------------------------------------------
+# Contributions -------------------------------------------
+# ---------------------------------------------------------
+
+# Comes from the BulkCheckout contract. This is an account
+# funding a grant
+
+type Contribution @entity {
+    id: ID!,
+    from: Account!,
+    to: Grant!,
+    amount: BigInt!,
+}

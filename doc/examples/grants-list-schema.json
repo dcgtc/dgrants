@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://gitcoin.co/grantlist.schema.json",
+  "title": "Gitcoin Grants List",
+  "description": "Schema for lists of grants compatible with the Gitcoin Grants web interface",
+  "definitions": {
+    "Version": {
+      "type": "object",
+      "description": "The version of the list, used in change detection",
+      "examples": [
+        {
+          "major": 1,
+          "minor": 0,
+          "patch": 0
+        }
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "major": {
+          "type": "integer",
+          "description": "The major version of the list. Must be incremented when grant are removed from the list or grant addresses are changed.",
+          "minimum": 0,
+          "examples": [
+            1,
+            2
+          ]
+        },
+        "minor": {
+          "type": "integer",
+          "description": "The minor version of the list. Must be incremented when grants are added to the list.",
+          "minimum": 0,
+          "examples": [
+            0,
+            1
+          ]
+        },
+        "patch": {
+          "type": "integer",
+          "description": "The patch version of the list. Must be incremented for any changes to the list.",
+          "minimum": 0,
+          "examples": [
+            0,
+            1
+          ]
+        }
+      },
+      "required": [
+        "major",
+        "minor",
+        "patch"
+      ]
+    },
+    "GrantId": {
+      "type": "object",
+      "description": "Record of a grant in a grants list",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Grant ID in the Gitcoin Grants registry",
+          "examples": [
+            ""
+          ]
+        }
+      }
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the grants list",
+      "minLength": 1,
+      "maxLength": 20,
+      "pattern": "^[\\w ]+$",
+      "examples": [
+        "My List of Trusted Grants"
+      ]
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp of this list version; i.e. when this immutable version of the list was created"
+    },
+    "version": {
+      "$ref": "#/definitions/Version"
+    },
+    "grants": {
+      "type": "array",
+      "description": "The list of grants included in the list",
+      "items": {
+        "$ref": "#/definitions/GrantId"
+      },
+      "minItems": 1,
+      "maxItems": 10000
+    },
+    "logoURI": {
+      "type": "string",
+      "description": "A URI for the logo of the token list; prefer SVG or PNG of size 256x256",
+      "format": "uri",
+      "examples": [
+        "ipfs://QmXfzKRvjZz3u5JRgC4v5mGVbm9ahrUiB4DgzHBsnWbTMM"
+      ]
+    },
+    "keywords": {
+      "type": "array",
+      "description": "Keywords associated with the contents of the list; may be used in list discoverability",
+      "items": {
+        "type": "string",
+        "description": "A keyword to describe the contents of the list",
+        "minLength": 1,
+        "maxLength": 20,
+        "pattern": "^[\\w ]+$",
+        "examples": [
+          "community",
+          "DeFi",
+          "NFTs"
+        ]
+      },
+      "maxItems": 20,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "name",
+    "timestamp",
+    "version",
+    "grants"
+  ]
+}
