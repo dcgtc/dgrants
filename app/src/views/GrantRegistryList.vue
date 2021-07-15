@@ -20,9 +20,9 @@
           bg-white
           rounded-lg
           shadow
-          divide-y divide-gray-200
+          divide-y divide-gray-400 divide-opacity-30
           cursor-pointer
-          border
+          border border-gray-200
           hover:border-primary-500
         "
       >
@@ -35,7 +35,7 @@
           </div>
         </div>
         <div>
-          <div class="pl-6 p-2 -mt-px flex divide-x divide-gray-200">
+          <div class="pl-6 p-2 -mt-px flex divide-x divide-gray-400 divide-opacity-30">
             <div class="w-0 flex-1 flex">
               <div class="flex-1 truncate text-left">
                 <p class="mt-1 text-gray-500 text-sm truncate">Owner</p>

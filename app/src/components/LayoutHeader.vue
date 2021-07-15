@@ -20,7 +20,7 @@
           </div>
         </div>
         <div class="ml-10 space-x-4">
-          <div v-if="userDisplayName">{{ userDisplayName }}</div>
+          <div v-if="userDisplayName" class="text-gray-700">{{ userDisplayName }}</div>
           <div v-else-if="!isSupportedNetwork" class="flex items-center">
             <ExclamationIcon class="h-5 w-5 text-yellow-500 mr-2" />
             <div class="text-gray-500">Unsupported network</div>

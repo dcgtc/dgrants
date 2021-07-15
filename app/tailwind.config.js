@@ -11,6 +11,15 @@ module.exports = {
         secondary: colors.yellow, // secondary theme color
       },
     },
+    nightwind: {
+      // Keys specify light-mode colors, and values are overrides for Nightwind to replace them with
+      colors: {
+        white: 'gray.900',
+        gray: {
+          50: 'gray.800',
+        },
+      },
+    },
   },
   variants: {
     extend: {},
