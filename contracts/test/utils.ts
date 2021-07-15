@@ -15,3 +15,8 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
   expect(grant1.payee).to.equal(grant2.payee);
   expect(grant1.metaPtr).to.equal(grant2.metaPtr);
 }
+
+export async function timeTravel(provider: any, seconds: number) {
+  await provider.send('evm_increaseTime', [Number(seconds)]);
+  await provider.send('evm_mine', []);
+}

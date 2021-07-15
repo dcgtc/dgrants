@@ -15,7 +15,7 @@ contract GrantRound {
   // @notice GrantsRegistry
   address public registry;
   // @notice ERC20 token that accepts pool donations
-  address public donationToken;
+  IERC20 public donationToken;
   // @notice URL pointing to grant round metadata (for off-chain use)
   string public metaPtr;
   // @notice minimum contribution amt that can be made
@@ -59,7 +59,7 @@ contract GrantRound {
   constructor(
     address _owner,
     address _registry,
-    address _donationToken,
+    IERC20 _donationToken,
     uint256 _startTime,
     uint256 _endTime,
     string memory _metaPtr,
@@ -96,9 +96,9 @@ contract GrantRound {
 
     address payee = gRegistry.getGrantPayee(_grantId);
     require(payee != address(0), "Payee not set in the grant metadata");
-    _safeTransferDonationToken(msg.sender, payee, _donationAmount);
+    donationToken.transfer(payee, _donationAmount);
 
-    emit DonationSent(_grantId, donationToken, _donationAmount, payee, msg.sender);
+    emit DonationSent(_grantId, address(donationToken), _donationAmount, payee, msg.sender);
   }
 
   /**
@@ -106,11 +106,16 @@ contract GrantRound {
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
   function payoutGrant(address _payoutAddress) external roundEnd onlyOwner {
-    IERC20 token = IERC20(donationToken);
-    uint256 balance = token.balanceOf(address(this));
-    token.safeTransfer(_payoutAddress, balance);
+    uint256 balance = donationToken.balanceOf(address(this));
+    donationToken.safeTransferFrom(address(this), _payoutAddress, balance);
 
     hasPaidOut = true;
+  }
+
+  // For testing purposes only
+  function checkBalance(address addr) public view returns (uint256) {
+    uint256 balance = donationToken.balanceOf(addr);
+    return balance;
   }
 
   /**
@@ -124,7 +129,6 @@ contract GrantRound {
     address _to,
     uint256 _amount
   ) internal {
-    IERC20 token = IERC20(donationToken);
-    token.safeTransferFrom(_from, _to, _amount);
+    donationToken.safeTransferFrom(_from, _to, _amount);
   }
 }
