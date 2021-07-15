@@ -9,19 +9,7 @@ import { computed, markRaw, ref } from 'vue';
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, MULTICALL_ADDRESS, MULTICALL_ABI } from 'src/utils/constants';
-
-// --- Types ---
-// The output from ethers/typechain allows array or object access to grant data, so we must define types for
-// handling the Grant struct as done below
-type GrantObject = {
-  id: BigNumber;
-  owner: string;
-  payee: string;
-  metaPtr: string;
-};
-type GrantArray = [BigNumber, string, string, string];
-type GrantEthers = GrantArray & GrantObject;
-type Grant = GrantObject | GrantEthers;
+import { Grant } from '@dgrants/types';
 
 // --- Parameters required ---
 const { provider } = useWalletStore();
@@ -60,6 +48,7 @@ export default function useDataStore() {
     lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
     lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
     grants.value = grantsList as Grant[];
+    console.log('grants.value: ', grants.value);
   }
 
   /**
