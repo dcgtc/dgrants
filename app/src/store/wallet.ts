@@ -53,7 +53,7 @@ function resetState() {
 }
 
 // Settings
-const infuraApiKey = import.meta.env.VITE_INFURA_API_KEY;
+const infuraApiKey = import.meta.env.VITE_INFURA_ID;
 const walletChecks = [{ checkName: 'connect' }];
 const wallets = [
   { walletName: 'metamask', preferred: true },
