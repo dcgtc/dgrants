@@ -48,7 +48,6 @@ export default function useDataStore() {
     lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
     lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
     grants.value = grantsList as Grant[];
-    console.log('grants.value: ', grants.value);
   }
 
   /**
