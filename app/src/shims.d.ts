@@ -1,9 +1,7 @@
 // Shim for Vue composition API
 declare module '*.vue' {
   import type { DefineComponent } from 'vue';
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>;
-  /* eslint-enable @typescript-eslint/no-explicit-any */
+  const component: DefineComponent<Record<string, unknown>, Record<string, unknown>, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
   export default component;
 }
 
@@ -16,6 +14,6 @@ declare module 'nightwind/helper';
 interface ImportMeta {
   env: {
     VITE_BLOCKNATIVE_API_KEY: string;
-    VITE_INFURA_API_KEY: string;
+    VITE_INFURA_ID: string;
   };
 }
