@@ -17,6 +17,6 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
 }
 
 export async function timeTravel(provider: any, seconds: number) {
-  await provider.send('evm_increaseTime', [Number(seconds)]);
+  await provider.send('evm_increaseTime', [seconds]);
   await provider.send('evm_mine', []);
 }

@@ -131,15 +131,6 @@ contract GrantRegistry {
   }
 
   /**
-   * @notice Returns a boolean that is true when a given grant ID is in the registry
-   * @param _id Grant ID of a possible grant in the registry
-   */
-  function isGrantInRegistry(uint96 _id) public view returns (bool) {
-    Grant storage grant = grants[_id];
-    return grant.id == _id;
-  }
-
-  /**
    * @notice Returns the address that will be used to pay out donations for a given grant
    * @dev The payee may be set to null address
    * @param _id Grant ID used to retrieve the payee address in the registry

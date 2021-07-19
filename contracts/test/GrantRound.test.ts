@@ -18,7 +18,7 @@ describe('GrantRound', function () {
     grantRoundOwner: SignerWithAddress,
     donor: SignerWithAddress,
     grantPayee: SignerWithAddress,
-    mpUser: SignerWithAddress;
+    mpUser: SignerWithAddress; // matching pool user
   let registry: GrantRegistry;
   let roundContract: any;
   let mockERC20: any;
@@ -32,9 +32,9 @@ describe('GrantRound', function () {
     [deployer, grantRoundOwner, donor, grantPayee, mpUser] = await ethers.getSigners();
     mockERC20 = await deployMockContract(deployer, IERC20Artifact.abi);
     // Seed funds for matching pool user
-    await mockERC20.mock.transfer.withArgs(mpUser.address, ethers.utils.parseEther(balances[0]));
+    await mockERC20.mock.transfer.withArgs(mpUser.address, ethers.utils.parseEther(balances[0])).returns(true);
     // Seed funds for initial donor
-    await mockERC20.mock.transfer.withArgs(donor.address, ethers.utils.parseEther(balances[0]));
+    await mockERC20.mock.transfer.withArgs(donor.address, ethers.utils.parseEther(balances[0])).returns(true);
 
     const grantRegistryArtifact: Artifact = await artifacts.readArtifact('GrantRegistry');
     registry = <GrantRegistry>await deployContract(deployer, grantRegistryArtifact);
@@ -66,31 +66,38 @@ describe('GrantRound', function () {
     });
   });
 
-  describe('acceptMatchingPool - Add funds to matching round', () => {
+  describe('addMatchingFunds - Add funds to matching round', () => {
     it('updates contract and user balances', async function () {
       // set up mock calls
       await mockERC20.mock.balanceOf.withArgs(mpUser.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transferFrom.withArgs(mpUser.address, roundContract.address, balances[0]).returns(true);
 
-      await roundContract.connect(mpUser).acceptMatchingPool(balances[0]);
-      expect(await roundContract.connect(deployer).checkBalance(roundContract.address)).to.be.equal(
-        ethers.utils.parseEther(balances[0])
-      );
+      await roundContract.connect(mpUser).addMatchingFunds(balances[0]);
+      // TODO: add token.balanceOf check in mock ERC20
     });
   });
 
   describe('donateToGrant - Add funds during active round', () => {
     it('sends donation token to the grant payee with a given grant id', async function () {
-      const grantId: number = 0;
+      const grantId = 0;
       await mockERC20.mock.balanceOf.withArgs(donor.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
-      await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
+      await mockERC20.mock.transferFrom.withArgs(donor.address, grantPayee.address, balances[0]).returns(true);
 
       await roundContract.connect(donor).donateToGrant(balances[0], grantId);
-      expect(await roundContract.connect(deployer).checkBalance(grantPayee.address)).to.be.equal(
-        ethers.utils.parseEther(balances[0])
-      );
+      // TODO: add token.balanceOf check in mock ERC20
+    });
+
+    it('emits an event when successful', async function () {
+      const grantId = 0;
+      await mockERC20.mock.balanceOf.withArgs(donor.address).returns(ethers.utils.parseEther(balances[0]));
+      await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
+      await mockERC20.mock.transferFrom.withArgs(donor.address, grantPayee.address, balances[0]).returns(true);
+
+      await expect(roundContract.connect(donor).donateToGrant(balances[0], grantId))
+        .to.emit(roundContract, 'DonationSent')
+        .withArgs(grantId, mockERC20.address, balances[0], donor.address);
     });
 
     it('donations revert if not above minimum contribution', async function () {
@@ -99,43 +106,42 @@ describe('GrantRound', function () {
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
-      void expect(roundContract.connect(donor).donateToGrant(10, grantId)).to.be.revertedWith(
+      await expect(roundContract.connect(donor).donateToGrant(10, grantId)).to.be.revertedWith(
         'Donation amount must be greater than minimum contribution'
       );
     });
   });
 
-  describe('payoutGrant - payout remaining contract balance to a given address', () => {
+  describe('payoutGrants - payout remaining contract balance to a given address', () => {
     it('reverts if round has not ended', async function () {
       await mockERC20.mock.balanceOf.withArgs(deployer.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(deployer.address, balances[0]).returns(true);
 
-      void expect(roundContract.connect(grantRoundOwner).payoutGrant(deployer.address)).to.be.revertedWith(
+      await expect(roundContract.connect(grantRoundOwner).payoutGrants(deployer.address)).to.be.revertedWith(
         'Method must be called after the active round has ended'
       );
     });
-
+  });
+  describe('Round end corner cases', () => {
     it('sends remaining matching pool funds to payout address', async function () {
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
-      await mockERC20.mock.transferFrom.withArgs(roundContract.address, grantPayee.address, balances[0]).returns(true);
+      await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
       // End the round for all subsequent tests
       await timeTravel(deployer.provider, endTime + 1);
-      // await roundContract.connect(grantRoundOwner).payoutGrant(grantPayee.address);
+      await roundContract.connect(grantRoundOwner).payoutGrants(grantPayee.address);
 
-      //expect(await roundContract.connect(deployer).checkBalance(deployer.address)).to.be.equal(ethers.utils.parseEther(balances[0]));
+      // TODO: add token.balanceOf check in mock ERC20
     });
-  });
-  describe('Round end corner cases', () => {
     it('matching pool transfers revert if passed round end time', async function () {
       await mockERC20.mock.balanceOf.withArgs(mpUser.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transferFrom.withArgs(mpUser.address, roundContract.address, balances[0]).returns(true);
 
-      void expect(roundContract.connect(mpUser).acceptMatchingPool(balances[0])).to.be.revertedWith(
-        'Time has passed to complete this tx'
+      await expect(roundContract.connect(mpUser).addMatchingFunds(balances[0])).to.be.revertedWith(
+        'GrantRound: Action cannot be performed as the round has ended'
       );
     });
 
@@ -145,7 +151,7 @@ describe('GrantRound', function () {
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
-      void expect(roundContract.connect(donor).donateToGrant(balances[0], grantId)).to.be.revertedWith(
+      await expect(roundContract.connect(donor).donateToGrant(balances[0], grantId)).to.be.revertedWith(
         'Donations must be sent during an active round'
       );
     });
