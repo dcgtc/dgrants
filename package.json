@@ -24,6 +24,7 @@
     "node": "yarn contracts app:node",
     "dev": "concurrently --restart-tries 5 --kill-others \"yarn run node\" \"yarn contracts app:setup && yarn app dev\"",
     "lint": "lerna run lint",
+    "postinstall": "lerna run postinstall",
     "prettier": "lerna run prettier",
     "prepare": "lerna run prepare && husky install",
     "test": "lerna run test",
