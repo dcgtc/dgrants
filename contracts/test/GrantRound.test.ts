@@ -124,13 +124,16 @@ describe('GrantRound', function () {
     });
   });
   describe('Round end corner cases', () => {
-    it('sends remaining matching pool funds to payout address', async function () {
+    before(async () => {
+      // End the round for all subsequent tests
+      await timeTravel(deployer.provider, endTime + 1);
+    });
+
+    it.skip('sends remaining matching pool funds to payout address', async function () {
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
-      // End the round for all subsequent tests
-      await timeTravel(deployer.provider, endTime + 1);
       await roundContract.connect(grantRoundOwner).payoutGrants(grantPayee.address);
 
       // TODO: add token.balanceOf check in mock ERC20
