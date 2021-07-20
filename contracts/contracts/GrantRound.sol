@@ -5,25 +5,39 @@ import "./GrantRegistry.sol";
 
 contract GrantRound {
   using SafeERC20 for IERC20;
-  // @notice Unix timestamp of the start of the round
+
+  // --- Data ---
+
+  /// @notice Unix timestamp of the start of the round
   uint256 public immutable startTime;
-  // @notice Unix timestamp of the end of the round
+
+  /// @notice Unix timestamp of the end of the round
   uint256 public immutable endTime;
-  // @notice Contract owner
+
+  /// @notice Contract owner
   address public owner;
-  // @notice GrantsRegistry
+
+  /// @notice GrantsRegistry
   GrantRegistry public immutable registry;
-  // @notice ERC20 token that accepts pool donations
+
+  /// @notice ERC20 token that accepts pool donations
   IERC20 public immutable donationToken;
-  // @notice URL pointing to grant round metadata (for off-chain use)
+
+  /// @notice URL pointing to grant round metadata (for off-chain use)
   string public metaPtr;
-  // @notice minimum contribution amount that can be made
+
+  /// @notice minimum contribution amount that can be made
   uint256 public immutable minContribution;
-  // @notice Set to true if grant round has ended and payouts have been released
+
+  /// @notice Set to true if grant round has ended and payouts have been released
   bool public hasPaidOut;
+
+  // --- Events ---
 
   /// @notice Emitted when a grant receives a donation
   event DonationSent(uint96 indexed id, address indexed token, uint256 amount, address indexed donor);
+
+  // --- Core methods ---
 
   /**
    * @notice Instantiates a new grant round
@@ -91,6 +105,8 @@ contract GrantRound {
     hasPaidOut = true;
     donationToken.safeTransfer(_payoutAddress, balance);
   }
+
+  // --- Modifiers ---
 
   modifier onlyOwner() {
     require(msg.sender == owner, "Only owner can call this method");
