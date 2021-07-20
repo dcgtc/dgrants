@@ -37,7 +37,8 @@ async function main(): Promise<void> {
 
   // --- GrantRegistry Setup ---
   // Deploy contract
-  const [deployer] = await ethers.getSigners();
+  const signers = await ethers.getSigners();
+  const deployer = signers[16]; // use a random signer to minimize chance of mainnet use bumping the nonce and changing deploy address
   const GrantRegistryFactory: ContractFactory = await ethers.getContractFactory('GrantRegistry', deployer);
   const registry = await (await GrantRegistryFactory.deploy()).deployed();
   console.log(`Deployed GrantRegistry to ${registry.address}`);

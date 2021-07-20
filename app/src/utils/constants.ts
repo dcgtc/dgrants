@@ -17,5 +17,5 @@ export const MULTICALL_ABI = [
 ];
 
 // Data for Grants contracts
-export const GRANT_REGISTRY_ADDRESS = '0x70e0bA845a1A0F2DA3359C97E0285013525FFC49';
+export const GRANT_REGISTRY_ADDRESS = '0xd0f350b13465b5251bb03e4bbf9fa1dbc4a378f3';
 export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
