@@ -23,12 +23,12 @@ describe('GrantRound', function () {
   let roundContract: any;
   let mockERC20: any;
   const balances: string[] = ['100', '200'];
-  const startTime: number = Math.floor(new Date().getTime() / 1000); // time in seconds
-  const endTime: number = startTime + 86400; // One day
+  const startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
+  const endTime = startTime + 86400; // One day
 
   beforeEach(async () => {
     const mockUrl: string = 'https://test.url';
-    const minContribution: number = 50;
+    const minContribution = 50;
     [deployer, grantRoundOwner, donor, grantPayee, mpUser] = await ethers.getSigners();
     mockERC20 = await deployMockContract(deployer, IERC20Artifact.abi);
     // Seed funds for matching pool user
@@ -101,7 +101,7 @@ describe('GrantRound', function () {
     });
 
     it('donations revert if not above minimum contribution', async function () {
-      const grantId: number = 0;
+      const grantId = 0;
       await mockERC20.mock.balanceOf.withArgs(donor.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
@@ -149,7 +149,7 @@ describe('GrantRound', function () {
     });
 
     it('donations revert if not during active round', async function () {
-      const grantId: number = 0;
+      const grantId = 0;
       await mockERC20.mock.balanceOf.withArgs(donor.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(grantPayee.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
