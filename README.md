@@ -5,7 +5,6 @@
 .
 ├── app                     # Frontend Vue.js application
 ├── contracts               # Smart contracts
-├── dapp                    # The dapp
 ├── doc                     # Project documentation including the protocol definition
 ├── lerna.json              # Lerna config
 ├── package.json            # Root package configuration
