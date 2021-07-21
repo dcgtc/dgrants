@@ -6,8 +6,11 @@ The dGrants protocol specification
 
 ```
 .
-├── protocol.md                   # dGrants protocol definition
-├── examples                      # Example files for metadata and schemas
+├── protocol.md                      # dGrants protocol definition
+├── examples                         # Example files for metadata and schemas
+│   ├── example-collection.json      # Example showing a proposed schema for a collection
+│   ├── grant-metadata-schema.json   # Example showing a proposed schema for grant metadata
+│   ├── grants-list-schema.json      # Example showing a proposed schema for a grant list
 └── README.md
 ```
 
