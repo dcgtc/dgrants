@@ -92,12 +92,9 @@ contract GrantRound {
    * @param _grantId The id of the grant in the registry
    */
   function donateToGrant(uint256 _donationAmount, uint96 _grantId) external activeRound {
-    require(
-      _donationAmount >= minContribution,
-      "GrantRound: Donation amount must be greater than minimum contribution"
-    );
+    require(_donationAmount >= minContribution, "GrantRound: Donation must be greater than minimum contribution");
 
-    require(_grantId < registry.grantCount(), "GrantRound: Grant with given id does not exist in registry provided");
+    require(_grantId < registry.grantCount(), "GrantRound: Grant does not exist in registry provided");
 
     address payee = registry.getGrantPayee(_grantId);
     require(payee != address(0), "GrantRound: Payee not set in the grant metadata");
@@ -122,10 +119,7 @@ contract GrantRound {
    * @param _newMetaPtr A string where the updated metadata is stored
    */
   function updateMetadataPtr(string memory _newMetaPtr) external {
-    require(
-      msg.sender == metadataAdmin,
-      "GrantRound: Only the grant round metadata admin can update the metadata pointer"
-    );
+    require(msg.sender == metadataAdmin, "GrantRound: Action can be perfomed only by metadataAdmin");
     string memory oldPtr = metaPtr;
     metaPtr = _newMetaPtr;
 
@@ -148,7 +142,7 @@ contract GrantRound {
   }
 
   modifier afterRoundEnd() {
-    require(block.timestamp >= endTime, "GrantRound: Method must be called after the active round has ended");
+    require(block.timestamp >= endTime, "GrantRound: Method must be called after round has ended");
     _;
   }
 }

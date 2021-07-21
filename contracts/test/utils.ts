@@ -5,6 +5,7 @@
 import { Grant } from '@dgrants/types';
 
 // --- External imports ---
+import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
 // --- Functions ---
@@ -16,7 +17,7 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
   expect(grant1.metaPtr).to.equal(grant2.metaPtr);
 }
 
-export async function timeTravel(provider: any, seconds: number) {
-  await provider.send('evm_increaseTime', [seconds]);
-  await provider.send('evm_mine', []);
+export async function timeTravel(seconds: number): Promise<void> {
+  await ethers.provider.send('evm_increaseTime', [seconds]);
+  await ethers.provider.send('evm_mine', []);
 }
