@@ -1,6 +1,7 @@
 # dgrants
 
 ## Directory Structure
+```
 .
 ├── app                     # Frontend Vue.js application
 ├── contracts               # Smart contracts
@@ -14,6 +15,7 @@
 ├── vetur.config.js         # Vetur configuration
 ├── yarn.lock               # Yarn lock file
 └── README.md
+```
 
 ## Development
 

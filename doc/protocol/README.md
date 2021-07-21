@@ -4,10 +4,12 @@ The dGrants protocol specification
 
 ## Directory Structure
 
+```
 .
 ├── protocol.md                   # dGrants protocol definition
 ├── examples                      # Example files for metadata and schemas
 └── README.md
+```
 
 ## Overview
 
