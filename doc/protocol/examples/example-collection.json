@@ -1,0 +1,23 @@
+{
+  "name": "My Grant Collection",
+  "logoURI": "ipfs://QmUSNbwUxUYNMvMksKypkgWs8unSm8dX2GjCPBVGZ7GGMr",
+  "keywords": [
+    "Trusted",
+    "Gitcoin round 11",
+    "DeFi projects"
+  ],
+  "timestamp": "2020-06-12T00:00:00+00:00",
+  "grants": [
+    {
+      "id": "123"
+    },
+    {
+      "id": "234"
+    }
+  ],
+  "version": {
+    "major": 1,
+    "minor": 0,
+    "patch": 0
+  }
+}

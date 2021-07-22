@@ -1,5 +1,21 @@
 # dgrants
 
+## Directory Structure
+```
+.
+├── app                     # Frontend Vue.js application
+├── contracts               # Smart contracts
+├── doc                     # Project documentation including the protocol definition
+├── lerna.json              # Lerna config
+├── package.json            # Root package configuration
+├── tsconfig.json           # Typescript configuration
+├── tsconfig.settings.json  # Typescript configuration
+├── types                   # Shared types
+├── vetur.config.js         # Vetur configuration
+├── yarn.lock               # Yarn lock file
+└── README.md
+```
+
 ## Development
 
 This project is a monorepo with two packages:
