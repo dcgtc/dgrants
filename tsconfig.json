@@ -4,6 +4,7 @@
     { "path": "app" },
     { "path": "contracts" },
     { "path": "types" },
+    { "path": "dcurve" },
     { "path": "utils" }
   ],
   "exclude": ["node_modules"]
