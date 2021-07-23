@@ -15,7 +15,7 @@ const { isAddress } = ethers.utils;
 
 describe('GrantRound', function () {
   let deployer: SignerWithAddress,
-    grantRoundOwner: SignerWithAddress,
+    payoutAdmin: SignerWithAddress,
     donor: SignerWithAddress,
     grantPayee: SignerWithAddress,
     mpUser: SignerWithAddress; // matching pool user
@@ -29,7 +29,7 @@ describe('GrantRound', function () {
   beforeEach(async () => {
     const mockUrl: string = 'https://test.url';
     const minContribution = 50;
-    [deployer, grantRoundOwner, donor, grantPayee, mpUser] = await ethers.getSigners();
+    [deployer, payoutAdmin, donor, grantPayee, mpUser] = await ethers.getSigners();
     mockERC20 = await deployMockContract(deployer, IERC20Artifact.abi);
     // Seed funds for matching pool user
     await mockERC20.mock.transfer.withArgs(mpUser.address, ethers.utils.parseEther(balances[0])).returns(true);
@@ -50,7 +50,7 @@ describe('GrantRound', function () {
     );
 
     roundContract = await roundContractFactory.deploy(
-      grantRoundOwner.address,
+      payoutAdmin.address,
       registry.address,
       mockERC20.address,
       startTime,
@@ -118,11 +118,29 @@ describe('GrantRound', function () {
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(deployer.address, balances[0]).returns(true);
 
-      await expect(roundContract.connect(grantRoundOwner).payoutGrants(deployer.address)).to.be.revertedWith(
+      await expect(roundContract.connect(payoutAdmin).payoutGrants(deployer.address)).to.be.revertedWith(
         'Method must be called after the active round has ended'
       );
     });
   });
+
+  describe('updateMetadataPtr - updates metadata pointer string', () => {
+    it('updates the pointer and emits an event', async function () {
+      const newPtr = 'https://new.com';
+      const oldPtr = await roundContract.metaPtr();
+
+      await expect(roundContract.connect(deployer).updateMetadataPtr(newPtr))
+        .to.emit(roundContract, 'MetadataUpdated')
+        .withArgs(oldPtr, newPtr);
+    });
+
+    it('reverts if not the grant round owner', async function () {
+      await expect(roundContract.connect(mpUser).updateMetadataPtr('test')).to.be.revertedWith(
+        'GrantRound: Only the grant round owner can update the metadata pointer'
+      );
+    });
+  });
+
   describe('Round end corner cases', () => {
     before(async () => {
       // End the round for all subsequent tests
@@ -134,10 +152,21 @@ describe('GrantRound', function () {
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
-      await roundContract.connect(grantRoundOwner).payoutGrants(grantPayee.address);
+      await roundContract.connect(payoutAdmin).payoutGrants(grantPayee.address);
 
       // TODO: add token.balanceOf check in mock ERC20
     });
+
+    it('reverts if not the grant round payout administrator', async function () {
+      await mockERC20.mock.balanceOf.withArgs(deployer.address).returns(ethers.utils.parseEther(balances[0]));
+      await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));
+      await mockERC20.mock.transfer.withArgs(deployer.address, balances[0]).returns(true);
+
+      await expect(roundContract.connect(mpUser).payoutGrants(deployer.address)).to.be.revertedWith(
+        'GrantRound: Only the payout administrator can call this method'
+      );
+    });
+
     it('matching pool transfers revert if passed round end time', async function () {
       await mockERC20.mock.balanceOf.withArgs(mpUser.address).returns(ethers.utils.parseEther(balances[0]));
       await mockERC20.mock.balanceOf.withArgs(roundContract.address).returns(ethers.utils.parseEther(balances[0]));

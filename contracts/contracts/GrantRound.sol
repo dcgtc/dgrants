@@ -14,7 +14,10 @@ contract GrantRound {
   /// @notice Unix timestamp of the end of the round
   uint256 public immutable endTime;
 
-  /// @notice Contract owner
+  /// @notice Grant round payout administrator
+  address public payoutAdmin;
+
+  /// @notice Grant round owner
   address public owner;
 
   /// @notice GrantsRegistry
@@ -37,11 +40,14 @@ contract GrantRound {
   /// @notice Emitted when a grant receives a donation
   event DonationSent(uint96 indexed id, address indexed token, uint256 amount, address indexed donor);
 
+  /// @notice Emitted when a grant round metadata pointer is updated
+  event MetadataUpdated(string oldMetaPtr, string indexed newMetaPtr);
+
   // --- Core methods ---
 
   /**
    * @notice Instantiates a new grant round
-   * @param _owner Grant round owner that has permission to payout the matching pool
+   * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
    * @param _startTime Unix timestamp of the start of the round
@@ -50,7 +56,7 @@ contract GrantRound {
    * @param _minContribution Miniumum donation amount that can be made using the given donation token
    */
   constructor(
-    address _owner,
+    address _payoutAdmin,
     GrantRegistry _registry,
     IERC20 _donationToken,
     uint256 _startTime,
@@ -58,8 +64,9 @@ contract GrantRound {
     string memory _metaPtr,
     uint256 _minContribution
   ) {
+    owner = msg.sender;
+    payoutAdmin = _payoutAdmin;
     hasPaidOut = false;
-    owner = _owner;
     registry = _registry;
     donationToken = _donationToken;
     startTime = _startTime;
@@ -100,18 +107,26 @@ contract GrantRound {
    * @notice When the round ends the owner can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
-  function payoutGrants(address _payoutAddress) external afterRoundEnd onlyOwner {
+  function payoutGrants(address _payoutAddress) external afterRoundEnd {
+    require(msg.sender == payoutAdmin, "GrantRound: Only the payout administrator can call this method");
     uint256 balance = donationToken.balanceOf(address(this));
     hasPaidOut = true;
     donationToken.safeTransfer(_payoutAddress, balance);
   }
 
-  // --- Modifiers ---
+  /**
+   * @notice Updates the metadata pointer to a new location
+   * @param _newMetaPtr A string where the updated metadata is stored
+   */
+  function updateMetadataPtr(string memory _newMetaPtr) external {
+    require(msg.sender == owner, "GrantRound: Only the grant round owner can update the metadata pointer");
+    string memory oldPtr = metaPtr;
+    metaPtr = _newMetaPtr;
 
-  modifier onlyOwner() {
-    require(msg.sender == owner, "Only owner can call this method");
-    _;
+    emit MetadataUpdated(oldPtr, _newMetaPtr);
   }
+
+  // --- Modifiers ---
 
   modifier beforeRoundEnd() {
     require(block.timestamp < endTime, "GrantRound: Action cannot be performed as the round has ended");
