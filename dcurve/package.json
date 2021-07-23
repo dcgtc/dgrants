@@ -1,0 +1,26 @@
+{
+  "name": "@dgrants/dcurve",
+  "version": "0.0.1",
+  "description": "distribution generator for GrantCLR in dgrants",
+  "keywords": [
+    "pairwise",
+    "linear",
+    "CLR",
+    "curve"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "dev": "echo 'TODO'",
+    "build": "echo 'TODO'",
+    "test": "echo 'TODO'",
+    "lint": "eslint --ext .ts,.js,.vue .",
+    "precommit": "lint-staged",
+    "prettier": "prettier --write ."
+  },
+  "bugs": {
+    "url": "https://github.com/dcgtc/dgrants/dcurve/issues"
+  },
+  "volta": {
+    "extends": "../package.json"
+  }
+}
