@@ -47,6 +47,7 @@ contract GrantRound {
 
   /**
    * @notice Instantiates a new grant round
+   * @param _owner Grant round owner that has permission to update the metadata pointer
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
@@ -56,6 +57,7 @@ contract GrantRound {
    * @param _minContribution Miniumum donation amount that can be made using the given donation token
    */
   constructor(
+    address _owner,
     address _payoutAdmin,
     GrantRegistry _registry,
     IERC20 _donationToken,
@@ -64,7 +66,7 @@ contract GrantRound {
     string memory _metaPtr,
     uint256 _minContribution
   ) {
-    owner = msg.sender;
+    owner = _owner;
     payoutAdmin = _payoutAdmin;
     hasPaidOut = false;
     registry = _registry;
