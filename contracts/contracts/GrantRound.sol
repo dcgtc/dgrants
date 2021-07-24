@@ -66,6 +66,11 @@ contract GrantRound {
     string memory _metaPtr,
     uint256 _minContribution
   ) {
+    require(_donationToken.totalSupply() > 0, "GrantRound: Invalid token");
+    require(_startTime >= block.timestamp, "GrantRound: Start time has already passed");
+    require(_endTime > _startTime, "GrantRound: End time must be after start time");
+    require(_registry.grantCount() >= 0, "GrantRound: Invalid registry"); // verify this call doesn't revert
+
     owner = _owner;
     payoutAdmin = _payoutAdmin;
     hasPaidOut = false;

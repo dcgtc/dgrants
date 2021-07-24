@@ -20,3 +20,9 @@ export async function timeTravel(provider: any, seconds: number) {
   await provider.send('evm_increaseTime', [seconds]);
   await provider.send('evm_mine', []);
 }
+
+export async function setNextBlockTimestamp(provider: any, timestamp: number, delay: number) {
+  const newTimestamp = timestamp + delay;
+  await provider.send('evm_setNextBlockTimestamp', [newTimestamp]);
+  return newTimestamp;
+}
