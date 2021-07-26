@@ -9,7 +9,8 @@ contract GrantRoundFactory {
 
   /**
    * @notice Creates a new GrantRound
-   * @param _owner Grant round owner that has permission to payout the matching pool
+   * @param _owner Grant round owner that has permission to update the metadata pointer
+   * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
    * @param _startTime Unix timestamp of the start of the round
@@ -19,6 +20,7 @@ contract GrantRoundFactory {
    */
   function createGrantRound(
     address _owner,
+    address _payoutAdmin,
     GrantRegistry _registry,
     IERC20 _donationToken,
     uint256 _startTime,
@@ -28,6 +30,7 @@ contract GrantRoundFactory {
   ) external {
     GrantRound _grantRound = new GrantRound(
       _owner,
+      _payoutAdmin,
       _registry,
       _donationToken,
       _startTime,

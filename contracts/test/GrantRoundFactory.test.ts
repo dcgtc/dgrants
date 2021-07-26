@@ -38,14 +38,24 @@ describe('GrantRoundFactory', () => {
     await mockToken.mock.totalSupply.returns('1');
 
     // Create round
-    const owner = randomAddress();
+    const metadataAdmin = randomAddress();
+    const payoutAdmin = randomAddress();
     const registry = mockRegistry.address;
     const token = mockToken.address;
     const startTime = '50000000000000'; // random timestamp far in the future
     const endTime = '60000000000000'; // random timestamp far in the future
     const metaPtr = 'https://metadata-pointer.com';
     const minContribution = '100';
-    const tx = await factory.createGrantRound(owner, registry, token, startTime, endTime, metaPtr, minContribution);
+    const tx = await factory.createGrantRound(
+      metadataAdmin,
+      payoutAdmin,
+      registry,
+      token,
+      startTime,
+      endTime,
+      metaPtr,
+      minContribution
+    );
 
     // Verify event log was emitted
     await expect(tx).to.emit(factory, 'GrantRoundCreated');
@@ -57,7 +67,8 @@ describe('GrantRoundFactory', () => {
 
     // Verify GrantRound was properly created
     const grantRound = await ethers.getContractAt('GrantRound', grantRoundAddress);
-    expect(await grantRound.owner()).to.equal(owner);
+    expect(await grantRound.metadataAdmin()).to.equal(metadataAdmin);
+    expect(await grantRound.payoutAdmin()).to.equal(payoutAdmin);
     expect(await grantRound.registry()).to.equal(registry);
     expect(await grantRound.donationToken()).to.equal(token);
     expect(await grantRound.startTime()).to.equal(startTime);
