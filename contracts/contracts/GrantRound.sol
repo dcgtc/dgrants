@@ -15,10 +15,10 @@ contract GrantRound {
   uint256 public immutable endTime;
 
   /// @notice Grant round payout administrator
-  address public payoutAdmin;
+  address public immutable payoutAdmin;
 
-  /// @notice Grant round owner
-  address public owner;
+  /// @notice Grant round metadata administrator
+  address public immutable metadataAdmin;
 
   /// @notice GrantsRegistry
   GrantRegistry public immutable registry;
@@ -47,7 +47,7 @@ contract GrantRound {
 
   /**
    * @notice Instantiates a new grant round
-   * @param _owner Grant round owner that has permission to update the metadata pointer
+   * @param _metadataAdmin The address with the role that has permission to update the metadata pointer
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
@@ -57,7 +57,7 @@ contract GrantRound {
    * @param _minContribution Miniumum donation amount that can be made using the given donation token
    */
   constructor(
-    address _owner,
+    address _metadataAdmin,
     address _payoutAdmin,
     GrantRegistry _registry,
     IERC20 _donationToken,
@@ -66,7 +66,7 @@ contract GrantRound {
     string memory _metaPtr,
     uint256 _minContribution
   ) {
-    owner = _owner;
+    metadataAdmin = _metadataAdmin;
     payoutAdmin = _payoutAdmin;
     hasPaidOut = false;
     registry = _registry;
@@ -106,7 +106,7 @@ contract GrantRound {
   }
 
   /**
-   * @notice When the round ends the owner can send the remaining matching pool funds to a given address
+   * @notice When the round ends the payoutAdmin can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
   function payoutGrants(address _payoutAddress) external afterRoundEnd {
@@ -121,7 +121,10 @@ contract GrantRound {
    * @param _newMetaPtr A string where the updated metadata is stored
    */
   function updateMetadataPtr(string memory _newMetaPtr) external {
-    require(msg.sender == owner, "GrantRound: Only the grant round owner can update the metadata pointer");
+    require(
+      msg.sender == metadataAdmin,
+      "GrantRound: Only the grant round metadata admin can update the metadata pointer"
+    );
     string memory oldPtr = metaPtr;
     metaPtr = _newMetaPtr;
 

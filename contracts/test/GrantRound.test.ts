@@ -135,9 +135,9 @@ describe('GrantRound', function () {
         .withArgs(oldPtr, newPtr);
     });
 
-    it('reverts if not the grant round owner', async function () {
+    it('reverts if not the grant round metadata admin', async function () {
       await expect(roundContract.connect(mpUser).updateMetadataPtr('test')).to.be.revertedWith(
-        'GrantRound: Only the grant round owner can update the metadata pointer'
+        'GrantRound: Only the grant round metadata admin can update the metadata pointer'
       );
     });
   });
