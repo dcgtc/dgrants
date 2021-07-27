@@ -6,28 +6,28 @@ import { deployMockContract } from '@ethereum-waffle/mock-contract';
 import { expect } from 'chai';
 
 // --- Our imports ---
-import { GrantRoundFactory } from '../typechain';
+import { GrantRoundManager } from '../typechain';
 
 // --- Parse and define helpers ---
 const { isAddress } = ethers.utils;
 const { deployContract } = waffle;
 const randomAddress = () => ethers.Wallet.createRandom().address;
 
-// --- GrantRoundFactory tests ---
-describe('GrantRoundFactory', () => {
+// --- GrantRoundManager tests ---
+describe('GrantRoundManager', () => {
   let user: SignerWithAddress;
-  let factory: GrantRoundFactory;
+  let manager: GrantRoundManager;
 
   before(async () => {
     [user] = await ethers.getSigners();
 
-    // Deploy Factory
-    const factoryArtifact: Artifact = await artifacts.readArtifact('GrantRoundFactory');
-    factory = <GrantRoundFactory>await deployContract(user, factoryArtifact);
+    // Deploy Manager
+    const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
+    manager = <GrantRoundManager>await deployContract(user, managerArtifact);
   });
 
   it('deploys properly', async () => {
-    expect(isAddress(factory.address), 'Failed to deploy GrantRoundFactory').to.be.true;
+    expect(isAddress(manager.address), 'Failed to deploy GrantRoundManager').to.be.true;
   });
 
   it('creates new grant rounds', async () => {
@@ -46,7 +46,7 @@ describe('GrantRoundFactory', () => {
     const endTime = '60000000000000'; // random timestamp far in the future
     const metaPtr = 'https://metadata-pointer.com';
     const minContribution = '100';
-    const tx = await factory.createGrantRound(
+    const tx = await manager.createGrantRound(
       metadataAdmin,
       payoutAdmin,
       registry,
@@ -58,11 +58,11 @@ describe('GrantRoundFactory', () => {
     );
 
     // Verify event log was emitted
-    await expect(tx).to.emit(factory, 'GrantRoundCreated');
+    await expect(tx).to.emit(manager, 'GrantRoundCreated');
 
     // Parse data from the event to get the address of the new GrantRound
     const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-    const log = factory.interface.parseLog(receipt.logs[0]);
+    const log = manager.interface.parseLog(receipt.logs[0]);
     const { grantRound: grantRoundAddress } = log.args;
 
     // Verify GrantRound was properly created

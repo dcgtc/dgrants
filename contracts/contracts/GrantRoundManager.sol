@@ -3,7 +3,7 @@ pragma solidity ^0.8.5;
 
 import "./GrantRound.sol";
 
-contract GrantRoundFactory {
+contract GrantRoundManager {
   /// @notice Emitted when a new GrantRound contract is created
   event GrantRoundCreated(address grantRound);
 
