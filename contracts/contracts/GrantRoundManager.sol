@@ -2,17 +2,37 @@
 pragma solidity ^0.8.5;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/utils/Address.sol";
+import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "./GrantRegistry.sol";
 import "./GrantRound.sol";
 
 contract GrantRoundManager {
+  using Address for address;
+
+  /// @notice Address of the GrantRegistry
+  GrantRegistry public immutable registry;
+
+  /// @notice Address of the Uniswap V3 Router used for token swaps
+  ISwapRouter public immutable router;
+
   /// @notice Address of the ERC20 token in which donations are made
   IERC20 public immutable donationToken;
 
   /// @notice Emitted when a new GrantRound contract is created
   event GrantRoundCreated(address grantRound);
 
-  constructor(IERC20 _donationToken) {
+  constructor(
+    GrantRegistry _registry,
+    ISwapRouter _router,
+    IERC20 _donationToken
+  ) {
+    require(_registry.grantCount() >= 0, "GrantRoundManager: Invalid registry");
+    require(address(_router).isContract(), "GrantRoundManager: Invalid router"); // Router interface doesn't have a state variable to check
     require(_donationToken.totalSupply() > 0, "GrantRoundManager: Invalid token");
+
+    registry = _registry;
+    router = _router;
     donationToken = _donationToken;
   }
 
