@@ -13,10 +13,13 @@ contract GrantRoundManager {
   /// @notice Donation Object
   struct Donation {
     uint96 grantId; // grant ID to which donation is being made
-    uint256 amount; // amount of tokens which are being donated
-    address[] swapPath; // Uniswap router swap path
-    // WHY IS THIS AN ARRAY ? CAN THIS BE IERC20
     GrantRound[] rounds; // rounds against which the donation should be counted
+    IERC20 tokenIn; // token in which the user made the donation
+    uint24 fee; // selected fee tier
+    uint256 deadline; // deadline by when swap has to be happen
+    uint256 amountIn; // amount donated by the user
+    uint256 amountOutMinimum; // minimum amount to be returned after swap
+    uint160 sqrtPriceLimitX96; // determine limits on the pool prices which cannot exceed swap
   }
 
   /// @notice Address of the GrantRegistry
@@ -32,7 +35,13 @@ contract GrantRoundManager {
   event GrantRoundCreated(address grantRound);
 
   /// @notice Emit when a donation has been made
-  event GrantDonation(uint96 grantId, address inputToken, uint256 amount, address[] rounds);
+  event GrantDonation(
+    uint96 indexed grantId,
+    address indexed tokenIn,
+    uint256 amountIn,
+    uint256 indexed amountOut,
+    GrantRound[] rounds
+  );
 
   constructor(
     GrantRegistry _registry,
@@ -85,63 +94,61 @@ contract GrantRoundManager {
    * @notice Swap and donate to a grant
    * @param  _donation Donation being made to a grant
    */
-  function swapAndDonate(
-    Donation calldata _donation
-  ) external {
-
+  function swapAndDonate(Donation calldata _donation) external {
     uint96 grantId = _donation.grantId;
-    GrantRound[] rounds = _donation.rounds;
+    GrantRound[] calldata rounds = _donation.rounds;
 
     // Checks to ensure grant recieving donation exists in registry
-    require(
-      grantId < registry.grantCount(),
-      "GrantRoundManager: Grant does not exist in registry provided"
-    );
+    require(grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry provided");
 
     /**
      * Iterates through every GrantRound to ensure it has the
      * - same donationToken as the GrantRoundManager
      * - GrantRound is active
      */
-    for (uint i = 0; i <= rounds.length; i++) {
+    for (uint256 i = 0; i <= rounds.length; i++) {
       require(
         donationToken == rounds[i].donationToken(),
         "GrantRoundManager: GrantRound has a donationToken from GrantRoundManager."
       );
 
       require(
-        block.timestamp >= rounds[i].startTime() &&
-        block.timestamp < rounds[i].endTime(),
+        block.timestamp >= rounds[i].startTime() && block.timestamp < rounds[i].endTime(),
         "GrantRoundManager: GrantRound is not active"
       );
     }
 
-    address payoutAddress =  registry.getGrantPayee(grantId);
-    uint256 amountIn = _donation.amount;
-    address tokenIn = _donation.swapPath[0];
+    address payoutAddress = registry.getGrantPayee(grantId);
+
+    IERC20 tokenIn = _donation.tokenIn;
+    uint256 amountIn = _donation.amountIn;
+    uint256 amountOut;
 
     if (tokenIn == donationToken) {
-      // Uses safeTransfer if the Donation is made in the same donationToken
-      donationToken.safeTransfer(payoutAddress, amountIn);
-
-      emit GrantDonation(grantId, donationToken, amountIn, rounds);
+      amountOut = amountIn;
     } else {
+      uint24 fee = _donation.fee;
+      uint256 deadline = _donation.deadline;
+      uint256 amountOutMinimum = _donation.amountOutMinimum;
+      uint160 sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
 
       // Swaps the donation into donationToken using SwapRouter
       ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
-        tokenIn,          // tokenIn
-        donationToken,    // tokenOut
-        fee,              // TODO
-        payoutAddress,    // recipient
-        deadline,         // TODO
-        amountIn,         // amountIn
-        amountOutMinimum, // TODO
-        0                 // sqrtPriceLimitX96
+        tokenIn, // tokenIn
+        donationToken, // tokenOut
+        fee, // fee
+        payoutAddress, // recipient
+        deadline, // deadline
+        amountIn, // amountIn
+        amountOutMinimum, // amountOutMinimum
+        sqrtPriceLimitX96 // sqrtPriceLimitX96
       );
 
-      uint amountOut = router.exactInputSingle(params);
-      // TODO: DO we also want to emit event for the actual donation
-      emit GrantDonation(grantId, donationToken, amountOut, rounds);
+      amountOut = router.exactInputSingle(params);
     }
+
+    // transfer funds to grant payout address
+    donationToken.safeTransfer(payoutAddress, amountOut);
+    emit GrantDonation(grantId, tokenIn, amountIn, amountOut, rounds);
   }
 }
