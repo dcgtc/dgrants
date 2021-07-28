@@ -10,6 +10,15 @@ import "./GrantRound.sol";
 contract GrantRoundManager {
   using Address for address;
 
+  /// @notice Donation Object
+  struct Donation {
+    uint96 grantId; // grant ID to which donation is being made
+    uint256 amount; // amount of tokens which are being donated
+    address[] swapPath; // Uniswap router swap path
+    // WHY IS THIS AN ARRAY ? CAN THIS BE IERC20
+    GrantRound[] rounds; // rounds against which the donation should be counted
+  }
+
   /// @notice Address of the GrantRegistry
   GrantRegistry public immutable registry;
 
@@ -21,6 +30,9 @@ contract GrantRoundManager {
 
   /// @notice Emitted when a new GrantRound contract is created
   event GrantRoundCreated(address grantRound);
+
+  /// @notice Emit when a donation has been made
+  event GrantDonation(uint96 grantId, address inputToken, uint256 amount, address[] rounds);
 
   constructor(
     GrantRegistry _registry,
@@ -67,5 +79,69 @@ contract GrantRoundManager {
     );
 
     emit GrantRoundCreated(address(_grantRound));
+  }
+
+  /**
+   * @notice Swap and donate to a grant
+   * @param  _donation Donation being made to a grant
+   */
+  function swapAndDonate(
+    Donation calldata _donation
+  ) external {
+
+    uint96 grantId = _donation.grantId;
+    GrantRound[] rounds = _donation.rounds;
+
+    // Checks to ensure grant recieving donation exists in registry
+    require(
+      grantId < registry.grantCount(),
+      "GrantRoundManager: Grant does not exist in registry provided"
+    );
+
+    /**
+     * Iterates through every GrantRound to ensure it has the
+     * - same donationToken as the GrantRoundManager
+     * - GrantRound is active
+     */
+    for (uint i = 0; i <= rounds.length; i++) {
+      require(
+        donationToken == rounds[i].donationToken(),
+        "GrantRoundManager: GrantRound has a donationToken from GrantRoundManager."
+      );
+
+      require(
+        block.timestamp >= rounds[i].startTime() &&
+        block.timestamp < rounds[i].endTime(),
+        "GrantRoundManager: GrantRound is not active"
+      );
+    }
+
+    address payoutAddress =  registry.getGrantPayee(grantId);
+    uint256 amountIn = _donation.amount;
+    address tokenIn = _donation.swapPath[0];
+
+    if (tokenIn == donationToken) {
+      // Uses safeTransfer if the Donation is made in the same donationToken
+      donationToken.safeTransfer(payoutAddress, amountIn);
+
+      emit GrantDonation(grantId, donationToken, amountIn, rounds);
+    } else {
+
+      // Swaps the donation into donationToken using SwapRouter
+      ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
+        tokenIn,          // tokenIn
+        donationToken,    // tokenOut
+        fee,              // TODO
+        payoutAddress,    // recipient
+        deadline,         // TODO
+        amountIn,         // amountIn
+        amountOutMinimum, // TODO
+        0                 // sqrtPriceLimitX96
+      );
+
+      uint amountOut = router.exactInputSingle(params);
+      // TODO: DO we also want to emit event for the actual donation
+      emit GrantDonation(grantId, donationToken, amountOut, rounds);
+    }
   }
 }
