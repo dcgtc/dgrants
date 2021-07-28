@@ -22,7 +22,7 @@
     "build": "lerna run build",
     "clean": "lerna run clean",
     "node": "yarn contracts app:node",
-    "dev": "concurrently --restart-tries 5 --kill-others \"yarn run node\" \"yarn contracts app:setup && yarn app dev\"",
+    "dev": "concurrently --restart-tries 5 --kill-others \"yarn run node\" \"yarn contracts app:setup && yarn contracts app:load && yarn app dev\"",
     "lint": "lerna run lint",
     "postinstall": "lerna run postinstall",
     "prettier": "lerna run prettier",

@@ -89,6 +89,7 @@ async function main(): Promise<void> {
   await Promise.all(grants.map((grant) => registry.createGrant(grant.owner, grant.payee, grant.metaPtr)));
   console.log(`Created ${grants.length} dummy grants`);
 
+  // Creat the grantRounds
   await createGrantRoundFactory(deployer, registry.address);
 }
 

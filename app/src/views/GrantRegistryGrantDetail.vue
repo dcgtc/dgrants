@@ -1,7 +1,9 @@
 <template>
   <!-- Grant details -->
   <div v-if="!isEditing && grant">
-    <div class="font-bold">Details for Grant ID {{ grant.id.toString() }}</div>
+    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">
+      Details for Grant ID {{ grant.id.toString() }}
+    </h1>
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
     <p>

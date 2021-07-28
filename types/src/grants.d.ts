@@ -24,3 +24,21 @@ export interface Donation {
   amountOutMinimum: BigNumberish;
   sqrtPriceLimitX96: BigNumberish;
 }
+// GrantRound object from GrantRoundManager
+export type GrantRound = {
+  address: string,
+  owner: string,
+  registry: string,
+  donationToken: string,
+  donationTokenName: string,
+  donationTokenSymbol: string,
+  donationTokenDecimals: BigNumberish,
+  funds: BigNumberish,
+  status: string,
+  startTime: BigNumberish,
+  endTime: BigNumberish,
+  metaPtr: string,
+  minContribution: BigNumberish,
+  hasPaidOut: Boolean
+};
+export type GrantRounds = Array<GrantRound>;

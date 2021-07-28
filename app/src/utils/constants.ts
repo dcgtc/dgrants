@@ -19,3 +19,19 @@ export const MULTICALL_ABI = [
 // Data for Grants contracts
 export const GRANT_REGISTRY_ADDRESS = '0xd0f350b13465b5251bb03e4bbf9fa1dbc4a378f3';
 export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
+
+export { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
+
+export const GRANT_ROUND_FACTORY_ADDRESS = '0xa27bC320252d51EEAA24BCCF6cc003979E485860';
+export { abi as GRANT_ROUND_FACTORY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundFactory.sol/GrantRoundFactory.json';
+
+export const ERC20_ABI = [
+  'function name() view returns (string)',
+  'function symbol() view returns (string)',
+  'function decimals() view returns (uint8)',
+  'function balanceOf(address) view returns (uint)',
+  'function approve(address spender, uint256 amount) external returns (bool)',
+  'function allowance(address owner, address spender) external view returns (uint256)',
+  'function transfer(address to, uint amount)',
+  'event Transfer(address indexed from, address indexed to, uint amount)',
+];

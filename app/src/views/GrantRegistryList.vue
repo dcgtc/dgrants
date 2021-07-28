@@ -1,15 +1,16 @@
 <template>
   <div class="max-w-screen-lg mx-auto">
+    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Grant Registry</h1>
     <!-- Create New Grant -->
     <div class="mb-10">
-      <h1 class="text-lg mb-3">Create New Grant</h1>
+      <h2 class="text-lg mb-3">Create New Grant</h2>
       <div class="mb-1">Click the button below to create a new grant</div>
-      <button @click="pushRoute({ name: 'dgrants-new' })" class="btn btn-secondary">Create Grant</button>
+      <button @click="pushRoute({ name: 'dgrants-new' })" class="btn btn-secondary mt-6">Create Grant</button>
     </div>
 
     <!-- View Existing Grants -->
-    <h1 class="text-lg mb-3">Grant Registry List</h1>
-    <div class="mb-1">Below is all grants read from the GrantRegistry contract</div>
+    <h2 class="text-lg mb-3">Grant Registry List</h2>
+    <div class="mb-10">Below is all grants read from the GrantRegistry contract</div>
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <li
         v-for="grant in grants"

@@ -26,6 +26,8 @@
         :name="id"
         :required="true"
         :type="type"
+        :readonly="readonly"
+        :disabled="disabled"
       />
       <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
         <ExclamationCircleIcon class="h-5 w-5 text-red-500" />
@@ -52,6 +54,8 @@ export default defineComponent({
     id: { type: String, required: false, default: undefined }, // id, for accessibility
     placeholder: { type: String, required: false, default: undefined }, // input placeholder text
     type: { type: String, required: false, default: 'text' }, // input type
+    readonly: { type: Boolean, required: false, default: false }, // is readonly
+    disabled: { type: Boolean, required: false, default: false }, // is disabled
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,

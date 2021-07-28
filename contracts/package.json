@@ -63,7 +63,8 @@
     "test": "hardhat test",
     "typechain": "hardhat typechain",
     "app:node": "INFURA_ID=$(grep INFURA_ID .env | cut -d '=' -f2) && yarn hardhat node --fork \"https://mainnet.infura.io/v3/$INFURA_ID\"",
-    "app:setup": "hardhat run scripts/app.ts --network localhost"
+    "app:setup": "hardhat run scripts/app.ts --network localhost",
+    "app:load": "hardhat load-accounts --network localhost"
   },
   "volta": {
     "extends": "../package.json"
