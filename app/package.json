@@ -9,7 +9,7 @@
     "serve": "vite preview",
     "test:unit": "vue-cli-service test:unit",
     "test:e2e": "vue-cli-service test:e2e",
-    "lint": "eslint --ext .ts,.js,.vue .",
+    "lint": "vue-tsc --noEmit && eslint --ext .ts,.js,.vue .",
     "precommit": "lint-staged",
     "prettier": "prettier --write ."
   },

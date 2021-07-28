@@ -53,3 +53,5 @@ jobs:
           steps.cache-node-modules.outputs.cache-hit == 'true'
       - name: Run test
         run: yarn test
+      - name: Run lint
+        run: yarn lint
