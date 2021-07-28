@@ -139,7 +139,7 @@ describe('GrantRound', function () {
   describe('Round end corner cases', () => {
     it('sends remaining matching pool funds to payout address', async function () {
       await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(balances[0]));
-      await timeTravel(deployer.provider, endTime + 1);
+      await timeTravel(endTime + 1);
       await roundContract.connect(payoutAdmin).payoutGrants(grantPayee.address);
       expect(await mockERC20.balanceOf(grantPayee.address)).to.be.equal(ethers.utils.parseEther(balances[0]));
     });
