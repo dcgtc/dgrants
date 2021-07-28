@@ -2,26 +2,6 @@
 
 
 ## Design Specification
-
-
-## 25/6/2021
-
-Prepared for:
-
-Gitcoin Holdings
-
-Prepared by:
-
-ChainSafe Systems
-
-
-[TOC]
-
-
-
-#
-
-
 # 1. Overview
 
 This document details an alternative design for Gitcoin Grants with a focus on openness and non-intervention by the Gitcoin team.
@@ -175,8 +155,8 @@ See supplementary material
 
 
 
-* [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grants-list-schema.json](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grants-list-schema.json)
-* [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/example-collection.json](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/example-collection.json)
+* [https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grants-list-schema.json](https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grants-list-schema.json)
+* [https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/example-collection.json](https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/example-collection.json)
 
 
 ## 5.2. Curation Markets
@@ -215,7 +195,7 @@ The existing Gitcoin profiles provide the infrastructure required to support use
 
 The dGrants web UI developed by Gitcoin will optionally query the existing database to retrieve user data for given addresses. This will require an additional API call on the Gitcoin backend to retrieve data by Ethereum address e.g.
 
-  GET `/v1/api/userdata/&lt;address>`
+  GET `/v1/api/userdata/<address>`
 
 This allows users to have a consistent presence on both Gitcoin and Gitcoin dGrants.
 
@@ -935,22 +915,22 @@ _Table 5. _
 
 ## 10.3. Grants List JSON Schema
 
-See: [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grants-list-schema.json](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grants-list-schema.json)
+See: [https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grants-list-schema.json](https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grants-list-schema.json)
 
 
 ## 10.4. Indexer GraphQL Schema
 
-See: [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/indexer-manifest.yaml](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/indexer-manifest.yaml)
+See: [https://github.com/dcgtc/dgrants-subgraph/blob/main/subgraph.yaml](https://github.com/dcgtc/dgrants-subgraph/blob/main/subgraph.yaml)
 
 
 ## 10.5. Indexer Subgraph Manifest
 
-See: [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/indexer-schema.graphql](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/indexer-schema.graphql)
+See: [https://github.com/dcgtc/dgrants-subgraph/blob/main/schema.graphql](https://github.com/dcgtc/dgrants-subgraph/blob/main/schema.graphql)
 
 
 ## 10.6. Grant Metadata JSON Schema
 
-See: [https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grant-metadata-schema.json](https://github.com/ChainSafe/gitcoin-dgrants-specs/blob/main/grant-metadata-schema.json)
+See: [https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grant-metadata-schema.json](https://github.com/dcgtc/dgrants/blob/main/doc/protocol/examples/grant-metadata-schema.json)
 
 
 ##
