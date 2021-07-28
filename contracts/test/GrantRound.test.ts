@@ -8,6 +8,8 @@ import { expect } from 'chai';
 import { GrantRegistry } from '../typechain/GrantRegistry';
 import { timeTravel, setNextBlockTimestamp } from './utils';
 import IERC20Artifact from '../artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json';
+import { MockContract } from 'ethereum-waffle';
+import { Contract } from 'ethers';
 
 // --- Parse and define helpers ---
 const { deployContract, deployMockContract } = waffle;
@@ -20,8 +22,8 @@ describe('GrantRound', function () {
     grantPayee: SignerWithAddress,
     mpUser: SignerWithAddress; // matching pool user
   let registry: GrantRegistry;
-  let roundContract: any;
-  let mockERC20: any;
+  let roundContract: Contract;
+  let mockERC20: MockContract;
   const balances: string[] = ['100', '200'];
   let startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
   let endTime: number; // One day
@@ -112,7 +114,7 @@ describe('GrantRound', function () {
       await mockERC20.mock.transfer.withArgs(grantPayee.address, balances[0]).returns(true);
 
       await expect(roundContract.connect(donor).donateToGrant(10, grantId)).to.be.revertedWith(
-        'Donation amount must be greater than minimum contribution'
+        'Donation must be greater than minimum contribution'
       );
     });
   });
@@ -124,7 +126,7 @@ describe('GrantRound', function () {
       await mockERC20.mock.transfer.withArgs(deployer.address, balances[0]).returns(true);
 
       await expect(roundContract.connect(payoutAdmin).payoutGrants(deployer.address)).to.be.revertedWith(
-        'Method must be called after the active round has ended'
+        'Method must be called after round has ended'
       );
     });
   });
@@ -139,9 +141,9 @@ describe('GrantRound', function () {
         .withArgs(oldPtr, newPtr);
     });
 
-    it('reverts if not the grant round owner', async function () {
+    it('reverts if not the grant round metadata admin', async function () {
       await expect(roundContract.connect(mpUser).updateMetadataPtr('test')).to.be.revertedWith(
-        'GrantRound: Only the grant round owner can update the metadata pointer'
+        'GrantRound: Action can be perfomed only by metadataAdmin'
       );
     });
   });
@@ -149,7 +151,7 @@ describe('GrantRound', function () {
   describe('Round end corner cases', () => {
     before(async () => {
       // End the round for all subsequent tests
-      await timeTravel(deployer.provider, endTime + 1);
+      await timeTravel(endTime + 1);
     });
 
     it.skip('sends remaining matching pool funds to payout address', async function () {

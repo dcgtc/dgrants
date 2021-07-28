@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.8.5;
 
 /**
@@ -21,8 +22,10 @@ contract GrantRegistry {
     string metaPtr; // URL pointing to grant metadata (for off-chain use)
   }
 
+  // TODO use an array instead with ID to index it? Which is better?
+  // TODO Will array copy full array to memory in `getAllGrants`?
   /// @notice Mapping from Grant ID to grant data
-  mapping(uint96 => Grant) public grants; // TODO use an array instead with ID to index it? Which is better? Will array copy full array to memory in `getAllGrants`?
+  mapping(uint96 => Grant) public grants;
 
   // --- Events ---
   /// @notice Emitted when a new grant is created

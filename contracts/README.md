@@ -1,5 +1,7 @@
 # @dgrants/contracts
 
+[hardhat](https://hardhat.org/getting-started/) is the environment used to compile, deploy, test and debug the dGrants contract.
+
 ## Usage
 
 ### Pre Requisites
@@ -15,7 +17,7 @@ $ yarn install
 Compile the smart contracts with Hardhat:
 
 ```sh
-$ yarn compile
+$ yarn build
 ```
 
 ### TypeChain
@@ -72,4 +74,12 @@ Delete the smart contract artifacts, the coverage reports and the Hardhat cache:
 
 ```sh
 $ yarn clean
+```
+
+### Hardhat console
+
+To access the console once the hardnat network is running on your local machine.
+
+```sh
+$ npx hardhat console
 ```
