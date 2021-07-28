@@ -29,7 +29,7 @@ To ensure that everyone is using the same version of nodejs on this project, [vo
 
 ### Set your env files
 
-Copy `app/.env.template` to `app/.env` and edit, providing your own env vars. You will have to supply a [Blocknative](https://www.blocknative.com/) API key and an [Infura](https://infura.io/) identifier. Both services have free tiers which are sufficient for development.
+Copy `app/.env.template` to `app/.env` and edit, providing your own env vars. You will have to supply a [Blocknative](https://www.blocknative.com/) API key and an [Infura](https://infura.io/) Project ID. Both services have free tiers which are sufficient for development.
 
 ```bash
 cp app/.env.template app/.env
@@ -41,7 +41,7 @@ Copy `contracts/.env.template` to `contracts/.env` and edit, providing your own 
 cp contracts/.env.template contracts/.env
 ```
 
-You will have to supply an [Infura](https://infura.io/) identifier. An account with their free tier is sufficient for development.
+You will have to supply an [Infura](https://infura.io/) Project ID. An account with their free tier is sufficient for development.
 
 ### Develop
 

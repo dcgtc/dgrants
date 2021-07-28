@@ -9,6 +9,9 @@ import { GrantRegistry } from '../typechain/GrantRegistry';
 import { MockToken } from '../typechain/MockToken';
 import { timeTravel, setNextBlockTimestamp } from './utils';
 
+import { MockContract } from 'ethereum-waffle';
+import { Contract } from 'ethers';
+
 // --- Parse and define helpers ---
 const { deployContract } = waffle;
 const { MaxUint256 } = ethers.constants;
@@ -21,7 +24,7 @@ describe('GrantRound', function () {
     grantPayee: SignerWithAddress,
     mpUser: SignerWithAddress; // matching pool user
   let registry: GrantRegistry;
-  let roundContract: any;
+  let roundContract: Contract;
   let mockERC20: MockToken;
   const balances: string[] = ['100', '2000'];
   let startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
@@ -103,7 +106,7 @@ describe('GrantRound', function () {
       const grantId = 0;
 
       await expect(roundContract.connect(donor).donateToGrant(10, grantId)).to.be.revertedWith(
-        'Donation amount must be greater than minimum contribution'
+        'Donation must be greater than minimum contribution'
       );
     });
   });
@@ -111,7 +114,7 @@ describe('GrantRound', function () {
   describe('payoutGrants - payout remaining contract balance to a given address', () => {
     it('reverts if round has not ended', async function () {
       await expect(roundContract.connect(payoutAdmin).payoutGrants(deployer.address)).to.be.revertedWith(
-        'Method must be called after the active round has ended'
+        'Method must be called after round has ended'
       );
     });
   });
@@ -126,18 +129,14 @@ describe('GrantRound', function () {
         .withArgs(oldPtr, newPtr);
     });
 
-    it('reverts if not the grant round owner', async function () {
+    it('reverts if not the grant round metadata admin', async function () {
       await expect(roundContract.connect(mpUser).updateMetadataPtr('test')).to.be.revertedWith(
-        'GrantRound: Only the grant round owner can update the metadata pointer'
+        'GrantRound: Action can be perfomed only by metadataAdmin'
       );
     });
   });
 
   describe('Round end corner cases', () => {
-    before(async () => {
-      // End the round for all subsequent tests
-    });
-
     it('sends remaining matching pool funds to payout address', async function () {
       await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(balances[0]));
       await timeTravel(deployer.provider, endTime + 1);
