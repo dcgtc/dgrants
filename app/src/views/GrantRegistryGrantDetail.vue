@@ -1,6 +1,6 @@
 <template>
   <!-- Grant details -->
-  <div v-if="!isEditing">
+  <div v-if="!isEditing && grant">
     <div class="font-bold">Details for Grant ID {{ grant.id.toString() }}</div>
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
@@ -12,7 +12,7 @@
   </div>
 
   <!-- Editing grant -->
-  <div v-else class="flex flex-col justify-center sm:px-6 lg:px-8">
+  <div v-else-if="grant" class="flex flex-col justify-center sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <img
         class="mx-auto h-12 w-auto"
@@ -68,6 +68,11 @@
         </form>
       </div>
     </div>
+  </div>
+
+  <!-- No grant selected -->
+  <div v-else>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant selected</h2>
   </div>
 </template>
 

@@ -13,8 +13,8 @@
     <ul class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <li
         v-for="grant in grants"
-        :key="grant.id"
-        @click="pushRoute({ name: 'dgrants-id', params: { id: grant.id } })"
+        :key="grant.id.toString()"
+        @click="pushRoute({ name: 'dgrants-id', params: { id: grant.id.toString() } })"
         class="
           col-span-1
           bg-white

@@ -24,7 +24,7 @@
         "
         :id="id"
         :name="id"
-        required
+        :required="true"
         :type="type"
       />
       <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
