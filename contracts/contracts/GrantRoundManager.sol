@@ -9,6 +9,7 @@ import "./GrantRound.sol";
 
 contract GrantRoundManager {
   using Address for address;
+  using SafeERC20 for IERC20;
 
   /// @notice Donation Object
   struct Donation {
@@ -34,12 +35,12 @@ contract GrantRoundManager {
   /// @notice Emitted when a new GrantRound contract is created
   event GrantRoundCreated(address grantRound);
 
-  /// @notice Emit when a donation has been made
+  /// @notice Emitted when a donation has been made
   event GrantDonation(
     uint96 indexed grantId,
-    address indexed tokenIn,
+    IERC20 indexed tokenIn,
     uint256 amountIn,
-    uint256 indexed amountOut,
+    uint256 amountOut,
     GrantRound[] rounds
   );
 
@@ -109,7 +110,7 @@ contract GrantRoundManager {
     for (uint256 i = 0; i <= rounds.length; i++) {
       require(
         donationToken == rounds[i].donationToken(),
-        "GrantRoundManager: GrantRound has a donationToken from GrantRoundManager."
+        "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"
       );
 
       require(
@@ -119,23 +120,25 @@ contract GrantRoundManager {
     }
 
     address payoutAddress = registry.getGrantPayee(grantId);
-
     IERC20 tokenIn = _donation.tokenIn;
     uint256 amountIn = _donation.amountIn;
-    uint256 amountOut;
 
+    uint256 amountOut;
     if (tokenIn == donationToken) {
+      // Transfer funds directly to grant payout address
       amountOut = amountIn;
+      tokenIn.safeTransferFrom(msg.sender, payoutAddress, amountOut);
     } else {
       uint24 fee = _donation.fee;
       uint256 deadline = _donation.deadline;
       uint256 amountOutMinimum = _donation.amountOutMinimum;
       uint160 sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
 
-      // Swaps the donation into donationToken using SwapRouter
+      // Prepare to swap the provided token to donationToken using Uniswap V3
+      tokenIn.safeTransferFrom(msg.sender, address(this), amountIn);
       ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
-        tokenIn, // tokenIn
-        donationToken, // tokenOut
+        address(tokenIn), // tokenIn
+        address(donationToken), // tokenOut
         fee, // fee
         payoutAddress, // recipient
         deadline, // deadline
@@ -144,11 +147,10 @@ contract GrantRoundManager {
         sqrtPriceLimitX96 // sqrtPriceLimitX96
       );
 
+      // Execute swap -- output of swap is sent to the payoutAddress
       amountOut = router.exactInputSingle(params);
     }
 
-    // transfer funds to grant payout address
-    donationToken.safeTransfer(payoutAddress, amountOut);
     emit GrantDonation(grantId, tokenIn, amountIn, amountOut, rounds);
   }
 }

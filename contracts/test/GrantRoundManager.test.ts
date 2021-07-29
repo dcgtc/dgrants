@@ -84,7 +84,7 @@ describe('GrantRoundManager', () => {
     });
   });
 
-  describe('Functionality', () => {
+  describe('createGrantRound', () => {
     it('creates new grant rounds', async () => {
       // Deploy and configure mocks (used to pass the validation in the GrantRound constructor)
       const mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
@@ -127,5 +127,14 @@ describe('GrantRoundManager', () => {
       expect(await grantRound.metaPtr()).to.equal(metaPtr);
       expect(await grantRound.minContribution()).to.equal(minContribution);
     });
+  });
+
+  describe('swapAndDonate', () => {
+    it('reverts if an invalid grant ID is provided');
+    it('reverts if a provided grant round has a different donation token than the GrantRoundManager');
+    it('reverts if a provided grant round is not active');
+    it('if input token equals donation token, it transfers funds directly to grant payee');
+    it('if input token does not equal donation token, it swaps funds to grant payee');
+    it('emits a log on a successful donation');
   });
 });
