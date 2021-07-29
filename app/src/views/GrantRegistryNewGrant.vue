@@ -89,8 +89,9 @@ function useNewGrant() {
    */
   async function createGrant() {
     // Send transaction
-    if (!signer.value) throw new Error('Please connect a wallet');
     const { owner, payee, metaPtr } = form.value;
+    if (!owner || !payee || !metaPtr) throw new Error('Please complete the form');
+    if (!signer.value) throw new Error('Please connect a wallet');
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
     const tx = await registry.createGrant(owner, payee, metaPtr);
     await tx.wait();

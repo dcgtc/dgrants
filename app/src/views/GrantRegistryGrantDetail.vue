@@ -90,17 +90,22 @@ function useGrantDetail() {
   const { signer, userAddress } = useWalletStore();
 
   const route = useRoute();
-  const grant = computed(() => grants.value[route.params.id]);
+  const grant = computed(() => {
+    const id = route.params.id; // type `string | string[]`, so must narrow it down
+    if (!grants.value || Array.isArray(id)) return null; // array type unsupported
+    return grants.value[Number(id)];
+  });
 
   // --- Edit capabilities ---
-  const isOwner = computed(() => userAddress.value === grant.value.owner);
+  const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
   const form = ref<{ owner: string | undefined; payee: string | undefined; metaPtr: string | undefined }>({
-    owner: grant.value.owner,
-    payee: grant.value.payee,
-    metaPtr: grant.value.metaPtr,
+    owner: grant.value?.owner,
+    payee: grant.value?.payee,
+    metaPtr: grant.value?.metaPtr,
   });
   const isFormValid = computed(() => {
+    if (!grant.value) return false;
     const { owner, payee, metaPtr } = form.value;
     const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isValidUrl(metaPtr);
     const areFieldsUpdated = owner !== grant.value.owner || payee !== grant.value.payee || metaPtr !== grant.value.metaPtr; // prettier-ignore
@@ -111,17 +116,25 @@ function useGrantDetail() {
    * @notice Resets the form values that user may have changed, and hides the edit window
    */
   function cancelEdits() {
-    ['owner', 'payee', 'metaPtr'].forEach((field) => (form.value[field] = grant.value[field])); // reset form values
-    isEditing.value = false; // hide edit form
+    // Reset form values
+    form.value.owner = grant.value?.owner;
+    form.value.payee = grant.value?.payee;
+    form.value.metaPtr = grant.value?.metaPtr;
+    // Hide edit form
+    isEditing.value = false;
   }
 
   /**
    * @notice Saves edits
    */
   async function saveEdits() {
-    // Get contract instance
-    if (!signer.value) throw new Error('Please connect a wallet');
+    // Validation
     const { owner, payee, metaPtr } = form.value;
+    if (!owner || !payee || !metaPtr) throw new Error('Please complete the form');
+    if (!grant.value) throw new Error('No grant selected');
+    if (!signer.value) throw new Error('Please connect a wallet');
+
+    // Get registry instance
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
 
     // Determine which update method to call

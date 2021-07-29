@@ -17,11 +17,11 @@ export async function pushRoute(to: RouteLocationRaw) {
 }
 
 // Returns true if the provided URL is a valid URL
-export function isValidUrl(val: string) {
+export function isValidUrl(val: string | undefined) {
   return val && val.includes('://'); // TODO more robust URL validation
 }
 
 // Returns true if the provided address is valid (TODO support ENS)
-export function isValidAddress(val: string) {
-  return isAddress(val);
+export function isValidAddress(val: string | undefined) {
+  return val && isAddress(val);
 }
