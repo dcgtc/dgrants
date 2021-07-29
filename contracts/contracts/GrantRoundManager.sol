@@ -108,7 +108,7 @@ contract GrantRoundManager {
      * - same donationToken as the GrantRoundManager
      * - GrantRound is active
      */
-    for (uint256 i = 0; i <= _rounds.length; i++) {
+    for (uint256 i = 0; i < _rounds.length; i++) {
       require(
         donationToken == _rounds[i].donationToken(),
         "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"

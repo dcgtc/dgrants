@@ -7,14 +7,15 @@ import { MockContract } from 'ethereum-waffle';
 import { expect } from 'chai';
 
 // --- Our imports ---
-import { ETH_ADDRESS, UNISWAP_FEES } from './utils';
+import { ETH_ADDRESS, UNISWAP_FEES, tokens, approve, balanceOf, setBalance } from './utils';
 import { GrantRoundManager } from '../typechain';
 import { Donation } from '@dgrants/types';
 
 // --- Parse and define helpers ---
-const { isAddress } = ethers.utils;
+const { isAddress, parseUnits } = ethers.utils;
 const { deployContract } = waffle;
 const randomAddress = () => ethers.Wallet.createRandom().address;
+const gtcAddress = tokens['gtc'].address;
 
 // --- GrantRoundManager tests ---
 describe('GrantRoundManager', () => {
@@ -29,18 +30,18 @@ describe('GrantRoundManager', () => {
 
     // Deploy mock contracts
     // Registry
-    mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
+    mockRegistry = await deployMockContract(user, artifacts.readArtifactSync('GrantRegistry').abi);
     await mockRegistry.mock.grantCount.returns('1');
     // Router (constructor just verifies that code exists, so we don't need to mock a function response)
     mockRouter = await deployMockContract(user, []);
     // Token
     mockToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
-    await mockToken.mock.totalSupply.returns('1');
+    await mockToken.mock.totalSupply.returns('0');
 
     // Deploy Manager
     const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
     manager = <GrantRoundManager>(
-      await deployContract(user, managerArtifact, [mockRegistry.address, mockRouter.address, mockToken.address])
+      await deployContract(user, managerArtifact, [mockRegistry.address, mockRouter.address, gtcAddress])
     );
   });
 
@@ -52,14 +53,14 @@ describe('GrantRoundManager', () => {
       // Verify constructor parameters
       expect(await manager.registry()).to.equal(mockRegistry.address);
       expect(await manager.router()).to.equal(mockRouter.address);
-      expect(await manager.donationToken()).to.equal(mockToken.address);
+      expect(await manager.donationToken()).to.equal(gtcAddress);
     });
 
     it('reverts when deploying with an invalid grant registry', async () => {
       // Test that deployment fails if provided Registry address has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [randomAddress(), mockRouter.address, mockToken.address])
+        deployContract(user, managerArtifact, [randomAddress(), mockRouter.address, gtcAddress])
       ).to.be.revertedWith('function call to a non-contract account');
     });
 
@@ -67,7 +68,7 @@ describe('GrantRoundManager', () => {
       // Test that deployment fails if provided Router address has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [mockRegistry.address, randomAddress(), mockToken.address])
+        deployContract(user, managerArtifact, [mockRegistry.address, randomAddress(), gtcAddress])
       ).to.be.revertedWith('GrantRoundManager: Invalid router');
     });
 
@@ -123,7 +124,7 @@ describe('GrantRoundManager', () => {
       expect(await grantRound.metadataAdmin()).to.equal(metadataAdmin);
       expect(await grantRound.payoutAdmin()).to.equal(payoutAdmin);
       expect(await grantRound.registry()).to.equal(registry);
-      expect(await grantRound.donationToken()).to.equal(mockToken.address);
+      expect(await grantRound.donationToken()).to.equal(gtcAddress);
       expect(await grantRound.startTime()).to.equal(startTime);
       expect(await grantRound.endTime()).to.equal(endTime);
       expect(await grantRound.metaPtr()).to.equal(metaPtr);
@@ -131,7 +132,7 @@ describe('GrantRoundManager', () => {
     });
   });
 
-  describe.only('swapAndDonate', () => {
+  describe('swapAndDonate', () => {
     let mockRound: MockContract;
     let donation: Donation;
     const farTimestamp = '10000000000'; // date of 2286-11-20
@@ -139,7 +140,7 @@ describe('GrantRoundManager', () => {
     beforeEach(async () => {
       // Deploy a mock GrantRound
       mockRound = await deployMockContract(user, artifacts.readArtifactSync('GrantRound').abi);
-      await mockRound.mock.donationToken.returns(mockToken.address);
+      await mockRound.mock.donationToken.returns(gtcAddress);
       await mockRound.mock.startTime.returns('1');
       await mockRound.mock.endTime.returns(farTimestamp);
 
@@ -147,7 +148,7 @@ describe('GrantRoundManager', () => {
       donation = {
         grantId: 0,
         rounds: [mockRound.address],
-        tokenIn: mockToken.address,
+        tokenIn: gtcAddress,
         fee: UNISWAP_FEES[0],
         deadline: farTimestamp, // arbitrary date far in the future
         amountIn: '1',
@@ -185,8 +186,39 @@ describe('GrantRoundManager', () => {
       await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
     });
 
-    it('if input token equals donation token, it transfers funds directly to grant payee');
+    it('if input token equals donation token, it transfers funds directly to grant payee', async () => {
+      // Set donation token to GTC and give the user 100 GTC
+      const amountIn = parseUnits('100', 18);
+      await setBalance('gtc', user.address, amountIn);
+
+      // Set payee address to be a random address
+      const payee = randomAddress();
+      await mockRegistry.mock.getGrantPayee.returns(payee);
+
+      // Execute donation to the payee
+      expect(await balanceOf('gtc', payee)).to.equal('0');
+      await approve('gtc', user, manager.address);
+      await manager.swapAndDonate({ ...donation, amountIn });
+      expect(await balanceOf('gtc', payee)).to.equal(amountIn);
+    });
+
     it('if input token does not equal donation token, it swaps funds to grant payee');
-    it('emits a log on a successful donation');
+
+    it('emits a log on a successful donation', async () => {
+      // Set donation token to GTC and give the user 100 GTC
+      const amountIn = parseUnits('100', 18);
+      await setBalance('gtc', user.address, amountIn);
+
+      // Set payee address to be a random address
+      const payee = randomAddress();
+      await mockRegistry.mock.getGrantPayee.returns(payee);
+
+      // Execute donation to the payee
+      await approve('gtc', user, manager.address);
+      const tx = await manager.swapAndDonate({ ...donation, amountIn });
+      await expect(tx)
+        .to.emit(manager, 'GrantDonation')
+        .withArgs('0', gtcAddress, amountIn, amountIn, [mockRound.address]);
+    });
   });
 });
