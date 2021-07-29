@@ -75,10 +75,10 @@ function useNewGrant() {
   const { poll } = useDataStore();
 
   // Define form fields and parameters
-  const form = ref<{ owner: string | undefined; payee: string | undefined; metaPtr: string | undefined }>({
-    owner: undefined,
-    payee: undefined,
-    metaPtr: undefined,
+  const form = ref<{ owner: string; payee: string; metaPtr: string }>({
+    owner: '',
+    payee: '',
+    metaPtr: '',
   });
   const isFormValid = computed(
     () => isValidAddress(form.value.owner) && isValidAddress(form.value.payee) && isValidUrl(form.value.metaPtr)
@@ -90,7 +90,6 @@ function useNewGrant() {
   async function createGrant() {
     // Send transaction
     const { owner, payee, metaPtr } = form.value;
-    if (!owner || !payee || !metaPtr) throw new Error('Please complete the form');
     if (!signer.value) throw new Error('Please connect a wallet');
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
     const tx = await registry.createGrant(owner, payee, metaPtr);
