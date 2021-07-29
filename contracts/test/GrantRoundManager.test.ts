@@ -7,7 +7,9 @@ import { MockContract } from 'ethereum-waffle';
 import { expect } from 'chai';
 
 // --- Our imports ---
+import { ETH_ADDRESS, UNISWAP_FEES } from './utils';
 import { GrantRoundManager } from '../typechain';
+import { Donation } from '@dgrants/types';
 
 // --- Parse and define helpers ---
 const { isAddress } = ethers.utils;
@@ -28,7 +30,7 @@ describe('GrantRoundManager', () => {
     // Deploy mock contracts
     // Registry
     mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
-    await mockRegistry.mock.grantCount.returns('0');
+    await mockRegistry.mock.grantCount.returns('1');
     // Router (constructor just verifies that code exists, so we don't need to mock a function response)
     mockRouter = await deployMockContract(user, []);
     // Token
@@ -129,10 +131,60 @@ describe('GrantRoundManager', () => {
     });
   });
 
-  describe('swapAndDonate', () => {
-    it('reverts if an invalid grant ID is provided');
-    it('reverts if a provided grant round has a different donation token than the GrantRoundManager');
-    it('reverts if a provided grant round is not active');
+  describe.only('swapAndDonate', () => {
+    let mockRound: MockContract;
+    let donation: Donation;
+    const farTimestamp = '10000000000'; // date of 2286-11-20
+
+    beforeEach(async () => {
+      // Deploy a mock GrantRound
+      mockRound = await deployMockContract(user, artifacts.readArtifactSync('GrantRound').abi);
+      await mockRound.mock.donationToken.returns(mockToken.address);
+      await mockRound.mock.startTime.returns('1');
+      await mockRound.mock.endTime.returns(farTimestamp);
+
+      // Configure default donation data
+      donation = {
+        grantId: 0,
+        rounds: [mockRound.address],
+        tokenIn: mockToken.address,
+        fee: UNISWAP_FEES[0],
+        deadline: farTimestamp, // arbitrary date far in the future
+        amountIn: '1',
+        amountOutMinimum: '0',
+        sqrtPriceLimitX96: '0',
+      };
+    });
+
+    it('reverts if no rounds are specified', async () => {
+      await expect(manager.swapAndDonate({ ...donation, rounds: [] })).to.be.revertedWith(
+        'GrantRoundManager: Must specify at least one round'
+      );
+    });
+
+    it('reverts if an invalid grant ID is provided', async () => {
+      await expect(manager.swapAndDonate({ ...donation, grantId: '500' })).to.be.revertedWith(
+        'GrantRoundManager: Grant does not exist in registry'
+      );
+    });
+
+    it('reverts if a provided grant round has a different donation token than the GrantRoundManager', async () => {
+      await mockRound.mock.donationToken.returns(ETH_ADDRESS);
+      await expect(manager.swapAndDonate(donation)).to.be.revertedWith(
+        "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"
+      );
+    });
+
+    it('reverts if a provided grant round has not started', async () => {
+      await mockRound.mock.startTime.returns(farTimestamp);
+      await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
+    });
+
+    it('reverts if a provided grant round has already ended', async () => {
+      await mockRound.mock.endTime.returns('1');
+      await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
+    });
+
     it('if input token equals donation token, it transfers funds directly to grant payee');
     it('if input token does not equal donation token, it swaps funds to grant payee');
     it('emits a log on a successful donation');

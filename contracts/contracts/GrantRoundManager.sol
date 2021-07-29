@@ -97,24 +97,25 @@ contract GrantRoundManager {
    */
   function swapAndDonate(Donation calldata _donation) external {
     uint96 grantId = _donation.grantId;
-    GrantRound[] calldata rounds = _donation.rounds;
+    GrantRound[] calldata _rounds = _donation.rounds;
+    require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
 
     // Checks to ensure grant recieving donation exists in registry
-    require(grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry provided");
+    require(grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
     /**
      * Iterates through every GrantRound to ensure it has the
      * - same donationToken as the GrantRoundManager
      * - GrantRound is active
      */
-    for (uint256 i = 0; i <= rounds.length; i++) {
+    for (uint256 i = 0; i <= _rounds.length; i++) {
       require(
-        donationToken == rounds[i].donationToken(),
+        donationToken == _rounds[i].donationToken(),
         "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"
       );
 
       require(
-        block.timestamp >= rounds[i].startTime() && block.timestamp < rounds[i].endTime(),
+        block.timestamp >= _rounds[i].startTime() && block.timestamp < _rounds[i].endTime(),
         "GrantRoundManager: GrantRound is not active"
       );
     }
@@ -151,6 +152,6 @@ contract GrantRoundManager {
       amountOut = router.exactInputSingle(params);
     }
 
-    emit GrantDonation(grantId, tokenIn, amountIn, amountOut, rounds);
+    emit GrantDonation(grantId, tokenIn, amountIn, amountOut, _rounds);
   }
 }

@@ -8,6 +8,10 @@ import { Grant } from '@dgrants/types';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 
+// --- Constants ---
+export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const UNISWAP_FEES = ['500', '3000', '10000']; // Uniswap V3 fee tiers, as parts per 10k: https://github.com/Uniswap/uniswap-v3-core/blob/main/contracts/UniswapV3Factory.sol
+
 // --- Functions ---
 // Helper method to verify that two Grant objects are equal
 export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
@@ -17,6 +21,7 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
   expect(grant1.metaPtr).to.equal(grant2.metaPtr);
 }
 
+// Helper method to fast forward time
 export async function timeTravel(seconds: number): Promise<void> {
   await ethers.provider.send('evm_increaseTime', [seconds]);
   await ethers.provider.send('evm_mine', []);
