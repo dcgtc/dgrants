@@ -32,6 +32,9 @@ contract GrantRoundManager {
   /// @notice Address of the ERC20 token in which donations are made
   IERC20 public immutable donationToken;
 
+  /// @notice WETH address
+  address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+
   /// @notice Emitted when a new GrantRound contract is created
   event GrantRoundCreated(address grantRound);
 
@@ -95,19 +98,26 @@ contract GrantRoundManager {
    * @notice Swap and donate to a grant
    * @param  _donation Donation being made to a grant
    */
-  function swapAndDonate(Donation calldata _donation) external {
-    uint96 grantId = _donation.grantId;
+  function swapAndDonate(Donation calldata _donation) external payable {
+    // --- Validation ---
+    // Rounds must be specified
     GrantRound[] calldata _rounds = _donation.rounds;
     require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
 
-    // Checks to ensure grant recieving donation exists in registry
+    // Only allow value to be sent if the input token is WETH
+    IERC20 tokenIn = _donation.tokenIn;
+    require(
+      (msg.value == 0 && address(tokenIn) != WETH) || (msg.value > 0 && address(tokenIn) == WETH),
+      "GrantRoundManager: Invalid token-value pairing"
+    );
+
+    // Wnsure grant recieving donation exists in registry
+    uint96 grantId = _donation.grantId;
     require(grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
-    /**
-     * Iterates through every GrantRound to ensure it has the
-     * - same donationToken as the GrantRoundManager
-     * - GrantRound is active
-     */
+    // Iterate through each GrantRound to verify:
+    //   - The round has the same donationToken as the GrantRoundManager
+    //   - The round is active
     for (uint256 i = 0; i < _rounds.length; i++) {
       require(
         donationToken == _rounds[i].donationToken(),
@@ -120,23 +130,21 @@ contract GrantRoundManager {
       );
     }
 
+    // --- Swap ---
     address payoutAddress = registry.getGrantPayee(grantId);
-    IERC20 tokenIn = _donation.tokenIn;
     uint256 amountIn = _donation.amountIn;
+    uint256 amountOut = amountIn; // by default, by may be overwritten in the swap branch below
 
-    uint256 amountOut;
-    if (tokenIn == donationToken) {
-      // Transfer funds directly to grant payout address
-      amountOut = amountIn;
-      tokenIn.safeTransferFrom(msg.sender, payoutAddress, amountOut);
+    if (tokenIn == donationToken && msg.value == 0) {
+      // ETH as the donation token is not supported, so ensure msg.value is zero
+      tokenIn.safeTransferFrom(msg.sender, payoutAddress, amountOut); // transfer funds directly to payout address
     } else {
+      // Swap setup
       uint24 fee = _donation.fee;
       uint256 deadline = _donation.deadline;
       uint256 amountOutMinimum = _donation.amountOutMinimum;
       uint160 sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
 
-      // Prepare to swap the provided token to donationToken using Uniswap V3
-      tokenIn.safeTransferFrom(msg.sender, address(this), amountIn);
       ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
         address(tokenIn), // tokenIn
         address(donationToken), // tokenOut
@@ -148,8 +156,14 @@ contract GrantRoundManager {
         sqrtPriceLimitX96 // sqrtPriceLimitX96
       );
 
+      // If user is sending a token, transfer it to this contract and approve the router to spend it
+      if (msg.value == 0) {
+        tokenIn.safeTransferFrom(msg.sender, address(this), amountIn);
+        tokenIn.approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
+      }
+
       // Execute swap -- output of swap is sent to the payoutAddress
-      amountOut = router.exactInputSingle(params);
+      amountOut = router.exactInputSingle{value: msg.value}(params);
     }
 
     emit GrantDonation(grantId, tokenIn, amountIn, amountOut, _rounds);

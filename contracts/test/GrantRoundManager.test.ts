@@ -7,7 +7,7 @@ import { MockContract } from 'ethereum-waffle';
 import { expect } from 'chai';
 
 // --- Our imports ---
-import { ETH_ADDRESS, UNISWAP_FEES, tokens, approve, balanceOf, setBalance } from './utils';
+import { ETH_ADDRESS, WETH_ADDRESS, UNISWAP_ROUTER, UNISWAP_FEES, tokens, approve, balanceOf, setBalance } from './utils'; // prettier-ignore
 import { GrantRoundManager } from '../typechain';
 import { Donation } from '@dgrants/types';
 
@@ -23,36 +23,31 @@ describe('GrantRoundManager', () => {
   let manager: GrantRoundManager;
   let mockToken: MockContract;
   let mockRegistry: MockContract;
-  let mockRouter: MockContract;
 
   before(async () => {
     [user] = await ethers.getSigners();
 
     // Deploy mock contracts
-    // Registry
     mockRegistry = await deployMockContract(user, artifacts.readArtifactSync('GrantRegistry').abi);
-    await mockRegistry.mock.grantCount.returns('1');
-    // Router (constructor just verifies that code exists, so we don't need to mock a function response)
-    mockRouter = await deployMockContract(user, []);
-    // Token
     mockToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
+    await mockRegistry.mock.grantCount.returns('1');
     await mockToken.mock.totalSupply.returns('0');
 
     // Deploy Manager
     const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
     manager = <GrantRoundManager>(
-      await deployContract(user, managerArtifact, [mockRegistry.address, mockRouter.address, gtcAddress])
+      await deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, gtcAddress])
     );
   });
 
-  describe('Constructor', () => {
+  describe('constructor', () => {
     it('deploys properly', async () => {
       // Verify deploy
       expect(isAddress(manager.address), 'Failed to deploy GrantRoundManager').to.be.true;
 
       // Verify constructor parameters
       expect(await manager.registry()).to.equal(mockRegistry.address);
-      expect(await manager.router()).to.equal(mockRouter.address);
+      expect(await manager.router()).to.equal(UNISWAP_ROUTER);
       expect(await manager.donationToken()).to.equal(gtcAddress);
     });
 
@@ -60,7 +55,7 @@ describe('GrantRoundManager', () => {
       // Test that deployment fails if provided Registry address has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [randomAddress(), mockRouter.address, gtcAddress])
+        deployContract(user, managerArtifact, [randomAddress(), UNISWAP_ROUTER, gtcAddress])
       ).to.be.revertedWith('function call to a non-contract account');
     });
 
@@ -76,13 +71,13 @@ describe('GrantRoundManager', () => {
       // First we test a donation token address that has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [mockRegistry.address, mockRouter.address, randomAddress()])
+        deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, randomAddress()])
       ).to.be.revertedWith('function call to a non-contract account');
 
       // Now we test a donation token that has no supply
       await mockToken.mock.totalSupply.returns('0');
       await expect(
-        deployContract(user, managerArtifact, [mockRegistry.address, mockRouter.address, mockToken.address])
+        deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, mockToken.address])
       ).to.be.revertedWith('GrantRoundManager: Invalid token');
     });
   });
@@ -186,8 +181,8 @@ describe('GrantRoundManager', () => {
       await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
     });
 
-    it('if input token equals donation token, it transfers funds directly to grant payee', async () => {
-      // Set donation token to GTC and give the user 100 GTC
+    it('input token GTC, output token GTC', async () => {
+      // Give the user 100 GTC
       const amountIn = parseUnits('100', 18);
       await setBalance('gtc', user.address, amountIn);
 
@@ -202,7 +197,51 @@ describe('GrantRoundManager', () => {
       expect(await balanceOf('gtc', payee)).to.equal(amountIn);
     });
 
-    it('if input token does not equal donation token, it swaps funds to grant payee');
+    it('input token ETH, output token GTC', async () => {
+      // Set payee address to be a random address
+      const payee = randomAddress();
+      await mockRegistry.mock.getGrantPayee.returns(payee);
+
+      // Use the 1% GTC/ETH pool to swap from ETH (input) to GTC (donationToken). The 1% pool is currently the most liquid
+      const amountIn = parseUnits('10', 18);
+      const tx = await manager.swapAndDonate(
+        { ...donation, tokenIn: WETH_ADDRESS, fee: UNISWAP_FEES[2], amountIn },
+        { value: amountIn, gasPrice: '0' } // zero gas price to make balance checks simpler
+      );
+
+      // Get the amountOut from the swap from the GrantDonation log
+      const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+      const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+      const { amountOut } = log.args;
+      expect(await balanceOf('gtc', payee)).to.equal(amountOut);
+    });
+
+    it.skip('input token DAI, output token GTC', async () => {
+      // TODO skipped because there is no DAI-GTC pool, so this fails as Uniswap V3 tries to swap directly in
+      // the specified pool. Need to determine how to specify a route
+
+      // Give the user 100 DAI
+      const amountIn = parseUnits('100', 18);
+      await setBalance('dai', user.address, amountIn);
+
+      // Set payee address to be a random address
+      const payee = randomAddress();
+      await mockRegistry.mock.getGrantPayee.returns(payee);
+
+      // Execute donation to the payee
+      await approve('dai', user, manager.address);
+      console.log(1);
+      console.log('tokens.dai.address: ', tokens.dai.address);
+      const tx = await manager.swapAndDonate({ ...donation, tokenIn: tokens.dai.address, amountIn });
+      console.log(2);
+      expect(await balanceOf('dai', user.address)).to.equal('0');
+
+      // Get the amountOut from the swap from the GrantDonation log
+      const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+      const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+      const { amountOut } = log.args;
+      expect(await balanceOf('gtc', payee)).to.equal(amountOut);
+    });
 
     it('emits a log on a successful donation', async () => {
       // Set donation token to GTC and give the user 100 GTC

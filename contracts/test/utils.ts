@@ -13,6 +13,7 @@ const { defaultAbiCoder, hexStripZeros, hexZeroPad, keccak256 } = utils;
 
 // --- Constants ---
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
+export const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 export const UNISWAP_FEES = ['500', '3000', '10000']; // Uniswap V3 fee tiers, as parts per 10k: https://github.com/Uniswap/uniswap-v3-core/blob/main/contracts/UniswapV3Factory.sol
 export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 
