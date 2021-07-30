@@ -104,10 +104,10 @@ function useGrantDetail() {
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
-  const form = ref<{ owner: string | undefined; payee: string | undefined; metaPtr: string | undefined }>({
-    owner: grant.value?.owner,
-    payee: grant.value?.payee,
-    metaPtr: grant.value?.metaPtr,
+  const form = ref<{ owner: string; payee: string; metaPtr: string }>({
+    owner: grant.value?.owner || '',
+    payee: grant.value?.payee || '',
+    metaPtr: grant.value?.metaPtr || '',
   });
   const isFormValid = computed(() => {
     if (!grant.value) return false;
@@ -122,9 +122,9 @@ function useGrantDetail() {
    */
   function cancelEdits() {
     // Reset form values
-    form.value.owner = grant.value?.owner;
-    form.value.payee = grant.value?.payee;
-    form.value.metaPtr = grant.value?.metaPtr;
+    form.value.owner = grant.value?.owner || '';
+    form.value.payee = grant.value?.payee || '';
+    form.value.metaPtr = grant.value?.metaPtr || '';
     // Hide edit form
     isEditing.value = false;
   }
@@ -135,7 +135,6 @@ function useGrantDetail() {
   async function saveEdits() {
     // Validation
     const { owner, payee, metaPtr } = form.value;
-    if (!owner || !payee || !metaPtr) throw new Error('Please complete the form');
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
