@@ -99,6 +99,34 @@ describe('GrantRound', function () {
         'GrantRound: End time must be after start time'
       );
     });
+
+    it('reverts deployment if grant registry is invalid', async function () {
+      const [deployer, payoutAdmin] = await ethers.getSigners();
+      const mockTokenArtifact: Artifact = await artifacts.readArtifact('MockToken');
+      const mockERC20 = <MockToken>(
+        await deployContract(deployer, mockTokenArtifact, [ethers.utils.parseEther(defaultTokenSupply)])
+      );
+
+      const grantRoundArtifact: Artifact = await artifacts.readArtifact('GrantRound');
+      roundContractFactory = new ethers.ContractFactory(grantRoundArtifact.abi, grantRoundArtifact.bytecode, deployer);
+
+      startTime = await setNextBlockTimestamp(deployer.provider, startTime, 200);
+      endTime = startTime + 86400; // One day
+
+      await expect(
+        roundContractFactory.deploy(
+          deployer.address,
+          payoutAdmin.address,
+          // send an EOA instead of a grant registry contract
+          deployer.address,
+          mockERC20.address,
+          startTime,
+          endTime,
+          mockUrl,
+          minContribution
+        )
+      ).to.be.reverted;
+    });
   });
 
   describe('addMatchingFunds - Add funds to matching round', () => {
