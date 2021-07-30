@@ -1,5 +1,5 @@
 // --- External imports ---
-import { artifacts, ethers, network, waffle } from 'hardhat';
+import { artifacts, ethers, waffle } from 'hardhat';
 import { Artifact } from 'hardhat/types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { expect } from 'chai';
@@ -137,34 +137,6 @@ describe('GrantRound', function () {
     });
   });
 
-  describe('donateToGrant - Add funds during active round', () => {
-    it('sends donation token to the grant payee with a given grant id', async function () {
-      const { mockERC20, roundContract } = await loadFixture(setup);
-      const grantId = 0;
-
-      await roundContract.connect(donor).donateToGrant(ethers.utils.parseEther(donorAmount), grantId);
-      expect(await mockERC20.balanceOf(grantPayee.address)).to.be.equal(ethers.utils.parseEther(donorAmount));
-    });
-
-    it('emits an event when successful', async function () {
-      const grantId = 0;
-      const { mockERC20, roundContract } = await loadFixture(setup);
-
-      await expect(roundContract.connect(donor).donateToGrant(donorAmount, grantId))
-        .to.emit(roundContract, 'DonationSent')
-        .withArgs(grantId, mockERC20.address, donorAmount, donor.address);
-    });
-
-    it('donations revert if not above minimum contribution', async function () {
-      const grantId = 0;
-      const { roundContract } = await loadFixture(setup);
-
-      await expect(roundContract.connect(donor).donateToGrant(10, grantId)).to.be.revertedWith(
-        'Donation must be greater than minimum contribution'
-      );
-    });
-  });
-
   describe('payoutGrants - payout remaining contract balance to a given address', () => {
     it('reverts if round has not ended', async function () {
       const { roundContract } = await loadFixture(setup);
@@ -215,15 +187,6 @@ describe('GrantRound', function () {
       await timeTravel(endTime + 1);
       await expect(roundContract.connect(mpUser).addMatchingFunds(donorAmount)).to.be.revertedWith(
         'GrantRound: Action cannot be performed as the round has ended'
-      );
-    });
-
-    it('donations revert if not during active round', async function () {
-      const grantId = 0;
-      const { roundContract } = await loadFixture(setup);
-      await timeTravel(endTime + 1);
-      await expect(roundContract.connect(donor).donateToGrant(donorAmount, grantId)).to.be.revertedWith(
-        'Donations must be sent during an active round'
       );
     });
   });

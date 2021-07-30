@@ -92,23 +92,6 @@ contract GrantRound {
   }
 
   /**
-   * @notice During an active round users can use this method to send donation tokens to a specified grant
-   * @param _donationAmount The number of tokens to be sent to grant receipient
-   * @param _grantId The id of the grant in the registry
-   */
-  function donateToGrant(uint256 _donationAmount, uint96 _grantId) external activeRound {
-    require(_donationAmount >= minContribution, "GrantRound: Donation must be greater than minimum contribution");
-
-    require(_grantId < registry.grantCount(), "GrantRound: Grant does not exist in registry provided");
-
-    address payee = registry.getGrantPayee(_grantId);
-    require(payee != address(0), "GrantRound: Payee not set in the grant metadata");
-    donationToken.safeTransferFrom(msg.sender, payee, _donationAmount);
-
-    emit DonationSent(_grantId, address(donationToken), _donationAmount, msg.sender);
-  }
-
-  /**
    * @notice When the round ends the payoutAdmin can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
