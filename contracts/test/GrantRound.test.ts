@@ -17,30 +17,26 @@ const { MaxUint256 } = ethers.constants;
 const { isAddress } = ethers.utils;
 
 describe('GrantRound', function () {
+  const mockUrl: string = 'https://test.url';
   let deployer: SignerWithAddress,
     payoutAdmin: SignerWithAddress,
     donor: SignerWithAddress,
     grantPayee: SignerWithAddress,
     mpUser: SignerWithAddress; // matching pool user
   let registry: GrantRegistry;
-  const tokenSupply = '2000';
+  const defaultTokenSupply = '2000';
   const donorAmount = '100';
   let roundContractFactory: ContractFactory;
   let startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
   let endTime: number; // One day
   const minContribution = 50;
 
-  async function setup() {
-    const mockUrl: string = 'https://test.url';
+  async function deployGrantRound(tokenSupply: string, newStartTime?: number, newEndTime?: number) {
     [deployer, payoutAdmin, donor, grantPayee, mpUser] = await ethers.getSigners();
     const mockTokenArtifact: Artifact = await artifacts.readArtifact('MockToken');
     const mockERC20 = <MockToken>(
       await deployContract(deployer, mockTokenArtifact, [ethers.utils.parseEther(tokenSupply)])
     );
-    // Seed funds for matching pool user
-    await mockERC20.transfer(mpUser.address, ethers.utils.parseEther(donorAmount));
-    // Seed funds for initial donor
-    await mockERC20.transfer(donor.address, ethers.utils.parseEther(donorAmount));
 
     const grantRegistryArtifact: Artifact = await artifacts.readArtifact('GrantRegistry');
     registry = <GrantRegistry>await deployContract(deployer, grantRegistryArtifact);
@@ -51,8 +47,8 @@ describe('GrantRound', function () {
     const grantRoundArtifact: Artifact = await artifacts.readArtifact('GrantRound');
     roundContractFactory = new ethers.ContractFactory(grantRoundArtifact.abi, grantRoundArtifact.bytecode, deployer);
 
-    startTime = await setNextBlockTimestamp(deployer.provider, startTime, 200);
-    endTime = startTime + 86400; // One day
+    startTime = newStartTime ? newStartTime : await setNextBlockTimestamp(deployer.provider, startTime, 200);
+    endTime = newEndTime ? newEndTime : startTime + 86400; // One day
 
     const roundContract = await roundContractFactory.deploy(
       deployer.address,
@@ -65,6 +61,16 @@ describe('GrantRound', function () {
       minContribution
     );
 
+    return { mockERC20, roundContract };
+  }
+
+  async function setup() {
+    const { mockERC20, roundContract } = await deployGrantRound(defaultTokenSupply);
+
+    // Seed funds for matching pool user
+    await mockERC20.transfer(mpUser.address, ethers.utils.parseEther(donorAmount));
+    // Seed funds for initial donor
+    await mockERC20.transfer(donor.address, ethers.utils.parseEther(donorAmount));
     await mockERC20.connect(mpUser).approve(roundContract.address, MaxUint256);
     await mockERC20.connect(donor).approve(roundContract.address, MaxUint256);
     await mockERC20.connect(payoutAdmin).approve(roundContract.address, MaxUint256);
@@ -76,6 +82,22 @@ describe('GrantRound', function () {
     it('deploys properly', async function () {
       const { roundContract } = await loadFixture(setup);
       expect(isAddress(roundContract.address), 'Failed to deploy GrantRegistry').to.be.true;
+    });
+
+    it('reverts if token supply is zero', async function () {
+      await expect(deployGrantRound('0')).to.be.revertedWith('GrantRound: Invalid token');
+    });
+
+    it('reverts if start time is invalid', async function () {
+      await expect(deployGrantRound(defaultTokenSupply, startTime)).to.be.revertedWith(
+        'GrantRound: Start time has already passed'
+      );
+    });
+
+    it('reverts if end time is invalid', async function () {
+      await expect(deployGrantRound(defaultTokenSupply, undefined, startTime)).to.be.revertedWith(
+        'GrantRound: End time must be after start time'
+      );
     });
   });
 
