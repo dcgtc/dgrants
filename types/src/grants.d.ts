@@ -1,4 +1,4 @@
-import {  BigNumber, BigNumberish } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 
 // --- Types ---
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for

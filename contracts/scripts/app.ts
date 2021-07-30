@@ -11,10 +11,9 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
 
-import {
-  abi as SWAP_ROUTER_ABI,
-  bytecode as SWAP_ROUTER_BYTECODE,
-} from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json'
+import { UNISWAP_ROUTER, tokens } from '../test/utils';
+
+import { abi as SWAP_ROUTER_ABI } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json';
 
 // --- Constants ---
 // Define grants to create (addresses are random)
@@ -36,50 +35,42 @@ const grants = [
   },
 ];
 
-
-const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_address: String) => {
-
-  // --- ISwapRouter --
-  const routerArgs = {
-    _factory: '0x0',
-    _WETH9: '0x0'
-  };
-
-  const SwapRouter: ContractFactory = await ethers.getContractFactory(SWAP_ROUTER_ABI, SWAP_ROUTER_BYTECODE);
-  const router = await (await SwapRouter.deploy(routerArgs)).deployed();
-  console.log(`Deployed SwapRouter to ${router.address}`);
-
+const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_address: string) => {
+  // --- SwapRouter --
+  const router = await ethers.getContractAt(SWAP_ROUTER_ABI, UNISWAP_ROUTER, deployer);
+  console.log(`Fetched SwapRouter at ${router.address}`);
 
   // --- GrantRoundManager --
-  const grantRoundManagerArgs = {
-    registry: registry_address,
-    router: router,
-    donationToken: '0x8ad3aa5d5ff084307d28c8f514d7a193b2bfe725',
-  }
-
-  const GrantRoundFactory: ContractFactory = await ethers.getContractFactory('GrantRoundManager', deployer);
-  const roundFactory = await (await GrantRoundFactory.deploy(grantRoundManagerArgs)).deployed();
-  console.log(`Deployed GrantRoundFactory to ${roundFactory.address}`);
+  const GrantRoundManager: ContractFactory = await ethers.getContractFactory('GrantRoundManager', deployer);
+  const roundManager = await (
+    await GrantRoundManager.deploy(registry_address, router.address, tokens.gtc.address)
+  ).deployed();
+  console.log(`Deployed GrantRoundManager to ${roundManager.address}`);
 
   // --- GRANT ROUND ---
   const startDate = new Date();
   const endDate = startDate;
-  endDate.setDate(endDate.getDate() + 7);
+  endDate.setMonth(endDate.getMonth() + 2);
 
   // GrantRound Argument
-  const owner = '0x34f4E532a33EB545941e914B25Efe348Aea31f0A';
+  const metadataAdmin = '0x34f4E532a33EB545941e914B25Efe348Aea31f0A';
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
   const startTime = startDate.getTime();
-  const endTime = endDate.getTime();
+  const endTime = endDate.getTime() + 10;
   const metaPtr = 'https://time-travel.eth.link';
   const minContribution = ethers.constants.One;
 
-  await roundFactory.createGrantRound(
-    owner, payoutAdmin, startTime, endTime, metaPtr, minContribution
+  await roundManager.createGrantRound(
+    metadataAdmin,
+    payoutAdmin,
+    registry_address,
+    startTime,
+    endTime,
+    metaPtr,
+    minContribution
   );
   console.log(`Created GrantRound`);
 };
-
 
 // --- Method to execute ---
 async function main(): Promise<void> {
@@ -98,7 +89,7 @@ async function main(): Promise<void> {
   await Promise.all(grants.map((grant) => registry.createGrant(grant.owner, grant.payee, grant.metaPtr)));
   console.log(`Created ${grants.length} dummy grants`);
 
-  // await createGrantRoundFactory(deployer, registry.address);
+  await createGrantRoundFactory(deployer, registry.address);
 }
 
 // --- Execute main() ---

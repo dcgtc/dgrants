@@ -105,15 +105,15 @@ contract GrantRoundManager {
     require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
 
     // Only allow value to be sent if the input token is WETH
-    IERC20 tokenIn = _donation.tokenIn;
+    IERC20 _tokenIn = _donation.tokenIn;
     require(
-      (msg.value == 0 && address(tokenIn) != WETH) || (msg.value > 0 && address(tokenIn) == WETH),
+      (msg.value == 0 && address(_tokenIn) != WETH) || (msg.value > 0 && address(_tokenIn) == WETH),
       "GrantRoundManager: Invalid token-value pairing"
     );
 
     // Wnsure grant recieving donation exists in registry
-    uint96 grantId = _donation.grantId;
-    require(grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
+    uint96 _grantId = _donation.grantId;
+    require(_grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
     // Iterate through each GrantRound to verify:
     //   - The round has the same donationToken as the GrantRoundManager
@@ -131,41 +131,41 @@ contract GrantRoundManager {
     }
 
     // --- Swap ---
-    address payoutAddress = registry.getGrantPayee(grantId);
-    uint256 amountIn = _donation.amountIn;
-    uint256 amountOut = amountIn; // by default, by may be overwritten in the swap branch below
+    address _payoutAddress = registry.getGrantPayee(_grantId);
+    uint256 _amountIn = _donation.amountIn;
+    uint256 _amountOut = _amountIn; // by default, by may be overwritten in the swap branch below
 
-    if (tokenIn == donationToken && msg.value == 0) {
+    if (_tokenIn == donationToken && msg.value == 0) {
       // ETH as the donation token is not supported, so ensure msg.value is zero
-      tokenIn.safeTransferFrom(msg.sender, payoutAddress, amountOut); // transfer funds directly to payout address
+      _tokenIn.safeTransferFrom(msg.sender, _payoutAddress, _amountOut); // transfer funds directly to payout address
     } else {
       // Swap setup
-      uint24 fee = _donation.fee;
-      uint256 deadline = _donation.deadline;
-      uint256 amountOutMinimum = _donation.amountOutMinimum;
-      uint160 sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
+      uint24 _fee = _donation.fee;
+      uint256 _deadline = _donation.deadline;
+      uint256 _amountOutMinimum = _donation.amountOutMinimum;
+      uint160 _sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
 
       ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
-        address(tokenIn), // tokenIn
+        address(_tokenIn), // tokenIn
         address(donationToken), // tokenOut
-        fee, // fee
-        payoutAddress, // recipient
-        deadline, // deadline
-        amountIn, // amountIn
-        amountOutMinimum, // amountOutMinimum
-        sqrtPriceLimitX96 // sqrtPriceLimitX96
+        _fee, // fee
+        _payoutAddress, // recipient
+        _deadline, // deadline
+        _amountIn, // amountIn
+        _amountOutMinimum, // amountOutMinimum
+        _sqrtPriceLimitX96 // sqrtPriceLimitX96
       );
 
       // If user is sending a token, transfer it to this contract and approve the router to spend it
       if (msg.value == 0) {
-        tokenIn.safeTransferFrom(msg.sender, address(this), amountIn);
-        tokenIn.approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
+        _tokenIn.safeTransferFrom(msg.sender, address(this), _amountIn);
+        _tokenIn.approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
       }
 
       // Execute swap -- output of swap is sent to the payoutAddress
-      amountOut = router.exactInputSingle{value: msg.value}(params);
+      _amountOut = router.exactInputSingle{value: msg.value}(params);
     }
 
-    emit GrantDonation(grantId, tokenIn, amountIn, amountOut, _rounds);
+    emit GrantDonation(_grantId, _tokenIn, _amountIn, _amountOut, _rounds);
   }
 }
