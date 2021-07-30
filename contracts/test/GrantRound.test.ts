@@ -1,5 +1,5 @@
 // --- External imports ---
-import { artifacts, ethers, waffle } from 'hardhat';
+import { artifacts, ethers, network, waffle } from 'hardhat';
 import { Artifact } from 'hardhat/types';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { expect } from 'chai';

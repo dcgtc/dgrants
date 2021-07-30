@@ -35,8 +35,8 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
 
 // Fast forward time
 export async function timeTravel(seconds: number): Promise<void> {
-  await ethers.provider.send('evm_increaseTime', [seconds]);
-  await ethers.provider.send('evm_mine', []);
+  await network.provider.send('evm_increaseTime', [seconds]);
+  await network.provider.send('evm_mine', []);
 }
 
 export async function setNextBlockTimestamp(provider: any, timestamp: number, delay: number) {
