@@ -47,7 +47,7 @@ describe('GrantRound', function () {
     const grantRoundArtifact: Artifact = await artifacts.readArtifact('GrantRound');
     roundContractFactory = new ethers.ContractFactory(grantRoundArtifact.abi, grantRoundArtifact.bytecode, deployer);
 
-    startTime = newStartTime ? newStartTime : await setNextBlockTimestamp(deployer.provider, startTime, 200);
+    startTime = newStartTime ? newStartTime : await setNextBlockTimestamp(startTime + 200);
     endTime = newEndTime ? newEndTime : startTime + 86400; // One day
 
     const roundContract = await roundContractFactory.deploy(
@@ -110,7 +110,7 @@ describe('GrantRound', function () {
       const grantRoundArtifact: Artifact = await artifacts.readArtifact('GrantRound');
       roundContractFactory = new ethers.ContractFactory(grantRoundArtifact.abi, grantRoundArtifact.bytecode, deployer);
 
-      startTime = await setNextBlockTimestamp(deployer.provider, startTime, 200);
+      startTime = await setNextBlockTimestamp(startTime + 200);
       endTime = startTime + 86400; // One day
 
       await expect(

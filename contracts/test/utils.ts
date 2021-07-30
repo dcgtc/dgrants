@@ -24,7 +24,10 @@ export const tokens = {
   gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', decimals: 18, mappingSlot: '0x5' },
 };
 
-// --- Functions ---
+// This type is our list of tokens supported in the "Token Helpers" section
+export type SupportedTokens = keyof typeof tokens;
+
+// --- Assertions ---
 // Verifies that two Grant objects are equal
 export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
   expect(grant1.id).to.equal(grant2.id);
@@ -33,20 +36,23 @@ export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
   expect(grant1.metaPtr).to.equal(grant2.metaPtr);
 }
 
+// --- Time manipulation ---
 // Fast forward time
-export async function timeTravel(seconds: number): Promise<void> {
-  await network.provider.send('evm_increaseTime', [seconds]);
+export async function timeTravel(seconds: BigNumberish): Promise<void> {
+  await network.provider.send('evm_increaseTime', [BigNumber.from(seconds).toNumber()]);
   await network.provider.send('evm_mine', []);
 }
 
-export async function setNextBlockTimestamp(provider: any, timestamp: number, delay: number) {
-  const newTimestamp = timestamp + delay;
-  await provider.send('evm_setNextBlockTimestamp', [newTimestamp]);
-  return newTimestamp;
+// Set timestamp of next block
+export async function setNextBlockTimestamp(timestamp: BigNumberish) {
+  timestamp = BigNumber.from(timestamp).toNumber();
+  await network.provider.send('evm_setNextBlockTimestamp', [timestamp]);
+  return timestamp;
 }
 
+// --- Token helpers ---
 // Gets token balance
-export async function balanceOf(tokenSymbol: keyof typeof tokens, address: string): Promise<BigNumber> {
+export async function balanceOf(tokenSymbol: SupportedTokens, address: string): Promise<BigNumber> {
   if (tokenSymbol === 'eth') return ethers.provider.getBalance(address);
   const tokenAddress = tokens[tokenSymbol].address;
   const abi = ['function balanceOf(address) external view returns (uint256)'];
@@ -55,7 +61,7 @@ export async function balanceOf(tokenSymbol: keyof typeof tokens, address: strin
 }
 
 // Sets token allowance
-export async function approve(tokenSymbol: keyof typeof tokens, holder: SignerWithAddress, spender: string) {
+export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAddress, spender: string) {
   if (tokenSymbol === 'eth') return;
   const tokenAddress = tokens[tokenSymbol].address;
   const abi = ['function approve(address,uint256) external returns (bool)'];
@@ -64,7 +70,7 @@ export async function approve(tokenSymbol: keyof typeof tokens, holder: SignerWi
 }
 
 // Arbitrarily set token balance of an account to a given amount
-export async function setBalance(tokenSymbol: keyof typeof tokens, to: string, amount: BigNumberish) {
+export async function setBalance(tokenSymbol: SupportedTokens, to: string, amount: BigNumberish) {
   // If ETH, set the balance directly
   if (tokenSymbol === 'eth') {
     await network.provider.send('hardhat_setBalance', [to, BigNumber.from(amount).toHexString()]);
@@ -76,7 +82,7 @@ export async function setBalance(tokenSymbol: keyof typeof tokens, to: string, a
   await network.provider.send('hardhat_setStorageAt', [tokens[tokenSymbol].address, slot, to32ByteHex(amount)]);
 }
 
-// --- Internal helpers ---
+// --- Private (not exported) helpers ---
 // Determine the storage slot used to store an account's balance. Notes:
 //   - This only works for Solidity tokens since Vyper has different storage layout rules
 //   - Read about Solidity storage layout rules at https://docs.soliditylang.org/en/latest/internals/layout_in_storage.html#mappings-and-dynamic-arrays
