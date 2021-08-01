@@ -83,3 +83,8 @@ or to start the frontend locally in development mode:
 ```bash
 yarn app dev
 ```
+
+# Join our Dev Team!
+
+<strong>As of August 2021, Gitcoin is Hiring</strong> -- Say hi in the #decentralize-gitcoin channel on the [Gitcoin Discord](https://gitcoin.co/discord) to get involve
+
