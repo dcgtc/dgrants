@@ -49,6 +49,7 @@ const network = ref<Network>(); // connected network, derived from provider
 // Reset state when, e.g.user switches wallets. Provider/signer are automatically updated by ethers so are not cleared
 function resetState() {
   userAddress.value = undefined;
+  userEns.value = undefined;
   network.value = undefined;
 }
 
@@ -111,6 +112,14 @@ export default function useWalletStore() {
     await configureProvider(); // load info based on user's address
   }
 
+  /**
+   * @notice Reset wallet state and disconnect the user.
+   */
+  function disconnectWallet() {
+    onboard.walletReset();
+    resetState();
+  }
+
   // ----------------------------------------------------- Actions -----------------------------------------------------
 
   // When user connects their wallet, we call this method to update the provider
@@ -168,6 +177,7 @@ export default function useWalletStore() {
     configureProvider,
     connectWallet,
     setProvider,
+    disconnectWallet,
     // Properties
     isSupportedNetwork: computed(() => (network.value ? supportedChainIds.includes(network.value.chainId) : true)), // assume valid if we have no network information
     network: computed(() => network.value),
