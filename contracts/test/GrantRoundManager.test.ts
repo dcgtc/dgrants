@@ -136,8 +136,7 @@ describe('GrantRoundManager', () => {
       // Deploy a mock GrantRound
       mockRound = await deployMockContract(user, artifacts.readArtifactSync('GrantRound').abi);
       await mockRound.mock.donationToken.returns(gtcAddress);
-      await mockRound.mock.startTime.returns('1');
-      await mockRound.mock.endTime.returns(farTimestamp);
+      await mockRound.mock.isActive.returns(true);
 
       // Configure default donation data
       donation = {
@@ -171,13 +170,8 @@ describe('GrantRoundManager', () => {
       );
     });
 
-    it('reverts if a provided grant round has not started', async () => {
-      await mockRound.mock.startTime.returns(farTimestamp);
-      await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
-    });
-
-    it('reverts if a provided grant round has already ended', async () => {
-      await mockRound.mock.endTime.returns('1');
+    it('reverts if a provided grant round is not active', async () => {
+      await mockRound.mock.isActive.returns(false);
       await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
     });
 

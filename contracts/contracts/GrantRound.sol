@@ -114,6 +114,13 @@ contract GrantRound {
     emit MetadataUpdated(oldPtr, _newMetaPtr);
   }
 
+  /**
+   * @notice Returns true if the round is active, false otherwise
+   */
+  function isActive() public view returns (bool) {
+    return block.timestamp >= startTime && block.timestamp < endTime;
+  }
+
   // --- Modifiers ---
 
   modifier beforeRoundEnd() {
@@ -122,10 +129,7 @@ contract GrantRound {
   }
 
   modifier activeRound() {
-    require(
-      block.timestamp >= startTime && block.timestamp < endTime,
-      "GrantRound: Donations must be sent during an active round"
-    );
+    require(isActive(), "GrantRound: Donations must be sent during an active round");
     _;
   }
 
