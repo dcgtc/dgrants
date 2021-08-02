@@ -11,13 +11,13 @@ contract GrantRoundManager {
   using Address for address;
   using SafeERC20 for IERC20;
 
-  /// @notice Donation Object
+  /// @notice Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/single-swaps
   struct Donation {
     uint96 grantId; // grant ID to which donation is being made
     GrantRound[] rounds; // rounds against which the donation should be counted
     IERC20 tokenIn; // token in which the user made the donation
     uint24 fee; // selected fee tier
-    uint256 deadline; // deadline by when swap has to be happen
+    uint256 deadline; // unix timestamp after which a swap will revert, i.e. swap must be executed before this
     uint256 amountIn; // amount donated by the user
     uint256 amountOutMinimum; // minimum amount to be returned after swap
     uint160 sqrtPriceLimitX96; // determine limits on the pool prices which cannot exceed swap
@@ -111,7 +111,7 @@ contract GrantRoundManager {
       "GrantRoundManager: Invalid token-value pairing"
     );
 
-    // Wnsure grant recieving donation exists in registry
+    // Ensure grant recieving donation exists in registry
     uint96 _grantId = _donation.grantId;
     require(_grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
