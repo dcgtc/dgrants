@@ -44,7 +44,7 @@ export async function timeTravel(seconds: BigNumberish): Promise<void> {
 }
 
 // Set timestamp of next block
-export async function setNextBlockTimestamp(timestamp: BigNumberish) {
+export async function setNextBlockTimestamp(timestamp: BigNumberish): Promise<number> {
   timestamp = BigNumber.from(timestamp).toNumber();
   await network.provider.send('evm_setNextBlockTimestamp', [timestamp]);
   return timestamp;
@@ -61,7 +61,7 @@ export async function balanceOf(tokenSymbol: SupportedTokens, address: string): 
 }
 
 // Sets token allowance
-export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAddress, spender: string) {
+export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAddress, spender: string): Promise<void> {
   if (tokenSymbol === 'eth') return;
   const tokenAddress = tokens[tokenSymbol].address;
   const abi = ['function approve(address,uint256) external returns (bool)'];
@@ -70,7 +70,7 @@ export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAd
 }
 
 // Arbitrarily set token balance of an account to a given amount
-export async function setBalance(tokenSymbol: SupportedTokens, to: string, amount: BigNumberish) {
+export async function setBalance(tokenSymbol: SupportedTokens, to: string, amount: BigNumberish): Promise<void> {
   // If ETH, set the balance directly
   if (tokenSymbol === 'eth') {
     await network.provider.send('hardhat_setBalance', [to, BigNumber.from(amount).toHexString()]);
