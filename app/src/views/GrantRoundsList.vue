@@ -27,7 +27,7 @@
               <div class="flex items-center space-x-3">
                 <h3 class="text-gray-900 text-sm font-medium truncate">
                   Grant Round funds: {{ grantRound.funds.toString() }}
-                  <span :title="grantRound.donationTokenName">{{ grantRound.donationTokenSymbol }}</span>
+                  <span :title="grantRound.donationToken.name">{{ grantRound.donationToken.symbol }}</span>
                 </h3>
               </div>
               <p class="mt-1 text-gray-500 text-sm truncate">{{ grantRound.metaPtr }}</p>
@@ -86,13 +86,10 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import { daysAgo, formatAddress, pushRoute, unixToLocaleString } from 'src/utils/utils';
+import { daysAgo, formatAddress, pushRoute, unixToLocaleString, hasStatus } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 import { GrantRound } from '@dgrants/types';
 import { BigNumber } from 'ethers';
-
-// check if the grantRound has the given status
-const hasStatus = (status: string) => (round: GrantRound) => round.status == status;
 
 // sort by startDate
 const sortByStartTime = (a: GrantRound, b: GrantRound) =>

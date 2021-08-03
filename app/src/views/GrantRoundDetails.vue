@@ -8,7 +8,7 @@
       <p>Status: {{ grantRound.status }}</p>
       <p>
         Funds: {{ grantRound.funds.toString() }}
-        <span :title="grantRound.donationTokenName">{{ grantRound.donationTokenSymbol }}</span>
+        <span :title="grantRound.donationToken.name">{{ grantRound.donationToken.symbol }}</span>
       </p>
       <p>
         {{ hasStatus('Upcoming')(grantRound) ? 'Will begin' : 'Started' }}:
@@ -119,8 +119,16 @@ import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
-import { BigNumber, BigNumberish, Contract, ContractTransaction, parseUnits } from 'src/utils/ethers';
-import { daysAgo, formatAddress, isValidAddress, isValidUrl } from 'src/utils/utils';
+import { BigNumber, BigNumberish, Contract, ContractTransaction, MaxUint256, parseUnits } from 'src/utils/ethers';
+import {
+  daysAgo,
+  formatAddress,
+  isValidAddress,
+  isValidUrl,
+  checkAllowance,
+  getApproval,
+  hasStatus,
+} from 'src/utils/utils';
 // --- Types ---
 import { GrantRound } from '@dgrants/types';
 import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
@@ -146,21 +154,16 @@ function useGrantRoundDetail() {
   const isContributing = ref(false);
   const form = computed<{ token: string; amount: BigNumberish }>(() => {
     return {
-      token: grantRound.value.donationToken,
+      token: grantRound.value.donationToken.address,
       amount: grantRound.value.minContribution,
     };
   });
   const isFormValid = computed(() => {
     const { token, amount } = form.value;
     const areFieldsValid =
-      isValidAddress(<string>token) && token == grantRound.value.donationToken && (amount || 0 > 0);
+      isValidAddress(<string>token) && token == grantRound.value.donationToken.address && (amount || 0 > 0);
     return areFieldsValid;
   });
-
-  /**
-   * @notice Check against the grantRounds status for a match
-   */
-  const hasStatus = (status: string) => (round: GrantRound) => round.status == status;
 
   /**
    * @notice Show the contribution window
@@ -187,16 +190,16 @@ function useGrantRoundDetail() {
     const { amount } = form.value;
 
     // set up contracts
-    const token = new Contract(grantRound.value.donationToken, ERC20_ABI, signer.value);
+    const token = new Contract(grantRound.value.donationToken.address, ERC20_ABI, signer.value);
     const round = <GrantRoundContract>new Contract(grantRound.value.address, GRANT_ROUND_ABI, signer.value);
 
     // contributionAmount must have the right number of decimals and be hexed
-    const contributionAmount = parseUnits(amount.toString(), grantRound.value.donationTokenDecimals);
+    const contributionAmount = parseUnits(amount.toString(), grantRound.value.donationToken.decimals);
 
     // check if contract is already approved as a spender
-    const allowance = await checkAllowance(token, grantRound.value.address);
+    const allowance = await checkAllowance(token, userAddress.value, grantRound.value.address);
     if (allowance < contributionAmount) {
-      await getApproval(token, grantRound.value.address, contributionAmount);
+      await getApproval(token, grantRound.value.address, MaxUint256);
     }
 
     // invoke addMatchingFunds on the round contract
@@ -205,24 +208,6 @@ function useGrantRoundDetail() {
     // poll for the updated state and toggle page state back to display mode
     await poll();
     cancelContribution();
-  }
-
-  /**
-   * @notice Check for approved allowance
-   */
-  async function checkAllowance(token: Contract, address: string) {
-    // return the balance held for userAddress
-    return await token.allowance(userAddress.value, address);
-  }
-
-  /**
-   * @notice Get approval for the round contract to spend the amount on behalf of the user
-   */
-  async function getApproval(token: Contract, address: string, amount: BigNumberish) {
-    // get approval
-    const tx: ContractTransaction = await token.approve(address, amount);
-    // wait for approval to go through
-    await tx.wait();
   }
 
   /**

@@ -4,7 +4,8 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, isAddress } from 'src/utils/ethers';
-import { BigNumberish } from 'ethers';
+import { BigNumberish, Contract, ContractTransaction } from 'ethers';
+import { GrantRound } from '@dgrants/types';
 
 // Returns an address with the following format: 0x1234...abcd
 export function formatAddress(address: string) {
@@ -41,4 +42,24 @@ export function daysAgo(val = 0) {
 // convert a unix ts to a toLocaleString
 export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
+}
+
+// Check for approved allowance
+export async function checkAllowance(token: Contract, ownerAddress: string | undefined, spenderAddress: string) {
+  // return the balance held for userAddress
+  return ownerAddress ? await token.allowance(ownerAddress, spenderAddress) : 0;
+}
+
+// Get approval for the round contract to spend the amount on behalf of the user
+export async function getApproval(token: Contract, address: string, amount: BigNumberish) {
+  // get approval
+  const tx: ContractTransaction = await token.approve(address, amount);
+  // wait for approval to go through
+  await tx.wait();
+}
+
+// Check against the grantRounds status for a match
+export function hasStatus(status: string) {
+  // returns a fn (currying the given status)
+  return (round: GrantRound) => round.status === status;
 }

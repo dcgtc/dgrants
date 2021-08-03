@@ -18,8 +18,9 @@
 export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
 export { Contract } from '@ethersproject/contracts';
+export type { BigNumberish } from 'ethers';
 export type { ContractTransaction } from '@ethersproject/contracts';
 export type { Network } from '@ethersproject/networks';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 export { commify, formatUnits, parseUnits } from '@ethersproject/units';
-export type { BigNumberish } from 'ethers';
+export { MaxUint256 } from '@ethersproject/constants';
