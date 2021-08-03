@@ -53,5 +53,7 @@ jobs:
           steps.cache-node-modules.outputs.cache-hit == 'true'
       - name: Run test
         run: yarn test
+        env:
+          INFURA_ID: ${{ secrets.INFURA_ID }}
       - name: Run lint
         run: yarn lint
