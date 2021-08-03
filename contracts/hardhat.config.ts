@@ -3,8 +3,6 @@ import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
 
-import './tasks/load-accounts';
-
 import './tasks/accounts';
 import './tasks/clean';
 
