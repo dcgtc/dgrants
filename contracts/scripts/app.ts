@@ -11,9 +11,10 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
 
-import { UNISWAP_ROUTER, tokens } from '../test/utils';
+import { UNISWAP_ROUTER, tokens, setBalance } from '../test/utils';
 
 import { abi as SWAP_ROUTER_ABI } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json';
+import { parseUnits } from 'ethers/lib/utils';
 
 // --- Constants ---
 // Define grants to create (addresses are random)
@@ -91,6 +92,15 @@ async function main(): Promise<void> {
 
   // Create the grantRounds
   await createGrantRoundFactory(deployer, registry.address);
+
+  // SetBalance on signer accounts
+  await Promise.all(
+    signers.map(async (signer) => {
+      await setBalance('gtc', signer.address, parseUnits('10000', 18));
+      await setBalance('dai', signer.address, parseUnits('10000', 18));
+    })
+  );
+  console.log(`Funded ${signers.length} accounts`);
 }
 
 // --- Execute main() ---
