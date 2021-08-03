@@ -49,7 +49,7 @@ const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_add
 
   // --- GRANT ROUND ---
   const startDate = new Date();
-  const endDate = startDate;
+  const endDate = new Date();
   endDate.setMonth(endDate.getMonth() + 2);
 
   // GrantRound Argument
@@ -64,8 +64,8 @@ const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_add
     metadataAdmin,
     payoutAdmin,
     registry_address,
-    startTime,
-    endTime,
+    Math.floor(startTime / 1000),
+    Math.floor(endTime / 1000),
     metaPtr,
     minContribution
   );
@@ -89,7 +89,7 @@ async function main(): Promise<void> {
   await Promise.all(grants.map((grant) => registry.createGrant(grant.owner, grant.payee, grant.metaPtr)));
   console.log(`Created ${grants.length} dummy grants`);
 
-  // Creat the grantRounds
+  // Create the grantRounds
   await createGrantRoundFactory(deployer, registry.address);
 }
 

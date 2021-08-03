@@ -9,8 +9,8 @@ import { computed, markRaw, ref } from 'vue';
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
 import {
-  GRANT_ROUND_FACTORY_ADDRESS,
-  GRANT_ROUND_FACTORY_ABI,
+  GRANT_ROUND_MANAGER_ADDRESS,
+  GRANT_ROUND_MANAGER_ABI,
   GRANT_ROUND_ABI,
   GRANT_REGISTRY_ADDRESS,
   GRANT_REGISTRY_ABI,
@@ -25,7 +25,7 @@ import { TokenInfo } from '@uniswap/token-lists';
 const { provider } = useWalletStore();
 const multicall = ref<Contract>();
 const registry = ref<Contract>();
-const roundFactory = ref<Contract>();
+const roundManager = ref<Contract>();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -40,7 +40,7 @@ export default function useDataStore() {
    * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
    */
   async function poll() {
-    if (!multicall.value || !registry.value || !roundFactory.value) return;
+    if (!multicall.value || !registry.value || !roundManager.value) return;
 
     // Define calls to be read using multicall
     const calls = [
@@ -57,7 +57,7 @@ export default function useDataStore() {
     const grantsList = registry.value.interface.decodeFunctionResult('getAllGrants', grantsEncoded.returnData)[0]; // prettier-ignore
 
     // Get all rounds from GrantRoundCreated --- TODO: We need to cache these events somewhere (like the graph)
-    const roundList = await roundFactory.value.queryFilter(roundFactory.value.filters.GrantRoundCreated());
+    const roundList = await roundManager.value.queryFilter(roundManager.value.filters.GrantRoundCreated());
     const roundAddresses = [...roundList.map((e) => e.args?.grantRound)];
 
     // Pull state from each GrantRound
@@ -152,7 +152,7 @@ export default function useDataStore() {
     // Start polling with the user's provider if available, or fallback to our default provider
     multicall.value = markRaw(new Contract(MULTICALL_ADDRESS, MULTICALL_ABI, provider.value));
     registry.value = markRaw(new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, provider.value));
-    roundFactory.value = markRaw(new Contract(GRANT_ROUND_FACTORY_ADDRESS, GRANT_ROUND_FACTORY_ABI, provider.value));
+    roundManager.value = markRaw(new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, provider.value));
     provider.value.on('block', (/* block: number */) => void poll());
   }
 

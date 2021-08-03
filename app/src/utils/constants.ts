@@ -17,13 +17,13 @@ export const MULTICALL_ABI = [
 ];
 
 // Data for Grants contracts
-export const GRANT_REGISTRY_ADDRESS = '0xd0f350b13465b5251bb03e4bbf9fa1dbc4a378f3';
+export const GRANT_REGISTRY_ADDRESS = '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3';
 export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
 
 export { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
 
-export const GRANT_ROUND_FACTORY_ADDRESS = '0xa27bC320252d51EEAA24BCCF6cc003979E485860';
-export { abi as GRANT_ROUND_FACTORY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundFactory.sol/GrantRoundFactory.json';
+export const GRANT_ROUND_MANAGER_ADDRESS = '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016';
+export { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
 
 export const ERC20_ABI = [
   'function name() view returns (string)',

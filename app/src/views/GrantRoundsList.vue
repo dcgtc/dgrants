@@ -2,7 +2,7 @@
   <div class="max-w-screen-lg mx-auto">
     <!-- View Existing GrantRounds -->
     <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Grant Round List</h1>
-    <div class="mb-10">Below is all grant rounds read from the GrantRoundFactory contract</div>
+    <div class="mb-10">Below is all grant rounds read from the GrantRoundManager contract</div>
 
     <div v-for="list in grantRoundLists" :key="list.title">
       <h2 class="text-left my-5">{{ list.title }}</h2>
