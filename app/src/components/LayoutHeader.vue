@@ -22,7 +22,10 @@
         <div class="ml-10 space-x-4">
           <div v-if="userDisplayName" class="text-gray-700">
             {{ userDisplayName }}
-            <XIcon @click="disconnectWallet" class="h-5 w-5 text-yellow-500 mr-2 inline-block cursor-pointer" />
+            <SwitchHorizontalIcon
+              @click="resetWallet"
+              class="h-5 w-5 text-yellow-500 mr-2 inline-block cursor-pointer"
+            />
           </div>
           <div v-else-if="!isSupportedNetwork" class="flex items-center">
             <ExclamationIcon class="h-5 w-5 text-yellow-500 mr-2" />
@@ -50,7 +53,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useWalletStore from 'src/store/wallet';
-import { ExclamationIcon, XIcon } from '@heroicons/vue/solid';
+import { ExclamationIcon, SwitchHorizontalIcon } from '@heroicons/vue/solid';
 
 // Header menu bar items
 const navigation = [
@@ -62,10 +65,10 @@ const navigation = [
 
 export default defineComponent({
   name: 'LayoutHeader',
-  components: { ExclamationIcon, XIcon },
+  components: { ExclamationIcon, SwitchHorizontalIcon },
   setup() {
-    const { connectWallet, isSupportedNetwork, userDisplayName, disconnectWallet } = useWalletStore();
-    return { connectWallet, isSupportedNetwork, navigation, userDisplayName, disconnectWallet };
+    const { connectWallet, isSupportedNetwork, userDisplayName, resetWallet } = useWalletStore();
+    return { connectWallet, isSupportedNetwork, navigation, userDisplayName, resetWallet };
   },
 });
 </script>

@@ -113,11 +113,11 @@ export default function useWalletStore() {
   }
 
   /**
-   * @notice Reset wallet state and disconnect the user.
+   * @notice Allow the user to reset their wallet.
    */
-  function disconnectWallet() {
-    onboard.walletReset();
-    resetState();
+  async function resetWallet() {
+    await onboard.walletSelect();
+    await configureProvider();
   }
 
   // ----------------------------------------------------- Actions -----------------------------------------------------
@@ -177,7 +177,7 @@ export default function useWalletStore() {
     configureProvider,
     connectWallet,
     setProvider,
-    disconnectWallet,
+    resetWallet,
     // Properties
     isSupportedNetwork: computed(() => (network.value ? supportedChainIds.includes(network.value.chainId) : true)), // assume valid if we have no network information
     network: computed(() => network.value),
