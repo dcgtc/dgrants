@@ -7,8 +7,14 @@
       </h1>
       <p>Status: {{ grantRound.status }}</p>
       <p>
-        Funds: {{ grantRound.funds.toString() }}
-        <span :title="grantRound.donationToken.name">{{ grantRound.donationToken.symbol }}</span>
+        Funds:
+        <a
+          class="link"
+          :title="grantRound.donationToken.name"
+          :href="`https://etherscan.io/token/${grantRound.donationToken.address}?a=${grantRound.address}`"
+        >
+          {{ grantRound.funds.toString() }} {{ grantRound.donationToken.symbol }}
+        </a>
       </p>
       <p>
         {{ hasStatus('Upcoming')(grantRound) ? 'Will begin' : 'Started' }}:
