@@ -119,7 +119,15 @@ import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
-import { BigNumber, BigNumberish, Contract, ContractTransaction, MaxUint256, parseUnits } from 'src/utils/ethers';
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  ContractTransaction,
+  getAddress,
+  MaxUint256,
+  parseUnits,
+} from 'src/utils/ethers';
 import {
   daysAgo,
   formatAddress,
@@ -142,7 +150,7 @@ function useGrantRoundDetail() {
   const grantRound = computed(() => {
     if (grantRounds.value) {
       // filter for a matching GrantRound
-      const round = grantRounds.value.filter((round) => round.address === route.params.address);
+      const round = grantRounds.value.filter((round) => round.address === getAddress(<string>route.params.address));
 
       return <GrantRound>(round.length ? round[0] : { error: `No GrantRound @ ${route.params.address}` });
     } else {
