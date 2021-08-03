@@ -14,11 +14,12 @@ import {
   GRANT_ROUND_ABI,
   GRANT_REGISTRY_ADDRESS,
   GRANT_REGISTRY_ABI,
-  ERC20_ABI,
   MULTICALL_ADDRESS,
   MULTICALL_ABI,
+  ERC20_ABI,
 } from 'src/utils/constants';
 import { Grant, GrantRound, GrantRounds } from '@dgrants/types';
+import { TokenInfo } from '@uniswap/token-lists';
 
 // --- Parameters required ---
 const { provider } = useWalletStore();
@@ -55,57 +56,90 @@ export default function useDataStore() {
     const { timestamp } = multicall.value.interface.decodeFunctionResult('getCurrentBlockTimestamp', timestampEncoded.returnData); // prettier-ignore
     const grantsList = registry.value.interface.decodeFunctionResult('getAllGrants', grantsEncoded.returnData)[0]; // prettier-ignore
 
-    // Save off data
-    lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
-    lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
-    grants.value = grantsList as Grant[];
-
     // Get all rounds from GrantRoundCreated --- TODO: We need to cache these events somewhere (like the graph)
     const roundList = await roundFactory.value.queryFilter(roundFactory.value.filters.GrantRoundCreated());
     const roundAddresses = [...roundList.map((e) => e.args?.grantRound)];
 
     // Pull state from each GrantRound
-    grantRounds.value = await Promise.all(
+    const grantRoundsList = await Promise.all(
       roundAddresses.map(async (grantRoundAddress) => {
-        const round = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
-        const donationToken = await round.donationToken();
-        // --- TODO: Cache token contracts and the name/sybmol
-        const token = new Contract(donationToken, ERC20_ABI, provider.value);
-        // get the token details
-        const donationTokenName = await token.name();
-        const donationTokenSymbol = await token.symbol();
-        const donationTokenDecimals = await token.decimals();
-        // get the rounds balance (in whole units)
-        const funds = (await token.balanceOf(grantRoundAddress)) / 10 ** donationTokenDecimals;
-        // discover status from startTime/endTime
-        const now = Date.now();
-        const startTime = await round.startTime();
-        const endTime = await round.endTime();
-        const status =
-          now > startTime.toNumber() * 1000 && now < endTime.toNumber() * 1000
-            ? 'Active'
-            : Date.now() < round.startTime.toNumber() * 1000
-            ? 'Upcoming'
-            : 'Completed';
+        const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
+        // collect the donationToken before promise.all'ing everything
+        const donationTokenAddress = await roundContract.donationToken();
+        const donationTokenContract = new Contract(donationTokenAddress, ERC20_ABI, provider.value);
 
-        return {
-          address: grantRoundAddress,
-          startTime: startTime,
-          endTime: endTime,
-          status: status,
-          donationToken: donationToken,
-          donationTokenName: donationTokenName,
-          donationTokenSymbol: donationTokenSymbol,
-          donationTokenDecimals: donationTokenDecimals,
-          funds: funds,
-          owner: await round.owner(),
-          registry: await round.registry(),
-          metaPtr: await round.metaPtr(),
-          minContribution: await round.minContribution(),
-          hasPaidOut: await round.hasPaidOut(),
-        } as GrantRound;
+        return await Promise.all([
+          // round details
+          roundContract.startTime(),
+          roundContract.endTime(),
+          roundContract.metadataAdmin(),
+          roundContract.payoutAdmin(),
+          roundContract.registry(),
+          roundContract.metaPtr(),
+          roundContract.minContribution(),
+          roundContract.hasPaidOut(),
+          // get token details
+          donationTokenContract.name(),
+          donationTokenContract.symbol(),
+          donationTokenContract.decimals(),
+          donationTokenContract.balanceOf(grantRoundAddress),
+        ]).then(
+          ([
+            // round details
+            startTime,
+            endTime,
+            metadataAdmin,
+            payoutAdmin,
+            registry,
+            metaPtr,
+            minContribution,
+            hasPaidOut,
+            // token details
+            donationTokenName,
+            donationTokenSymbol,
+            donationTokenDecimals,
+            donationTokenBalance,
+          ]) => {
+            // check for status against `now`
+            const now = Date.now();
+
+            return {
+              startTime,
+              endTime,
+              metadataAdmin,
+              payoutAdmin,
+              registry,
+              metaPtr,
+              minContribution,
+              hasPaidOut,
+              donationToken: {
+                address: donationTokenAddress,
+                name: donationTokenName,
+                symbol: donationTokenSymbol,
+                decimals: donationTokenDecimals,
+                chainId: provider.value.network.chainId || 1,
+                // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
+                logoURI: undefined, // we can leave this out for now
+              } as TokenInfo,
+              address: grantRoundAddress,
+              funds: donationTokenBalance / 10 ** donationTokenDecimals,
+              status:
+                now >= startTime.toNumber() * 1000 && now < endTime.toNumber() * 1000
+                  ? 'Active'
+                  : now < startTime.toNumber() * 1000
+                  ? 'Upcoming'
+                  : 'Completed',
+            } as GrantRound;
+          }
+        );
       })
     );
+
+    // Save off data
+    lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
+    lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
+    grants.value = grantsList as Grant[];
+    grantRounds.value = grantRoundsList as GrantRound[];
   }
 
   /**

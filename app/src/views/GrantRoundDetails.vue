@@ -27,8 +27,16 @@
         <span>{{ grantRound.hasPaidOut ? 'Yes' : 'No' }}</span>
       </p>
       <p>
-        Owner:
-        <a class="link" :href="`https://etherscan.io/address/${grantRound.owner}`">{{ grantRound.owner }}</a>
+        Metadata Admin:
+        <a class="link" :href="`https://etherscan.io/address/${grantRound.metadataAdmin}`">{{
+          grantRound.metadataAdmin
+        }}</a>
+      </p>
+      <p>
+        Payout Admin:
+        <a class="link" :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`">{{
+          grantRound.payoutAdmin
+        }}</a>
       </p>
       <p>
         Address:

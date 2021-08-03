@@ -4,6 +4,7 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, isAddress } from 'src/utils/ethers';
+import { BigNumberish } from 'ethers';
 
 // Returns an address with the following format: 0x1234...abcd
 export function formatAddress(address: string) {
@@ -28,17 +29,16 @@ export function isValidAddress(val: string | undefined) {
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is
 export function daysAgo(val = 0) {
-  // use a formatter to establish "in 10 days" vs "10 days ago"
+  // Use a formatter to establish "in 10 days" vs "10 days ago"
   const formatter = new Intl.RelativeTimeFormat();
-
-  // days ago
+  // Number of days since now
   const deltaDays = (val * 1000 - Date.now()) / (1000 * 3600 * 24);
 
-  // Format days to string (rember to round off deltaDays)
+  // Format "days ago" as string
   return formatter.format(Math.round(deltaDays), 'days');
 }
 
 // convert a unix ts to a toLocaleString
-export const unixToLocaleString = (time: BigNumber) => {
-  return new Date(time.toNumber() * 1000).toLocaleString();
-};
+export function unixToLocaleString(time: BigNumberish) {
+  return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
+}

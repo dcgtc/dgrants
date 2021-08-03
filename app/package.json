@@ -19,6 +19,7 @@
     "@headlessui/vue": "^1.2.0",
     "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.3.3",
+    "@uniswap/token-lists": "^1.0.0-beta.25",
     "assert": "^2.0.0",
     "bnc-onboard": "^1.27.0",
     "crypto-browserify": "^3.12.0",
