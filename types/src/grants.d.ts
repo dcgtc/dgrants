@@ -39,5 +39,6 @@ export type GrantRound = {
   metaPtr: string;
   minContribution: BigNumberish;
   hasPaidOut: boolean;
+  error: string|undefined;
 };
 export type GrantRounds = Array<GrantRound>;

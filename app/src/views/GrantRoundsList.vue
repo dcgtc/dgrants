@@ -53,7 +53,7 @@
                     </p>
                     <div class="flex items-center space-x-3">
                       <h3 class="text-gray-900 text-sm font-medium" :title="unixToLocaleString(grantRound.startTime)">
-                        {{ daysAgo(grantRound.startTime.toNumber()) }}
+                        {{ daysAgo(BigNumber.from(grantRound.startTime).toNumber()) }}
                       </h3>
                     </div>
                   </div>
@@ -67,7 +67,7 @@
                     </p>
                     <div class="flex items-center space-x-3">
                       <h3 class="text-gray-900 text-sm font-medium" :title="unixToLocaleString(grantRound.endTime)">
-                        {{ daysAgo(grantRound.endTime.toNumber()) }}
+                        {{ daysAgo(BigNumber.from(grantRound.endTime).toNumber()) }}
                       </h3>
                     </div>
                   </div>
@@ -120,7 +120,7 @@ export default defineComponent({
       },
     ]);
 
-    return { daysAgo, formatAddress, grantRoundLists, hasStatus, pushRoute, unixToLocaleString };
+    return { BigNumber, daysAgo, formatAddress, grantRoundLists, hasStatus, pushRoute, unixToLocaleString };
   },
 });
 </script>

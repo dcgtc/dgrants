@@ -18,14 +18,14 @@
       </p>
       <p>
         {{ hasStatus('Upcoming')(grantRound) ? 'Will begin' : 'Started' }}:
-        <span :title="new Date(grantRound.startTime.toNumber() * 1000).toLocaleString()">
-          {{ daysAgo(grantRound.startTime.toNumber()) }}
+        <span :title="new Date(BigNumber.from(grantRound.startTime).toNumber() * 1000).toLocaleString()">
+          {{ daysAgo(BigNumber.from(grantRound.startTime).toNumber()) }}
         </span>
       </p>
       <p>
         {{ hasStatus('Completed')(grantRound) ? 'Ended' : 'Will end' }}:
-        <span :title="new Date(grantRound.endTime.toNumber() * 1000).toLocaleString()">
-          {{ daysAgo(grantRound.endTime.toNumber()) }}
+        <span :title="new Date(BigNumber.from(grantRound.endTime).toNumber() * 1000).toLocaleString()">
+          {{ daysAgo(BigNumber.from(grantRound.endTime).toNumber()) }}
         </span>
       </p>
       <p v-if="hasStatus('Completed')(grantRound)">
@@ -92,11 +92,11 @@
 
           <!-- contribution amount -->
           <BaseInput
-            v-model="form.amount"
+            :v-model="String(form.amount)"
             description="The number of tokens to contribute"
             id="contribution-amount"
             label="Contribution amount"
-            :rules="(amount) => amount || 0 > 0"
+            :rules="isAmountValid"
             errorMsg="Please enter an amount greater than 0"
           />
 
@@ -172,10 +172,13 @@ function useGrantRoundDetail() {
       amount: grantRound.value.minContribution,
     };
   });
+  const isAmountValid = (amount: BigNumberish) => {
+    return (amount || 0) > 0;
+  };
   const isFormValid = computed(() => {
     const { token, amount } = form.value;
     const areFieldsValid =
-      isValidAddress(<string>token) && token === grantRound.value.donationToken.address && (amount || 0 > 0);
+      isValidAddress(<string>token) && token === grantRound.value.donationToken.address && isAmountValid(amount);
     return areFieldsValid;
   });
 
@@ -235,9 +238,11 @@ function useGrantRoundDetail() {
   }
 
   return {
+    BigNumber,
     hasStatus,
     daysAgo,
     formatAddress,
+    isAmountValid,
     isContributing,
     isValidAddress,
     isValidUrl,
