@@ -95,7 +95,7 @@ import { BigNumber } from 'ethers';
 const sortByStartTime = (a: GrantRound, b: GrantRound) =>
   BigNumber.from(a.startTime).toNumber() < BigNumber.from(b.startTime).toNumber()
     ? -1
-    : BigNumber.from(a.startTime).toNumber() == BigNumber.from(b.startTime).toNumber()
+    : BigNumber.from(a.startTime).toNumber() === BigNumber.from(b.startTime).toNumber()
     ? 0
     : 1;
 

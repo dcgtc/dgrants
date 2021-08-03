@@ -142,7 +142,7 @@ function useGrantRoundDetail() {
   const grantRound = computed(() => {
     if (grantRounds.value) {
       // filter for a matching GrantRound
-      const round = grantRounds.value.filter((round) => round.address == route.params.address);
+      const round = grantRounds.value.filter((round) => round.address === route.params.address);
 
       return <GrantRound>(round.length ? round[0] : { error: `No GrantRound @ ${route.params.address}` });
     } else {
@@ -161,7 +161,7 @@ function useGrantRoundDetail() {
   const isFormValid = computed(() => {
     const { token, amount } = form.value;
     const areFieldsValid =
-      isValidAddress(<string>token) && token == grantRound.value.donationToken.address && (amount || 0 > 0);
+      isValidAddress(<string>token) && token === grantRound.value.donationToken.address && (amount || 0 > 0);
     return areFieldsValid;
   });
 
