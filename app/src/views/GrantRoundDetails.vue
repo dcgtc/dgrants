@@ -119,12 +119,11 @@ import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
-import { BigNumber, Contract, ContractTransaction } from 'src/utils/ethers';
+import { BigNumber, BigNumberish, Contract, ContractTransaction, parseUnits } from 'src/utils/ethers';
 import { daysAgo, formatAddress, isValidAddress, isValidUrl } from 'src/utils/utils';
 // --- Types ---
 import { GrantRound } from '@dgrants/types';
 import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
-import { BigNumberish, utils } from 'ethers';
 
 function useGrantRoundDetail() {
   const { grantRounds, poll } = useDataStore();
@@ -192,7 +191,7 @@ function useGrantRoundDetail() {
     const round = <GrantRoundContract>new Contract(grantRound.value.address, GRANT_ROUND_ABI, signer.value);
 
     // contributionAmount must have the right number of decimals and be hexed
-    const contributionAmount = utils.parseUnits(amount.toString(), grantRound.value.donationTokenDecimals);
+    const contributionAmount = parseUnits(amount.toString(), grantRound.value.donationTokenDecimals);
 
     // check if contract is already approved as a spender
     const allowance = await checkAllowance(token, grantRound.value.address);
