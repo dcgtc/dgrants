@@ -27,7 +27,7 @@ contract GrantRound {
   /// @notice Token used for all contributions. Contributions in a different token are swapped to this token
   IERC20 public immutable donationToken;
 
-  /// @notice ERC20 token that for the matching pool
+  /// @notice Token used to payout match amounts at the end of a round
   IERC20 public immutable matchingToken;
 
   /// @notice URL pointing to grant round metadata (for off-chain use)
