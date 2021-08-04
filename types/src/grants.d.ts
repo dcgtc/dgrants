@@ -18,12 +18,10 @@ export type Grant = GrantObject | GrantEthers;
 export interface Donation {
   grantId: BigNumberish;
   rounds: string[];
-  tokenIn: string;
-  fee: BigNumberish;
+  path: string;
   deadline: BigNumberish;
   amountIn: BigNumberish;
   amountOutMinimum: BigNumberish;
-  sqrtPriceLimitX96: BigNumberish;
 }
 // GrantRound object from GrantRoundManager
 export type GrantRound = {

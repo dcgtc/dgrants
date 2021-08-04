@@ -9,23 +9,28 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { ethers, network } from 'hardhat';
 import { expect } from 'chai';
 import { BigNumber, BigNumberish, utils } from 'ethers';
+import { abi as UNISWAP_POOL_ABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
+import { FeeAmount, Pool, Route, computePoolAddress, encodeRouteToPath } from '@uniswap/v3-sdk';
+import { Token } from '@uniswap/sdk-core';
+
 const { defaultAbiCoder, hexStripZeros, hexZeroPad, keccak256 } = utils;
 
 // --- Constants ---
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-export const UNISWAP_FEES = ['500', '3000', '10000']; // Uniswap V3 fee tiers, as parts per 10k: https://github.com/Uniswap/uniswap-v3-core/blob/main/contracts/UniswapV3Factory.sol
 export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
+export const UNISWAP_FACTORY = '0x1F98431c8aD98523631AE4a59f267346ea31F984';
 
 // Mapping from lowercase token symbol to properties about that token
 export const tokens = {
-  eth: { address: ETH_ADDRESS, decimals: 18, mappingSlot: null },
-  dai: { address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', decimals: 18, mappingSlot: '0x2' },
-  gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', decimals: 18, mappingSlot: '0x5' },
+  eth: { address: ETH_ADDRESS, name: 'Ether', symbol: 'ETH', decimals: 18, mappingSlot: null },
+  weth: { address: WETH_ADDRESS, name: 'Wrapped Ether', symbol: 'WETH', decimals: 18, mappingSlot: '0x3' },
+  dai: { address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', name: "Dai", symbol: "DAI", decimals: 18, mappingSlot: '0x2' }, // prettier-ignore
+  gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', name: "USD Coin", symbol: "USDC", decimals: 18, mappingSlot: '0x5' }, // prettier-ignore
 };
 
 // This type is our list of tokens supported in the "Token Helpers" section
-export type SupportedTokens = keyof typeof tokens;
+export type SupportedToken = keyof typeof tokens;
 
 // --- Assertions ---
 // Verifies that two Grant objects are equal
@@ -50,9 +55,42 @@ export async function setNextBlockTimestamp(timestamp: BigNumberish): Promise<nu
   return timestamp;
 }
 
+// --- Uniswap SDK Helpers ---
+export async function encodeRoute(tokens: SupportedToken[]): Promise<string> {
+  const route = await getRoute(tokens);
+  return encodeRouteToPath(route, false);
+}
+
+async function getRoute(tokens: SupportedToken[]): Promise<Route<Token, Token>> {
+  const poolPromises: Promise<Pool>[] = [];
+  tokens.forEach((_, index) => {
+    if (index > 0) poolPromises.push(getPoolInstance(tokens[index - 1], tokens[index]));
+  });
+  const pools = await Promise.all(poolPromises);
+  return new Route(pools, pools[0].token0, pools[pools.length - 1].token1);
+}
+
+async function getPoolInstance(token0: SupportedToken, token1: SupportedToken): Promise<Pool> {
+  // Get pool contract
+  token0 = token0 === 'eth' ? 'weth' : token0;
+  token1 = token1 === 'eth' ? 'weth' : token1;
+  const tokenA = new Token(1, tokens[token0].address, tokens[token0].decimals, tokens[token0].symbol, tokens[token0].name); // prettier-ignore
+  const tokenB = new Token(1, tokens[token1].address, tokens[token1].decimals, tokens[token1].symbol, tokens[token1].name); // prettier-ignore
+  const fee = FeeAmount.MEDIUM; // always use Medium fee for now
+  const poolAddress = computePoolAddress({ factoryAddress: UNISWAP_FACTORY, tokenA, tokenB, fee });
+  const poolContract = new ethers.Contract(poolAddress, UNISWAP_POOL_ABI, ethers.provider);
+
+  // Read pool data
+  const [slot, liquidity] = await Promise.all([await poolContract.slot0(), await poolContract.liquidity()]);
+  const [sqrtPriceX96, tick] = slot;
+
+  // Return pool instance
+  return new Pool(tokenA, tokenB, FeeAmount.MEDIUM, sqrtPriceX96, liquidity, tick);
+}
+
 // --- Token helpers ---
 // Gets token balance
-export async function balanceOf(tokenSymbol: SupportedTokens, address: string): Promise<BigNumber> {
+export async function balanceOf(tokenSymbol: SupportedToken, address: string): Promise<BigNumber> {
   if (tokenSymbol === 'eth') return ethers.provider.getBalance(address);
   const tokenAddress = tokens[tokenSymbol].address;
   const abi = ['function balanceOf(address) external view returns (uint256)'];
@@ -61,7 +99,7 @@ export async function balanceOf(tokenSymbol: SupportedTokens, address: string): 
 }
 
 // Sets token allowance
-export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAddress, spender: string): Promise<void> {
+export async function approve(tokenSymbol: SupportedToken, holder: SignerWithAddress, spender: string): Promise<void> {
   if (tokenSymbol === 'eth') return;
   const tokenAddress = tokens[tokenSymbol].address;
   const abi = ['function approve(address,uint256) external returns (bool)'];
@@ -70,7 +108,7 @@ export async function approve(tokenSymbol: SupportedTokens, holder: SignerWithAd
 }
 
 // Arbitrarily set token balance of an account to a given amount
-export async function setBalance(tokenSymbol: SupportedTokens, to: string, amount: BigNumberish): Promise<void> {
+export async function setBalance(tokenSymbol: SupportedToken, to: string, amount: BigNumberish): Promise<void> {
   // If ETH, set the balance directly
   if (tokenSymbol === 'eth') {
     await network.provider.send('hardhat_setBalance', [to, BigNumber.from(amount).toHexString()]);
