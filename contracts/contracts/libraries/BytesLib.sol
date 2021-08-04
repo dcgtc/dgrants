@@ -12,6 +12,8 @@
 // with this newer version of BytesLib which supports 0.8.x. This version is the same as the one linked, but with
 // our Prettier config ran against it
 // Source: https://github.com/GNSPS/solidity-bytes-utils/blob/6458fb2780a3092bc756e737f246be1de6d3d362/contracts/BytesLib.sol
+// solhint-disable
+
 pragma solidity >=0.8.0 <0.9.0;
 
 library BytesLib {
