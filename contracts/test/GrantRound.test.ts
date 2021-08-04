@@ -31,11 +31,20 @@ describe('GrantRound', function () {
   let endTime: number; // One day
   const minContribution = 50;
 
-  async function deployGrantRound(tokenSupply: string, newStartTime?: number, newEndTime?: number) {
+  async function deployGrantRound(
+    matchingTokenSupply: string,
+    donationTokenSupply: string,
+    newStartTime?: number,
+    newEndTime?: number
+  ) {
     [deployer, payoutAdmin, donor, grantPayee, mpUser] = await ethers.getSigners();
     const mockTokenArtifact: Artifact = await artifacts.readArtifact('MockToken');
-    const mockERC20 = <MockToken>(
-      await deployContract(deployer, mockTokenArtifact, [ethers.utils.parseEther(tokenSupply)])
+    const mockDonationERC20 = <MockToken>(
+      await deployContract(deployer, mockTokenArtifact, [ethers.utils.parseEther(donationTokenSupply)])
+    );
+
+    const mockMatchingERC20 = <MockToken>(
+      await deployContract(deployer, mockTokenArtifact, [ethers.utils.parseEther(matchingTokenSupply)])
     );
 
     const grantRegistryArtifact: Artifact = await artifacts.readArtifact('GrantRegistry');
@@ -54,28 +63,33 @@ describe('GrantRound', function () {
       deployer.address,
       payoutAdmin.address,
       registry.address,
-      mockERC20.address,
+      mockDonationERC20.address,
+      mockMatchingERC20.address,
       startTime,
       endTime,
       mockUrl,
       minContribution
     );
 
-    return { mockERC20, roundContract };
+    return { mockMatchingERC20, mockDonationERC20, roundContract };
   }
 
   async function setup() {
-    const { mockERC20, roundContract } = await deployGrantRound(defaultTokenSupply);
+    const { mockMatchingERC20, mockDonationERC20, roundContract } = await deployGrantRound(
+      defaultTokenSupply,
+      defaultTokenSupply
+    );
 
     // Seed funds for matching pool user
-    await mockERC20.transfer(mpUser.address, ethers.utils.parseEther(donorAmount));
+    await mockMatchingERC20.transfer(mpUser.address, ethers.utils.parseEther(donorAmount));
     // Seed funds for initial donor
-    await mockERC20.transfer(donor.address, ethers.utils.parseEther(donorAmount));
-    await mockERC20.connect(mpUser).approve(roundContract.address, MaxUint256);
-    await mockERC20.connect(donor).approve(roundContract.address, MaxUint256);
-    await mockERC20.connect(payoutAdmin).approve(roundContract.address, MaxUint256);
+    await mockDonationERC20.transfer(donor.address, ethers.utils.parseEther(donorAmount));
+    await mockMatchingERC20.connect(mpUser).approve(roundContract.address, MaxUint256);
 
-    return { mockERC20, roundContract };
+    await mockDonationERC20.connect(donor).approve(roundContract.address, MaxUint256);
+    await mockDonationERC20.connect(payoutAdmin).approve(roundContract.address, MaxUint256);
+
+    return { mockMatchingERC20, mockDonationERC20, roundContract };
   }
 
   describe('Initialization', () => {
@@ -84,18 +98,22 @@ describe('GrantRound', function () {
       expect(isAddress(roundContract.address), 'Failed to deploy GrantRegistry').to.be.true;
     });
 
-    it('reverts if token supply is zero', async function () {
-      await expect(deployGrantRound('0')).to.be.revertedWith('GrantRound: Invalid token');
+    it('reverts if donation token supply is zero', async function () {
+      await expect(deployGrantRound(defaultTokenSupply, '0')).to.be.revertedWith('GrantRound: Invalid donation token');
+    });
+
+    it('reverts if matching token supply is zero', async function () {
+      await expect(deployGrantRound('0', defaultTokenSupply)).to.be.revertedWith('GrantRound: Invalid matching token');
     });
 
     it('reverts if start time is invalid', async function () {
-      await expect(deployGrantRound(defaultTokenSupply, startTime)).to.be.revertedWith(
+      await expect(deployGrantRound(defaultTokenSupply, defaultTokenSupply, startTime)).to.be.revertedWith(
         'GrantRound: Start time has already passed'
       );
     });
 
     it('reverts if end time is invalid', async function () {
-      await expect(deployGrantRound(defaultTokenSupply, undefined, startTime)).to.be.revertedWith(
+      await expect(deployGrantRound(defaultTokenSupply, defaultTokenSupply, undefined, startTime)).to.be.revertedWith(
         'GrantRound: End time must be after start time'
       );
     });
@@ -131,9 +149,11 @@ describe('GrantRound', function () {
 
   describe('addMatchingFunds - Add funds to matching round', () => {
     it('updates contract and user balances', async function () {
-      const { mockERC20, roundContract } = await loadFixture(setup);
+      const { mockMatchingERC20, roundContract } = await loadFixture(setup);
       await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(donorAmount));
-      expect(await mockERC20.balanceOf(roundContract.address)).to.be.equal(ethers.utils.parseEther(donorAmount));
+      expect(await mockMatchingERC20.balanceOf(roundContract.address)).to.be.equal(
+        ethers.utils.parseEther(donorAmount)
+      );
     });
   });
 
@@ -167,11 +187,11 @@ describe('GrantRound', function () {
 
   describe('Round end corner cases', () => {
     it('sends remaining matching pool funds to payout address', async function () {
-      const { mockERC20, roundContract } = await loadFixture(setup);
+      const { mockMatchingERC20, roundContract } = await loadFixture(setup);
       await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(donorAmount));
       await timeTravel(endTime + 1);
       await roundContract.connect(payoutAdmin).payoutGrants(grantPayee.address);
-      expect(await mockERC20.balanceOf(grantPayee.address)).to.be.equal(ethers.utils.parseEther(donorAmount));
+      expect(await mockMatchingERC20.balanceOf(grantPayee.address)).to.be.equal(ethers.utils.parseEther(donorAmount));
     });
 
     it('reverts if not the grant round payout administrator', async function () {

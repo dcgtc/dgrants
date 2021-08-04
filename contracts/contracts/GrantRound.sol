@@ -72,7 +72,8 @@ contract GrantRound {
     string memory _metaPtr,
     uint256 _minContribution
   ) {
-    require(_donationToken.totalSupply() > 0, "GrantRound: Invalid token");
+    require(_donationToken.totalSupply() > 0, "GrantRound: Invalid donation token");
+    require(_matchingToken.totalSupply() > 0, "GrantRound: Invalid matching token");
     require(_startTime >= block.timestamp, "GrantRound: Start time has already passed");
     require(_endTime > _startTime, "GrantRound: End time must be after start time");
     require(_registry.grantCount() >= 0, "GrantRound: Invalid registry"); // verify this call doesn't revert
@@ -103,9 +104,9 @@ contract GrantRound {
    */
   function payoutGrants(address _payoutAddress) external afterRoundEnd {
     require(msg.sender == payoutAdmin, "GrantRound: Only the payout administrator can call this method");
-    uint256 balance = donationToken.balanceOf(address(this));
+    uint256 balance = matchingToken.balanceOf(address(this));
     hasPaidOut = true;
-    donationToken.safeTransfer(_payoutAddress, balance);
+    matchingToken.safeTransfer(_payoutAddress, balance);
   }
 
   /**
