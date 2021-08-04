@@ -17,7 +17,7 @@ contract GrantRoundManager {
   struct Donation {
     uint96 grantId; // grant ID to which donation is being made
     GrantRound[] rounds; // rounds against which the donation should be counted
-    bytes path; // swap path
+    bytes path; // swap path, or if user is providing donationToken, the address of the donationToken
     uint256 deadline; // unix timestamp after which a swap will revert, i.e. swap must be executed before this
     uint256 amountIn; // amount donated by the user
     uint256 amountOutMinimum; // minimum amount to be returned after swap
@@ -108,7 +108,8 @@ contract GrantRoundManager {
     GrantRound[] calldata _rounds = _donation.rounds;
     require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
 
-    // Only allow value to be sent if the input token is WETH
+    // Only allow value to be sent if the input token is WETH (this limitation should be fixed in #76, as this
+    // require statement prohibits donating WETH)
     IERC20 _tokenIn = IERC20(_donation.path.toAddress(0));
     require(
       (msg.value == 0 && address(_tokenIn) != WETH) || (msg.value > 0 && address(_tokenIn) == WETH),
