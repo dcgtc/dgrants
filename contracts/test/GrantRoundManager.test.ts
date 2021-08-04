@@ -83,22 +83,31 @@ describe('GrantRoundManager', () => {
   });
 
   describe('createGrantRound', () => {
-    it('creates new grant rounds', async () => {
+    let mockRegistry: MockContract;
+    let mockMatchingToken: MockContract;
+    let registry: string;
+    // Create round
+    const metadataAdmin = randomAddress();
+    const payoutAdmin = randomAddress();
+    const startTime = '50000000000000'; // random timestamp far in the future
+    const endTime = '60000000000000'; // random timestamp far in the future
+    const metaPtr = 'https://metadata-pointer.com';
+    const minContribution = '100';
+    beforeEach(async () => {
       // Deploy and configure mocks (used to pass the validation in the GrantRound constructor)
-      const mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
+      mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
       await mockRegistry.mock.grantCount.returns('0');
+      registry = mockRegistry.address;
 
-      // Create round
-      const metadataAdmin = randomAddress();
-      const payoutAdmin = randomAddress();
-      const registry = mockRegistry.address;
-      const startTime = '50000000000000'; // random timestamp far in the future
-      const endTime = '60000000000000'; // random timestamp far in the future
-      const metaPtr = 'https://metadata-pointer.com';
-      const minContribution = '100';
+      mockMatchingToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
+    });
+    it('creates new grant rounds', async () => {
+      // Create a valid token supply
+      await mockMatchingToken.mock.totalSupply.returns('100');
       const tx = await manager.createGrantRound(
         metadataAdmin,
         payoutAdmin,
+        mockMatchingToken.address,
         registry,
         startTime,
         endTime,
@@ -120,10 +129,27 @@ describe('GrantRoundManager', () => {
       expect(await grantRound.payoutAdmin()).to.equal(payoutAdmin);
       expect(await grantRound.registry()).to.equal(registry);
       expect(await grantRound.donationToken()).to.equal(gtcAddress);
+      expect(await grantRound.matchingToken()).to.equal(mockMatchingToken.address);
       expect(await grantRound.startTime()).to.equal(startTime);
       expect(await grantRound.endTime()).to.equal(endTime);
       expect(await grantRound.metaPtr()).to.equal(metaPtr);
       expect(await grantRound.minContribution()).to.equal(minContribution);
+    });
+
+    it('reverts when creating a round with an invalid matching token', async () => {
+      await mockMatchingToken.mock.totalSupply.returns('0');
+      await expect(
+        manager.createGrantRound(
+          metadataAdmin,
+          payoutAdmin,
+          mockMatchingToken.address,
+          registry,
+          startTime,
+          endTime,
+          metaPtr,
+          minContribution
+        )
+      ).to.be.revertedWith('GrantRoundManager: Invalid matching token');
     });
   });
 
