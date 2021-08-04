@@ -10,7 +10,7 @@ import "./GrantRound.sol";
 
 contract GrantRoundManager {
   using Address for address;
-  using BytesLib for bytes; // TODO we use patch-package so this lib supports Solidity >0.8.0, but need to verify this is safe
+  using BytesLib for bytes;
   using SafeERC20 for IERC20;
 
   /// @notice Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/multihop-swaps
