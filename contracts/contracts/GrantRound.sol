@@ -92,7 +92,7 @@ contract GrantRound {
 
   /**
    * @notice Before the round ends this method accepts matching pool funds
-   * @param _amount The amount of matching token that can be sent to the contract for the matching pool
+   * @param _amount The amount of matching token that will be sent to the contract for the matching pool
    */
   function addMatchingFunds(uint256 _amount) external beforeRoundEnd {
     matchingToken.safeTransferFrom(msg.sender, address(this), _amount);
