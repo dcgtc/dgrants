@@ -4,23 +4,23 @@ pragma solidity ^0.8.5;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+import "@uniswap/v3-periphery/contracts/libraries/BytesLib.sol";
 import "./GrantRegistry.sol";
 import "./GrantRound.sol";
 
 contract GrantRoundManager {
   using Address for address;
+  using BytesLib for bytes; // TODO we use patch-package so this lib supports Solidity >0.8.0, but need to verify this is safe
   using SafeERC20 for IERC20;
 
-  /// @notice Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/single-swaps
+  /// @notice Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/multihop-swaps
   struct Donation {
     uint96 grantId; // grant ID to which donation is being made
     GrantRound[] rounds; // rounds against which the donation should be counted
-    IERC20 tokenIn; // token in which the user made the donation
-    uint24 fee; // selected fee tier
+    bytes path; // swap path
     uint256 deadline; // unix timestamp after which a swap will revert, i.e. swap must be executed before this
     uint256 amountIn; // amount donated by the user
     uint256 amountOutMinimum; // minimum amount to be returned after swap
-    uint160 sqrtPriceLimitX96; // determine limits on the pool prices which cannot exceed swap
   }
 
   /// @notice Address of the GrantRegistry
@@ -109,7 +109,7 @@ contract GrantRoundManager {
     require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
 
     // Only allow value to be sent if the input token is WETH
-    IERC20 _tokenIn = _donation.tokenIn;
+    IERC20 _tokenIn = IERC20(_donation.path.toAddress(0));
     require(
       (msg.value == 0 && address(_tokenIn) != WETH) || (msg.value > 0 && address(_tokenIn) == WETH),
       "GrantRoundManager: Invalid token-value pairing"
@@ -140,30 +140,22 @@ contract GrantRoundManager {
       _tokenIn.safeTransferFrom(msg.sender, _payoutAddress, _amountOut); // transfer funds directly to payout address
     } else {
       // Swap setup
-      uint24 _fee = _donation.fee;
-      uint256 _deadline = _donation.deadline;
-      uint256 _amountOutMinimum = _donation.amountOutMinimum;
-      uint160 _sqrtPriceLimitX96 = _donation.sqrtPriceLimitX96;
-
-      ISwapRouter.ExactInputSingleParams memory params = ISwapRouter.ExactInputSingleParams(
-        address(_tokenIn), // tokenIn
-        address(donationToken), // tokenOut
-        _fee, // fee
+      ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams(
+        _donation.path,
         _payoutAddress, // recipient
-        _deadline, // deadline
-        _amountIn, // amountIn
-        _amountOutMinimum, // amountOutMinimum
-        _sqrtPriceLimitX96 // sqrtPriceLimitX96
+        _donation.deadline,
+        _amountIn,
+        _donation.amountOutMinimum
       );
 
       // If user is sending a token, transfer it to this contract and approve the router to spend it
       if (msg.value == 0) {
-        _tokenIn.safeTransferFrom(msg.sender, address(this), _amountIn);
-        _tokenIn.approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
+        IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), _amountIn);
+        IERC20(_tokenIn).approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
       }
 
       // Execute swap -- output of swap is sent to the payoutAddress
-      _amountOut = router.exactInputSingle{value: msg.value}(params);
+      _amountOut = router.exactInput{value: msg.value}(params);
     }
 
     emit GrantDonation(_grantId, _tokenIn, _amountIn, _amountOut, _rounds);
