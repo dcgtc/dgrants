@@ -156,6 +156,7 @@ describe('GrantRoundManager', () => {
   describe('swapAndDonate', () => {
     let mockRound: MockContract;
     let donation: Donation;
+    let payee: string; // address the grant owner receives donations to
     const farTimestamp = '10000000000'; // date of 2286-11-20
 
     beforeEach(async () => {
@@ -163,6 +164,10 @@ describe('GrantRoundManager', () => {
       mockRound = await deployMockContract(user, artifacts.readArtifactSync('GrantRound').abi);
       await mockRound.mock.donationToken.returns(tokens.gtc.address);
       await mockRound.mock.isActive.returns(true);
+
+      // Set payee address to be a random address
+      payee = randomAddress();
+      await mockRegistry.mock.getGrantPayee.returns(payee);
 
       // Configure default donation data
       donation = {
@@ -209,10 +214,6 @@ describe('GrantRoundManager', () => {
       const amountIn = parseUnits('100', 18);
       await setBalance('gtc', user.address, amountIn);
 
-      // Set payee address to be a random address
-      const payee = randomAddress();
-      await mockRegistry.mock.getGrantPayee.returns(payee);
-
       // Execute donation to the payee
       expect(await balanceOf('gtc', payee)).to.equal('0');
       await approve('gtc', user, manager.address);
@@ -221,10 +222,6 @@ describe('GrantRoundManager', () => {
     });
 
     it('input token ETH, output token GTC', async () => {
-      // Set payee address to be a random address
-      const payee = randomAddress();
-      await mockRegistry.mock.getGrantPayee.returns(payee);
-
       // Use the 1% GTC/ETH pool to swap from ETH (input) to GTC (donationToken). The 1% pool is currently the most liquid
       const amountIn = parseUnits('10', 18);
       const tx = await manager.swapAndDonate(
@@ -239,25 +236,11 @@ describe('GrantRoundManager', () => {
       expect(await balanceOf('gtc', payee)).to.equal(amountOut);
     });
 
-    it.skip('input token DAI, output token GTC', async () => {
-      // TODO skipped because there is no DAI-GTC pool, so this fails as Uniswap V3 tries to swap directly in
-      // the specified pool. Need to determine how to specify a route
-
-      // Give the user 100 DAI
-      const amountIn = parseUnits('100', 18);
-      await setBalance('dai', user.address, amountIn);
-
-      // Set payee address to be a random address
-      const payee = randomAddress();
-      await mockRegistry.mock.getGrantPayee.returns(payee);
-
+    it('input token DAI, output token GTC', async () => {
       // Execute donation to the payee
+      const amountIn = parseUnits('100', 18);
       await approve('dai', user, manager.address);
-      console.log(1);
-      console.log('tokens.dai.address: ', tokens.dai.address);
-      const tx = await manager.swapAndDonate({ ...donation, path: await encodeRoute(['eth', 'gtc']), amountIn });
-      console.log(2);
-      expect(await balanceOf('dai', user.address)).to.equal('0');
+      const tx = await manager.swapAndDonate({ ...donation, path: await encodeRoute(['dai', 'eth', 'gtc']), amountIn });
 
       // Get the amountOut from the swap from the GrantDonation log
       const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
@@ -267,10 +250,6 @@ describe('GrantRoundManager', () => {
     });
 
     it('emits a log on a successful donation', async () => {
-      // Set payee address to be a random address
-      const payee = randomAddress();
-      await mockRegistry.mock.getGrantPayee.returns(payee);
-
       // Execute donation to the payee
       const amountIn = parseUnits('100', 18);
       await approve('gtc', user, manager.address);
