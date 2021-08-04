@@ -9,3 +9,8 @@
 const generateHash = (distribution: GrantsDistribution, algorithm?: string): string => {
 
 }
+
+// expose a single method to perform the hashing function
+export const handle = () => {
+
+}

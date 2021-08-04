@@ -1,4 +1,4 @@
-'use strict';
+'use strict'
 
 /**
  * Fetches grant round information from chain
@@ -21,11 +21,20 @@ const fetchContributions = (grantIds: [string], startDate: Date, endDate?: Date,
 
 
 /**
- * returns an array of GrantsDistribution + which grantId
+ * returns an array of GrantConstributions[] + which grantId
  * @param predicted_amount
  */
- const fetchInfo = (predicted_amount?: Number) => {
+ export const fetch = (grantRound:number, registry:string) => {
   // 1. fetchGrantRound
   // 2. fetchContributions
   // 3. optional -> add new predicted_amount contribution to grant
+
+  // Example Output
+  // {
+  //   roundId: 1,
+  //   fundAmount: 2000,
+  //   contributions: [
+  //       {grantId: 2, address: '0x0...', contribution_amount: 100}
+  //   ]
+  // }
 }
