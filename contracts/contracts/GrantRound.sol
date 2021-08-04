@@ -55,7 +55,7 @@ contract GrantRound {
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
-   * @param _donationToken Address of the ERC20 token for accepting matching pool contributions
+   * @param _matchingToken Address of the ERC20 token for accepting matching pool contributions
    * @param _startTime Unix timestamp of the start of the round
    * @param _endTime Unix timestamp of the end of the round
    * @param _metaPtr URL pointing to the grant round metadata
