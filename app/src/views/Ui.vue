@@ -17,8 +17,6 @@
     text="“Focus on infrastructure, and the organization of services. vidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.”"
   />
 
-  <p>test</p>
-
   <h1>I am a Headline</h1>
 
   <p>
