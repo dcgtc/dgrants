@@ -24,7 +24,7 @@ contract GrantRound {
   /// @notice GrantsRegistry
   GrantRegistry public immutable registry;
 
-  /// @notice ERC20 token that accepts donations
+  /// @notice Token used for all contributions. Contributions in a different token are swapped to this token
   IERC20 public immutable donationToken;
 
   /// @notice ERC20 token that for the matching pool
