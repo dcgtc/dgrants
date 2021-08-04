@@ -55,6 +55,7 @@ const navigation = [
   { name: 'About', href: '/about' },
   { name: 'Docs', href: '/docs' },
   { name: 'Contact', href: '/contact' },
+  { name: 'Ui', href: '/ui' },
 ];
 
 export default defineComponent({

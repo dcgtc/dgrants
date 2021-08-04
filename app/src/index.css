@@ -8,36 +8,36 @@
 
 /* Add styles to the base styles: https://tailwindcss.com/docs/adding-base-styles */
 @layer base {
-  #app-main {
-    @apply text-gray-700; /* Default font color */
+  #app {
+    @apply text-grey-500; /* Default font color */
+    @apply text-sm md:text-md lg:text-lg xl:text-xl 2xl:text-xxl;
+    font-kerning: auto;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
   }
+
+  h1{
+    @apply text-headline;
+  }
+  a{ @apply underline; }
 }
+
 
 /* Add styles to components */
 @layer components {
-  .btn {
-    @apply inline-block px-4 py-2 text-base font-medium border border-transparent rounded-md;
-  }
-  .btn-primary {
-    @apply font-medium text-white bg-primary-500 hover:bg-opacity-75 focus:outline-none;
-  }
-  .btn-primary-disabled {
-    @apply bg-opacity-75 cursor-not-allowed;
-  }
-  .btn-secondary {
-    @apply font-medium text-primary-700 bg-primary-100 hover:bg-primary-200;
-  }
-  .btn-outline {
-    @apply font-medium text-primary-600 border border-primary-600 hover:bg-primary-50;
-  }
-  .btn-flat {
-    @apply font-medium text-primary-600 hover:bg-primary-50;
+  .intent{
+    text-indent: 1em;
   }
   .link {
-    @apply text-primary-600 underline cursor-pointer;
+    @apply text-grey-500 underline cursor-pointer;
   }
 }
 
 /* Add styles to utilities */
 @layer utilities {
 }
+
+
+
