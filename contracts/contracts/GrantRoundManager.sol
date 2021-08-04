@@ -65,6 +65,7 @@ contract GrantRoundManager {
    * @notice Creates a new GrantRound
    * @param _owner Grant round owner that has permission to update the metadata pointer
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
+   * @param _matchingToken Address for the matching pool tokens
    * @param _registry Address that contains the grant metadata
    * @param _startTime Unix timestamp of the start of the round
    * @param _endTime Unix timestamp of the end of the round
@@ -74,17 +75,20 @@ contract GrantRoundManager {
   function createGrantRound(
     address _owner,
     address _payoutAdmin,
+    IERC20 _matchingToken,
     GrantRegistry _registry,
     uint256 _startTime,
     uint256 _endTime,
     string memory _metaPtr,
     uint256 _minContribution
   ) external {
+    require(_matchingToken.totalSupply() > 0, "GrantRoundManager: Invalid matching token");
     GrantRound _grantRound = new GrantRound(
       _owner,
       _payoutAdmin,
       _registry,
       donationToken,
+      _matchingToken,
       _startTime,
       _endTime,
       _metaPtr,
