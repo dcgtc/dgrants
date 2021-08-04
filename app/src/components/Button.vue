@@ -17,7 +17,7 @@ export default defineComponent({
 <style lang="postcss" scoped >
 
 button{
-  @apply py-4 px-8 font-medium uppercase bg-grey-300 text-white hover:bg-grey-400
+  @apply py-4 px-8 font-medium uppercase bg-grey-500 text-white hover:bg-grey-400
 }
 
 </style>
