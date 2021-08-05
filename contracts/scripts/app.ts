@@ -56,6 +56,7 @@ const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_add
   // GrantRound Argument
   const metadataAdmin = '0x34f4E532a33EB545941e914B25Efe348Aea31f0A';
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
+  const matchingToken = tokens.dai.address;
   const startTime = startDate.getTime();
   const endTime = endDate.getTime() + 10;
   const metaPtr = 'https://time-travel.eth.link';
@@ -64,6 +65,7 @@ const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_add
   await roundManager.createGrantRound(
     metadataAdmin,
     payoutAdmin,
+    matchingToken,
     registry_address,
     Math.floor(startTime / 1000),
     Math.floor(endTime / 1000),

@@ -32,6 +32,7 @@ export type GrantRound = {
   payoutAdmin: string;
   registry: string;
   donationToken: TokenInfo;
+  matchingToken: TokenInfo;
   funds: BigNumberish;
   status: string;
   startTime: BigNumberish;

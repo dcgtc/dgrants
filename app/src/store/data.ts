@@ -67,6 +67,8 @@ export default function useDataStore() {
         // collect the donationToken before promise.all'ing everything
         const donationTokenAddress = await roundContract.donationToken();
         const donationTokenContract = new Contract(donationTokenAddress, ERC20_ABI, provider.value);
+        const matchingTokenAddress = await roundContract.matchingToken();
+        const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
 
         return await Promise.all([
           // round details
@@ -78,11 +80,15 @@ export default function useDataStore() {
           roundContract.metaPtr(),
           roundContract.minContribution(),
           roundContract.hasPaidOut(),
-          // get token details
+          // get donation token details
           donationTokenContract.name(),
           donationTokenContract.symbol(),
           donationTokenContract.decimals(),
-          donationTokenContract.balanceOf(grantRoundAddress),
+          // get matching token details
+          matchingTokenContract.name(),
+          matchingTokenContract.symbol(),
+          matchingTokenContract.decimals(),
+          matchingTokenContract.balanceOf(grantRoundAddress),
         ]).then(
           ([
             // round details
@@ -94,11 +100,15 @@ export default function useDataStore() {
             metaPtr,
             minContribution,
             hasPaidOut,
-            // token details
+            // donation token details
             donationTokenName,
             donationTokenSymbol,
             donationTokenDecimals,
-            donationTokenBalance,
+            // matching token details
+            matchingTokenName,
+            matchingTokenSymbol,
+            matchingTokenDecimals,
+            matchingTokenBalance,
           ]) => {
             // check for status against `now`
             const now = Date.now();
@@ -121,8 +131,17 @@ export default function useDataStore() {
                 // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
                 logoURI: undefined, // we can leave this out for now
               } as TokenInfo,
+              matchingToken: {
+                address: matchingTokenAddress,
+                name: matchingTokenName,
+                symbol: matchingTokenSymbol,
+                decimals: matchingTokenDecimals,
+                chainId: provider.value.network.chainId || 1,
+                // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
+                logoURI: undefined, // we can leave this out for now
+              },
               address: grantRoundAddress,
-              funds: donationTokenBalance / 10 ** donationTokenDecimals,
+              funds: matchingTokenBalance / 10 ** matchingTokenDecimals,
               status:
                 now >= startTime.toNumber() * 1000 && now < endTime.toNumber() * 1000
                   ? 'Active'

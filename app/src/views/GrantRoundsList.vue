@@ -27,7 +27,7 @@
               <div class="flex items-center space-x-3">
                 <h3 class="text-gray-900 text-sm font-medium truncate">
                   Grant Round funds: {{ grantRound.funds.toString() }}
-                  <span :title="grantRound.donationToken.name">{{ grantRound.donationToken.symbol }}</span>
+                  <span :title="grantRound.matchingToken.name">{{ grantRound.matchingToken.symbol }}</span>
                 </h3>
               </div>
               <p class="mt-1 text-gray-500 text-sm truncate">{{ grantRound.metaPtr }}</p>

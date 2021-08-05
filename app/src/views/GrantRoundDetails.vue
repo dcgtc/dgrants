@@ -10,10 +10,10 @@
         Funds:
         <a
           class="link"
-          :title="grantRound.donationToken.name"
-          :href="`https://etherscan.io/token/${grantRound.donationToken.address}?a=${grantRound.address}`"
+          :title="grantRound.matchingToken.name"
+          :href="`https://etherscan.io/token/${grantRound.matchingToken.address}?a=${grantRound.address}`"
         >
-          {{ grantRound.funds.toString() }} {{ grantRound.donationToken.symbol }}
+          {{ grantRound.funds.toString() }} {{ grantRound.matchingToken.symbol }}
         </a>
       </p>
       <p>
@@ -92,7 +92,7 @@
 
           <!-- contribution amount -->
           <BaseInput
-            :v-model="String(form.amount)"
+            v-model="form.amount"
             description="The number of tokens to contribute"
             id="contribution-amount"
             label="Contribution amount"
@@ -166,19 +166,19 @@ function useGrantRoundDetail() {
 
   // --- Contribution capabilities ---
   const isContributing = ref(false);
-  const form = computed<{ token: string; amount: BigNumberish }>(() => {
+  const form = computed<{ token: string; amount: string }>(() => {
     return {
-      token: grantRound.value.donationToken.address,
-      amount: grantRound.value.minContribution,
+      token: grantRound.value.matchingToken.address,
+      amount: String(grantRound.value.minContribution),
     };
   });
   const isAmountValid = (amount: BigNumberish) => {
-    return (amount || 0) > 0;
+    return (Number(amount) || 0) > 0;
   };
   const isFormValid = computed(() => {
     const { token, amount } = form.value;
     const areFieldsValid =
-      isValidAddress(<string>token) && token === grantRound.value.donationToken.address && isAmountValid(amount);
+      isValidAddress(<string>token) && token === grantRound.value.matchingToken.address && isAmountValid(amount);
     return areFieldsValid;
   });
 
@@ -207,11 +207,11 @@ function useGrantRoundDetail() {
     const { amount } = form.value;
 
     // set up contracts
-    const token = new Contract(grantRound.value.donationToken.address, ERC20_ABI, signer.value);
+    const token = new Contract(grantRound.value.matchingToken.address, ERC20_ABI, signer.value);
     const round = <GrantRoundContract>new Contract(grantRound.value.address, GRANT_ROUND_ABI, signer.value);
 
     // contributionAmount must have the right number of decimals and be hexed
-    const contributionAmount = parseUnits(amount.toString(), grantRound.value.donationToken.decimals);
+    const contributionAmount = parseUnits(amount, grantRound.value.matchingToken.decimals);
 
     // check if contract is already approved as a spender
     const allowance = await checkAllowance(token, userAddress.value, grantRound.value.address);
