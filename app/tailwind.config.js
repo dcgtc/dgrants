@@ -28,6 +28,11 @@ module.exports = {
       'grey-500': '#0E0333'
     },
 
+    boxShadow: {
+        light: '0px 0px 40px 0px rgba(14, 3, 51, .1)',
+        none: 'none',
+      },
+
     nightwind: {
       // Keys specify light-mode colors, and values are overrides for Nightwind to replace them with
       colors: {
@@ -39,8 +44,13 @@ module.exports = {
     },
   },
   variants: {
-    extend: {},
+    extend: {
+      display: ["group-hover"],
+    },
   },
   plugins: [require('@tailwindcss/forms'), require('nightwind')],
 };
+
+
+
 
