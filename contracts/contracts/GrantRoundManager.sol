@@ -4,7 +4,7 @@ pragma solidity ^0.8.5;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "./libraries/BytesLib.sol";
+import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./GrantRegistry.sol";
 import "./GrantRound.sol";
 
