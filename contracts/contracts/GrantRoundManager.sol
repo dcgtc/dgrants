@@ -151,8 +151,8 @@ contract GrantRoundManager {
 
       // If user is sending a token, transfer it to this contract and approve the router to spend it
       if (msg.value == 0) {
-        IERC20(_tokenIn).safeTransferFrom(msg.sender, address(this), _amountIn);
-        IERC20(_tokenIn).approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
+        _tokenIn.safeTransferFrom(msg.sender, address(this), _amountIn);
+        _tokenIn.approve(address(router), type(uint256).max); // TODO optimize so we don't call this every time
       }
 
       // Execute swap -- output of swap is sent to the payoutAddress

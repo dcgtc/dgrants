@@ -232,7 +232,7 @@ describe('GrantRoundManager', () => {
       expect(await balanceOf('gtc', payee)).to.equal(amountOut);
     });
 
-    it('input token DAI, output token GTC', async () => {
+    it('input token DAI, output token GTC, swap passes through ETH', async () => {
       // Execute donation to the payee
       const amountIn = parseUnits('100', 18);
       await approve('dai', user, manager.address);
