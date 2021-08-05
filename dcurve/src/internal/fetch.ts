@@ -1,5 +1,7 @@
 'use strict'
 
+import { GrantRoundContributions, GrantRoundFetchArgs } from "src/types";
+
 /**
  * Fetches grant round information from chain
  * @param roundId
@@ -9,32 +11,33 @@
 
 
 /**
- * Fetches all contributions from a set of grants between start and end date from chain
+ * Fetches all contributions from a set of grants between start and end date for a grantRound 
  *
- * @param grantIds array of grantids for which the contribution needs to be fetched
+ * @param roundId grant round
  * @param startDate contributions made after this date
  * @param endDate contributions made before this date. default: current timestamp
  */
-const fetchContributions = (grantIds: [string], startDate: Date, endDate?: Date, registry?: string) => {
-
+const fetchContributions = (roundId: string, startDate: Date, endDate?: Date): Contribution => {
 }
 
 
 /**
- * returns an array of GrantConstributions[] + which grantId
- * @param predicted_amount
+ * Returns an array of GrantRoundContributions
+ * @param {GrantRoundFetchArgs}
  */
- export const fetch = (grantRound:number, registry:string) => {
+ export const fetch = (args: GrantRoundFetchArgs): GrantRoundContributions => {
   // 1. fetchGrantRound
+  
   // 2. fetchContributions
-  // 3. optional -> add new predicted_amount contribution to grant
+  const contributions = fetchContributions();
 
-  // Example Output
-  // {
-  //   roundId: 1,
-  //   fundAmount: 2000,
-  //   contributions: [
-  //       {grantId: 2, address: '0x0...', contribution_amount: 100}
-  //   ]
-  // }
+  // 3. Ignore contributions - CAN BE DONE LATER
+
+  const output: GrantRoundContributions  = {
+    grantRound: args.grantRound,
+    matchingAmount: 0, // TODO: UPDATE
+    contributions : contributions // TODO: UPDATE
+  }
+
+  return output;
 }
