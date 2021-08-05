@@ -18,16 +18,19 @@
     scroll-behavior: smooth;
   }
 
-  h1{
+  h1 {
     @apply text-headline;
   }
-  a{ @apply underline; }
-}
 
+  a {
+    @apply underline;
+    @apply hover:text-grey-400;
+  }
+}
 
 /* Add styles to components */
 @layer components {
-  .intent{
+  .intent {
     text-indent: 1em;
   }
   .link {
@@ -38,6 +41,3 @@
 /* Add styles to utilities */
 @layer utilities {
 }
-
-
-
