@@ -64,7 +64,10 @@ export async function encodeRoute(tokens: SupportedToken[]): Promise<string> {
 async function getRoute(tokens: SupportedToken[]): Promise<Route<Token, Token>> {
   const poolPromises: Promise<Pool>[] = [];
   tokens.forEach((_, index) => {
-    if (index > 0) poolPromises.push(getPoolInstance(tokens[index - 1], tokens[index]));
+    if (index === 0) return;
+    const inputToken = tokens[index - 1];
+    const outputToken = tokens[index];
+    poolPromises.push(getPoolInstance(inputToken, outputToken));
   });
   const pools = await Promise.all(poolPromises);
   return new Route(pools, pools[0].token0, pools[pools.length - 1].token1);
