@@ -210,11 +210,7 @@ describe('GrantRoundManager', () => {
     });
 
     it('input token GTC, output token GTC', async () => {
-      // Give the user 100 GTC
       const amountIn = parseUnits('100', 18);
-      await setBalance('gtc', user.address, amountIn);
-
-      // Execute donation to the payee
       expect(await balanceOf('gtc', payee)).to.equal('0');
       await approve('gtc', user, manager.address);
       await manager.swapAndDonate({ ...donation, path: tokens.gtc.address, amountIn });
