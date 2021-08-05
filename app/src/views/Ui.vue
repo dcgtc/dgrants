@@ -1,6 +1,6 @@
 <template>
-  <!-- header with navigation -->
-  <header class="px-12 border-b border-grey-100 py-16 text-center relative">
+  <!-- header with navigation, bredcrumb, subtile, quote-->
+  <header class="px-12 py-20 border-b border-grey-100 text-center relative">
     <!-- optional breadcrumb -->
     <div class="uppercase font-medium text-grey-400 mb-8">
       <span class="">dgrants</span>
@@ -32,6 +32,11 @@
     <!-- optional navigation to jump to next item in a list -->
     <nav class="inline p-6 bg-pink absolute right-0" style="top: 50%; transform: translateY(-50%)">PREV</nav>
     <nav class="inline p-6 bg-pink absolute left-0" style="top: 50%; transform: translateY(-50%)">NEXT</nav>
+  </header>
+
+  <!-- minimal header  -->
+  <header class="px-12 py-20 border-b border-grey-100 text-center relative">
+    <h1>Best Infrastructure Grants</h1>
   </header>
 
   <!-- head part for sections-->
