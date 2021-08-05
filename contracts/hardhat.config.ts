@@ -61,6 +61,7 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
+      hardfork: 'berlin', // not using London for now, for backwards compatibility with test suite
       forking: { url: `https://mainnet.infura.io/v3/${infuraApiKey}` },
       accounts: {
         mnemonic,
