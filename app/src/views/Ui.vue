@@ -14,14 +14,14 @@
     <h1>Best Infrastructure Grants</h1>
 
     <!-- optional subline -->
-    <h1>subline</h1>
+    <h1>“Fusion - Iconpack for Cryptonauts”</h1>
 
     <!--optional by address last seen / last  updated-->
-    <p>
+    <div>
       <span class="text-grey-400 mr-4">by</span>
       <a class="mr-4" href="#">0xff…ffff</a>
       <span class="italic text-grey-400">last seen 3 days ago</span>
-    </p>
+    </div>
 
     <!-- optional quote -->
     <p class="italic mt-8">
