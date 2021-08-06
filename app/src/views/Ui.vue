@@ -215,37 +215,30 @@
         py-2
         border-b-2
       "
-      href="#"
       >All (543)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >Infra Tech (184)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >dApp Tech (184)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >Community (43)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >Building Gitcoin (10)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >NFTs (3)</span
     >
     <span
       class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      href="#"
       >dGov (17)</span
     >
   </div>
