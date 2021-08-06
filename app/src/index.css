@@ -40,4 +40,24 @@
 
 /* Add styles to utilities */
 @layer utilities {
+  .i16 {
+    height: 16px;
+    width: 16px;
+  }
+  .i24 {
+    height: 24px;
+    width: 24px;
+  }
+  .i32 {
+    height: 32px;
+    width: 32px;
+  }
+  .i48 {
+    height: 48px;
+    width: 48px;
+  }
+  .i64 {
+    height: 64px;
+    width: 64px;
+  }
 }
