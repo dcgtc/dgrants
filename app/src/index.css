@@ -40,24 +40,23 @@
 
 /* Add styles to utilities */
 @layer utilities {
-  .i16 {
-    height: 16px;
-    width: 16px;
+
+  .icon{
+    @apply h-10 w-10 md:h-14 md:w-14  ;
+    object-fit: contain;
   }
-  .i24 {
-    height: 24px;
-    width: 24px;
+
+  .icon-small{
+    @apply h-6 w-6 md:h-10 md:w-10;
+    object-fit: contain;
   }
-  .i32 {
-    height: 32px;
-    width: 32px;
+
+  .icon-large{
+    @apply h-16 w-16 md:h-20 md:w-20;
+    object-fit: contain;
   }
-  .i48 {
-    height: 48px;
-    width: 48px;
-  }
-  .i64 {
-    height: 64px;
-    width: 64px;
-  }
+
+
+
+
 }
