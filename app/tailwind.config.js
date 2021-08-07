@@ -28,6 +28,16 @@ module.exports = {
       'grey-500': '#0E0333'
     },
 
+    stroke:{
+      'grey-400': '#757087',
+      'grey-500': '#0E0333'
+    },
+    strokeWidth: {
+         '1': '1',
+         '2': '2',
+         '3': '3',
+         '4': '4',
+    },
     boxShadow: {
         light: '0px 0px 40px 0px rgba(14, 3, 51, .1)',
         none: 'none',
@@ -46,11 +56,9 @@ module.exports = {
   variants: {
     extend: {
       display: ["group-hover"],
+      stroke: ["group-hover"],
     },
   },
   plugins: [require('@tailwindcss/forms'), require('nightwind')],
 };
-
-
-
 

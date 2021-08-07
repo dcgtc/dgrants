@@ -38,22 +38,23 @@
   }
 }
 
-/* Add styles to utilities */
+/* Add styles to utilities      */
 @layer utilities {
+
+  .icon, .icon-small, .icon-large{
+    @apply object-contain stroke-2 stroke-grey-400 group-hover:stroke-grey-500 ;
+  }
 
   .icon{
     @apply h-10 w-10 md:h-14 md:w-14  ;
-    object-fit: contain;
   }
 
   .icon-small{
     @apply h-6 w-6 md:h-10 md:w-10;
-    object-fit: contain;
   }
 
   .icon-large{
     @apply h-16 w-16 md:h-20 md:w-20;
-    object-fit: contain;
   }
 
 

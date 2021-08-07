@@ -44,9 +44,7 @@
       <!--text-->
       <div class="hidden md:block group-hover:text-grey-500">Cart</div>
       <!--icon-->
-      <div>
-        <img class="icon" src="http://placekitten.com/64" />
-      </div>
+      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none"><path d="M12 44a48.53 48.53 0 0 0 20 4 48.53 48.53 0 0 0 20-4c-4-20-4-32-20-32S16 24 12 44z"/><line x1="32" y1="8" x2="32" y2="12"/><path d="M24 47.41V48a8 8 0 0 0 16 0v-.59"/></svg>
       <!--in cart number-->
       <div class="group-hover:text-grey-500">12</div>
     </div>
