@@ -1,9 +1,26 @@
 <template>
-  <!-- navigation -->
+
+  <!-- take the codebase of this documents "fragments"
+    and make components out of it by copy the fragments
+    into new files in /components and make it modular with 
+    params / logic . then remove the code-part from here
+    and replace it with the <Component params="value" />
+    so richard can continue finetune it along the way,
+    and we can start build views from that components
+  -->
+
+
+
+
+  <!----------------------------------------------- NAVIGATION 
+  with: logo + text + arrow + menu
+  with optional : cart ( text + icon + number )
+  with optional : web3-connected ( address + identicon + arrow + menu )
+  with optional : web3-not-connected ( text + icon )
+  -->
   <nav class="flex items-center gap-x-4 md:gap-x-8 h-28 mx-4 text-grey-400" style="z-index: 9999;">
-    <!-- logo + menu - this is a group to use group-hover:block for the absolute hidden menu line 29-39 -->
+    <!-- logo + menu -->
     <div class="group">
-      <!-- this is the relative always there logo+text+arrow part -->
       <div class="relative">
         <!--logo + text + arrow -->
         <div class="font-medium flex items-center h-14 cursor-pointer">
@@ -23,7 +40,7 @@
         </div>
       </div>
 
-      <!-- menu - this is the absolute menu what should apear on hover over the relative part line 10-27 -->
+      <!-- main menu-->
       <div class="absolute hidden left-20 group-hover:block"  style="z-index: 9999;">
         <div
           class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
@@ -53,17 +70,40 @@
     <div class="border-r border-grey-100 h-14"></div>
 
     <!-- web3:connected : show this-->
-    <div class="flex items-center h-16 gap-x-2 group cursor-pointer">
-      <!--text-->
-      <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
-      <!--image-->
-      <div>
-        <img class="icon" src="http://placekitten.com/64?image=3" />
+    <div class="group">
+
+      <!--navigation part-->
+      <div class="relative flex items-center h-16 gap-x-2 group cursor-pointer">
+        <!--text-->
+        <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
+        <!--image-->
+        <div>
+          <img class="icon" src="http://placekitten.com/64?image=3" />
+        </div>
+        <!--arrow-->
+        <div>
+          <img class="icon-small" src="http://placekitten.com/64" />
+        </div>
       </div>
-      <!--arrow-->
-      <div>
-        <img class="icon-small" src="http://placekitten.com/64" />
+
+      <!-- menu-->
+      <div class="absolute hidden right-20 group-hover:block"  style="z-index: 9999;">
+        <div
+          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
+        >
+          <div>0xff…ffff</div>
+          <div>1337 ETH</div>
+          <div class="border-b border-grey-400 my-4"></div>
+          <div class="cursor-pointer hover:text-grey-500 flex">profile</div>
+          <div class="cursor-pointer hover:text-grey-500 flex">favorites<span class="pl-4 ml-auto">32</span></div>
+          <div class="cursor-pointer hover:text-grey-500 flex">my grants<span class="pl-4 ml-auto">32</span></div>
+          <div class="cursor-pointer hover:text-grey-500 flex">settings</div>
+          <div class="border-b border-grey-400 my-4 flex"></div>
+          <div class="cursor-pointer hover:text-grey-500 flex">change wallet</div>
+          <div class="cursor-pointer hover:text-grey-500 flex">disconnect wallet</div>
+        </div>
       </div>
+
     </div>
 
     <!-- web3: not connected : show this-->
@@ -77,14 +117,14 @@
     </div>
   </nav>
 
-  <!-- header 
+  <!----------------------------------------------- HEADER  
   with headline
   with optional absolute left right navigation 
   with optional breadcrumb navigation 
   with optional second headline
   with optional metadata "by {address}" + "last seen/update" + humanized timestamp
   with optional "quote" ( for a public collection of a user ) 
--->
+  -->
   <header class="px-12 py-20 border-b border-grey-100 text-center relative">
     <!-- optional breadcrumb within a header -->
     <div class="flex flex-wrap justify-center mb-8">
@@ -135,10 +175,12 @@
     </nav>
   </header>
 
-  <!-- section header / divider ( whats a good name ? )
+
+  <!----------------------------------------------- SECTION HEADER / DIVIDER 
+  ( whats a good name for this element ? )  
   - with optional right button 
   - with optional submenu per item
--->
+  -->
   <div class="px-12 pt-16 pb-8 border-b border-grey-100">
     <div class="block md:flex gap-x-8">
       <div class="flex flex-wrap content-center gap-x-8">
@@ -188,7 +230,10 @@
     </div>
   </div>
 
-  <!-- grant description paragraph with some intent-->
+  <!----------------------------------------------- GRANT DESCRIPTION  
+  - a paragraph with some intent for better typography - for now probably just
+  gona used for the round and grant detail page
+  -->
   <div class="border-b border-grey-100">
     <p class="intent px-12 py-12 mx-auto max-w-6xl">
       Im a paragraph but with intent. <a href="#">link</a> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
@@ -200,7 +245,9 @@
     </p>
   </div>
 
-  <!-- tab bar -->
+  <!----------------------------------------------- TAB BAR   
+  - with active state ( see first "all") classes vs other clases 
+  -->
   <div class="px-12 py-6 border-b border-grey-100 flex flex-wrap gap-x-10 gap-y-2">
     <span
       class="
@@ -241,8 +288,8 @@
     >
   </div>
 
-  <!-- grid of grant cards -->
-  <br /><br /><br /><br />
+  <!----------------------------------------------- CARD GRID FOR ROUNDS AND GRANTS  -->
+
 
   <section
     class="
@@ -258,7 +305,12 @@
       border-b border-grey-100
     "
   >
-    <!-- grant card -->
+
+
+  <!----------------------------------------------- GRANT CART   
+  - with 3 icons just for test . we might just need one later on 
+  -->
+
     <figure class="group cursor-pointer">
       <div class="relative">
         <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
@@ -298,13 +350,17 @@
 
   <br /><br /><br />
 
-  <!--button-->
+  <!----------------------------------------------- BUTTON 
+  -->
   <br /><br />
   <button class="uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">Click me</button>
 
-  <!--link-->
-  <br /><br />
-  <a href="#">Im a link</a>
+
+
+
+
+
+
 </template>
 
 <script lang="ts">
