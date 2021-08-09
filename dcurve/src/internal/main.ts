@@ -1,68 +1,88 @@
 'use strict';
 
-import { GrantPredictionArgs, GrantPredictions, GrantsDistribution } from 'src/types';
+import { GrantPrediction, GrantPredictionArgs, GrantPredictions, GrantRoundContributions, GrantsDistribution } from 'src/types';
+import { addAnonContribution, getGrantMatch } from './utils';
 
-// ========== Actual Calculations ===========
+type InitArgs = {
+  calcAlgo: Function,
+  hashAlgo: Function
+}
 
 export class CLR {
-  _options = {};
+  _options: InitArgs;
 
-  constructor(options: object) {
+  constructor(options: InitArgs) {
     this._options = options;
   }
 
-  calculate(contributions: Function): GrantsDistribution {
+  calculate(grantRoundContributions: GrantRoundContributions): GrantsDistribution {
     const calcAlgo = this._options['calcAlgo'];
     const hashAlgo = this._options['hashAlgo'];
+
+    // calculate distribution based on contributions
+    const distribution: GrantsDistribution = calcAlgo(
+      // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
+    );
+
+    // generate the hash on the distribution based on selected hashAlgo
+    distribution.hash = hashAlgo(distribution.distribution);
+
+    return distribution;
   }
 
   /**
-   *
-   * @param contributions
-   * @param grantId
-   * @param predicitionPoints
+   * Calculates the matching amount based on current distribution and predicts
+   * the match based on predictionPoints
+   * @param GrantPredictionArgs
    *
    * @returns GrantPredictions
    */
   predict(args: GrantPredictionArgs): GrantPredictions {
     const calcAlgo = this._options['calcAlgo'];
-    const hashAlgo = this._options['hashAlgo'];
 
-    // accepts ALL contributions then predicts against each preidicitionPoint on the grantId only
+    const grantId: number = args.grantId
+    const predictionPoints: number[] = args.predictionPoints;
+    const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
 
-    // CLR calculation (full/with 0)
-    // CLR calculation with 1
-    // 1:predictedAmount = final_match for 1 - final_match for 0
+    // calculate distribution based on current contribution
+    const distribution: GrantsDistribution = calcAlgo(
+      // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
+    );
+    const currentGrantMatch = getGrantMatch(grantId, distribution);
 
-    // return [
-    //     {predictionPoint: 1, predictedAmount: 12},
-    //     {predictionPoint: 10, predictedAmount: 30}
-    // ];
+    let predictions: GrantPrediction[] = [];
+
+    // calculate predicted distribution for each predictionPoint
+    predictionPoints.forEach(predictionPoint => {
+
+      // add anon contribution of value predictionPoint
+      let newGrantRoundContributions = addAnonContribution(grantId, grantRoundContributions, predictionPoint);
+
+      // calculate distribution with anon contribution
+      const newDistribution: GrantsDistribution = calcAlgo(
+        // TODO: invoke calcAlgo with CLRArgs object and newGrantRoundContributions
+      );
+
+      const predictedGrantMatch = getGrantMatch(grantId, newDistribution);
+
+      const prediction: GrantPrediction = {
+        predictionPoint: predictionPoint,
+        predictedGrantMatch: predictedGrantMatch,
+        predictionDiff: predictedGrantMatch - currentGrantMatch
+      }
+
+      predictions.push(prediction);
+
+    });
+
+    const grantPredictions: GrantPredictions = {
+      grantId: grantId,
+      predictions: predictions
+    }
+
+    return grantPredictions;
   }
 }
-
-// import { linear } from 'dcurve';
-// import { sha256 } from 'dcurve';
-//
-// const clr = new CLR({
-//     calcAlgo: (...args:any[]) => {
-//         return linear(...args)
-//     },
-//     hashAlgo: (...args:any[]) => {
-//         return sha256(...args)
-//     }
-// });
-// const distribution = clr.calculate(() => {
-//
-//     // feed in grantRound and a list of addresses to ignore
-//     return fetch(1, [
-//         '0x0...', '0x0...',
-//     ])
-// })[0];
-// const prediction = clr.predict(() => {
-//
-//     return fetch(...);
-// }, 10, [1, 10])
 
 // ======= FOR FUTURE ========
 
