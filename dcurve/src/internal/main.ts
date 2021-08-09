@@ -1,11 +1,11 @@
 'use strict';
 
 import { GrantPrediction, GrantPredictionArgs, GrantPredictions, GrantRoundContributions, GrantsDistribution } from 'src/types';
+import { generateMerkleRoot } from './merkle-distributor';
 import { addAnonContribution, getGrantMatch } from './utils';
 
 type InitArgs = {
-  calcAlgo: Function,
-  hashAlgo: Function
+  calcAlgo: Function
 }
 
 export class CLR {
@@ -17,7 +17,6 @@ export class CLR {
 
   calculate(grantRoundContributions: GrantRoundContributions): GrantsDistribution {
     const calcAlgo = this._options['calcAlgo'];
-    const hashAlgo = this._options['hashAlgo'];
 
     // calculate distribution based on contributions
     const distribution: GrantsDistribution = calcAlgo(
@@ -25,7 +24,7 @@ export class CLR {
     );
 
     // generate the hash on the distribution based on selected hashAlgo
-    distribution.hash = hashAlgo(distribution.distribution);
+    distribution.hash = generateMerkleRoot(distribution.distribution);
 
     return distribution;
   }
