@@ -6,7 +6,6 @@ export { fetch } from './internal/fetch';
 
 // Calculation commands
 export { handle as linear } from './internal/calc/linear';
-export { handle as pairwise } from './internal/calc/pairwise';
 
 // Hashing commands
 export { handle as sha256 } from './internal/hash/sha256';

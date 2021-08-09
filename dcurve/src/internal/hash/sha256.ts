@@ -1,16 +1,23 @@
+import { utils } from  'ethers';
+import { GrantMatch } from 'src/types';
 
 /**
- * Generates hash of the GrantsDistribution using the 
- * @param distribution - GrantsDistribution object
- * @param algorithm - hashing algorithm on the distribution. default is sha256
- * 
- * @returns {string} - hash of the distribution
+ * Generates hash of the GrantsDistribution distribution
+ * @param distribution - GrantMatch[]
+ * @returns {string} - sha256 hash of the distribution
  */
-const generateHash = (distribution: GrantsDistribution, algorithm?: string): string => {
+export const handle = (distribution: GrantMatch[]) => {
 
-}
+  let grantIds: number[] = [];
+  let matches: number[] = [];
 
-// expose a single method to perform the hashing function
-export const handle = () => {
+  distribution.forEach((grantMatch: GrantMatch) => {
+    grantIds.push(grantMatch.grantId);
+    matches.push(grantMatch.match);
+  });
 
+  const grandIdsHash = utils.sha256(grantIds);
+  const matchesHash = utils.sha256(matches);
+
+  return utils.sha256(grandIdsHash + matchesHash);
 }
