@@ -35,7 +35,7 @@ const fetchContributions = (roundId: string, startDate: Date, endDate?: Date): C
 
   const output: GrantRoundContributions  = {
     grantRound: args.grantRound,
-    matchingAmount: 0, // TODO: UPDATE
+    totalPot: 0, // TODO: UPDATE
     contributions : contributions // TODO: UPDATE
   }
 
