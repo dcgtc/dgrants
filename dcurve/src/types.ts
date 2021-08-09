@@ -88,10 +88,12 @@ export type GrantPredictions = {
  * Individual grant's match
  * @type GrantMatch
  * @field {grantId} unique grant identifier
+ * @field {address} grant payout address
  * @field {match} match amount
  */
  export type GrantMatch = {
   grantId: number;
+  address: string;
   match: number;
 }
 

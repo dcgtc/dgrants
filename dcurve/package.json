@@ -24,6 +24,8 @@
     "extends": "../package.json"
   },
   "dependencies": {
+    "@uniswap/merkle-distributor": "^1.0.1",
+    "ethereumjs-util": "^7.1.0",
     "ethers": "^5.4.4"
   }
 }

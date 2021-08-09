@@ -33,6 +33,7 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
     const match = Math.pow(sumOfSqrtContrib, 2) - sumOfContrib;
     let grantMatch: GrantMatch = {
       grantId: contribution.grantId,
+      address: contribution.address,
       match: match
     };
 

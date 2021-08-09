@@ -10,19 +10,19 @@ This can intended to be used
 
 
 
-## Structure 
+## Structure
 
 ```
 .
-├── src                    
-│   ├── README.md           # Getting started guide
-│   ├── types.ts            # Typescript types
-|   ├── index.ts            # What client imports 
-│   ├── internal            
-│       ├── calc            # Contains impls of CLR algorithm
-│       ├── hash            # Contains impls of hash algorithms
-|       ├── fetch.ts        # fetch information from chain
-|       ├── main.ts         # orchestrator 
+├── src
+│   ├── README.md               # Getting started guide
+│   ├── types.ts                # Typescript types
+|   ├── index.ts                # What client imports
+│   ├── internal
+│       ├── calc                # Contains impls of CLR algorithm
+│       ├── merkle-distributor  # Contains impls to generate merkle-root and verify
+|       ├── fetch.ts            # fetch information from chain
+|       ├── main.ts             # orchestrator
 └── ...
 ```
 
@@ -57,41 +57,30 @@ const options = {
 const clr = new CLR(options);
 ```
 
-### internal/cal (mandatory)
+### internal/merkle-distributor
 
-This folder lists out the different hash algorithms supported by dcurve
-and would need to be set when creating a new instance of CLR object
+This folder contains the logic to
+- generate merkle root of the distribution
+- verify an individual claim
 
+This logic has been ported over from [Uniswap/merkle-distributor](https://github.com/Uniswap/merkle-distributor) and generates the merkle root and provides means to generate a merkle root given the final distribution.
+This is what is uploaded to the `GrantRoundPayout.sol` contract
 
-| Hash algorithm | How to import                             | Description            |
-|----------------|-------------------------------------------|------------------------|
-| `sha256`       | `import { sha256 } from @dgrants/dcurve;` | uses the ethers.sha256 |
-
-```javascript
-import { sha256, CLR } from @dgrants/dcurve;
-const options = {
-  'calcAlgo' : '...',
-  'hashAlgo' : sha256
-}
-const clr = new CLR(options);
-```
 
 ## Usage
 
 ```
-// 1. Import the 
+// 1. Import the
 //  - CLR algorithm
 //  - hashing algorithm
-//  - fetch 
+//  - fetch
 import { linear } from @dgrants/dcurve;
-import { sha256 } from @dgrants/dcurve;
 import { fetch } from @dgrants/dcurve;
 import { CLR } from @dgrants/dcurve;
 
-// 2. Create instance of CLR 
+// 2. Create instance of CLR
 const options = {
-  'calcAlgo' : linear,
-  'hashAlgo' : sha256
+  'calcAlgo' : linear
 }
 const clr = new CLR(options)
 
