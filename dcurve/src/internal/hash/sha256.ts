@@ -6,7 +6,7 @@ import { GrantMatch } from 'src/types';
  * @param distribution - GrantMatch[]
  * @returns {string} - sha256 hash of the distribution
  */
-export const handle = (distribution: GrantMatch[]) => {
+export const handle = (distribution: GrantMatch[]): string => {
 
   let grantIds: number[] = [];
   let matches: number[] = [];

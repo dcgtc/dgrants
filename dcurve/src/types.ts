@@ -52,7 +52,7 @@ export type GrantRoundContributions = {
 export type GrantPredictionArgs = {
   grantId: number;
   predictionPoints: number[];
-  contributions: Contribution[];
+  grantRoundContributions: GrantRoundContributions;
 };
 
 /**
@@ -61,12 +61,12 @@ export type GrantPredictionArgs = {
 *
 * @type GrantPrediction
 * @field {predictionPoint} if grant were to recieve an anon contribution
-* @field {predictionAmount} new match after adding predicted_amount
+* @field {predictedGrantMatch} new match after adding predicted_amount
 * @field {predictionDiff} difference between predicted_match and predicted_amount
 */
-type GrantPrediction = {
+export type GrantPrediction = {
   predictionPoint: number;
-  predictionAmount: number;
+  predictedGrantMatch: number;
   predictionDiff: number;
 }
 
