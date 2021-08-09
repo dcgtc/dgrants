@@ -41,7 +41,7 @@
       </div>
 
       <!-- main menu-->
-      <div class="absolute hidden left-20 group-hover:block"  style="z-index: 9999;">
+      <div class="absolute hidden left-2 md:left-20 group-hover:block"  style="z-index: 9999;">
         <div
           class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
         >
@@ -87,7 +87,7 @@
       </div>
 
       <!-- menu-->
-      <div class="absolute hidden right-20 group-hover:block"  style="z-index: 9999;">
+      <div class="absolute hidden right-2 md:right-20 group-hover:block"  style="z-index: 9999;">
         <div
           class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
         >
@@ -125,7 +125,7 @@
   with optional metadata "by {address}" + "last seen/update" + humanized timestamp
   with optional "quote" ( for a public collection of a user ) 
   -->
-  <header class="px-12 py-20 border-b border-grey-100 text-center relative">
+  <header class="px-4 md:px-12 py-20 border-b border-grey-100 text-center relative">
     <!-- optional breadcrumb within a header -->
     <div class="flex flex-wrap justify-center mb-8">
       <a class="no-underline flex items-center" href="#">
@@ -181,7 +181,7 @@
   - with optional right button 
   - with optional submenu per item
   -->
-  <div class="px-12 pt-16 pb-8 border-b border-grey-100">
+  <div class="px-4 md:px-12 pt-16 pb-8 border-b border-grey-100">
     <div class="block md:flex gap-x-8">
       <div class="flex flex-wrap content-center gap-x-8">
         <!-- text + (number) -->
@@ -235,7 +235,7 @@
   gona used for the round and grant detail page
   -->
   <div class="border-b border-grey-100">
-    <p class="intent px-12 py-12 mx-auto max-w-6xl">
+    <p class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
       Im a paragraph but with intent. <a href="#">link</a> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
       diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
       accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
@@ -248,7 +248,7 @@
   <!----------------------------------------------- TAB BAR   
   - with active state ( see first "all") classes vs other clases 
   -->
-  <div class="px-12 py-6 border-b border-grey-100 flex flex-wrap gap-x-10 gap-y-2">
+  <div class="px-4 md:px-12 py-6 border-b border-grey-100 flex flex-wrap gap-x-10 gap-y-2">
     <span
       class="
         cursor-pointer
@@ -288,12 +288,12 @@
     >
   </div>
 
-  <!----------------------------------------------- CARD GRID FOR ROUNDS AND GRANTS  -->
+<!----------------------------------------------- CARD GRID FOR ROUNDS AND GRANTS  -->
 
 
   <section
     class="
-      px-12
+      px-4 md:px-12
       py-12
       pb-24
       grid
@@ -307,9 +307,9 @@
   >
 
 
-  <!----------------------------------------------- GRANT CART   
-  - with 3 icons just for test . we might just need one later on 
-  -->
+<!----------------------------------------------- GRANT CARD   
+- with 3 icons just for test . we might just need one later on 
+-->
 
     <figure class="group cursor-pointer">
       <div class="relative">
@@ -350,10 +350,242 @@
 
   <br /><br /><br />
 
-  <!----------------------------------------------- BUTTON 
+<!----------------------------------------------- BUTTON 
   -->
   <br /><br />
   <button class="uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">Click me</button>
+
+
+
+
+<br/><br/><br/><br/><br/>
+
+
+<!----------------------------------------------- CART TOP BAR ( maybe not call it cart top bar and keep it generic,
+    its probably a bar full of interactions like share, delete, save ... ) 
+  -->
+
+  <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex gap-x-8 ">
+
+    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span class="group-hover:text-grey-500 hidden md:block">Save as Collection</span>
+    </div>
+
+    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span class="group-hover:text-grey-500 hidden md:block">Share Cart</span>
+    </div>
+
+    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer ml-auto">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span class="group-hover:text-grey-500 hidden md:block">Clear Cart</span>      
+    </div>
+  </div>
+
+
+
+<br/><br/><br/><br/><br/>
+
+
+
+
+
+
+<!----------------------------------------------- A CART ITEM V3-->
+
+<div class="px-4 md:px-12">
+  <div class="py-8 border-b border-grey-100">
+
+    <div class="grid grid-flow-col items-center gap-x-8">
+
+      <div>
+
+        <div class="grid grid-cols-4 items-center gap-x-4 gap-y-4 ">
+          <!-- image -->
+          <div class="col-span-4 lg:col-span-1">
+            <figure class="max-w-lg">
+              <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
+            </figure>
+          </div>
+          <!-- text -->
+          <div class="col-span-4 lg:col-span-1">
+              <div>DeFi Developer Roadmap V3</div>
+          </div>
+          <!-- input -->
+          <div class="col-span-4 lg:col-span-1">
+              
+            <div class="flex">
+              <div class="input-wrapper w-40">
+                <input class="right" type="number" placeholder="0">
+              </div>
+
+              <div class="input-wrapper w-40 border-l-0">
+                <select name="token">
+                  <option value="eth">ETH</option>
+                  <option value="dai">DAI</option>
+                  <option value="gtc">GTC</option>
+                  <option value="weth">WETH</option>
+                </select>
+              </div>
+            </div>              
+
+          </div>   
+          <!-- matching -->  
+          <div class="col-span-4 lg:col-span-1">
+              <div class="text-grey-400">not in an active round</div>
+          </div>
+        </div>
+
+      </div>  
+
+      <div class="justify-self-end bg-pink">
+         <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      </div>   
+
+    </div>
+
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+<br/><br/><br/><br/><br/><br/>
+
+
+<!----------------------------------------------- A SINGLE INPUT
+with optional delete item  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+
+    <!-- label -->
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <label for="" class="text-grey-400">Website:</label>
+    </div>
+
+    <!-- input -->
+    <div class="col-span-10 md:col-span-7">
+      <div class="input-wrapper">
+        <input type="text" placeholder="https://">
+      </div>
+    </div>
+
+    <!-- optional delete icon -->
+    <div class="col-span-2 justify-self-end">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+<!----------------------------------------------- A DROPDOWN INPUT
+with optional delete item  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+
+    <!-- label -->
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <label for="" class="text-grey-400">Category:</label>
+    </div>
+
+    <!-- input -->
+    <div class="col-span-10 md:col-span-7">
+      <div class="input-wrapper">
+        <select name="token">
+          <option value="community">Community</option>
+          <option value="infrastructure">Infrastructure</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- optional delete icon -->
+    <div class="col-span-2 justify-self-end">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+    </div>
+
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<!----------------------------------------------- A SINGLE INPUT
+but wrapped into another div for "groups of elements see figma "
+its basicaly removing the "px-4 md:px-12" from div but put it in an extra
+div arround it ...
+
+with optional delete item -->
+
+<div class="px-4 md:px-12">
+
+  <div class="py-8 border-b border-grey-100">
+    <div class="grid grid-cols-12 items-center gap-x-8">
+
+      <!-- label -->
+      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+        <label for="" class="text-grey-400">Website:</label>
+      </div>
+
+      <!-- input -->
+      <div class="col-span-10 md:col-span-7">
+        <div class="input-wrapper">
+          <input type="text" placeholder="https://">
+        </div>
+      </div>
+
+      <!-- optional delete icon -->
+      <div class="col-span-2 justify-self-end">
+        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br/><br/><br/><br/><br/><br/>
+
+
+
+
+
+
+
+
+
 
 
 

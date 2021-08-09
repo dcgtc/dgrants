@@ -26,6 +26,7 @@
     @apply underline;
     @apply hover:text-grey-400;
   }
+
 }
 
 /* Add styles to components */
@@ -36,7 +37,32 @@
   .link {
     @apply text-grey-500 underline cursor-pointer;
   }
+
+
+  .input-wrapper{
+    @apply p-4 border border-grey-400 hover:border-grey-500 ;
+  }
+
+  input, select, textarea{
+    @apply w-full;
+  }
+
+  input.right, select.right{
+    text-align: right;
+  }
+
+  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+  input:focus, select:focus, textarea:focus{
+    @apply text-grey-500;
+    outline: none;
+  }
+
+
 }
+
+
+
 
 /* Add styles to utilities      */
 @layer utilities {
