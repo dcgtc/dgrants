@@ -1,6 +1,6 @@
 # Contributing to dGrants
 
-A big welcome and thank you for considering contributing to dGrants open source projects! It’s people like you that make it a reality for users in our community.
+A big welcome and thank you for considering contributing to the dGrants open source project! It’s people like you that make it a reality for users in our community.
 
 Reading and following these guidelines will help us make the contribution process easy and effective for everyone involved. It also communicates that you agree to respect the time of the developers managing and developing these open source projects. In return, we will reciprocate that respect by addressing your issue, assessing changes, and helping you finalize your pull requests.
 
@@ -18,7 +18,7 @@ Reading and following these guidelines will help us make the contribution proces
 
 Contributions to Gitcoin are governed by the [Contributor Covenant version 1.4](https://www.contributor-covenant.org/version/1/4/code-of-conduct.html).
 All contributors and participants agree to abide by its terms. To report
-violations, shoot out an email to founders@gitcoin.co
+violations, shoot out an email to philip@gitcoin.co
 
 The Code of Conduct is designed and intended, above all else, to help establish
 a culture within the project that allows anyone and everyone who wants to
@@ -32,16 +32,16 @@ faith and everyone is working towards a common goal.
 
 Contributions are made to this repo via Discussions, Issues and Pull Requests (PRs). A few general guidelines that cover the trio:
 
-- Search for existing Issues and PRs before creating your own.
+- Search for existing Descriptions, Issues and PRs before creating your own.
 - We work hard to makes sure issues are handled in a timely manner but, depending on the impact, it could take a while to investigate the root cause. A friendly ping in the comment thread to the submitter or a contributor can help draw attention if your issue is blocking.
 
 ### Discussions
 
-Discussion should be used to discuss potential changes before a PR is created,  or discussing the implmentation on a current feature. Once the discussion has ended with participation from the community and maintainers, if changes need to made to the codebase, follow it up by creating an issue.
+Discussion should be used to discuss potential changes before an issue or PR is created, or discussing the implementation on a current feature. Once the discussion has ended with participation from the community and maintainers, if changes need to made to the codebase, follow it up by creating an issue.
 
 ### Issues
 
-Issues should be used to report problems with the dApp, request a new feature, update an existing feature (which has a discussion on the discussion board). When you create a new Issue, a template will be loaded that will guide you through collecting and providing the information we need to investigate.
+Issues should be used to report problems with the dApp, request a new feature, or update an existing feature (and features should have a discussion on the discussion board before creating an issue). When you create a new Issue, a template will be loaded that will guide you through collecting and providing the information we need to investigate.
 
 If you find an Issue that addresses the problem you're having, please add your own reproduction information to the existing issue rather than creating a new one. Adding a [reaction](https://github.blog/2016-03-10-add-reactions-to-pull-requests-issues-and-comments/) can also help be indicating to our maintainers that a particular problem is affecting more than just the reporter.
 
@@ -52,7 +52,7 @@ When creating a new issue, please do your best to be as detailed and specific as
 PRs to our repo are always welcome and can be a quick way to get your fix or improvement slated for the next release. In general, PRs should:
 
 - Should have a correspoding issue created.
-- Only fix/add the functionality described on the issue to ensure reviewers are cleaner
+- Only fix/add the functionality described on the issue to ensure reviews are clean and well-scoped
 - Add tests if there is changed functionality and ensure all tests continue to pass.
 - Address a single concern in the least number of changed lines as possible.
 - Be accompanied by a complete Pull Request template (loaded automatically when a PR is created).

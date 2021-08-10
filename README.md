@@ -18,7 +18,7 @@
 
 ## Contributing Guideline
 
-Checkout the [CONTRIBUTING.md](https://github.com/dcgtc/dgrants/blob/contributing-guide/CONTRIBUTING.md) if you'd like to help with building dGrants
+Checkout the [CONTRIBUTING.md](https://github.com/dcgtc/dgrants/blob/main/CONTRIBUTING.md) if you'd like to help with building dGrants
 
 
 ## Development
