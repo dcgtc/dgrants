@@ -27,7 +27,6 @@
     @apply hover:text-grey-400;
   }
 
-
   [type='text'],
   [type='email'],
   [type='url'],
@@ -43,16 +42,9 @@
   [multiple],
   textarea,
   select {
-
     @apply w-full p-4 border border-grey-400 hover:border-grey-500;
     font-size: 100%;
-
   }
-
-
-
-
-
 
 }
 
@@ -72,13 +64,12 @@
 
 
 
-
 /* Add styles to utilities      */
 @layer utilities {
   .icon,
   .icon-small,
   .icon-large {
-    @apply object-contain stroke-2 stroke-grey-400 group-hover:stroke-grey-500;
+    @apply object-contain stroke-2 stroke-grey-400 group-hover:stroke-grey-500 hover:stroke-grey-500;
   }
 
   .icon {

@@ -33,6 +33,7 @@ module.exports = {
     stroke: {
       'grey-400': '#757087',
       'grey-500': '#0E0333',
+      'pink': '#F3587D',
     },
 
     strokeWidth: {
@@ -73,7 +74,7 @@ module.exports = {
   variants: {
     extend: {
       display: ['group-hover'],
-      stroke: ['group-hover'],
+      stroke: ['group-hover', 'hover'],
     },
   },
   plugins: [require('@tailwindcss/forms'), require('nightwind')],

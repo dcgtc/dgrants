@@ -1,7 +1,6 @@
 <template>
   <div class="flex flex-col min-h-screen">
     <layout-header id="header" />
-    <Eth1027Icon style="stroke: #000" />
     <main id="app-main" class="flex-grow bg-white"><router-view /></main>
     <!--<layout-footer id="footer" />-->
   </div>
@@ -13,12 +12,11 @@ import useSettingsStore from 'src/store/settings';
 import useWalletStore from 'src/store/wallet';
 import LayoutHeader from './components/LayoutHeader.vue';
 // import LayoutFooter from './components/LayoutFooter.vue';
-import { Eth1027Icon } from '@fusion-icons/vue/coins';
 
 export default defineComponent({
   name: 'App',
   //components: { LayoutHeader, LayoutFooter },
-  components: { LayoutHeader, Eth1027Icon },
+  components: { LayoutHeader },
   setup() {
     // Load settings and try connecting user's wallet on page load
     const { connectWallet } = useWalletStore();

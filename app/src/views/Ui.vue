@@ -30,7 +30,7 @@
           </div>
           <!--arrow-->
           <div class="ml-1">
-            <img class="icon-small" src="http://placekitten.com/64" />
+            <ArrowBottomIcon class="icon-small" />
           </div>
         </div>
       </div>
@@ -56,11 +56,7 @@
       <!--text-->
       <div class="hidden md:block group-hover:text-grey-500">Cart</div>
       <!--icon-->
-      <svg class="icon" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
-        <path d="M12 44a48.53 48.53 0 0 0 20 4 48.53 48.53 0 0 0 20-4c-4-20-4-32-20-32S16 24 12 44z" />
-        <line x1="32" y1="8" x2="32" y2="12" />
-        <path d="M24 47.41V48a8 8 0 0 0 16 0v-.59" />
-      </svg>
+      <CartIcon class="icon" />
       <!--in cart number-->
       <div class="group-hover:text-grey-500">12</div>
     </div>
@@ -76,7 +72,7 @@
         <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
         <!--image-->
         <div>
-          <img class="icon" src="http://placekitten.com/64?image=3" />
+          <ArrowBottomIcon class="icon-small" />
         </div>
         <!--arrow-->
         <div>
@@ -109,7 +105,7 @@
       <div class="hidden md:block group-hover:text-grey-500">Connect</div>
       <!--image-->
       <div>
-        <img class="icon" src="http://placekitten.com/64" />
+        <ConnectWalletIcon class="icon" />
       </div>
     </div>
   </nav>
@@ -125,19 +121,19 @@
   <header class="px-4 md:px-12 py-20 border-b border-grey-100 text-center relative">
     <!-- optional breadcrumb within a header -->
     <div class="flex flex-wrap justify-center mb-8">
-      <a class="no-underline flex items-center" href="#">
+      <a class="group no-underline flex items-center" href="#">
         <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">dgrants</span>
-        <img class="icon-small mx-4" src="http://placekitten.com/64" />
+        <ArrowRightSmallIcon class="icon-small" />
       </a>
 
-      <a class="no-underline flex items-center" href="#">
+      <a class="group no-underline flex items-center" href="#">
         <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">collections (4949)</span>
-        <img class="icon-small mx-4" src="http://placekitten.com/64" />
+        <ArrowRightSmallIcon class="icon-small" />
       </a>
 
-      <a class="no-underline flex items-center" href="#">
+      <a class="group no-underline flex items-center" href="#">
         <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">#432</span>
-        <img class="icon-small mx-4" src="http://placekitten.com/64" />
+        <ArrowRightSmallIcon class="icon-small" />
       </a>
     </div>
 
@@ -164,11 +160,11 @@
     </p>
 
     <!-- optional navigation to jump to next item in a list -->
-    <nav class="inline p-6 bg-pink absolute right-0" style="top: 50%; transform: translateY(-50%)">
-      <img class="icon" src="http://placekitten.com/64" />
+    <nav class="group inline p-6 absolute right-0 cursor-pointer" style="top: 50%; transform: translateY(-50%)">
+      <ArrowRightIcon class="icon" />
     </nav>
-    <nav class="inline p-6 bg-pink absolute left-0" style="top: 50%; transform: translateY(-50%)">
-      <img class="icon" src="http://placekitten.com/64" />
+    <nav class="group inline p-6 absolute left-0 cursor-pointer" style="top: 50%; transform: translateY(-50%)">
+      <ArrowLeftIcon class="icon" />
     </nav>
   </header>
 
@@ -190,7 +186,7 @@
         <div class="cursor-pointer uppercase font-medium"><span class="text-grey-400 mr-2">curation:</span>on</div>
         <!-- label : text + SUBMENU -->
         <div class="group cursor-pointer uppercase font-medium">
-          <div class="relative"><span class="text-grey-400 mr-2">click me:</span>shuffle</div>
+          <div class="relative"><span class="text-grey-400 mr-2">hover me:</span>shuffle</div>
           <!-- menu -->
           <div class="absolute hidden group-hover:block">
             <div
@@ -281,46 +277,20 @@
   <!----------------------------------------------- CARD GRID FOR ROUNDS AND GRANTS  -->
 
   <section
-    class="
-      px-4
-      md:px-12
-      py-12
-      pb-24
-      grid
-      gap-x-12 gap-y-12
-      grid-cols-1
-      md:grid-cols-2
-      lg:grid-cols-3
-      xl:grid-cols-4
-      border-b border-grey-100
+    class="px-4 md:px-12 py-12
+      pb-24 grid gap-x-12 gap-y-12 grid-cols-1
+      md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-b border-grey-100
     "
   >
     <!----------------------------------------------- GRANT CARD   
 - with 3 icons just for test . we might just need one later on 
 -->
 
-    <figure class="group cursor-pointer">
+    <figure class="cursor-pointer">
       <div class="relative">
         <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
-        <div class="hidden group-hover:block">
-          <div
-            class="
-              absolute
-              flex
-              justify-center
-              gap-x-12
-              w-full
-              bottom-0
-              bg-white
-              border-b-2 border-t-2 border-grey-400
-              py-8
-              bg-white
-            "
-          >
-            <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-            <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-            <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-          </div>
+        <div class="group absolute bottom-0 right-0 p-4 bg-white opacity-30 hover:opacity-100">
+          <CartIcon class="icon-small" />
         </div>
       </div>
       <figcaption class="mt-4">
@@ -340,26 +310,34 @@
 
   <br /><br /><br /><br /><br />
 
-  <!----------------------------------------------- CART TOP BAR ( maybe not call it cart top bar and keep it generic,
-    its probably a bar full of interactions like share, delete, save ... ) 
+
+
+  <!----------------------------------------------- interaction icon bar ( used for cart and for round+grant detail page)
   -->
 
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex gap-x-8">
-    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer">
-      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-      <span class="group-hover:text-grey-500 hidden md:block">Save as Collection</span>
-    </div>
+  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+    <div class="flex flex-wrap gap-x-12 gap-y-4">
 
-    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer">
-      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-      <span class="group-hover:text-grey-500 hidden md:block">Share Cart</span>
-    </div>
+      <div class="group flex items-center gap-4 cursor-pointer">
+        <CollectionIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Save as Collection</span>
+      </div>
 
-    <div class="group flex items-center gap-x-4 text-grey-400 cursor-pointer ml-auto">
-      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-      <span class="group-hover:text-grey-500 hidden md:block">Clear Cart</span>
+      <div class="group flex items-center gap-4 cursor-pointer">
+        <ShareIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Share Cart</span>
+      </div>
+
+      <div class="group flex items-center gap-4 cursor-pointer ml-auto">
+        <XIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Clear Cart</span>
+      </div>
     </div>
   </div>
+
+
+
+
 
   <br /><br /><br /><br /><br />
 
@@ -399,8 +377,8 @@
           </div>
         </div>
 
-        <div class="justify-self-end bg-pink">
-          <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+        <div class="justify-self-end">
+          <XIcon class="icon cursor-pointer" />
         </div>
       </div>
     </div>
@@ -425,7 +403,7 @@ with optional delete item  -->
 
       <!-- optional delete icon -->
       <div class="col-span-2 justify-self-end">
-        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+        <XIcon class="icon cursor-pointer" />
       </div>
     </div>
   </div>
@@ -450,7 +428,7 @@ with optional delete item  -->
 
       <!-- optional delete icon -->
       <div class="col-span-2 justify-self-end">
-        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+        <XIcon class="icon cursor-pointer" />
       </div>
     </div>
   </div>
@@ -477,7 +455,7 @@ with optional delete item -->
 
         <!-- optional delete icon -->
         <div class="col-span-2 justify-self-end">
-          <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+          <XIcon class="icon cursor-pointer" />
         </div>
       </div>
     </div>
@@ -582,33 +560,112 @@ with optional delete item -->
     </div>
   </div>
 
-  <!-- interaction bar -->
+
+
+
+  <!-- interaction bar : see we have this twice different interactions ( use it for cart as well ) -->
+
   <div class="px-4 md:px-12 py-8 border-b border-grey-100">
     <div class="flex flex-wrap gap-x-12 gap-y-4">
-      <div class="flex items-center gap-4">
-        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-        <span>Share</span>
+
+      <div class="group flex items-center gap-4 cursor-pointer">
+        <ShareIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Share</span>
       </div>
 
-      <div class="flex items-center gap-4">
-        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-        <span>Favorites</span>
+      <div class="group flex items-center gap-4 cursor-pointer">
+        <FavoriteIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Favorites</span>
       </div>
 
-      <div class="flex items-center gap-4">
-        <img class="icon cursor-pointer" src="http://placekitten.com/64" />
-        <span>Collection</span>
+      <div class="group flex items-center gap-4 cursor-pointer ml-auto">
+        <CollectionIcon class="icon cursor-pointer" />
+        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Collection</span>
       </div>
     </div>
   </div>
 
-  <br /><br /><br /><br /><br /><br />
+
+
+
+
+
+
+<br/><br/><br/><br/><br/><br/>
+
+
+<!----------------------------------------------- grants detail page a single contribution  -->
+
+
+<div class="px-4 md:px-12">
+  <div class="border-b border-grey-100 py-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
+
+      <!--contributor-->
+      <div class="truncate">
+        <div class="flex items-center gap-4">
+          <figure>
+            <img class="icon cursor-pointer rounded-xl" src="http://placekitten.com/64" />
+          </figure>
+          <div>
+            <div class=""><a href="">0xff…ffff</a></div>
+            <div class="text-grey-400">3 min ago</div>
+          </div>
+        </div>
+      </div>
+   
+      <!-- tx -->
+      <div class="truncate">
+        <div class="truncate"><a href="">0xff55483c4f83e65155483c4f83e65155483c4f83e651</a></div>
+        <div class="text-grey-400">pending</div>
+      </div>
+
+      <!-- donation-->
+      <div class="truncate text-left md:text-right">
+        <div>1.337 ETH</div>
+        <div class="text-grey-400">≈ 2000 USD</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<br /><br /><br /><br /><br /><br />
+
+
+
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
+import { ArrowRight2Icon as ArrowRightSmallIcon } from '@fusion-icons/vue/interface';
+import { ArrowLeft4Icon as ArrowLeftIcon } from '@fusion-icons/vue/interface';
+import { ArrowRight4Icon as ArrowRightIcon } from '@fusion-icons/vue/interface';
+import { Heart2Icon as FavoriteIcon } from '@fusion-icons/vue/interface';
+import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
+import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
+import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
+import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
 
 export default defineComponent({
   name: 'Ui',
+  components: { 
+    ArrowBottomIcon,
+    CartIcon,
+    ConnectWalletIcon,
+    ArrowRightSmallIcon,
+    ArrowLeftIcon,
+    ArrowRightIcon,
+    FavoriteIcon,
+    CollectionIcon,
+    ShareIcon,
+    XIcon
+  },
 });
 </script>
