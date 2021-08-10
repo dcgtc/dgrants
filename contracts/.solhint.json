@@ -2,7 +2,7 @@
   "extends": "solhint:recommended",
   "plugins": ["prettier"],
   "rules": {
-    "code-complexity": ["error", 7],
+    "code-complexity": ["error", 9],
     "compiler-version": ["error", "^0.8.0"],
     "const-name-snakecase": "off",
     "constructor-syntax": "error",
@@ -10,6 +10,7 @@
     "max-line-length": "off",
     "not-rely-on-time": "off",
     "prettier/prettier": ["error", { "endOfLine": "auto" }],
-    "reason-string": "off"
+    "reason-string": "off",
+    "reentrancy": "off"
   }
 }
