@@ -16,6 +16,11 @@
 └── README.md
 ```
 
+## Contributing Guideline
+
+Checkout the [CONTRIBUTING.md](https://github.com/dcgtc/dgrants/blob/contributing-guide/CONTRIBUTING.md) if you'd like to help with building dGrants
+
+
 ## Development
 
 This project is a monorepo with two packages:
