@@ -401,7 +401,7 @@
 
       <div>
 
-        <div class="grid grid-cols-4 items-center gap-x-4 gap-y-4 ">
+        <div class="grid grid-cols-4 items-center gap-x-8 gap-y-4 ">
           <!-- image -->
           <div class="col-span-4 lg:col-span-1">
             <figure class="max-w-lg">
@@ -414,22 +414,15 @@
           </div>
           <!-- input -->
           <div class="col-span-4 lg:col-span-1">
-              
             <div class="flex">
-              <div class="input-wrapper w-40">
-                <input class="right" type="number" placeholder="0">
-              </div>
-
-              <div class="input-wrapper w-40 border-l-0">
-                <select name="token">
-                  <option value="eth">ETH</option>
-                  <option value="dai">DAI</option>
-                  <option value="gtc">GTC</option>
-                  <option value="weth">WETH</option>
-                </select>
-              </div>
+              <input class="right w-36" type="number" placeholder="0">
+              <select name="token" class="border-l-0 w-36">
+                <option value="eth">ETH</option>
+                <option value="dai">DAI</option>
+                <option value="gtc">GTC</option>
+                <option value="weth">WETH</option>
+              </select>
             </div>              
-
           </div>   
           <!-- matching -->  
           <div class="col-span-4 lg:col-span-1">
@@ -473,9 +466,7 @@ with optional delete item  -->
 
     <!-- input -->
     <div class="col-span-10 md:col-span-7">
-      <div class="input-wrapper">
-        <input type="text" placeholder="https://">
-      </div>
+      <input type="text" placeholder="https://">
     </div>
 
     <!-- optional delete icon -->
@@ -503,12 +494,10 @@ with optional delete item  -->
 
     <!-- input -->
     <div class="col-span-10 md:col-span-7">
-      <div class="input-wrapper">
-        <select name="token">
-          <option value="community">Community</option>
-          <option value="infrastructure">Infrastructure</option>
-        </select>
-      </div>
+      <select name="token">
+        <option value="community">Community</option>
+        <option value="infrastructure">Infrastructure</option>
+      </select>
     </div>
 
     <!-- optional delete icon -->
@@ -547,9 +536,7 @@ with optional delete item -->
 
       <!-- input -->
       <div class="col-span-10 md:col-span-7">
-        <div class="input-wrapper">
           <input type="text" placeholder="https://">
-        </div>
       </div>
 
       <!-- optional delete icon -->
@@ -581,13 +568,135 @@ with optional delete item -->
 
 
 
+<!----------------------------------------------- transaction status  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Hash:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="break-all"><a href="#">0xd510ef6c442fc967436e0bcaf0837ab372eced86fda84b04958b5e315f0a083a</a></div>
+    </div>
+  </div>
+</div>
+
+
+<!----------------------------------------------- transaction pending  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-grey-400 text-grey-400 font-medium mr-4">pending</span>
+        Pending since 37 sec
+      </div>
+    </div>
+  </div>
+</div>
+
+<!----------------------------------------------- transaction sucess  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-teal text-teal font-medium mr-4">success</span>
+        Confirmed within 37 sec
+      </div>
+    </div>
+  </div>
+</div>
+
+<!----------------------------------------------- transaction failed  -->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-pink text-pink font-medium mr-4">fail</span>
+        Confirmed within 37 sec
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<br/><br/><br/><br/><br/><br/>
+
+
+
+<!----------------------------------------------- grants detail page image+core stats ( that element under header )  -->
+
+<div class="border-b border-grey-100">
+
+  <div class="grid grid-cols-4 gap-8">
+    <!-- img -->
+    <div class="col-span-4 xl:col-span-2">
+      <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
+    </div>
+    <!-- raised, contract, round, matching -->
+    <div class="col-span-4 md:col-span-2 xl:col-span-1 mb-8 xl:mb-0">
+      <div class="px-4 xl:px-0 ">
+        <div><span class="text-grey-400 mr-4">Raised:</span>1337 USD</div>
+        <div><span class="text-grey-400 mr-4">Contract:</span><a href="">0xff…ffff</a></div>
+        <div><span class="text-grey-400 mr-4">In Round:</span><a href="">GR11</a></div>
+        <div><span class="text-grey-400 mr-4">Matching:</span><a href="">Quadratic</a></div>
+      </div>
+    </div>
+    <!-- add to cart, matching example -->
+    <div class="col-span-4 md:col-span-2 xl:col-span-1">
+      <div class="px-4 xl:px-12 md:text-right mb-8 xl:mb-0">
+        <div class="mb-4">
+          <button class="whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">add to cart</button>
+        </div>
+        <div>
+          <div>1 USD ≈ 32 USD Matching</div>
+          <div>10 USD ≈ 83 USD Matching</div>
+        </div>
+      </div>      
+    </div>
+  </div>
+
+</div>
+
+<!-- interaction bar -->
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="flex flex-wrap gap-x-12 gap-y-4">
+    <div class="flex items-center gap-4">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span>Share</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span>Favorites</span>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <img class="icon cursor-pointer" src="http://placekitten.com/64" />
+      <span>Collection</span>
+    </div>
+
+
+  </div>
+</div>
 
 
 
 
 
 
-
+<br/><br/><br/><br/><br/><br/>
 
 
 

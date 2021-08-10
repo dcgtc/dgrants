@@ -76,5 +76,5 @@ module.exports = {
       stroke: ['group-hover'],
     },
   },
-  plugins: [require('nightwind')],
+  plugins: [require('@tailwindcss/forms'), require('nightwind')],
 };

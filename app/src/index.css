@@ -27,7 +27,37 @@
     @apply hover:text-grey-400;
   }
 
+
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  [multiple],
+  textarea,
+  select {
+
+    @apply w-full p-4 border border-grey-400 hover:border-grey-500;
+    font-size: 100%;
+
+  }
+
+
+
+
+
+
 }
+
+
+
 
 /* Add styles to components */
 @layer components {
@@ -37,27 +67,6 @@
   .link {
     @apply text-grey-500 underline cursor-pointer;
   }
-
-
-  .input-wrapper{
-    @apply p-4 border border-grey-400 hover:border-grey-500 ;
-  }
-
-  input, select, textarea{
-    @apply w-full;
-  }
-
-  input.right, select.right{
-    text-align: right;
-  }
-
-  input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number] { -moz-appearance: textfield; }
-  input:focus, select:focus, textarea:focus{
-    @apply text-grey-500;
-    outline: none;
-  }
-
 
 }
 
