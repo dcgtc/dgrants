@@ -10,7 +10,7 @@ import { expect } from 'chai';
 // --- Our imports ---
 import { ETH_ADDRESS, UNISWAP_ROUTER, tokens, approve, balanceOf, setBalance, encodeRoute } from './utils'; // prettier-ignore
 import { GrantRoundManager } from '../typechain';
-import { Donation } from '@dgrants/types';
+import { SwapSummary, Donation } from '@dgrants/types';
 
 // --- Parse and define helpers ---
 const { isAddress, parseUnits } = ethers.utils;
@@ -153,11 +153,12 @@ describe('GrantRoundManager', () => {
     });
   });
 
-  describe('swapAndDonate', () => {
+  describe('donate', () => {
     let mockRound: MockContract;
+    let swap: SwapSummary;
     let donation: Donation;
     let payee: string; // address the grant owner receives donations to
-    const farTimestamp = '10000000000'; // date of 2286-11-20
+    const deadline = '10000000000'; // date of 2286-11-20 as swap deadline
 
     beforeEach(async () => {
       // Deploy a mock GrantRound
@@ -170,13 +171,17 @@ describe('GrantRoundManager', () => {
       await mockRegistry.mock.getGrantPayee.returns(payee);
 
       // Configure default donation data
+      swap = {
+        amountIn: '1',
+        amountOutMin: '0',
+        path: await encodeRoute(['dai', 'eth', 'gtc']),
+      };
+
       donation = {
         grantId: 0,
+        token: tokens.dai.address,
+        ratio: parseUnits('1', 18),
         rounds: [mockRound.address],
-        path: await encodeRoute(['dai', 'eth', 'gtc']),
-        deadline: farTimestamp, // arbitrary date far in the future
-        amountIn: '1',
-        amountOutMinimum: '0',
       };
 
       // Fund the first user with tokens
@@ -186,73 +191,81 @@ describe('GrantRoundManager', () => {
     });
 
     it('reverts if no rounds are specified', async () => {
-      await expect(manager.swapAndDonate({ ...donation, rounds: [] })).to.be.revertedWith(
+      await expect(manager.donate([swap], deadline, [{ ...donation, rounds: [] }])).to.be.revertedWith(
         'GrantRoundManager: Must specify at least one round'
       );
     });
 
     it('reverts if an invalid grant ID is provided', async () => {
-      await expect(manager.swapAndDonate({ ...donation, grantId: '500' })).to.be.revertedWith(
+      await expect(manager.donate([swap], deadline, [{ ...donation, grantId: '500' }])).to.be.revertedWith(
         'GrantRoundManager: Grant does not exist in registry'
       );
     });
 
     it('reverts if a provided grant round has a different donation token than the GrantRoundManager', async () => {
       await mockRound.mock.donationToken.returns(ETH_ADDRESS);
-      await expect(manager.swapAndDonate(donation)).to.be.revertedWith(
+      await expect(manager.donate([swap], deadline, [{ ...donation }])).to.be.revertedWith(
         "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"
       );
     });
 
     it('reverts if a provided grant round is not active', async () => {
       await mockRound.mock.isActive.returns(false);
-      await expect(manager.swapAndDonate(donation)).to.be.revertedWith('GrantRoundManager: GrantRound is not active');
+      await expect(manager.donate([swap], deadline, [{ ...donation }])).to.be.revertedWith(
+        'GrantRoundManager: GrantRound is not active'
+      );
     });
 
     it('input token GTC, output token GTC', async () => {
       const amountIn = parseUnits('100', 18);
       expect(await balanceOf('gtc', payee)).to.equal('0');
       await approve('gtc', user, manager.address);
-      await manager.swapAndDonate({ ...donation, path: tokens.gtc.address, amountIn });
+      await manager.donate([{ ...swap, path: tokens.gtc.address, amountIn }], deadline, [
+        { ...donation, token: tokens.gtc.address },
+      ]);
       expect(await balanceOf('gtc', payee)).to.equal(amountIn);
     });
 
     it('input token ETH, output token GTC', async () => {
       // Use the 1% GTC/ETH pool to swap from ETH (input) to GTC (donationToken). The 1% pool is currently the most liquid
       const amountIn = parseUnits('10', 18);
-      const tx = await manager.swapAndDonate(
-        { ...donation, path: await encodeRoute(['eth', 'gtc']), amountIn },
+      const tx = await manager.donate(
+        [{ ...swap, amountIn, path: await encodeRoute(['eth', 'gtc']) }],
+        deadline,
+        [{ ...donation, token: tokens.weth.address }],
         { value: amountIn, gasPrice: '0' } // zero gas price to make balance checks simpler
       );
 
-      // Get the amountOut from the swap from the GrantDonation log
+      // Get the donationAmount from the swap from the GrantDonation log
       const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
       const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
-      const { amountOut } = log.args;
-      expect(await balanceOf('gtc', payee)).to.equal(amountOut);
+      const { donationAmount } = log.args;
+      expect(await balanceOf('gtc', payee)).to.equal(donationAmount);
     });
 
     it('input token DAI, output token GTC, swap passes through ETH', async () => {
       // Execute donation to the payee
       const amountIn = parseUnits('100', 18);
       await approve('dai', user, manager.address);
-      const tx = await manager.swapAndDonate({ ...donation, path: await encodeRoute(['dai', 'eth', 'gtc']), amountIn });
+      const tx = await manager.donate([{ ...swap, amountIn }], deadline, [donation]);
 
-      // Get the amountOut from the swap from the GrantDonation log
+      // Get the donationAmount from the swap from the GrantDonation log
       const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
       const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
-      const { amountOut } = log.args;
-      expect(await balanceOf('gtc', payee)).to.equal(amountOut);
+      const { donationAmount } = log.args;
+      expect(await balanceOf('gtc', payee)).to.equal(donationAmount);
     });
 
     it('emits a log on a successful donation', async () => {
-      // Execute donation to the payee
+      // Execute donation to the payee using GTC as input
       const amountIn = parseUnits('100', 18);
       await approve('gtc', user, manager.address);
-      const tx = await manager.swapAndDonate({ ...donation, path: tokens.gtc.address, amountIn });
+      const tx = await manager.donate([{ ...swap, path: tokens.gtc.address, amountIn }], deadline, [
+        { ...donation, token: tokens.gtc.address },
+      ]);
       await expect(tx)
         .to.emit(manager, 'GrantDonation')
-        .withArgs('0', tokens.gtc.address, amountIn, amountIn, [mockRound.address]);
+        .withArgs('0', tokens.gtc.address, amountIn, [mockRound.address]);
     });
   });
 });

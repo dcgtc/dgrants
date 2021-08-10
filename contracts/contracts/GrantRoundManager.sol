@@ -28,17 +28,17 @@ contract GrantRoundManager {
   mapping(IERC20 => uint256) internal swapOutputs;
 
   /// @notice WETH address
-  address public constant WETH = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  IERC20 public constant WETH = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
   /// @notice Scale factor
   uint256 internal constant WAD = 1e18;
 
+  /// --- Types ---
   /// @notice Defines the total `amount` of the specified `token` that needs to be swapped to `donationToken`. If
   /// `path == donationToken`, no swap is required and we just transfer the tokens
   struct SwapSummary {
-    address token;
-    uint256 amount;
-    uint256 amountOutMinimum; // minimum amount to be returned after swap
+    uint256 amountIn;
+    uint256 amountOutMin; // minimum amount to be returned after swap
     bytes path;
   }
 
@@ -63,13 +63,24 @@ contract GrantRoundManager {
     ISwapRouter _router,
     IERC20 _donationToken
   ) {
+    // Validation
     require(_registry.grantCount() >= 0, "GrantRoundManager: Invalid registry");
     require(address(_router).isContract(), "GrantRoundManager: Invalid router"); // Router interface doesn't have a state variable to check
     require(_donationToken.totalSupply() > 0, "GrantRoundManager: Invalid token");
 
+    // Set state
     registry = _registry;
     router = _router;
     donationToken = _donationToken;
+
+    // Token approvals of common tokens
+    // TODO inherit from SwapRouter to remove the need for this approvals and extra safeTransferFrom before swap
+    IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F).safeApprove(address(_router), type(uint256).max); // DAI
+    IERC20(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F).safeApprove(address(_router), type(uint256).max); // GTC
+    IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).safeApprove(address(_router), type(uint256).max); // USDC
+    IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7).safeApprove(address(_router), type(uint256).max); // USDT
+    IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599).safeApprove(address(_router), type(uint256).max); // WBTC
+    IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2).safeApprove(address(_router), type(uint256).max); // WETH
   }
 
   // --- Core methods ---
@@ -146,15 +157,24 @@ contract GrantRoundManager {
     for (uint256 i = 0; i < _swaps.length; i++) {
       // Do nothing if the swap input token equals donationToken
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
-      if (_tokenIn == donationToken) continue;
+      if (_tokenIn == donationToken) {
+        swapOutputs[_tokenIn] = _swaps[i].amountIn;
+        continue;
+      }
+
+      // Transfer input token to this contract if required
+      // TODO inherit from SwapRouter to remove the need for this
+      if (_tokenIn != WETH || msg.value == 0) {
+        _tokenIn.safeTransferFrom(msg.sender, address(this), _swaps[i].amountIn);
+      }
 
       // Otherwise, execute swap
       ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams(
         _swaps[i].path,
         address(this), // send output to the contract and it will be transferred later
         _deadline,
-        _swaps[i].amount,
-        _swaps[i].amountOutMinimum
+        _swaps[i].amountIn,
+        _swaps[i].amountOutMin
       );
 
       require(swapOutputs[_tokenIn] == 0, "GrantRoundManager: Swap parameter has duplicate input tokens");

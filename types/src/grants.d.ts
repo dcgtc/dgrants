@@ -1,4 +1,4 @@
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { TokenInfo } from '@uniswap/token-lists';
 
 // --- Types ---
@@ -14,15 +14,21 @@ export type GrantArray = [BigNumber, string, string, string];
 export type GrantEthers = GrantArray & GrantObject;
 export type Grant = GrantObject | GrantEthers;
 
-// Donation object from GrantRoundManager
+// SwapSummary struct from GrantRoundManager
+export interface SwapSummary {
+  amountIn: BigNumberish;
+  amountOutMin: BigNumberish;
+  path: BytesLike; // encoded swap path
+}
+
+// Donation struct from GrantRoundManager
 export interface Donation {
   grantId: BigNumberish;
+  token: string; // token address
+  ratio: BigNumberish;
   rounds: string[];
-  path: string;
-  deadline: BigNumberish;
-  amountIn: BigNumberish;
-  amountOutMinimum: BigNumberish;
 }
+
 // GrantRound object from GrantRoundManager
 export type GrantRound = {
   address: string;
@@ -38,6 +44,6 @@ export type GrantRound = {
   metaPtr: string;
   minContribution: BigNumberish;
   hasPaidOut: boolean;
-  error: string|undefined;
+  error: string | undefined;
 };
 export type GrantRounds = Array<GrantRound>;
