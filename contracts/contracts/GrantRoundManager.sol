@@ -178,7 +178,8 @@ contract GrantRoundManager {
       );
 
       require(swapOutputs[_tokenIn] == 0, "GrantRoundManager: Swap parameter has duplicate input tokens");
-      swapOutputs[_tokenIn] = router.exactInput{value: msg.value}(params); // save off output amount for later
+      uint256 _value = _tokenIn == WETH && msg.value > 0 ? msg.value : 0;
+      swapOutputs[_tokenIn] = router.exactInput{value: _value}(params); // save off output amount for later
     }
 
     // --- Execute donations ---
@@ -188,6 +189,7 @@ contract GrantRoundManager {
       uint96 _grantId = _donations[i].grantId;
       IERC20 _tokenIn = _donations[i].token;
       uint256 _donationAmount = (swapOutputs[_tokenIn] * _donations[i].ratio) / WAD;
+      require(_donationAmount > 0, "GrantRoundManager: Donation amount must be greater than zero"); // verifies that swap and donation inputs are consistent
       address _payee = registry.getGrantPayee(_grantId);
 
       // Execute transfer
