@@ -27,6 +27,9 @@ contract GrantRoundManager {
   /// @notice Used during donations to temporarily store swap output amounts
   mapping(IERC20 => uint256) internal swapOutputs;
 
+  /// @notice Used during donations to temporarily store donation ratio sums to ensure totals are always 100%
+  mapping(IERC20 => uint256) internal donationRatios;
+
   /// @notice WETH address
   IERC20 public constant WETH = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
@@ -139,9 +142,15 @@ contract GrantRoundManager {
     // --- Validation ---
     // TODO consider moving this to the section where we already loop through donations in case that saves a lot of
     // gas. Leaving it here for now to improve readability
+
     for (uint256 i = 0; i < _donations.length; i++) {
+      // Validate grant exists
       require(_donations[i].grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
+      // Used later to validate ratios are correctly provided
+      donationRatios[_donations[i].token] += _donations[i].ratio;
+
+      // Validate round parameters
       GrantRound[] calldata _rounds = _donations[i].rounds;
       require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
       for (uint256 j = 0; j < _rounds.length; j++) {
@@ -155,8 +164,12 @@ contract GrantRoundManager {
 
     // --- Execute all swaps ---
     for (uint256 i = 0; i < _swaps.length; i++) {
-      // Do nothing if the swap input token equals donationToken
+      // Validate ratios sum to 100%
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
+      require(donationRatios[_tokenIn] == WAD, "GrantRoundManager: Ratios do not sum to 100%");
+      require(swapOutputs[_tokenIn] == 0, "GrantRoundManager: Swap parameter has duplicate input tokens");
+
+      // Do nothing if the swap input token equals donationToken
       if (_tokenIn == donationToken) {
         swapOutputs[_tokenIn] = _swaps[i].amountIn;
         continue;
@@ -176,8 +189,6 @@ contract GrantRoundManager {
         _swaps[i].amountIn,
         _swaps[i].amountOutMin
       );
-
-      require(swapOutputs[_tokenIn] == 0, "GrantRoundManager: Swap parameter has duplicate input tokens");
       uint256 _value = _tokenIn == WETH && msg.value > 0 ? msg.value : 0;
       swapOutputs[_tokenIn] = router.exactInput{value: _value}(params); // save off output amount for later
     }
@@ -201,10 +212,11 @@ contract GrantRoundManager {
       emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
     }
 
-    // --- Clear storage ---
+    // --- Clear storage for refunds ---
     for (uint256 i = 0; i < _swaps.length; i++) {
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
-      swapOutputs[_tokenIn] = 0; // storage refund
+      swapOutputs[_tokenIn] = 0;
+      donationRatios[_tokenIn] = 0;
     }
   }
 }

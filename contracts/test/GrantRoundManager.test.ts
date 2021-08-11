@@ -184,10 +184,20 @@ describe('GrantRoundManager', () => {
       swap = { amountIn: '1', amountOutMin: '0', path: await encodeRoute(['dai', 'eth', 'gtc']) };
       donation = { grantId: 0, token: tokens.dai.address, ratio: parseUnits('1', 18), rounds: [mockRound.address] };
 
-      // Fund the first user with tokens
+      // Fund the first user with tokens and approve the manager
       await setBalance('dai', user.address, parseUnits('1000', 18));
       await setBalance('gtc', user.address, parseUnits('1000', 18));
       await setBalance('weth', user.address, parseUnits('1000', 18));
+    });
+
+    afterEach(async () => {
+      // Manager should not hold tokens after a swap, but sometimes there is dust, so we check to ensure only dust
+      // remains. So far the highest seen left is 4 wei, so we check for 5 wei or less
+      const dust = ethers.BigNumber.from('5');
+      expect(await balanceOf('dai', manager.address)).to.be.lte(dust);
+      expect(await balanceOf('gtc', manager.address)).to.be.lte(dust);
+      expect(await balanceOf('weth', manager.address)).to.be.lte(dust);
+      expect(await balanceOf('eth', manager.address)).to.be.lte(dust);
     });
 
     describe('validations', () => {
@@ -217,19 +227,41 @@ describe('GrantRoundManager', () => {
         );
       });
 
-      it('reverts if swap and donate inputs are inconsistent, resulting in zero donation', async () => {
-        // No swap, just batch transfers
-        const swaps = [{ amountIn: parseUnits('100', 18), amountOutMin: '0', path: tokens.gtc.address }];
-        const donations = [
-          { grantId: 0, token: tokens.dai.address, ratio: parseUnits('0.25', 18), rounds: [mockRound.address] },
-          { grantId: 1, token: tokens.dai.address, ratio: parseUnits('0.75', 18), rounds: [mockRound.address] },
+      it('reverts if a token is listed twice in the swaps input', async () => {
+        const swaps = [
+          { amountIn: 1, amountOutMin: '0', path: tokens.gtc.address },
+          { amountIn: 1, amountOutMin: '0', path: tokens.gtc.address },
         ];
-        expect(await balanceOf('gtc', payee1)).to.equal('0');
-        expect(await balanceOf('gtc', payee2)).to.equal('0');
+        const donations = [
+          { grantId: 0, token: tokens.gtc.address, ratio: parseUnits('1', 18), rounds: [mockRound.address] },
+        ];
+        await approve('gtc', user, manager.address);
+        await expect(manager.donate(swaps, deadline, donations)).to.be.revertedWith(
+          'GrantRoundManager: Swap parameter has duplicate input tokens'
+        );
+      });
 
+      it('reverts if swap and donate inputs result in zero donation', async () => {
+        const swaps = [{ amountIn: 1, amountOutMin: '0', path: tokens.gtc.address }];
+        const donations = [
+          { grantId: 0, token: tokens.gtc.address, ratio: parseUnits('0.25', 18), rounds: [mockRound.address] },
+          { grantId: 1, token: tokens.gtc.address, ratio: parseUnits('0.75', 18), rounds: [mockRound.address] },
+        ];
         await approve('gtc', user, manager.address);
         await expect(manager.donate(swaps, deadline, donations)).to.be.revertedWith(
           'GrantRoundManager: Donation amount must be greater than zero'
+        );
+      });
+
+      it('reverts if donation ratios for a token do not sum to 100%', async () => {
+        const swaps = [{ amountIn: parseUnits('1', 18), amountOutMin: '0', path: tokens.gtc.address }];
+        const donations = [
+          { grantId: 0, token: tokens.gtc.address, ratio: parseUnits('0.25', 18), rounds: [mockRound.address] },
+          { grantId: 1, token: tokens.gtc.address, ratio: parseUnits('0.50', 18), rounds: [mockRound.address] },
+        ];
+        await approve('gtc', user, manager.address);
+        await expect(manager.donate(swaps, deadline, donations)).to.be.revertedWith(
+          'GrantRoundManager: Ratios do not sum to 100%'
         );
       });
     });
@@ -246,7 +278,6 @@ describe('GrantRoundManager', () => {
       });
 
       it('input token ETH, output token GTC', async () => {
-        // Use the 1% GTC/ETH pool to swap from ETH (input) to GTC (donationToken). The 1% pool is currently the most liquid
         const amountIn = parseUnits('10', 18);
         const tx = await manager.donate(
           [{ ...swap, amountIn, path: await encodeRoute(['eth', 'gtc']) }],
@@ -254,6 +285,20 @@ describe('GrantRoundManager', () => {
           [{ ...donation, token: tokens.weth.address }],
           { value: amountIn, gasPrice: '0' } // zero gas price to make balance checks simpler
         );
+
+        // Get the donationAmount from the swap from the GrantDonation log
+        const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
+        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+        const { donationAmount } = log.args;
+        expect(await balanceOf('gtc', payee1)).to.equal(donationAmount);
+      });
+
+      it('input token WETH, output token GTC', async () => {
+        const amountIn = parseUnits('10', 18);
+        await approve('weth', user, manager.address);
+        const tx = await manager.donate([{ ...swap, amountIn, path: await encodeRoute(['weth', 'gtc']) }], deadline, [
+          { ...donation, token: tokens.weth.address },
+        ]);
 
         // Get the donationAmount from the swap from the GrantDonation log
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
@@ -330,7 +375,7 @@ describe('GrantRoundManager', () => {
           { grantId: 1, token: tokens.dai.address, ratio: parseUnits('0.75', 18), rounds: [mockRound.address] },
         ];
         await approve('dai', user, manager.address);
-        const tx = await manager.donate(swaps, deadline, donations, { value: swaps[0].amountIn, gasPrice: '0' });
+        const tx = await manager.donate(swaps, deadline, donations);
 
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
         const amountOut = getSwapAmountOut(receipt.logs);
