@@ -31,9 +31,15 @@ module.exports = {
     },
 
     stroke: {
+      transparent: 'transparent',
+      white: '#ffffff',
+      teal: '#02E2AC',
+      pink: '#F3587D',
+      'grey-100': '#E2E0E7',
+      'grey-200': '#C4C1CF',
+      'grey-300': '#A7A2B6',
       'grey-400': '#757087',
       'grey-500': '#0E0333',
-      'pink': '#F3587D',
     },
 
     strokeWidth: {

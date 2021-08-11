@@ -42,7 +42,7 @@
   [multiple],
   textarea,
   select {
-    @apply w-full p-4 border border-grey-400 hover:border-grey-500;
+    @apply w-full p-4 border border-grey-400 hover:border-grey-500 focus:outline-none focus:border-grey-500 focus:ring-1 focus:ring-grey-500;
     font-size: 100%;
   }
 

@@ -1,395 +1,232 @@
 <template>
-  <!-- take the codebase of this documents "fragments"
-    and make components out of it by copy the fragments
-    into new files in /components and make it modular with 
-    params / logic . then remove the code-part from here
-    and replace it with the <Component params="value" />
-    so richard can continue finetune it along the way,
-    and we can start build views from that components
-  -->
 
-  <!----------------------------------------------- NAVIGATION 
-  with: logo + text + arrow + menu
-  with optional : cart ( text + icon + number )
-  with optional : web3-connected ( address + identicon + arrow + menu )
-  with optional : web3-not-connected ( text + icon )
-  -->
-  <nav class="flex items-center gap-x-4 md:gap-x-8 h-28 mx-4 text-grey-400" style="z-index: 9999">
-    <!-- logo + menu -->
-    <div class="group">
-      <div class="relative">
-        <!--logo + text + arrow -->
-        <div class="font-medium flex items-center h-14 cursor-pointer">
-          <!-- img -->
-          <div>
-            <img class="icon-large" src="../assets/logo.svg" />
-          </div>
-          <!--txt-->
-          <div class="ml-4 hidden md:block">
-            <big> <span class="text-teal">d</span><span class="text-grey-500">GRANTS</span></big>
-          </div>
-          <!--arrow-->
-          <div class="ml-1">
-            <ArrowBottomIcon class="icon-small" />
-          </div>
-        </div>
-      </div>
-
-      <!-- main menu-->
-      <div class="absolute hidden left-2 md:left-20 group-hover:block" style="z-index: 9999">
-        <div
-          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
-        >
-          <div class="text-grey-500">grants</div>
-          <div class="cursor-pointer hover:text-grey-500">rounds</div>
-          <div class="cursor-pointer hover:text-grey-500">collections</div>
-          <!-- seperator -->
-          <div class="border-b border-grey-400 my-4"></div>
-          <div class="cursor-pointer hover:text-grey-500">about</div>
-        </div>
-      </div>
-    </div>
-    <!-- group end-->
-
-    <!-- cart -->
-    <div class="ml-auto flex items-center gap-x-2 h-14 group cursor-pointer">
-      <!--text-->
-      <div class="hidden md:block group-hover:text-grey-500">Cart</div>
-      <!--icon-->
-      <CartIcon class="icon" />
-      <!--in cart number-->
-      <div class="group-hover:text-grey-500">12</div>
-    </div>
-
-    <!--seperator-->
-    <div class="border-r border-grey-100 h-14"></div>
-
-    <!-- web3:connected : show this-->
-    <div class="group">
-      <!--navigation part-->
-      <div class="relative flex items-center h-16 gap-x-2 group cursor-pointer">
-        <!--text-->
-        <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
-        <!--image-->
-        <div>
-          <ArrowBottomIcon class="icon-small" />
-        </div>
-        <!--arrow-->
-        <div>
-          <img class="icon-small" src="http://placekitten.com/64" />
-        </div>
-      </div>
-
-      <!-- menu-->
-      <div class="absolute hidden right-2 md:right-20 group-hover:block" style="z-index: 9999">
-        <div
-          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
-        >
-          <div>0xff…ffff</div>
-          <div>1337 ETH</div>
-          <div class="border-b border-grey-400 my-4"></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">profile</div>
-          <div class="cursor-pointer hover:text-grey-500 flex">favorites<span class="pl-4 ml-auto">32</span></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">my grants<span class="pl-4 ml-auto">32</span></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">settings</div>
-          <div class="border-b border-grey-400 my-4 flex"></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">change wallet</div>
-          <div class="cursor-pointer hover:text-grey-500 flex">disconnect wallet</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- web3: not connected : show this-->
-    <div class="flex items-center h-14 gap-x-2 group cursor-pointer">
-      <!--text-->
-      <div class="hidden md:block group-hover:text-grey-500">Connect</div>
-      <!--image-->
-      <div>
-        <ConnectWalletIcon class="icon" />
-      </div>
-    </div>
-  </nav>
-
-  <!----------------------------------------------- HEADER  
-  with headline
-  with optional absolute left right navigation 
-  with optional breadcrumb navigation 
-  with optional second headline
-  with optional metadata "by {address}" + "last seen/update" + humanized timestamp
-  with optional "quote" ( for a public collection of a user ) 
-  -->
-  <header class="px-4 md:px-12 py-20 border-b border-grey-100 text-center relative">
-    <!-- optional breadcrumb within a header -->
-    <div class="flex flex-wrap justify-center mb-8">
-      <a class="group no-underline flex items-center" href="#">
-        <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">dgrants</span>
-        <ArrowRightSmallIcon class="icon-small" />
-      </a>
-
-      <a class="group no-underline flex items-center" href="#">
-        <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">collections (4949)</span>
-        <ArrowRightSmallIcon class="icon-small" />
-      </a>
-
-      <a class="group no-underline flex items-center" href="#">
-        <span class="uppercase font-medium text-grey-400 truncate hover:text-grey-500">#432</span>
-        <ArrowRightSmallIcon class="icon-small" />
-      </a>
-    </div>
-
-    <h1>Best Infrastructure Grants</h1>
-
-    <!-- optional subline -->
-    <h1>“Fusion - Iconpack for Cryptonauts”</h1>
-
-    <!--optional by address last seen / last  updated-->
-    <div>
-      <span class="text-grey-400 mr-4">by</span>
-      <a class="mr-4" href="#">0xff…ffff</a>
-      <span class="italic text-grey-400">last seen 3 days ago</span>
-    </div>
-
-    <!-- optional quote -->
-    <p class="intent italic mt-8 mx-auto max-w-6xl">
-      “Im a paragraph but with intent. <a href="#">link</a> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-      diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-      accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-      sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
-      labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-      Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.”
-    </p>
-
-    <!-- optional navigation to jump to next item in a list -->
-    <nav class="group inline p-6 absolute right-0 cursor-pointer" style="top: 50%; transform: translateY(-50%)">
-      <ArrowRightIcon class="icon" />
-    </nav>
-    <nav class="group inline p-6 absolute left-0 cursor-pointer" style="top: 50%; transform: translateY(-50%)">
-      <ArrowLeftIcon class="icon" />
-    </nav>
-  </header>
-
-  <!----------------------------------------------- SECTION HEADER / DIVIDER 
-  ( whats a good name for this element ? )  
-  - with optional right button 
-  - with optional submenu per item
-  -->
-  <div class="px-4 md:px-12 pt-16 pb-8 border-b border-grey-100">
-    <div class="block md:flex gap-x-8">
-      <div class="flex flex-wrap content-center gap-x-8">
-        <!-- text + (number) -->
-        <div class="cursor-pointer uppercase font-medium">active rounds<span class="ml-2 text-grey-400">(3)</span></div>
-        <!-- text + (number) -->
-        <div class="cursor-pointer uppercase font-medium">all rounds<span class="ml-2 text-grey-400">(5)</span></div>
-        <!-- label : text -->
-        <div class="cursor-pointer uppercase font-medium"><span class="text-grey-400 mr-2">round:</span>gr11</div>
-        <!-- label : text -->
-        <div class="cursor-pointer uppercase font-medium"><span class="text-grey-400 mr-2">curation:</span>on</div>
-        <!-- label : text + SUBMENU -->
-        <div class="group cursor-pointer uppercase font-medium">
-          <div class="relative"><span class="text-grey-400 mr-2">hover me:</span>shuffle</div>
-          <!-- menu -->
-          <div class="absolute hidden group-hover:block">
-            <div
-              class="
-                border border-grey-400
-                p-6
-                pr-10
-                bg-white
-                text-grey-400
-                flex flex-col
-                gap-y-2
-                uppercase
-                font-medium
-              "
-            >
-              <div class="text-grey-500">newest</div>
-              <div class="hover:text-grey-500 cursor-pointer">shuffle</div>
-              <div class="hover:text-grey-500 cursor-pointer">oldest</div>
-              <div class="hover:text-grey-500 cursor-pointer">random</div>
-              <!-- seperator -->
-              <div class="border-b border-grey-400 my-4"></div>
-              <div class="hover:text-grey-500 cursor-pointer">something</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!--optional button -->
-      <div class="mt-4 md:mt-0 ml-auto">
-        <button class="whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">
-          im optional
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!----------------------------------------------- GRANT DESCRIPTION  
-  - a paragraph with some intent for better typography - for now probably just
-  gona used for the round and grant detail page
-  -->
-  <div class="border-b border-grey-100">
-    <p class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
-      Im a paragraph but with intent. <a href="#">link</a> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
-      diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
-      accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
-      sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
-      labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
-      Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
-    </p>
-  </div>
-
-  <!----------------------------------------------- TAB BAR   
-  - with active state ( see first "all") classes vs other clases 
-  -->
-  <div class="px-4 md:px-12 py-6 border-b border-grey-100 flex flex-wrap gap-x-10 gap-y-2">
-    <span
-      class="
-        cursor-pointer
-        text-grey-500
-        font-medium
-        no-underline
-        whitespace-pre-line
-        hover:text-grey-500
-        py-2
-        border-b-2
-      "
-      >All (543)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >Infra Tech (184)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >dApp Tech (184)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >Community (43)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >Building Gitcoin (10)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >NFTs (3)</span
-    >
-    <span class="cursor-pointer text-grey-400 font-medium no-underline whitespace-pre-line hover:text-grey-500 py-2"
-      >dGov (17)</span
-    >
-  </div>
-
-  <!----------------------------------------------- CARD GRID FOR ROUNDS AND GRANTS  -->
-
-  <section
-    class="px-4 md:px-12 py-12
-      pb-24 grid gap-x-12 gap-y-12 grid-cols-1
-      md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-b border-grey-100
-    "
-  >
-    <!----------------------------------------------- GRANT CARD   
-- with 3 icons just for test . we might just need one later on 
+<!--
+* @richard : these components are all hardcoded
+* and need to get props / data logic.
 -->
 
-    <figure class="cursor-pointer">
-      <div class="relative">
-        <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
-        <div class="group absolute bottom-0 right-0 p-4 bg-white opacity-30 hover:opacity-100">
-          <CartIcon class="icon-small" />
-        </div>
-      </div>
-      <figcaption class="mt-4">
-        <div class="text-grey-500 font-medium truncate">Gitcoin Grants Official Matching Pool Fund</div>
-        <div><span class="text-grey-400">by</span><a class="ml-1" href="#">0xff…ffff</a></div>
-        <div><span class="text-grey-400">Raised:</span><span class="ml-1">315.355 USD</span></div>
-      </figcaption>
-    </figure>
-  </section>
+<div class="bg-pink">BaseHeader</div>
+<BaseHeader />
 
-  <br /><br /><br />
+<!--
+*
+*
+-->
 
-  <!----------------------------------------------- BUTTON 
-  -->
-  <br /><br />
-  <button class="uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">Click me</button>
+<div class="bg-pink">BaseFilterNav</div>
+<BaseFilterNav />
 
-  <br /><br /><br /><br /><br />
+<!--
+*
+*
+-->
 
+<!-- i could not name it BaseSectionTitle - got errors on it. 
+  didnt get the concept of slots need help to do this right -->
+<div class="bg-pink">BaseTitle</div>
+<BaseTitle />
 
+<!--
+*
+*
+-->
 
-  <!----------------------------------------------- interaction icon bar ( used for cart and for round+grant detail page)
-  -->
+<div class="bg-pink">BaseTabs</div>
+<BaseTabs />
 
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="flex flex-wrap gap-x-12 gap-y-4">
+<!--
+*
+*
+-->
 
-      <div class="group flex items-center gap-4 cursor-pointer">
-        <CollectionIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Save as Collection</span>
-      </div>
+<div class="bg-pink">GrantCard ( in a Grid )</div>
+<section class="px-4 md:px-12 py-12 pb-24 grid gap-x-12 gap-y-12 grid-cols-1
+md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 border-b border-grey-100">
+<GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard />
+</section>
 
-      <div class="group flex items-center gap-4 cursor-pointer">
-        <ShareIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Share Cart</span>
-      </div>
+<!--
+*
+*
+-->
 
-      <div class="group flex items-center gap-4 cursor-pointer ml-auto">
-        <XIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Clear Cart</span>
+<div class="bg-pink">ActionsNav</div>
+<ActionsNav />
+
+<!--
+*
+*
+-->
+
+<div class="bg-pink">ContributionRow</div>
+<ContributionRow />
+
+<!--
+*
+*
+-->
+
+<div class="bg-pink">CartItem</div>
+<CartItem />
+
+<!--
+*
+*
+-->
+
+<div class="bg-pink">GrantDetailsRow</div>
+<GrantDetailsRow />
+
+<!--
+*
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : Grant Description</div>
+<!----------------------------------------------- GRANT DESCRIPTION  -->
+<div class="border-b border-grey-100">
+  <p class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
+    Im a paragraph but with intent. <a href="#">link</a> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed
+    diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et
+    accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor
+    sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut
+    labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.
+    Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+  </p>
+</div>
+
+<!--
+*
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : Button</div>
+<!----------------------------------------------- BUTTON -->
+<button class="uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">Click me</button>
+
+<!--
+*
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : Transaction Status</div>
+<!----------------------------------------------- transaction status -->
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Hash:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="break-all"><a href="#">0xd510ef6c442fc967436e0bcaf0837ab372eced86fda84b04958b5e315f0a083a</a></div>
+    </div>
+  </div>
+</div>
+
+<!--
+*
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : Transaction Pending</div>
+<!----------------------------------------------- transaction pending  -->
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-grey-400 text-grey-400 font-medium mr-4">pending</span>
+        Pending since 37 sec
       </div>
     </div>
   </div>
+</div>
 
+<!--
+*
+*
+-->
 
-
-
-
-  <br /><br /><br /><br /><br />
-
-  <!----------------------------------------------- A CART ITEM V3-->
-
-  <div class="px-4 md:px-12">
-    <div class="py-8 border-b border-grey-100">
-      <div class="grid grid-flow-col items-center gap-x-8">
-        <div>
-          <div class="grid grid-cols-4 items-center gap-x-8 gap-y-4">
-            <!-- image -->
-            <div class="col-span-4 lg:col-span-1">
-              <figure class="max-w-lg">
-                <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
-              </figure>
-            </div>
-            <!-- text -->
-            <div class="col-span-4 lg:col-span-1">
-              <div>DeFi Developer Roadmap V3</div>
-            </div>
-            <!-- input -->
-            <div class="col-span-4 lg:col-span-1">
-              <div class="flex">
-                <input class="right w-36" type="number" placeholder="0" />
-                <select name="token" class="border-l-0 w-36">
-                  <option value="eth">ETH</option>
-                  <option value="dai">DAI</option>
-                  <option value="gtc">GTC</option>
-                  <option value="weth">WETH</option>
-                </select>
-              </div>
-            </div>
-            <!-- matching -->
-            <div class="col-span-4 lg:col-span-1">
-              <div class="text-grey-400">not in an active round</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="justify-self-end">
-          <XIcon class="icon cursor-pointer" />
-        </div>
+<div class="bg-teal">HTML-Fragment : Transaction Success</div>
+<!----------------------------------------------- transaction sucess  -->
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-teal text-teal font-medium mr-4">success</span>
+        Confirmed within 37 sec
       </div>
     </div>
   </div>
+</div>
 
-  <br /><br /><br /><br /><br /><br />
+<!--
+*
+*
+-->
 
-  <!----------------------------------------------- A SINGLE INPUT
-with optional delete item  -->
+<div class="bg-teal">HTML-Fragment : Transaction Failed</div>
+<!----------------------------------------------- transaction failed  -->
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <span class="text-grey-400">Status:</span>
+    </div>
+    <div class="col-span-12 md:col-span-9">
+      <div class="my-4">
+        <span class="uppercase px-8 py-4 border-2 border-pink text-pink font-medium mr-4">fail</span>
+        Confirmed within 37 sec
+      </div>
+    </div>
+  </div>
+</div>
 
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+<!--
+* 
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : InputRow what can have some inputfields like text, dropdown ... </div>
+<!----------------------------------------------- A SINGLE INPUT
+with optional delete item InputRow.vue
+-->
+
+<div class="px-4 md:px-12 py-8 border-b border-grey-100">
+  <div class="grid grid-cols-12 items-center gap-x-8">
+    <!-- label -->
+    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
+      <label for="" class="text-grey-400">Website:</label>
+    </div>
+
+    <!-- input -->
+    <div class="col-span-10 md:col-span-7">
+      <input type="text" placeholder="https://" />
+    </div>
+
+    <!-- optional delete icon -->
+    <div class="col-span-2 justify-self-end">
+      <XIcon class="icon cursor-pointer" />
+    </div>
+  </div>
+</div>
+
+<!--
+* 
+*
+-->
+
+<div class="bg-teal">HTML-Fragment : same row but inset via a wrapper </div>
+<!----------------------------------------------- A SINGLE INPUT WRAPPER
+with optional delete item -->
+
+<!-- pref : inset  :class="`${inset ? "px-4..." : ""}`"   -->
+<div class="px-4 md:px-12">
+
+  <div class="py-8 border-b border-grey-100">
     <div class="grid grid-cols-12 items-center gap-x-8">
       <!-- label -->
       <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
@@ -407,234 +244,216 @@ with optional delete item  -->
       </div>
     </div>
   </div>
-
-  <!----------------------------------------------- A DROPDOWN INPUT
-with optional delete item  -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <!-- label -->
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <label for="" class="text-grey-400">Category:</label>
-      </div>
-
-      <!-- input -->
-      <div class="col-span-10 md:col-span-7">
-        <select name="token">
-          <option value="community">Community</option>
-          <option value="infrastructure">Infrastructure</option>
-        </select>
-      </div>
-
-      <!-- optional delete icon -->
-      <div class="col-span-2 justify-self-end">
-        <XIcon class="icon cursor-pointer" />
-      </div>
-    </div>
-  </div>
-
-  <!----------------------------------------------- A SINGLE INPUT
-but wrapped into another div for "groups of elements see figma "
-its basicaly removing the "px-4 md:px-12" from div but put it in an extra
-div arround it ...
-
-with optional delete item -->
-
-  <div class="px-4 md:px-12">
-    <div class="py-8 border-b border-grey-100">
-      <div class="grid grid-cols-12 items-center gap-x-8">
-        <!-- label -->
-        <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-          <label for="" class="text-grey-400">Website:</label>
-        </div>
-
-        <!-- input -->
-        <div class="col-span-10 md:col-span-7">
-          <input type="text" placeholder="https://" />
-        </div>
-
-        <!-- optional delete icon -->
-        <div class="col-span-2 justify-self-end">
-          <XIcon class="icon cursor-pointer" />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br /><br /><br /><br /><br /><br />
-
-  <!----------------------------------------------- transaction status  -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <span class="text-grey-400">Hash:</span>
-      </div>
-      <div class="col-span-12 md:col-span-9">
-        <div class="break-all"><a href="#">0xd510ef6c442fc967436e0bcaf0837ab372eced86fda84b04958b5e315f0a083a</a></div>
-      </div>
-    </div>
-  </div>
-
-  <!----------------------------------------------- transaction pending  -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <span class="text-grey-400">Status:</span>
-      </div>
-      <div class="col-span-12 md:col-span-9">
-        <div class="my-4">
-          <span class="uppercase px-8 py-4 border-2 border-grey-400 text-grey-400 font-medium mr-4">pending</span>
-          Pending since 37 sec
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!----------------------------------------------- transaction sucess  -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <span class="text-grey-400">Status:</span>
-      </div>
-      <div class="col-span-12 md:col-span-9">
-        <div class="my-4">
-          <span class="uppercase px-8 py-4 border-2 border-teal text-teal font-medium mr-4">success</span>
-          Confirmed within 37 sec
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!----------------------------------------------- transaction failed  -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <span class="text-grey-400">Status:</span>
-      </div>
-      <div class="col-span-12 md:col-span-9">
-        <div class="my-4">
-          <span class="uppercase px-8 py-4 border-2 border-pink text-pink font-medium mr-4">fail</span>
-          Confirmed within 37 sec
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <br /><br /><br /><br /><br /><br />
-
-  <!----------------------------------------------- grants detail page image+core stats ( that element under header )  -->
-
-  <div class="border-b border-grey-100">
-    <div class="grid grid-cols-4 gap-8">
-      <!-- img -->
-      <div class="col-span-4 xl:col-span-2">
-        <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
-      </div>
-      <!-- raised, contract, round, matching -->
-      <div class="col-span-4 md:col-span-2 xl:col-span-1 mb-8 xl:mb-0">
-        <div class="px-4 xl:px-0">
-          <div><span class="text-grey-400 mr-4">Raised:</span>1337 USD</div>
-          <div><span class="text-grey-400 mr-4">Contract:</span><a href="">0xff…ffff</a></div>
-          <div><span class="text-grey-400 mr-4">In Round:</span><a href="">GR11</a></div>
-          <div><span class="text-grey-400 mr-4">Matching:</span><a href="">Quadratic</a></div>
-        </div>
-      </div>
-      <!-- add to cart, matching example -->
-      <div class="col-span-4 md:col-span-2 xl:col-span-1">
-        <div class="px-4 xl:px-12 md:text-right mb-8 xl:mb-0">
-          <div class="mb-4">
-            <button class="whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">
-              add to cart
-            </button>
-          </div>
-          <div>
-            <div>1 USD ≈ 32 USD Matching</div>
-            <div>10 USD ≈ 83 USD Matching</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-
-
-  <!-- interaction bar : see we have this twice different interactions ( use it for cart as well ) -->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="flex flex-wrap gap-x-12 gap-y-4">
-
-      <div class="group flex items-center gap-4 cursor-pointer">
-        <ShareIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Share</span>
-      </div>
-
-      <div class="group flex items-center gap-4 cursor-pointer">
-        <FavoriteIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Favorites</span>
-      </div>
-
-      <div class="group flex items-center gap-4 cursor-pointer ml-auto">
-        <CollectionIcon class="icon cursor-pointer" />
-        <span class="hidden md:block text-grey-400 group-hover:text-grey-500">Collection</span>
-      </div>
-    </div>
-  </div>
-
-
-
-
-
-
-
-<br/><br/><br/><br/><br/><br/>
-
-
-<!----------------------------------------------- grants detail page a single contribution  -->
-
-
-<div class="px-4 md:px-12">
-  <div class="border-b border-grey-100 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-
-      <!--contributor-->
-      <div class="truncate">
-        <div class="flex items-center gap-4">
-          <figure>
-            <img class="icon cursor-pointer rounded-xl" src="http://placekitten.com/64" />
-          </figure>
-          <div>
-            <div class=""><a href="">0xff…ffff</a></div>
-            <div class="text-grey-400">3 min ago</div>
-          </div>
-        </div>
-      </div>
-   
-      <!-- tx -->
-      <div class="truncate">
-        <div class="truncate"><a href="">0xff55483c4f83e65155483c4f83e65155483c4f83e651</a></div>
-        <div class="text-grey-400">pending</div>
-      </div>
-
-      <!-- donation-->
-      <div class="truncate text-left md:text-right">
-        <div>1.337 ETH</div>
-        <div class="text-grey-400">≈ 2000 USD</div>
-      </div>
-
-    </div>
-  </div>
 </div>
 
 
+<!--
+* 
+*
+-->
+
+<div class="bg-teal">autocomplete dropdown - unsure cause not suported by tailwind/forms in styling the arrow</div>
+  <!-- theres a native html autocomplete thingy we could use for tokens
+  but tailfind/forms not support it in styles, and im not sure if i like it 
+  i wrote an issue https://github.com/tailwindlabs/tailwindcss/discussions/5187 -->
+
+<div>
+  <datalist id="tokens">
+      <option>eth</option>
+      <option>dai</option>
+      <option>wai</option>
+      <option>weth</option>   
+      <option>pan</option>         
+  </datalist>
+  <input type="text" autoComplete="on" list="tokens" placeholder="eth" /> 
+</div>
+
+<div class="bg-teal">some other inputs ( just to see the look )</div>
+
+<div class="flex gap-8">
+
+  <div>
+    <input type="number" placeholder="0" />
+  </div>
+
+  <div>
+    <input type="password" placeholder="password" />
+  </div>  
+
+  <div>
+    <input type="checkbox" name="radio">
+  </div>
+
+  <div>
+    <input type="radio" name="radio">
+    <input type="radio" name="radio">
+  </div>
+
+
+  <div>
+    <select name="token" class="w-36">
+        <option>eth</option>
+        <option>dai</option>
+        <option>wai</option>
+        <option>weth</option>   
+        <option>pan</option>  
+    </select>
+  </div>
+
+</div>
+
+<!--
+* 
+*
+-->
+
+<div class="bg-teal">button / button with icon</div>
+
+<div class="flex gap-8">
+
+  <div>
+    <button class="whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">test</button>
+  </div>
+  
+  <div>
+    <button class="flex items-center gap-2 whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">
+      <CollectionIcon class="stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8 " />
+      <span>test</span></button>
+  </div>
+
+</div>
+
+
+<!--
+*
+*
+-->
+
+<div class="bg-teal">toggle</div>
+
+<div>
+  <input v-model="toggle" type="checkbox" style="visibility: none;" checked>
+  <span v-if="toggle" @click="()=>{ toggle =!toggle }">on</span>
+  <span v-if="!toggle" @click="()=>{ toggle =!toggle }" >off</span>
+</div>
+
+<!--
+* 
+*
+-->
 
 
 
-<br /><br /><br /><br /><br /><br />
+<div class="bg-teal">nav</div>
+<!----------------------------------------------- NAVIGATION 
+with: logo + text + arrow + menu
+with optional : cart ( text + icon + number )
+with optional : web3-connected ( address + identicon + arrow + menu )
+with optional : web3-not-connected ( text + icon )
+-->
+<nav class="flex items-center gap-x-4 md:gap-x-8 h-28 mx-4 text-grey-400" style="z-index: 9999">
+  <!-- logo + menu -->
+  <div class="group">
+    <div class="relative">
+      <!--logo + text + arrow -->
+      <div class="font-medium flex items-center h-14 cursor-pointer">
+        <!-- img -->
+        <div>
+          <img class="icon-large" src="../assets/logo.svg" />
+        </div>
+        <!--txt-->
+        <div class="ml-4 hidden md:block">
+          <big> <span class="text-teal">d</span><span class="text-grey-500">GRANTS</span></big>
+        </div>
+        <!--arrow-->
+        <div class="ml-1">
+          <ArrowBottomIcon class="icon-small" />
+        </div>
+      </div>
+    </div>
+
+    <!-- main menu-->
+    <div class="absolute hidden left-2 md:left-20 group-hover:block" style="z-index: 9999">
+      <div
+        class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
+      >
+        <div class="text-grey-500">grants</div>
+        <div class="cursor-pointer hover:text-grey-500">rounds</div>
+        <div class="cursor-pointer hover:text-grey-500">collections</div>
+        <!-- seperator -->
+        <div class="border-b border-grey-400 my-4"></div>
+        <div class="cursor-pointer hover:text-grey-500">about</div>
+      </div>
+    </div>
+  </div>
+  <!-- group end-->
+
+  <!-- cart -->
+  <div class="ml-auto flex items-center gap-x-2 h-14 group cursor-pointer">
+    <!--text-->
+    <div class="hidden md:block group-hover:text-grey-500">Cart</div>
+    <!--icon-->
+    <CartIcon class="icon" />
+    <!--in cart number-->
+    <div class="group-hover:text-grey-500">12</div>
+  </div>
+
+  <!--seperator-->
+  <div class="border-r border-grey-100 h-14"></div>
+
+  <!-- web3:connected : show this-->
+  <div class="group">
+    <!--navigation part-->
+    <div class="relative flex items-center h-16 gap-x-2 group cursor-pointer">
+      <!--text-->
+      <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
+      <!--image-->
+      <div>
+        <ArrowBottomIcon class="icon-small" />
+      </div>
+      <!--arrow-->
+      <div>
+        <img class="icon-small" src="http://placekitten.com/64" />
+      </div>
+    </div>
+
+    <!-- menu-->
+    <div class="absolute hidden right-2 md:right-20 group-hover:block" style="z-index: 9999">
+      <div
+        class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
+      >
+        <div>0xff…ffff</div>
+        <div>1337 ETH</div>
+        <div class="border-b border-grey-400 my-4"></div>
+        <div class="cursor-pointer hover:text-grey-500 flex">profile</div>
+        <div class="cursor-pointer hover:text-grey-500 flex">favorites<span class="pl-4 ml-auto">32</span></div>
+        <div class="cursor-pointer hover:text-grey-500 flex">my grants<span class="pl-4 ml-auto">32</span></div>
+        <div class="cursor-pointer hover:text-grey-500 flex">settings</div>
+        <div class="border-b border-grey-400 my-4 flex"></div>
+        <div class="cursor-pointer hover:text-grey-500 flex">change wallet</div>
+        <div class="cursor-pointer hover:text-grey-500 flex">disconnect wallet</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- web3: not connected : show this-->
+  <div class="flex items-center h-14 gap-x-2 group cursor-pointer">
+    <!--text-->
+    <div class="hidden md:block group-hover:text-grey-500">Connect</div>
+    <!--image-->
+    <div>
+      <ConnectWalletIcon class="icon" />
+    </div>
+  </div>
+</nav>
+
+
+<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>
+
+<!--
+* 
+*
+-->
 
 
 
@@ -642,6 +461,18 @@ with optional delete item -->
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+// bigger components
+import BaseHeader from 'src/components/BaseHeader.vue';
+import BaseFilterNav from 'src/components/BaseFilterNav.vue';
+import BaseTitle from 'src/components/BaseTitle.vue';
+import BaseTabs from 'src/components/BaseTabs.vue';
+import GrantCard from 'src/components/GrantCard.vue';
+import ActionsNav from 'src/components/ActionsNav.vue';
+import ContributionRow from 'src/components/ContributionRow.vue';
+import CartItem from 'src/components/CartItem.vue';
+import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
+
+//all the icons i use
 import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
 import { ArrowRight2Icon as ArrowRightSmallIcon } from '@fusion-icons/vue/interface';
 import { ArrowLeft4Icon as ArrowLeftIcon } from '@fusion-icons/vue/interface';
@@ -651,21 +482,58 @@ import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
 import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
+import { SearchIcon as SearchIcon } from '@fusion-icons/vue/interface';
+import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
+import { CheckmarkIcon as CheckmarkIcon } from '@fusion-icons/vue/interface';
+import { Add1Icon as AddIcon } from '@fusion-icons/vue/interface';
+import { ImportIcon as ImportIcon } from '@fusion-icons/vue/interface';
 import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
 
 export default defineComponent({
   name: 'Ui',
   components: { 
-    ArrowBottomIcon,
-    CartIcon,
-    ConnectWalletIcon,
-    ArrowRightSmallIcon,
-    ArrowLeftIcon,
-    ArrowRightIcon,
-    FavoriteIcon,
-    CollectionIcon,
-    ShareIcon,
-    XIcon
+    ArrowBottomIcon, CartIcon, ConnectWalletIcon,
+    ArrowRightSmallIcon, ArrowLeftIcon, ArrowRightIcon,
+    FavoriteIcon, CollectionIcon,ShareIcon,
+    XIcon, SearchIcon, EditIcon,
+    CheckmarkIcon, AddIcon, ImportIcon,
+
+    BaseHeader,
+    BaseFilterNav,
+    BaseTitle,
+    BaseTabs,
+    GrantCard,
+    ActionsNav,
+    ContributionRow,
+    CartItem,
+    GrantDetailsRow
+    
   },
+  data()  {
+    return {
+      toggle: false  
+    }
+    
+  }
 });
 </script>
+
+
+
+
+
+<!----- toto : 
+
+- input item for simple toggle
+- round card
+- round detail view top part
+- spread x eth to y grants banner thingy
+- links list for grants and rounds
+- about modal
+- jazzicon images
+
+-->
+
+
+
+
