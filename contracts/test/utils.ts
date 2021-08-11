@@ -9,6 +9,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-wit
 import { ethers, network } from 'hardhat';
 import { expect } from 'chai';
 import { BigNumber, BigNumberish, utils } from 'ethers';
+import { Log } from '@ethersproject/providers';
 import { abi as UNISWAP_POOL_ABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
 import { FeeAmount, Pool, Route, computePoolAddress, encodeRouteToPath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
@@ -55,7 +56,19 @@ export async function setNextBlockTimestamp(timestamp: BigNumberish): Promise<nu
   return timestamp;
 }
 
-// --- Uniswap SDK Helpers ---
+// --- Uniswap Helpers ---
+// Loops through an array of logs to find a Uniswap V3 `Swap` log, and returns the swap's amountOut
+export function getSwapAmountOut(logs: Log[]) {
+  const swapTopic = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'; // topic for Swap event
+  const swapLogs = logs.filter((log) => log.topics[0] === swapTopic);
+  const swapLog = swapLogs[swapLogs.length - 1]; // always use the last Swap log to get final output amount
+  const swapEvent = 'event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)'; // prettier-ignore
+  const iface = new ethers.utils.Interface([swapEvent]);
+  const event = iface.parseLog(swapLog);
+  const amountOut = event.args.amount1 as BigNumber; // this is often negative
+  return amountOut.abs();
+}
+
 export async function encodeRoute(tokens: SupportedToken[]): Promise<string> {
   const route = await getRoute(tokens);
   return encodeRouteToPath(route, false);
