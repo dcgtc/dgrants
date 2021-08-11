@@ -139,16 +139,12 @@ contract GrantRoundManager {
     uint256 _deadline,
     Donation[] calldata _donations
   ) external payable {
-    // Validation
-    donateValidation(_donations);
+    // Main logic
+    _validateDonations(_donations);
+    _executeDonationSwaps(_swaps, _deadline);
+    _transferDonations(_donations);
 
-    // Execute all swaps
-    donateSwaps(_swaps, _deadline);
-
-    // Execute donations
-    donateExecution(_donations);
-
-    // Clear storage for refunds (this is set in donateSwaps)
+    // Clear storage for refunds (this is set in _executeDonationSwaps)
     for (uint256 i = 0; i < _swaps.length; i++) {
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
       swapOutputs[_tokenIn] = 0;
@@ -160,7 +156,7 @@ contract GrantRoundManager {
    * @dev Validates the the inputs to a donation call are valid, and reverts if any requirements are violated
    * @param _donations Array of donations that will be executed
    */
-  function donateValidation(Donation[] calldata _donations) internal {
+  function _validateDonations(Donation[] calldata _donations) internal {
     // TODO consider moving this to the section where we already loop through donations in case that saves a lot of
     // gas. Leaving it here for now to improve readability
 
@@ -188,7 +184,7 @@ contract GrantRoundManager {
    * @param _swaps Array of SwapSummary objects describing the swaps required
    * @param _deadline Unix timestamp after which a swap will revert, i.e. swap must be executed before this
    */
-  function donateSwaps(SwapSummary[] calldata _swaps, uint256 _deadline) internal {
+  function _executeDonationSwaps(SwapSummary[] calldata _swaps, uint256 _deadline) internal {
     for (uint256 i = 0; i < _swaps.length; i++) {
       // Validate ratios sum to 100%
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
@@ -224,7 +220,7 @@ contract GrantRoundManager {
    * @dev Core donation logic that transfers funds to grants
    * @param _donations Array of donations to execute
    */
-  function donateExecution(Donation[] calldata _donations) internal {
+  function _transferDonations(Donation[] calldata _donations) internal {
     for (uint256 i = 0; i < _donations.length; i++) {
       // Get data for this donation
       GrantRound[] calldata _rounds = _donations[i].rounds;
