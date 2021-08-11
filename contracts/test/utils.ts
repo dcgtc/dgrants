@@ -27,7 +27,7 @@ export const tokens = {
   eth: { address: ETH_ADDRESS, name: 'Ether', symbol: 'ETH', decimals: 18, mappingSlot: null },
   weth: { address: WETH_ADDRESS, name: 'Wrapped Ether', symbol: 'WETH', decimals: 18, mappingSlot: '0x3' },
   dai: { address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', name: "Dai", symbol: "DAI", decimals: 18, mappingSlot: '0x2' }, // prettier-ignore
-  gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', name: "USD Coin", symbol: "USDC", decimals: 18, mappingSlot: '0x5' }, // prettier-ignore
+  gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', name: "Gitcoin", symbol: "GTC", decimals: 18, mappingSlot: '0x5' }, // prettier-ignore
 };
 
 // This type is our list of tokens supported in the "Token Helpers" section
@@ -58,7 +58,7 @@ export async function setNextBlockTimestamp(timestamp: BigNumberish): Promise<nu
 
 // --- Uniswap Helpers ---
 // Loops through an array of logs to find a Uniswap V3 `Swap` log, and returns the swap's amountOut
-export function getSwapAmountOut(logs: Log[]) {
+export function getSwapAmountOut(logs: Log[]): BigNumber {
   const swapTopic = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'; // topic for Swap event
   const swapLogs = logs.filter((log) => log.topics[0] === swapTopic);
   const swapLog = swapLogs[swapLogs.length - 1]; // always use the last Swap log to get final output amount

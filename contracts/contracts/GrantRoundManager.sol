@@ -83,7 +83,7 @@ contract GrantRoundManager {
     IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).safeApprove(address(_router), type(uint256).max); // USDC
     IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7).safeApprove(address(_router), type(uint256).max); // USDT
     IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599).safeApprove(address(_router), type(uint256).max); // WBTC
-    IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2).safeApprove(address(_router), type(uint256).max); // WETH
+    WETH.safeApprove(address(_router), type(uint256).max); // WETH
   }
 
   // --- Core methods ---
@@ -139,7 +139,28 @@ contract GrantRoundManager {
     uint256 _deadline,
     Donation[] calldata _donations
   ) external payable {
-    // --- Validation ---
+    // Validation
+    donateValidation(_donations);
+
+    // Execute all swaps
+    donateSwaps(_swaps, _deadline);
+
+    // Execute donations
+    donateExecution(_donations);
+
+    // Clear storage for refunds (this is set in donateSwaps)
+    for (uint256 i = 0; i < _swaps.length; i++) {
+      IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
+      swapOutputs[_tokenIn] = 0;
+      donationRatios[_tokenIn] = 0;
+    }
+  }
+
+  /**
+   * @dev Validates the the inputs to a donation call are valid, and reverts if any requirements are violated
+   * @param _donations Array of donations that will be executed
+   */
+  function donateValidation(Donation[] calldata _donations) internal {
     // TODO consider moving this to the section where we already loop through donations in case that saves a lot of
     // gas. Leaving it here for now to improve readability
 
@@ -152,7 +173,6 @@ contract GrantRoundManager {
 
       // Validate round parameters
       GrantRound[] calldata _rounds = _donations[i].rounds;
-      require(_rounds.length > 0, "GrantRoundManager: Must specify at least one round");
       for (uint256 j = 0; j < _rounds.length; j++) {
         require(_rounds[j].isActive(), "GrantRoundManager: GrantRound is not active");
         require(
@@ -161,8 +181,14 @@ contract GrantRoundManager {
         );
       }
     }
+  }
 
-    // --- Execute all swaps ---
+  /**
+   * @dev Performs swaps if necessary
+   * @param _swaps Array of SwapSummary objects describing the swaps required
+   * @param _deadline Unix timestamp after which a swap will revert, i.e. swap must be executed before this
+   */
+  function donateSwaps(SwapSummary[] calldata _swaps, uint256 _deadline) internal {
     for (uint256 i = 0; i < _swaps.length; i++) {
       // Validate ratios sum to 100%
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
@@ -192,31 +218,31 @@ contract GrantRoundManager {
       uint256 _value = _tokenIn == WETH && msg.value > 0 ? msg.value : 0;
       swapOutputs[_tokenIn] = router.exactInput{value: _value}(params); // save off output amount for later
     }
+  }
 
-    // --- Execute donations ---
+  /**
+   * @dev Core donation logic that transfers funds to grants
+   * @param _donations Array of donations to execute
+   */
+  function donateExecution(Donation[] calldata _donations) internal {
     for (uint256 i = 0; i < _donations.length; i++) {
-      // Get data
+      // Get data for this donation
       GrantRound[] calldata _rounds = _donations[i].rounds;
       uint96 _grantId = _donations[i].grantId;
       IERC20 _tokenIn = _donations[i].token;
       uint256 _donationAmount = (swapOutputs[_tokenIn] * _donations[i].ratio) / WAD;
       require(_donationAmount > 0, "GrantRoundManager: Donation amount must be greater than zero"); // verifies that swap and donation inputs are consistent
-      address _payee = registry.getGrantPayee(_grantId);
 
       // Execute transfer
+      address _payee = registry.getGrantPayee(_grantId);
       if (_tokenIn == donationToken) {
         _tokenIn.safeTransferFrom(msg.sender, _payee, _donationAmount); // transfer token directly from caller
       } else {
         donationToken.transfer(_payee, _donationAmount); // transfer swap output
       }
-      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
-    }
 
-    // --- Clear storage for refunds ---
-    for (uint256 i = 0; i < _swaps.length; i++) {
-      IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
-      swapOutputs[_tokenIn] = 0;
-      donationRatios[_tokenIn] = 0;
+      // Emit event
+      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
     }
   }
 }

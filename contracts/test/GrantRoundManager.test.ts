@@ -201,12 +201,6 @@ describe('GrantRoundManager', () => {
     });
 
     describe('validations', () => {
-      it('reverts if no rounds are specified', async () => {
-        await expect(manager.donate([swap], deadline, [{ ...donation, rounds: [] }])).to.be.revertedWith(
-          'GrantRoundManager: Must specify at least one round'
-        );
-      });
-
       it('reverts if an invalid grant ID is provided', async () => {
         await expect(manager.donate([swap], deadline, [{ ...donation, grantId: '500' }])).to.be.revertedWith(
           'GrantRoundManager: Grant does not exist in registry'
@@ -318,6 +312,16 @@ describe('GrantRoundManager', () => {
         const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
         const { donationAmount } = log.args;
         expect(await balanceOf('gtc', payee1)).to.equal(donationAmount);
+      });
+
+      it('allows donations without specifying any rounds', async () => {
+        const amountIn = parseUnits('100', 18);
+        expect(await balanceOf('gtc', payee1)).to.equal('0');
+        await approve('gtc', user, manager.address);
+        await manager.donate([{ ...swap, path: tokens.gtc.address, amountIn }], deadline, [
+          { ...donation, token: tokens.gtc.address, rounds: [] },
+        ]);
+        expect(await balanceOf('gtc', payee1)).to.equal(amountIn);
       });
 
       it('emits a log on a successful donation', async () => {
