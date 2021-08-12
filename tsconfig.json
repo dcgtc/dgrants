@@ -3,7 +3,8 @@
   "references": [
     { "path": "app" },
     { "path": "contracts" },
-    { "path": "types" }
+    { "path": "types" },
+    { "path": "utils" }
   ],
   "exclude": ["node_modules"]
 }

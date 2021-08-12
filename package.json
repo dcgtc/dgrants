@@ -30,7 +30,8 @@
     "test": "lerna run test",
     "app": "yarn workspace @dgrants/app",
     "contracts": "yarn workspace @dgrants/contracts",
-    "types": "yarn workspace @dgrants/types"
+    "types": "yarn workspace @dgrants/types",
+    "utils": "yarn workspace @dgrants/utils"
   },
   "husky": {
     "hooks": {
