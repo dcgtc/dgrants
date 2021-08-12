@@ -4,6 +4,7 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, isAddress, parseUnits } from 'src/utils/ethers';
+import { CartItemOptions } from 'src/types';
 import { BigNumberish, Contract, ContractTransaction } from 'ethers';
 import { Grant, GrantRound } from '@dgrants/types';
 
@@ -45,14 +46,9 @@ export function isValidAddress(val: string | undefined) {
 const CART_KEY = 'cart';
 const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
 const DEFAULT_CONTRIBUTION_AMOUNT = parseUnits('5', 18).toString(); // DAI has 18 decimals
-type CartItem = {
-  grantId: string;
-  contributionTokenAddress: string; // store address instead of TokenInfo to reduce localStorage size used
-  contributionAmount: string;
-};
 
 // Loads cart data
-export function loadCart(): CartItem[] {
+export function loadCart(): CartItemOptions[] {
   // Return empty array if nothing found
   const rawCart = localStorage.getItem(CART_KEY);
   if (!rawCart) return [];
@@ -67,7 +63,8 @@ export function loadCart(): CartItem[] {
 }
 
 // Adds a grant to the cart
-export function addToCart(grant: Grant) {
+export function addToCart(grant: Grant | null | undefined) {
+  if (!grant) return; // null and undefined input types are to avoid lint errors when calling this from a template
   // If this grant is already in the cart, do nothing
   const cart = loadCart();
   if (cart.map((grant) => grant.grantId).includes(grant.id.toString())) return;

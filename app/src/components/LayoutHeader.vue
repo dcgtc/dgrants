@@ -53,7 +53,7 @@ import { ExclamationIcon } from '@heroicons/vue/solid';
 const navigation = [
   { name: 'Home', href: '/' },
   { name: 'About', href: '/about' },
-  { name: 'Docs', href: '/docs' },
+  { name: 'Cart', href: '/cart' },
   { name: 'Contact', href: '/contact' },
 ];
 
