@@ -1,53 +1,173 @@
 <template>
-  <header class="bg-white">
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Top">
-      <div class="w-full py-6 flex items-center justify-between border-b border-gray-300 lg:border-none">
-        <div class="flex items-center">
-          <a href="/">
-            <img class="h-10 w-auto" src="../assets/logo.png" alt="logo" />
-          </a>
-          <div class="hidden ml-10 space-x-8 lg:block">
-            <router-link
-              v-for="link in navigation"
-              :key="link.name"
-              :to="link.href"
-              active-class="font-bold"
-              exact
-              class="font-medium text-gray-500 hover:text-gray-900"
-            >
-              {{ link.name }}
-            </router-link>
+  <header class="flex items-center gap-x-4 md:gap-x-8 h-28 mx-4 text-grey-400">
+    <div class="group">
+      <!-- 
+      * logo icon + logo text + arrow 
+      * -->
+
+      <div class="relative">
+        <div class="font-medium flex items-center h-14 cursor-pointer">
+          <div>
+            <img class="icon-large" src="../assets/logo.svg" />
           </div>
-        </div>
-        <div class="ml-10 space-x-4">
-          <div v-if="userDisplayName" class="text-gray-700">{{ userDisplayName }}</div>
-          <div v-else-if="!isSupportedNetwork" class="flex items-center">
-            <ExclamationIcon class="h-5 w-5 text-yellow-500 mr-2" />
-            <div class="text-gray-500">Unsupported network</div>
+          <div class="ml-4 hidden md:block">
+            <big> <span class="text-teal">d</span><span class="text-grey-500">GRANTS</span></big>
           </div>
-          <button v-else @click="connectWallet" class="btn btn-secondary">Connect Wallet</button>
+          <div class="ml-1">
+            <ArrowBottomIcon class="icon-small" />
+          </div>
         </div>
       </div>
-      <div class="py-4 flex flex-wrap justify-center space-x-6 lg:hidden">
-        <router-link
-          v-for="link in navigation"
-          :key="link.name"
-          :to="link.href"
-          active-class="font-bold"
-          exact
-          class="font-medium text-gray-500 hover:text-gray-900"
+
+      <!-- 
+      * main menu 
+      * -->
+
+      <div class="absolute hidden left-2 md:left-20 group-hover:block" style="z-index: 9999">
+        <div
+          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
         >
-          {{ link.name }}
-        </router-link>
+          <router-link to="grants" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
+            >grants</router-link
+          >
+
+          <router-link to="rounds" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
+            >rounds</router-link
+          >
+
+          <div class="border-b border-grey-400 my-4"></div>
+
+          <router-link to="about" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
+            >about</router-link
+          >
+
+          <router-link to="ui" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
+            >ui</router-link
+          >
+        </div>
       </div>
-    </nav>
+    </div>
+
+    <!--
+    * cart
+    * just if connected to web3
+    -->
+
+    <div v-if="userDisplayName" class="ml-auto flex items-center gap-x-2 h-14 group cursor-pointer">
+      <!--text-->
+      <div class="hidden md:block group-hover:text-grey-500">Cart</div>
+      <!--icon-->
+      <CartIcon class="icon" />
+      <!--in cart number-->
+      <div class="group-hover:text-grey-500">12</div>
+    </div>
+
+    <!--
+    * a seperator between cart and user menu
+    * just if connected to web3
+    -->
+    <div v-if="userDisplayName" class="border-r border-grey-100 h-14"></div>
+
+    <!--
+    * user navigation
+    * just if connected to web3
+    -->
+
+    <div v-if="userDisplayName" class="group">
+      <div class="relative flex items-center h-16 gap-x-2 group cursor-pointer">
+        <div class="hidden md:block group-hover:text-grey-500">{{ userDisplayName }}</div>
+        <div>
+          <!-- identicon -->
+          <img src="http://placekitten.com/64" />
+        </div>
+        <!--arrow-->
+        <div>
+          <ArrowBottomIcon class="icon-small" />
+        </div>
+      </div>
+
+      <!-- menu-->
+      <div class="absolute hidden right-2 md:right-20 group-hover:block" style="z-index: 9999">
+        <div
+          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
+        >
+          <div>{{ userDisplayName }}</div>
+          <div>1337 ETH</div>
+          <div class="border-b border-grey-400 my-4"></div>
+
+          <router-link
+            to="profile"
+            class="cursor-pointer hover:text-grey-500 flex no-underline"
+            active-class="text-grey-500"
+            >profile</router-link
+          >
+
+          <router-link
+            to="favorites"
+            class="cursor-pointer hover:text-grey-500 flex no-underline"
+            active-class="text-grey-500"
+            >favorites<span class="pl-4 ml-auto">32</span></router-link
+          >
+
+          <router-link
+            to="my grants"
+            class="cursor-pointer hover:text-grey-500 flex no-underline"
+            active-class="text-grey-500"
+            >my grants<span class="pl-4 ml-auto">32</span></router-link
+          >
+
+          <router-link
+            to="settings"
+            class="cursor-pointer hover:text-grey-500 flex no-underline"
+            active-class="text-grey-500"
+            >settings</router-link
+          >
+
+          <div class="border-b border-grey-400 my-4 flex"></div>
+
+          <router-link
+            to="change wallet"
+            class="cursor-pointer hover:text-grey-500 flex no-underline"
+            active-class="text-grey-500"
+            >change wallet</router-link
+          >
+        </div>
+      </div>
+    </div>
+
+    <!--
+    * not connected
+    * 
+    -->
+
+    <div
+      v-if="!userDisplayName"
+      @click="connectWallet"
+      class="flex items-center h-14 gap-x-2 group cursor-pointer ml-auto"
+    >
+      <div class="hidden md:block group-hover:text-grey-500">Connect</div>
+      <div>
+        <ConnectWalletIcon class="icon" />
+      </div>
+    </div>
+
+    <!--
+    * not supported network
+    * 
+    -->
+
+    <div v-if="!isSupportedNetwork" class="text-pink">Not supportet Network!</div>
   </header>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import useWalletStore from 'src/store/wallet';
-import { ExclamationIcon } from '@heroicons/vue/solid';
+
+//icons
+import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
+import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
+import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
 // Header menu bar items
 const navigation = [
@@ -60,7 +180,7 @@ const navigation = [
 
 export default defineComponent({
   name: 'LayoutHeader',
-  components: { ExclamationIcon },
+  components: { ConnectWalletIcon, ArrowBottomIcon, CartIcon },
   setup() {
     const { connectWallet, isSupportedNetwork, userDisplayName } = useWalletStore();
     return { connectWallet, isSupportedNetwork, navigation, userDisplayName };
