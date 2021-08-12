@@ -90,6 +90,68 @@
   <GrantDetailsRow />
 
   <!--
+* a row of LABEL + INPUT 
+* props : 
+* deletable: Boolean // show X icon to the right
+* toggleable: Boolean // show toggleable button to the right ( can not combined with deletable ! )
+* intended: Boolean // intend the row a bit for grouped inputs
+* text: String // optional helping text for an input
+-->
+
+  <div class="bg-pink">InputRow</div>
+
+  <InputRow :deleteable="true" :intended="false" text="im optional helping text">
+    <template v-slot:label>Website:</template>
+    <template v-slot:input>
+      <input type="text" placeholder="https://" />
+    </template>
+  </InputRow>
+
+  <InputRow :deleteable="false" :intended="false">
+    <template v-slot:label>Category:</template>
+    <template v-slot:input>
+      <select name="token" class="w-36">
+        <option>eth</option>
+        <option>dai</option>
+        <option>wai</option>
+        <option>weth</option>
+        <option>pan</option>
+      </select>
+    </template>
+  </InputRow>
+
+  <InputRow :deleteable="false" :intended="true">
+    <template v-slot:label>intended:</template>
+    <template v-slot:input> im an intended row but not deletable </template>
+  </InputRow>
+
+  <InputRow :deleteable="true" :intended="true">
+    <template v-slot:label>intended:</template>
+    <template v-slot:input> im an intended row and deletable </template>
+  </InputRow>
+
+  <InputRow :deleteable="true" :intended="true">
+    <template v-slot:label>intended:</template>
+    <template v-slot:input> im an intended row and deletable </template>
+  </InputRow>
+
+  <InputRow
+    :deleteable="false"
+    :intended="false"
+    :toggleable="true"
+    text="Select a Platform and enter your Handle on this platform."
+  >
+    <template v-slot:label>platform:</template>
+    <template v-slot:input>
+      <select name="platform" class="w-1/2">
+        <option value="gitcoin">Gitcoin</option>
+        <option value="github">Github</option>
+      </select>
+      <input class="right w-1/2 border-l-0" type="text" placeholder="handle" />
+    </template>
+  </InputRow>
+
+  <!--
 *
 *
 -->
@@ -198,67 +260,7 @@
   </div>
 
   <!--
-* 
 *
--->
-
-  <div class="bg-teal">HTML-Fragment : InputRow what can have some inputfields like text, dropdown ...</div>
-  <!----------------------------------------------- A SINGLE INPUT
-with optional delete item InputRow.vue
--->
-
-  <div class="px-4 md:px-12 py-8 border-b border-grey-100">
-    <div class="grid grid-cols-12 items-center gap-x-8">
-      <!-- label -->
-      <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-        <label for="" class="text-grey-400">Website:</label>
-      </div>
-
-      <!-- input -->
-      <div class="col-span-10 md:col-span-7">
-        <input type="text" placeholder="https://" />
-      </div>
-
-      <!-- optional delete icon -->
-      <div class="col-span-2 justify-self-end">
-        <XIcon class="icon cursor-pointer" />
-      </div>
-    </div>
-  </div>
-
-  <!--
-* 
-*
--->
-
-  <div class="bg-teal">HTML-Fragment : same row but inset via a wrapper</div>
-  <!----------------------------------------------- A SINGLE INPUT WRAPPER
-with optional delete item -->
-
-  <!-- pref : inset  :class="`${inset ? "px-4..." : ""}`"   -->
-  <div class="px-4 md:px-12">
-    <div class="py-8 border-b border-grey-100">
-      <div class="grid grid-cols-12 items-center gap-x-8">
-        <!-- label -->
-        <div class="col-span-12 md:col-span-3 mb-3 md:mb-0">
-          <label for="" class="text-grey-400">Website:</label>
-        </div>
-
-        <!-- input -->
-        <div class="col-span-10 md:col-span-7">
-          <input type="text" placeholder="https://" />
-        </div>
-
-        <!-- optional delete icon -->
-        <div class="col-span-2 justify-self-end">
-          <XIcon class="icon cursor-pointer" />
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!--
-* 
 *
 -->
 
@@ -276,37 +278,6 @@ with optional delete item -->
       <option>pan</option>
     </datalist>
     <input type="text" autoComplete="on" list="tokens" placeholder="eth" />
-  </div>
-
-  <div class="bg-teal">some other inputs ( just to see the look )</div>
-
-  <div class="flex gap-8">
-    <div>
-      <input type="number" placeholder="0" />
-    </div>
-
-    <div>
-      <input type="password" placeholder="password" />
-    </div>
-
-    <div>
-      <input type="checkbox" name="radio" />
-    </div>
-
-    <div>
-      <input type="radio" name="radio" />
-      <input type="radio" name="radio" />
-    </div>
-
-    <div>
-      <select name="token" class="w-36">
-        <option>eth</option>
-        <option>dai</option>
-        <option>wai</option>
-        <option>weth</option>
-        <option>pan</option>
-      </select>
-    </div>
   </div>
 
   <!--
@@ -346,145 +317,6 @@ with optional delete item -->
   </div>
 
   <!--
-*
-*
--->
-
-  <div class="bg-teal">toggle</div>
-
-  <div>
-    <input v-model="toggle" type="checkbox" style="visibility: hidden" checked />
-    <span
-      v-if="toggle"
-      @click="
-        () => {
-          toggle = !toggle;
-        }
-      "
-      >on</span
-    >
-    <span
-      v-if="!toggle"
-      @click="
-        () => {
-          toggle = !toggle;
-        }
-      "
-      >off</span
-    >
-  </div>
-
-  <!--
-* 
-*
--->
-
-  <div class="bg-teal">nav</div>
-  <!----------------------------------------------- NAVIGATION 
-with: logo + text + arrow + menu
-with optional : cart ( text + icon + number )
-with optional : web3-connected ( address + identicon + arrow + menu )
-with optional : web3-not-connected ( text + icon )
--->
-  <nav class="flex items-center gap-x-4 md:gap-x-8 h-28 mx-4 text-grey-400" style="z-index: 9999">
-    <!-- logo + menu -->
-    <div class="group">
-      <div class="relative">
-        <!--logo + text + arrow -->
-        <div class="font-medium flex items-center h-14 cursor-pointer">
-          <!-- img -->
-          <div>
-            <img class="icon-large" src="../assets/logo.svg" />
-          </div>
-          <!--txt-->
-          <div class="ml-4 hidden md:block">
-            <big> <span class="text-teal">d</span><span class="text-grey-500">GRANTS</span></big>
-          </div>
-          <!--arrow-->
-          <div class="ml-1">
-            <ArrowBottomIcon class="icon-small" />
-          </div>
-        </div>
-      </div>
-
-      <!-- main menu-->
-      <div class="absolute hidden left-2 md:left-20 group-hover:block" style="z-index: 9999">
-        <div
-          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
-        >
-          <div class="text-grey-500">grants</div>
-          <div class="cursor-pointer hover:text-grey-500">rounds</div>
-          <div class="cursor-pointer hover:text-grey-500">collections</div>
-          <!-- seperator -->
-          <div class="border-b border-grey-400 my-4"></div>
-          <div class="cursor-pointer hover:text-grey-500">about</div>
-        </div>
-      </div>
-    </div>
-    <!-- group end-->
-
-    <!-- cart -->
-    <div class="ml-auto flex items-center gap-x-2 h-14 group cursor-pointer">
-      <!--text-->
-      <div class="hidden md:block group-hover:text-grey-500">Cart</div>
-      <!--icon-->
-      <CartIcon class="icon" />
-      <!--in cart number-->
-      <div class="group-hover:text-grey-500">12</div>
-    </div>
-
-    <!--seperator-->
-    <div class="border-r border-grey-100 h-14"></div>
-
-    <!-- web3:connected : show this-->
-    <div class="group">
-      <!--navigation part-->
-      <div class="relative flex items-center h-16 gap-x-2 group cursor-pointer">
-        <!--text-->
-        <div class="hidden md:block group-hover:text-grey-500">0x7099…79C8</div>
-        <!--image-->
-        <div>
-          <ArrowBottomIcon class="icon-small" />
-        </div>
-        <!--arrow-->
-        <div>
-          <img class="icon-small" src="http://placekitten.com/64" />
-        </div>
-      </div>
-
-      <!-- menu-->
-      <div class="absolute hidden right-2 md:right-20 group-hover:block" style="z-index: 9999">
-        <div
-          class="border border-grey-400 p-6 pr-10 bg-white text-grey-400 flex flex-col gap-y-2 uppercase font-medium"
-        >
-          <div>0xff…ffff</div>
-          <div>1337 ETH</div>
-          <div class="border-b border-grey-400 my-4"></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">profile</div>
-          <div class="cursor-pointer hover:text-grey-500 flex">favorites<span class="pl-4 ml-auto">32</span></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">my grants<span class="pl-4 ml-auto">32</span></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">settings</div>
-          <div class="border-b border-grey-400 my-4 flex"></div>
-          <div class="cursor-pointer hover:text-grey-500 flex">change wallet</div>
-          <div class="cursor-pointer hover:text-grey-500 flex">disconnect wallet</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- web3: not connected : show this-->
-    <div class="flex items-center h-14 gap-x-2 group cursor-pointer">
-      <!--text-->
-      <div class="hidden md:block group-hover:text-grey-500">Connect</div>
-      <!--image-->
-      <div>
-        <ConnectWalletIcon class="icon" />
-      </div>
-    </div>
-  </nav>
-
-  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-
-  <!--
 * 
 *
 --></template>
@@ -501,22 +333,17 @@ import ActionsNav from 'src/components/ActionsNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import CartItem from 'src/components/CartItem.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
+import InputRow from 'src/components/InputRow.vue';
 
 //all the icons i use
-import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
+
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
-import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
-import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
-import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
 
 export default defineComponent({
   name: 'Ui',
   components: {
-    ArrowBottomIcon,
-    CartIcon,
-    ConnectWalletIcon,
     CollectionIcon,
-    XIcon,
+
     BaseHeader,
     BaseFilterNav,
     BaseTitle,
@@ -526,11 +353,7 @@ export default defineComponent({
     ContributionRow,
     CartItem,
     GrantDetailsRow,
-  },
-  data() {
-    return {
-      toggle: false,
-    };
+    InputRow,
   },
 });
 </script>
