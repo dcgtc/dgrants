@@ -10,7 +10,8 @@
       Metadata URL: <a class="link" :href="grant.metaPtr" target="_blank">{{ grant.metaPtr }}</a>
     </p>
 
-    <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-primary">Edit Grant</button>
+    <button @click="addToCart(grant)" class="mt-5 btn btn-primary">Add to Cart</button>
+    <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
   </div>
 
   <!-- Editing grant -->
@@ -88,7 +89,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract, ContractTransaction } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl } from 'src/utils/utils';
+import { addToCart, isValidAddress, isValidUrl } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
 
@@ -169,7 +170,7 @@ export default defineComponent({
   name: 'GrantRegistryGrantDetail',
   components: { BaseInput },
   setup() {
-    return { ...useGrantDetail() };
+    return { ...useGrantDetail(), addToCart };
   },
 });
 </script>
