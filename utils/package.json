@@ -1,0 +1,24 @@
+{
+  "name": "@dgrants/utils",
+  "version": "0.0.1",
+  "description": "utils package used between dgrants package",
+  "keywords": [
+    "dgrants",
+    "utils"
+  ],
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "echo 'TODO'",
+    "test": "echo 'TODO'",
+    "lint": "eslint --ext .ts,.js,.vue .",
+    "precommit": "lint-staged",
+    "prettier": "prettier --write ."
+  },
+  "volta": {
+    "extends": "../package.json"
+  },
+  "dependencies": {
+    "ethereumjs-util": "^7.1.0",
+    "ethers": "^5.4.4"
+  }
+}
