@@ -1,4 +1,4 @@
-// code sourced from: https://github.com/Uniswap/merkle-distributor/blob/master/src/balance-tree.ts
+// code sourced from: https://github.com/Uniswap/merkle-distributor/blob/b986f50809b14dda0dd5b2390ba3791df2218313/src/balance-tree.ts
 import MerkleTree from './merkle-tree'
 import { BigNumber, utils } from 'ethers'
 

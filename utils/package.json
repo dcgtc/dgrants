@@ -1,7 +1,7 @@
 {
   "name": "@dgrants/utils",
   "version": "0.0.1",
-  "description": "utils package used between dgrants package",
+  "description": "common methods shared",
   "keywords": [
     "dgrants",
     "utils"
