@@ -3,7 +3,6 @@ pragma solidity ^0.8.5;
 
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
-import "@openzeppelin/contracts/utils/Multicall.sol";
 
 /**
  * @notice The GrantRoundPayout contract eligble grant owners to claim their
@@ -15,8 +14,14 @@ import "@openzeppelin/contracts/utils/Multicall.sol";
  *  - funds transferred from GrantRound contract
  *  - merkle root which contains how the funds are segrated and who can claim them
  *  - emit Claimed event when grant owner has claimed funds
+ *
+ * @dev code sourced from https://github.com/Uniswap/merkle-distributor/blob/master/contracts/MerkleDistributor.sol
+ * Changes made:
+ *  - does not implement interface IMerkleDistributor
+ *  - account renamed to payee
+ *  - claim function allows multiple claims
  */
-contract GrantRoundPayout is Multicall {
+contract GrantRoundPayout {
   using SafeERC20 for IERC20;
 
   // --- Data ---
@@ -28,6 +33,14 @@ contract GrantRoundPayout is Multicall {
 
   /// @notice packed array of booleans to keep track of claims
   mapping(uint256 => uint256) private claimedBitMap;
+
+  /// --- Types ---
+  struct Claim {
+    uint256 index; // index in claimedBitmao
+    address payee; // address to which the funds are sent
+    uint256 amount; // amount to be claimed
+    bytes32[] merkleProof; // generated merkle proof
+  }
 
   // --- Event ---
   /// @notice Emitted when claim succeeds
@@ -66,30 +79,29 @@ contract GrantRoundPayout is Multicall {
 
   /**
    * @notice Claims token to given address and updates claimedBitMap
-   * @dev Reverts if inputs are invalid
-   * @param _index index in claimedBitmao
-   * @param _payee address to which the funds are sent
-   * @param _amount amount to be claimed
-   * @param _merkleProof // TODO
+   * @dev Reverts a claim if inputs are invalid
+   * @param _claims Array of Claim
    */
-  function claim(
-    uint256 _index,
-    address _payee,
-    uint256 _amount,
-    bytes32[] calldata _merkleProof
-  ) external {
-    // check if payee has not claimed funds
-    require(!hasClaimed(_index), "GrantRoundPayout: Funds already claimed");
+  function claim(Claim[] calldata _claims) external {
+    for (uint256 i = 0; i < _claims.length; i++) {
+      uint256 _index = _claims[i].index;
+      address _payee = _claims[i].payee;
+      uint256 _amount = _claims[i].amount;
+      bytes32[] calldata _merkleProof = _claims[i].merkleProof;
 
-    // verify the merkle proof
-    bytes32 node = keccak256(abi.encodePacked(_index, _payee, _amount));
-    require(MerkleProof.verify(_merkleProof, merkleRoot, node), "GrantRoundPayout: Invalid proof.");
+      // check if payee has not claimed funds
+      require(!hasClaimed(_index), "GrantRoundPayout: Funds already claimed");
 
-    // mark as claimed and transfer
-    _setClaimed(_index);
-    token.safeTransfer(_payee, _amount);
+      // verify the merkle proof
+      bytes32 node = keccak256(abi.encodePacked(_index, _payee, _amount));
+      require(MerkleProof.verify(_merkleProof, merkleRoot, node), "GrantRoundPayout: Invalid proof.");
 
-    // emit event
-    emit Claimed(_index, _payee, _amount);
+      // mark as claimed and transfer
+      _setClaimed(_index);
+      token.safeTransfer(_payee, _amount);
+
+      // emit event
+      emit Claimed(_index, _payee, _amount);
+    }
   }
 }
