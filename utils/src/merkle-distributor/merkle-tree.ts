@@ -1,4 +1,4 @@
-// code sourced from: https://github.com/Uniswap/merkle-distributor/blob/master/src/merkle-tree.ts
+// code sourced from: https://github.com/Uniswap/merkle-distributor/blob/b986f50809b14dda0dd5b2390ba3791df2218313/src/merkle-tree.ts
 import { bufferToHex, keccak256 } from 'ethereumjs-util'
 
 export default class MerkleTree {

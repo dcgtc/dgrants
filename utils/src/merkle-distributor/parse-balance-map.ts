@@ -1,5 +1,5 @@
 /**
- * code sourced from: https://github.com/Uniswap/merkle-distributor/blob/master/src/parse-balance-map.ts
+ * code sourced from: https://github.com/Uniswap/merkle-distributor/blob/b986f50809b14dda0dd5b2390ba3791df2218313/src/parse-balance-map.ts
  * 
  * changes made:
  * - type OldFormat is exported

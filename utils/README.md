@@ -2,11 +2,6 @@
 
 This package exposes util functions which would be shared between the dgrants package
 
-- `contract`
-- `app`
-- `dcurve`
-
-
 ## Structure
 
 ```
