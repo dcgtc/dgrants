@@ -3,29 +3,15 @@
  */
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
-import { BigNumber, isAddress } from 'src/utils/ethers';
+import { BigNumber, isAddress, parseUnits } from 'src/utils/ethers';
 import { BigNumberish, Contract, ContractTransaction } from 'ethers';
-import { GrantRound } from '@dgrants/types';
+import { Grant, GrantRound } from '@dgrants/types';
 
+// --- Formatters ---
 // Returns an address with the following format: 0x1234...abcd
 export function formatAddress(address: string) {
   if (!address || address.length !== 42) return null;
   return `${address.slice(0, 6)}...${address.slice(38)}`;
-}
-
-// Navigates to the specified page and pushes a new entry into the history stack
-export async function pushRoute(to: RouteLocationRaw) {
-  await router.push(to);
-}
-
-// Returns true if the provided URL is a valid URL
-export function isValidUrl(val: string | undefined) {
-  return val && val.includes('://'); // TODO more robust URL validation
-}
-
-// Returns true if the provided address is valid (TODO support ENS)
-export function isValidAddress(val: string | undefined) {
-  return val && isAddress(val);
 }
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is
@@ -44,6 +30,71 @@ export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
 }
 
+// --- Validation ---
+// Returns true if the provided URL is a valid URL
+export function isValidUrl(val: string | undefined) {
+  return val && val.includes('://'); // TODO more robust URL validation
+}
+
+// Returns true if the provided address is valid (TODO support ENS)
+export function isValidAddress(val: string | undefined) {
+  return val && isAddress(val);
+}
+
+// --- Grants + Cart ---
+const CART_KEY = 'cart';
+const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
+const DEFAULT_CONTRIBUTION_AMOUNT = parseUnits('5', 18).toString(); // DAI has 18 decimals
+type CartItem = {
+  grantId: string;
+  contributionTokenAddress: string; // store address instead of TokenInfo to reduce localStorage size used
+  contributionAmount: string;
+};
+
+// Loads cart data
+export function loadCart(): CartItem[] {
+  // Return empty array if nothing found
+  const rawCart = localStorage.getItem(CART_KEY);
+  if (!rawCart) return [];
+
+  // Parse the data. If the data is an array, return it,
+  const cart = JSON.parse(rawCart);
+  if (Array.isArray(cart)) return cart;
+
+  // Otherwise clear the localStorage key and return empty array
+  localStorage.removeItem(CART_KEY);
+  return [];
+}
+
+// Adds a grant to the cart
+export function addToCart(grant: Grant) {
+  // If this grant is already in the cart, do nothing
+  const cart = loadCart();
+  if (cart.map((grant) => grant.grantId).includes(grant.id.toString())) return;
+
+  // Otherwise, add it to the cart and update localStorage
+  cart.push({
+    grantId: grant.id.toString(),
+    contributionTokenAddress: DEFAULT_CONTRIBUTION_TOKEN_ADDRESS,
+    contributionAmount: DEFAULT_CONTRIBUTION_AMOUNT,
+  });
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
+// Removes a grant from the cart
+export function removeFromCart(grantId: BigNumberish) {
+  const cart = loadCart();
+  const newCart = cart.filter((grant) => grant.grantId !== BigNumber.from(grantId).toString());
+  localStorage.setItem(CART_KEY, JSON.stringify(newCart));
+}
+
+// Check against the grantRounds status for a match
+export function hasStatus(status: string) {
+  // returns a fn (currying the given status)
+  return (round: GrantRound) => round.status === status;
+}
+
+// --- Tokens ---
 // Check for approved allowance
 export async function checkAllowance(token: Contract, ownerAddress: string | undefined, spenderAddress: string) {
   // return the balance held for userAddress
@@ -58,8 +109,8 @@ export async function getApproval(token: Contract, address: string, amount: BigN
   await tx.wait();
 }
 
-// Check against the grantRounds status for a match
-export function hasStatus(status: string) {
-  // returns a fn (currying the given status)
-  return (round: GrantRound) => round.status === status;
+// --- Other ---
+// Navigates to the specified page and pushes a new entry into the history stack
+export async function pushRoute(to: RouteLocationRaw) {
+  await router.push(to);
 }
