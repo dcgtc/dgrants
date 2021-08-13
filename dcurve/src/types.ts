@@ -10,13 +10,13 @@
  * @field {ignore.grants} *optional* grants to be ignored
  */
 export type GrantRoundFetchArgs = {
-  grantRegistry: string,
-  grantRound: string,
+  grantRegistry: string;
+  grantRound: string;
   ignore?: {
-    contributionAddress?: string[]
-    grants?: number[]
-  }
-}
+    contributionAddress?: string[];
+    grants?: number[];
+  };
+};
 
 /**
  * Object for an individual Contribution
@@ -27,10 +27,10 @@ export type GrantRoundFetchArgs = {
  * @field {amount} contribution amount
  */
 export type Contribution = {
-  grantId: number,
-  address: string,
-  amount: number
-}
+  grantId: number;
+  address: string;
+  amount: number;
+};
 
 /**
  * Response object returned by fetch
@@ -41,11 +41,10 @@ export type Contribution = {
  * @field {[contributions]} contributions in that round
  */
 export type GrantRoundContributions = {
-  grantRound: string,
-  totalPot: number,
-  contributions: Contribution[]
-}
-
+  grantRound: string;
+  totalPot: number;
+  contributions: Contribution[];
+};
 
 // --------- PREDICTION
 
@@ -56,31 +55,31 @@ export type GrantPredictionArgs = {
 };
 
 /**
-* The new match amount for a grant if it were to recieve an anon contribution
-* of value predicted_amount
-*
-* @type GrantPrediction
-* @field {predictionPoint} if grant were to recieve an anon contribution
-* @field {predictedGrantMatch} new match after adding predicted_amount
-* @field {predictionDiff} difference between predicted_match and predicted_amount
-*/
+ * The new match amount for a grant if it were to recieve an anon contribution
+ * of value predicted_amount
+ *
+ * @type GrantPrediction
+ * @field {predictionPoint} if grant were to recieve an anon contribution
+ * @field {predictedGrantMatch} new match after adding predicted_amount
+ * @field {predictionDiff} difference between predicted_match and predicted_amount
+ */
 export type GrantPrediction = {
   predictionPoint: number;
   predictedGrantMatch: number;
   predictionDiff: number;
-}
+};
 
 /**
-* Object containing an array of GrantPrediction
-*
-* @type GrantPredictions
-* @field {grantId} grant identifier
-* @field {[GrantPrediction]} list of GrantPrediction
-*/
+ * Object containing an array of GrantPrediction
+ *
+ * @type GrantPredictions
+ * @field {grantId} grant identifier
+ * @field {[GrantPrediction]} list of GrantPrediction
+ */
 export type GrantPredictions = {
-  grantId: number,
-  predictions: GrantPrediction[]
-}
+  grantId: number;
+  predictions: GrantPrediction[];
+};
 
 // --------- CALCULATE
 
@@ -91,23 +90,22 @@ export type GrantPredictions = {
  * @field {address} grant payout address
  * @field {match} match amount
  */
- export type GrantMatch = {
+export type GrantMatch = {
   grantId: number;
   address: string;
   match: number;
-}
-
+};
 
 /**
-* Grants match distribution
-* @type GrantMatch
-* @field {distribution} the distribution
-* @field {hasSaturated} flag to signify round is saturated
-* @field {hash} has of thr distribution
-*/
+ * Grants match distribution
+ * @type GrantMatch
+ * @field {distribution} the distribution
+ * @field {hasSaturated} flag to signify round is saturated
+ * @field {hash} has of thr distribution
+ */
 export type GrantsDistribution = {
   distribution: GrantMatch[];
-  hasSaturated: Boolean;
+  hasSaturated: boolean;
   hash?: string;
 };
 

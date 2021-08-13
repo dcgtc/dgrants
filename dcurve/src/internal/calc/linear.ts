@@ -1,11 +1,10 @@
-import { CLRArgs, GrantMatch, GrantRoundContributions, GrantsDistribution, Contribution } from "src/types";
+import { CLRArgs, GrantMatch, GrantRoundContributions, GrantsDistribution, Contribution } from 'src/types';
 
 /**
  * Holds the logic to determine the distribution using linear QF formula
  * @param clrArgs
  */
 export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
-
   // define local variables
   const matchCap = Number(clrArgs.matchCap);
   const grantRoundContributions: GrantRoundContributions = clrArgs.contributions;
@@ -17,11 +16,10 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
   let sumOfContrib = 0;
   let totalMatch = 0;
   let hasSaturated = false;
-  let distribution: any = [];
+  let distribution: GrantMatch[] = [];
 
   // calculate sum of sqrt of contributions and contributions
-  contributions.forEach(contribution => {
-
+  contributions.forEach((contribution) => {
     // TODO: ADD TRUST BONUS SCORE
 
     // sum of square root of contributions
@@ -31,10 +29,10 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
     sumOfContrib += contribution.amount;
 
     const match = Math.pow(sumOfSqrtContrib, 2) - sumOfContrib;
-    let grantMatch: GrantMatch = {
+    const grantMatch: GrantMatch = {
       grantId: contribution.grantId,
       address: contribution.address,
-      match: match
+      match: match,
     };
 
     // generate the distribution without normalizing
@@ -58,8 +56,7 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
    *  - hasSaturated is true
    *  - match of a grant exceeds set cap
    */
-   distribution.forEach((grantMatch: GrantMatch) => {
-
+  distribution.forEach((grantMatch: GrantMatch) => {
     if (hasSaturated) {
       // normalize match if round has saturated
       grantMatch.match = (grantMatch.match * totalPot) / totalMatch;
@@ -73,8 +70,8 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
 
   const grantDistribution: GrantsDistribution = {
     distribution: distribution,
-    hasSaturated: hasSaturated
-  }
+    hasSaturated: hasSaturated,
+  };
 
   return grantDistribution;
-}
+};
