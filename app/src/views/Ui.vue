@@ -4,6 +4,15 @@
 * and need to get props / data logic.
 -->
 
+  <!--
+<jazzicon :seed="10211" :diameter="100" :colors="['#02E2AC','#757087']" />
+-->
+
+  <!--
+*
+*
+-->
+
   <div class="bg-pink">BaseHeader</div>
   <BaseHeader />
 
@@ -71,6 +80,30 @@
     "
   >
     <GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard />
+  </section>
+
+  <!--
+*
+*
+-->
+
+  <div class="bg-pink">RoundCard ( in a Grid )</div>
+  <section
+    class="
+      px-4
+      md:px-12
+      py-12
+      pb-24
+      grid
+      gap-x-12 gap-y-12
+      grid-cols-1
+      md:grid-cols-2
+      lg:grid-cols-3
+      xl:grid-cols-4
+      border-b border-grey-100
+    "
+  >
+    <RoundCard /><RoundCard /><RoundCard /><RoundCard />
   </section>
 
   <!--
@@ -331,12 +364,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-// bigger components
+
+//components
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import BaseTitle from 'src/components/BaseTitle.vue';
 import BaseTabs from 'src/components/BaseTabs.vue';
 import GrantCard from 'src/components/GrantCard.vue';
+import RoundCard from 'src/components/RoundCard.vue';
 import ActionsNav from 'src/components/ActionsNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import CartItem from 'src/components/CartItem.vue';
@@ -344,8 +379,7 @@ import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 
-//all the icons i use
-
+// icons
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
@@ -358,6 +392,7 @@ export default defineComponent({
     BaseTitle,
     BaseTabs,
     GrantCard,
+    RoundCard,
     ActionsNav,
     ContributionRow,
     CartItem,
@@ -370,12 +405,9 @@ export default defineComponent({
 
 <!----- toto : 
 
-- input item for simple toggle
-- round card
-- round detail view top part
 - spread x eth to y grants banner thingy
 - links list for grants and rounds
-- about modal
+- about modal 
 - jazzicon images
 
 -->

@@ -37,9 +37,12 @@
 
           <div class="border-b border-grey-400 my-4"></div>
 
+          <!-- 
           <router-link to="about" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
             >about</router-link
           >
+          -->
+          <div @click="$emit('toggle-about')" class="cursor-pointer hover:text-grey-500">About</div>
 
           <router-link to="ui" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
             >ui</router-link
