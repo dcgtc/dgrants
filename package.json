@@ -5,7 +5,8 @@
   "workspaces": [
     "app",
     "contracts",
-    "types"
+    "types",
+    "utils"
   ],
   "devDependencies": {
     "concurrently": "^6.2.0",
