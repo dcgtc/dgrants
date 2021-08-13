@@ -3,7 +3,7 @@ import { artifacts, ethers, waffle } from 'hardhat';
 import { deployMockContract, MockContract } from 'ethereum-waffle';
 
 // --- Our imports ---
-import { GrantRoundPayout } from '../typechain/GrantRoundPayout';
+import { MerkleGrantRoundPayout } from '../typechain/MerkleGrantRoundPayout';
 import { expect } from 'chai';
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { Artifact } from 'hardhat/types';
@@ -16,10 +16,10 @@ const { isAddress } = ethers.utils;
 
 const ZERO_BYTES32 = '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-describe('GrantRoundPayout', function () {
+describe('MerkleGrantRoundPayout', function () {
   let user: SignerWithAddress;
   let mockToken: MockContract;
-  let payout: GrantRoundPayout;
+  let payout: MerkleGrantRoundPayout;
 
   before(async () => {
     [user] = await ethers.getSigners();
@@ -29,14 +29,14 @@ describe('GrantRoundPayout', function () {
     await mockToken.mock.totalSupply.returns('0');
 
     // Deploy PayoutContract
-    const payoutArtifact: Artifact = await artifacts.readArtifact('GrantRoundPayout');
-    payout = <GrantRoundPayout>await deployContract(user, payoutArtifact, [tokens.gtc.address, ZERO_BYTES32]);
+    const payoutArtifact: Artifact = await artifacts.readArtifact('MerkleGrantRoundPayout');
+    payout = <MerkleGrantRoundPayout>await deployContract(user, payoutArtifact, [tokens.gtc.address, ZERO_BYTES32]);
   });
 
   describe('constructor', () => {
     it('deploys properly', async function () {
       // Verify deploy
-      expect(isAddress(payout.address), 'Failed to deploy GrantRoundPayout').to.be.true;
+      expect(isAddress(payout.address), 'Failed to deploy MerkleGrantRoundPayout').to.be.true;
 
       // Verify constructor parameters
       expect(await payout.token()).to.equal(tokens.gtc.address);
@@ -44,7 +44,7 @@ describe('GrantRoundPayout', function () {
     });
 
     // it('reverts when deploying with an invalid token', async () => {
-    //   const payoutArtifact: Artifact = await artifacts.readArtifact('GrantRoundPayout');
+    //   const payoutArtifact: Artifact = await artifacts.readArtifact('MerkleGrantRoundPayout');
     //   await expect(
     //     deployContract(user, payoutArtifact, [randomAddress(), ZERO_BYTES32])
     //   ).to.be.revertedWith('function call to a non-contract account');
