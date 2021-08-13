@@ -1,7 +1,7 @@
 <template>
   <div
     :class="[showAbout ? 'flex' : 'hidden']"
-    class="h-screen fixed"
+    class="h-screen fixed w-full"
     style="z-index: 10000; background-color: #ffffffdd"
   >
     <div class="px-4 md:px-12 m-auto bg-white">
@@ -33,8 +33,16 @@
           >, <span><a href="#">Name</a></span
           >, <span><a href="#">Name</a></span
           >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
+          >, <span><a href="#">Name</a></span
           >,
-          <span><a href="#">Name</a></span>
         </div>
 
         <!-- donate -->
