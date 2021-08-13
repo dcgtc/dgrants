@@ -62,12 +62,12 @@
               hover:bg-grey-400
             "
           >
-            <span>donate to the workstream</span>
+            <span>donate to <span class="text-teal">d</span>grants</span>
           </button>
         </div>
 
         <!-- nav bar -->
-        <div class="mt-16 mb-8 flex gap-x-8">
+        <div class="mt-16 mb-8 block md:flex gap-x-8">
           <div><a href="">Licensed under xyz license</a></div>
           <div><a href="">Github</a></div>
           <div class="ml-auto"><a href="">Help & Support</a></div>
