@@ -12,6 +12,14 @@
 *
 -->
 
+  <div class="bg-pink">ActionsNav</div>
+  <ActionsNav />
+
+  <!--
+*
+*
+-->
+
   <div class="bg-pink">BaseFilterNav</div>
   <BaseFilterNav />
 
@@ -62,14 +70,6 @@
 *
 -->
 
-  <div class="bg-pink">ActionsNav</div>
-  <ActionsNav />
-
-  <!--
-*
-*
--->
-
   <div class="bg-pink">ContributionRow</div>
   <ContributionRow />
 
@@ -88,6 +88,14 @@
 
   <div class="bg-pink">GrantDetailsRow</div>
   <GrantDetailsRow />
+
+  <!--
+*
+*
+-->
+
+  <div class="bg-pink">RoundDetailsRow</div>
+  <RoundDetailsRow />
 
   <!--
 * a row of LABEL + INPUT 
@@ -333,6 +341,7 @@ import ActionsNav from 'src/components/ActionsNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import CartItem from 'src/components/CartItem.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
+import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 
 //all the icons i use
@@ -353,6 +362,7 @@ export default defineComponent({
     ContributionRow,
     CartItem,
     GrantDetailsRow,
+    RoundDetailsRow,
     InputRow,
   },
 });
