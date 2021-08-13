@@ -1,5 +1,5 @@
 {
-  "packages": ["app", "contracts", "types"],
+  "packages": ["app", "contracts", "types", "utils"],
   "npmClient": "yarn",
   "version": "independent",
   "useWorkspaces": true,
