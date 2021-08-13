@@ -12,6 +12,14 @@
 *
 -->
 
+  <div class="bg-pink">CartItem</div>
+  <CartItem />
+
+  <!--
+*
+*
+-->
+
   <div class="bg-pink">ActionsNav</div>
   <ActionsNav />
 
@@ -78,14 +86,6 @@
 *
 -->
 
-  <div class="bg-pink">CartItem</div>
-  <CartItem />
-
-  <!--
-*
-*
--->
-
   <div class="bg-pink">GrantDetailsRow</div>
   <GrantDetailsRow />
 
@@ -118,7 +118,7 @@
   <InputRow :deleteable="false" :intended="false">
     <template v-slot:label>Category:</template>
     <template v-slot:input>
-      <select name="token" class="w-36">
+      <select name="token" class="">
         <option>eth</option>
         <option>dai</option>
         <option>wai</option>

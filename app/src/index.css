@@ -27,29 +27,27 @@
     @apply hover:text-grey-400;
   }
 
-  [type='text'],
-  [type='email'],
-  [type='url'],
-  [type='password'],
-  [type='number'],
-  [type='date'],
-  [type='datetime-local'],
-  [type='month'],
-  [type='search'],
-  [type='tel'],
-  [type='time'],
-  [type='week'],
+  [type="text"],
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
   [multiple],
   textarea,
   select {
-    @apply w-full p-4 border border-grey-400 hover:border-grey-500 focus:outline-none focus:border-grey-500 focus:ring-1 focus:ring-grey-500;
+    @apply w-full p-4 border border-grey-400;
+    @apply hover:border-grey-500;
+    @apply focus:outline-none focus:border-grey-500 focus:ring-0;
     font-size: 100%;
   }
-
 }
-
-
-
 
 /* Add styles to components */
 @layer components {
@@ -59,10 +57,7 @@
   .link {
     @apply text-grey-500 underline cursor-pointer;
   }
-
 }
-
-
 
 /* Add styles to utilities      */
 @layer utilities {
