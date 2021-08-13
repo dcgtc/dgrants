@@ -46,7 +46,7 @@ export default defineComponent({
   components: { ExclamationCircleIcon },
   props: {
     // --- Required props ---
-    modelValue: { type: String, required: true, default: undefined }, // from v-model, don't pass this directly
+    modelValue: { type: [String, Number], required: true, default: undefined }, // from v-model, don't pass this directly
     // --- Optional props ---
     label: { type: String, required: false, default: undefined }, // field label
     description: { type: String, required: false, default: undefined }, // field description
