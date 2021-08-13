@@ -15,10 +15,10 @@
  * Read more at https://github.com/vitejs/vite/issues/731
  */
 
+export type { BigNumberish } from 'ethers';
 export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
 export { Contract } from '@ethersproject/contracts';
-export type { BigNumberish } from 'ethers';
 export type { ContractTransaction } from '@ethersproject/contracts';
 export type { Network } from '@ethersproject/networks';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';

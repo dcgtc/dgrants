@@ -3,10 +3,9 @@
  */
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
-import { BigNumber, isAddress, parseUnits } from 'src/utils/ethers';
-import { CartItemOptions } from 'src/types';
-import { BigNumberish, Contract, ContractTransaction } from 'ethers';
-import { Grant, GrantRound } from '@dgrants/types';
+import { BigNumber, BigNumberish, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
+import { CartItem, CartItemOptions } from 'src/types';
+import { Donation, Grant, GrantRound, SwapSummary } from '@dgrants/types';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234...abcd
@@ -45,7 +44,7 @@ export function isValidAddress(val: string | undefined) {
 // --- Grants + Cart ---
 const CART_KEY = 'cart';
 const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
-const DEFAULT_CONTRIBUTION_AMOUNT = parseUnits('5', 18).toString(); // DAI has 18 decimals
+const DEFAULT_CONTRIBUTION_AMOUNT = 5; // this is converted to a parsed BigNumber at checkout
 
 // Loads cart data
 export function loadCart(): CartItemOptions[] {
@@ -93,6 +92,11 @@ export function clearCart(): CartItemOptions[] {
   return [];
 }
 
+// Sets the full cart
+export function setCart(cart: CartItemOptions[]) {
+  localStorage.setItem(CART_KEY, JSON.stringify(cart));
+}
+
 // Check against the grantRounds status for a match
 export function hasStatus(status: string) {
   // returns a fn (currying the given status)
@@ -115,6 +119,19 @@ export async function getApproval(token: Contract, address: string, amount: BigN
 }
 
 // --- Other ---
+// Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
+export function formatDonateInputs(cart: CartItem[]): { swaps: SwapSummary[]; donations: Donation[] } {
+  const swaps: SwapSummary[] = [];
+  const donations: Donation[] = [];
+
+  for (const item of cart) {
+    // TODO use helper methods from @dgrants/utils
+    item;
+  }
+
+  return { swaps, donations };
+}
+
 // Navigates to the specified page and pushes a new entry into the history stack
 export async function pushRoute(to: RouteLocationRaw) {
   await router.push(to);
