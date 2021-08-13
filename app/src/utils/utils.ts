@@ -63,11 +63,11 @@ export function loadCart(): CartItemOptions[] {
 }
 
 // Adds a grant to the cart
-export function addToCart(grant: Grant | null | undefined) {
-  if (!grant) return; // null and undefined input types are to avoid lint errors when calling this from a template
+export function addToCart(grant: Grant | null | undefined): CartItemOptions[] {
+  if (!grant) return []; // null and undefined input types are to avoid lint errors when calling this from a template
   // If this grant is already in the cart, do nothing
   const cart = loadCart();
-  if (cart.map((grant) => grant.grantId).includes(grant.id.toString())) return;
+  if (cart.map((grant) => grant.grantId).includes(grant.id.toString())) return cart;
 
   // Otherwise, add it to the cart and update localStorage
   cart.push({
@@ -76,13 +76,21 @@ export function addToCart(grant: Grant | null | undefined) {
     contributionAmount: DEFAULT_CONTRIBUTION_AMOUNT,
   });
   localStorage.setItem(CART_KEY, JSON.stringify(cart));
+  return cart;
 }
 
 // Removes a grant from the cart
-export function removeFromCart(grantId: BigNumberish) {
+export function removeFromCart(grantId: BigNumberish): CartItemOptions[] {
   const cart = loadCart();
   const newCart = cart.filter((grant) => grant.grantId !== BigNumber.from(grantId).toString());
   localStorage.setItem(CART_KEY, JSON.stringify(newCart));
+  return newCart;
+}
+
+// Clears the cart
+export function clearCart(): CartItemOptions[] {
+  localStorage.removeItem(CART_KEY);
+  return [];
 }
 
 // Check against the grantRounds status for a match
