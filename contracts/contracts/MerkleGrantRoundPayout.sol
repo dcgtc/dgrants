@@ -5,23 +5,25 @@ import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 /**
- * @notice The MerkleGrantRoundPayout contract eligble grant owners to claim their
- * match after round ends and funds have been loaded into the contract
- * It allows grant owners to claim their funds in the given ERC20
- * token upon verif merkleRoot
+ * @notice The `MerkleGrantRoundPayout` contract enables eligible grant owners to claim their
+ * match after round ends and funds have been loaded into this contract. They claim their
+ * funds in the given `ERC20` token by providing a merkleProof.
  *
- * This contract does the following
- *  - funds transferred from GrantRound contract
- *  - merkle root which contains how the funds are segrated and who can claim them
- *  - emit Claimed event when grant owner has claimed funds
+ * This contract is intended to work as follows:
+ *  - When a `GrantRound` is complete, compute the match payouts for that round
+ *  - Generate a Merkle tree of the match payout results
+ *  - Deploy an instance of this contract with the associated Merkle root
+ *  - Transfer match funds from the `GrantRound` contract to this contract
+ *  - Users eligible for match payouts can use the `claim` or `batchClaim` method to claim their funds
  *
  * @dev code sourced from https://github.com/Uniswap/merkle-distributor/blob/0d478d722da2e5d95b7292fd8cbdb363d98e9a93/contracts/MerkleDistributor.sol
  * Changes made:
- *  - does not implement interface IMerkleDistributor
- *  - account renamed to payee
- *  - claim function accepts argument Claim
- *  - claim function is public to enable batchClaims
- *  - addd function batchClaim function allows multiple claims
+ *  - `isClaimed` renamed to `hasClaimed`
+ *  - `account` renamed to `payee`
+ *  - does not implement interface `IMerkleDistributor`
+ *  - claim function accepts argument `Claim`
+ *  - claim function is public to enable `batchClaims`
+ *  - add `batchClaim` function to allow multiple claims in a single transaction
  */
 contract MerkleGrantRoundPayout {
   using SafeERC20 for IERC20;
@@ -91,7 +93,7 @@ contract MerkleGrantRoundPayout {
     bytes32[] calldata _merkleProof = _claim.merkleProof;
 
     // check if payee has not claimed funds
-    require(!hasClaimed(_index), "MerkleGrantRoundPayout: Funds already claimed");
+    require(!hasClaimed(_index), "MerkleGrantRoundPayout: Funds already claimed.");
 
     // verify the merkle proof
     bytes32 node = keccak256(abi.encodePacked(_index, _payee, _amount));
