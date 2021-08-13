@@ -2,7 +2,7 @@
 import MerkleTree from './merkle-tree';
 import { BigNumber, utils } from 'ethers';
 
-export default class BalanceTree {
+export class BalanceTree {
   private readonly tree: MerkleTree;
   constructor(balances: { account: string; amount: BigNumber }[]) {
     this.tree = new MerkleTree(
