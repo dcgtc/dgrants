@@ -20,7 +20,7 @@ This can intended to be used
 |   ├── index.ts                # What client imports
 │   ├── internal
 │       ├── calc                # Contains impls of CLR algorithm
-│       ├── merkle-distributor  # Contains impls to generate merkle-root and verify
+│       ├── merkle-root         # Generates merkle root from distribution
 |       ├── fetch.ts            # fetch information from chain
 |       ├── main.ts             # orchestrator
 └── ...

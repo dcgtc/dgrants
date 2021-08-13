@@ -1,12 +1,18 @@
 'use strict';
 
-import { GrantPrediction, GrantPredictionArgs, GrantPredictions, GrantRoundContributions, GrantsDistribution } from 'src/types';
-import { generateMerkleRoot } from './merkle-distributor';
+import {
+  GrantPrediction,
+  GrantPredictionArgs,
+  GrantPredictions,
+  GrantRoundContributions,
+  GrantsDistribution,
+} from 'src/types';
+import { generateMerkleRoot } from './merkle-root';
 import { addAnonContribution, getGrantMatch } from './utils';
 
 type InitArgs = {
-  calcAlgo: Function
-}
+  calcAlgo: Function;
+};
 
 export class CLR {
   _options: InitArgs;
@@ -19,9 +25,8 @@ export class CLR {
     const calcAlgo = this._options['calcAlgo'];
 
     // calculate distribution based on contributions
-    const distribution: GrantsDistribution = calcAlgo(
-      // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
-    );
+    const distribution: GrantsDistribution = calcAlgo();
+    // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
 
     // generate the hash on the distribution based on selected hashAlgo
     distribution.hash = generateMerkleRoot(distribution.distribution);
@@ -39,45 +44,41 @@ export class CLR {
   predict(args: GrantPredictionArgs): GrantPredictions {
     const calcAlgo = this._options['calcAlgo'];
 
-    const grantId: number = args.grantId
+    const grantId: number = args.grantId;
     const predictionPoints: number[] = args.predictionPoints;
     const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
 
     // calculate distribution based on current contribution
-    const distribution: GrantsDistribution = calcAlgo(
-      // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
-    );
+    const distribution: GrantsDistribution = calcAlgo();
+    // TODO: invoke calcAlgo with CLRArgs object and grantRoundContributions
     const currentGrantMatch = getGrantMatch(grantId, distribution);
 
-    let predictions: GrantPrediction[] = [];
+    const predictions: GrantPrediction[] = [];
 
     // calculate predicted distribution for each predictionPoint
-    predictionPoints.forEach(predictionPoint => {
-
+    predictionPoints.forEach((predictionPoint) => {
       // add anon contribution of value predictionPoint
-      let newGrantRoundContributions = addAnonContribution(grantId, grantRoundContributions, predictionPoint);
+      const newGrantRoundContributions = addAnonContribution(grantId, grantRoundContributions, predictionPoint);
 
       // calculate distribution with anon contribution
-      const newDistribution: GrantsDistribution = calcAlgo(
-        // TODO: invoke calcAlgo with CLRArgs object and newGrantRoundContributions
-      );
+      const newDistribution: GrantsDistribution = calcAlgo();
+      // TODO: invoke calcAlgo with CLRArgs object and newGrantRoundContributions
 
       const predictedGrantMatch = getGrantMatch(grantId, newDistribution);
 
       const prediction: GrantPrediction = {
         predictionPoint: predictionPoint,
         predictedGrantMatch: predictedGrantMatch,
-        predictionDiff: predictedGrantMatch - currentGrantMatch
-      }
+        predictionDiff: predictedGrantMatch - currentGrantMatch,
+      };
 
       predictions.push(prediction);
-
     });
 
     const grantPredictions: GrantPredictions = {
       grantId: grantId,
-      predictions: predictions
-    }
+      predictions: predictions,
+    };
 
     return grantPredictions;
   }
