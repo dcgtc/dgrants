@@ -10,6 +10,12 @@ export type GrantObject = {
   payee: string;
   metaPtr: string;
 };
+export type GrantMetadata = {
+  name: string;
+  description: string;
+};
+export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
+export type GrantMetadataResolution = Partial<GrantMetadata> & { status: GrantMetadataStatus };
 export type GrantArray = [BigNumber, string, string, string];
 export type GrantEthers = GrantArray & GrantObject;
 export type Grant = GrantObject | GrantEthers;
