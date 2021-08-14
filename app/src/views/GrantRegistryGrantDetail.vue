@@ -1,14 +1,11 @@
 <template>
   <!-- Grant details -->
   <div v-if="!isEditing && grant">
-    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">
-      Details for Grant ID {{ grant.id.toString() }}
-    </h1>
+    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Grant Details</h1>
+    <p>Name: {{ grantMetadata?.name }}</p>
+    <p>Description: {{ grantMetadata?.description }}</p>
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
-    <p>
-      Metadata URL: <a class="link" :href="grant.metaPtr" target="_blank">{{ grant.metaPtr }}</a>
-    </p>
 
     <button
       v-if="isInCart(grant.id)"
@@ -106,7 +103,7 @@ import { GrantRegistry } from '@dgrants/contracts';
 import { Grant } from '@dgrants/types';
 
 function useGrantDetail() {
-  const { grants, poll } = useDataStore();
+  const { grants, poll, grantMetadata: metadata } = useDataStore();
   const { signer, userAddress } = useWalletStore();
 
   const route = useRoute();
@@ -115,6 +112,7 @@ function useGrantDetail() {
     if (!grants.value || Array.isArray(id)) return null; // array type unsupported
     return grants.value[Number(id)];
   });
+  const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
 
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
@@ -175,7 +173,18 @@ function useGrantDetail() {
     cancelEdits(); // reset form ref and toggle page state back to display mode
   }
 
-  return { cancelEdits, form, grant, isEditing, isFormValid, isOwner, isValidAddress, isValidUrl, saveEdits };
+  return {
+    isEditing,
+    isOwner,
+    isValidAddress,
+    isValidUrl,
+    isFormValid,
+    grant,
+    grantMetadata,
+    form,
+    cancelEdits,
+    saveEdits,
+  };
 }
 
 export default defineComponent({

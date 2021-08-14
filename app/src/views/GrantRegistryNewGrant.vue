@@ -38,7 +38,7 @@
             description="Your grant's name"
             id="grant-name"
             label="Grant name"
-            :rules="!isEmpty"
+            :rules="isDefined"
             errorMsg="Please enter a name"
           />
 
@@ -48,7 +48,7 @@
             description="Your grant's description"
             id="grant-description"
             label="Grant description"
-            :rules="!isEmpty"
+            :rules="isDefined"
             errorMsg="Please enter a description"
           />
 
@@ -76,7 +76,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl, isEmpty, pushRoute } from 'src/utils/utils';
+import { isValidAddress, isValidUrl, isDefined, pushRoute } from 'src/utils/utils';
 import * as ipfs from 'src/utils/ipfs';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
@@ -94,7 +94,10 @@ function useNewGrant() {
   });
   const isFormValid = computed(
     () =>
-      isValidAddress(form.value.owner) && isValidAddress(form.value.payee) && form.value.name && form.value.description
+      isValidAddress(form.value.owner) &&
+      isValidAddress(form.value.payee) &&
+      isDefined(form.value.name) &&
+      isDefined(form.value.description)
   );
 
   /**
@@ -120,7 +123,7 @@ function useNewGrant() {
     await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
-  return { createGrant, isValidAddress, isValidUrl, isFormValid, isEmpty, form };
+  return { createGrant, isValidAddress, isValidUrl, isFormValid, isDefined, form };
 }
 
 export default defineComponent({

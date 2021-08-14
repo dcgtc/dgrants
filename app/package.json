@@ -24,7 +24,6 @@
     "bnc-onboard": "~1.30.0",
     "browserify-zlib": "^0.2.0",
     "crypto-browserify": "^3.12.0",
-    "dotenv": "^10.0.0",
     "ethers": "^5.3.1",
     "https-browserify": "^1.0.0",
     "ipfs-http-client": "^51.0.1",
