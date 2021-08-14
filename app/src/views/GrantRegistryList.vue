@@ -32,9 +32,11 @@
           <div class="w-full flex items-center justify-between p-6 space-x-6 hover:border">
             <div class="flex-1 truncate text-left">
               <div class="flex items-center space-x-3">
-                <h3 class="text-gray-900 text-sm font-medium truncate">Grant ID: {{ grant.id.toString() }}</h3>
+                <h3 class="text-gray-900 text-sm font-medium truncate">
+                  Grant Name: {{ grantMetadata[grant.metaPtr].name }}
+                </h3>
               </div>
-              <p class="mt-1 text-gray-500 text-sm truncate">{{ grant.metaPtr }}</p>
+              <p class="mt-1 text-gray-500 text-sm truncate">{{ grantMetadata[grant.metaPtr].description }}</p>
             </div>
           </div>
           <div>
@@ -88,7 +90,7 @@ import { Grant } from '@dgrants/types';
 export default defineComponent({
   name: 'GrantRegistryList',
   setup() {
-    const { grants } = useDataStore();
+    const { grants, grantMetadata } = useDataStore();
 
     // TODO refactor cart to live in a store and reference that both here and in Cart.vue instead of forceRender hack
     const forceRender = ref(0); // increment to force an update, used to react to localstorage changes
@@ -98,7 +100,7 @@ export default defineComponent({
       else if (action === 'remove') removeFromCart(grant.id);
       forceRender.value += 1;
     }
-    return { isInCart, updateCart, formatAddress, pushRoute, grants, forceRender };
+    return { isInCart, updateCart, formatAddress, pushRoute, grants, forceRender, grantMetadata };
   },
 });
 </script>

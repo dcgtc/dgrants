@@ -13,7 +13,7 @@ export function formatAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(38)}`;
 }
 
-export function isEmpty(val: unknown) {
+export function isDefined(val: unknown) {
   return !!val;
 }
 

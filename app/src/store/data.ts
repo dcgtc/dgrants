@@ -18,8 +18,9 @@ import {
   MULTICALL_ABI,
   ERC20_ABI,
 } from 'src/utils/constants';
-import { Grant, GrantRound, GrantRounds } from '@dgrants/types';
+import { Grant, GrantRound, GrantRounds, GrantMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
+import { resolveMetaPtr } from 'src/utils/ipfs';
 
 // --- Parameters required ---
 const { provider } = useWalletStore();
@@ -33,6 +34,7 @@ const lastBlockNumber = ref<number>(0);
 const lastBlockTimestamp = ref<number>(0);
 const grants = ref<Grant[]>();
 const grantRounds = ref<GrantRounds>();
+const grantMetadata = ref<Record<string, GrantMetadataResolution>>({});
 
 // --- Store methods and exports ---
 export default function useDataStore() {
@@ -159,6 +161,28 @@ export default function useDataStore() {
     lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
     grants.value = grantsList as Grant[];
     grantRounds.value = grantRoundsList as GrantRound[];
+    const metaPtrs = grants.value.map((grant) => grant.metaPtr);
+    const newMetadata = metaPtrs
+      .filter((metaPtr) => !grantMetadata.value[metaPtr]) // only want new metaPtrs
+      .reduce((prev, cur) => {
+        return {
+          ...prev,
+          [cur]: { status: 'pending' },
+        };
+      }, {});
+
+    grantMetadata.value = { ...grantMetadata.value, ...newMetadata };
+    await Promise.all(
+      Object.keys(newMetadata).map(async (url) => {
+        try {
+          const data = await resolveMetaPtr(url);
+          grantMetadata.value[url] = { status: 'resolved', ...data };
+        } catch (e) {
+          grantMetadata.value[url] = { status: 'error' };
+          console.error(e);
+        }
+      })
+    );
   }
 
   /**
@@ -184,5 +208,6 @@ export default function useDataStore() {
     lastBlockTimestamp: computed(() => lastBlockTimestamp.value || 0),
     grants: computed(() => grants.value),
     grantRounds: computed(() => grantRounds.value),
+    grantMetadata: computed(() => grantMetadata.value),
   };
 }
