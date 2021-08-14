@@ -13,6 +13,10 @@ export function formatAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(38)}`;
 }
 
+export function isEmpty(val: unknown) {
+  return !!val;
+}
+
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is
 export function daysAgo(val = 0) {
   // Use a formatter to establish "in 10 days" vs "10 days ago"
