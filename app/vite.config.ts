@@ -12,8 +12,10 @@ export default defineConfig({
       crypto: require.resolve('crypto-browserify'),
       http: require.resolve('stream-http'),
       https: require.resolve('https-browserify'),
+      process: 'process/browser',
       os: require.resolve('os-browserify/browser'),
       stream: require.resolve('stream-browserify'),
+      zlib: require.resolve('browserify-zlib'),
     },
   },
 });

@@ -15,6 +15,16 @@
       </strong>
     </noscript>
     <div id="app"></div>
+    <script>
+      window.global = window;
+    </script>
+    <script type="module">
+      import process from "process";
+      window.process = process;
+    </script>
+    <script>
+      let global = globalThis;
+    </script>
     <script type="module" src="/src/main.ts"></script>
     <!-- built files will be auto injected -->
   </body>

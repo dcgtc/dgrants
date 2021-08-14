@@ -15,5 +15,6 @@ interface ImportMeta {
   env: {
     VITE_BLOCKNATIVE_API_KEY: string;
     VITE_INFURA_ID: string;
+    VITE_FLEEK_API_KEY: string;
   };
 }
