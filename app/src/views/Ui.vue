@@ -8,6 +8,27 @@
 <jazzicon :seed="10211" :diameter="100" :colors="['#02E2AC','#757087']" />
 -->
 
+  <ImageRow
+    label="Image 1:"
+    imgsrc="http://placekitten.com/1920/1200?image=1"
+    filename="0x32bc27d24ec86a23e8a52208935e7fa.png"
+  />
+  <ImageRow
+    label="Image 2:"
+    imgsrc="http://placekitten.com/1920/1200?image=2"
+    filename="0x32bc27d24ec86a23e8a52208935e7fa.png"
+  />
+  <ImageRow
+    label="Avatar:"
+    imgsrc="http://placekitten.com/1024/1024?image=3"
+    filename="0x32bc27d24ec86a23e8a52208935e7fa.png"
+  />
+  <ImageRow
+    label="Grant Thumbnail:"
+    imgsrc="http://placekitten.com/1920/1080?image=4"
+    filename="0x32bc27d24ec86a23e8a52208935e7fa.png"
+  />
+
   <!--
 *
 *
@@ -384,6 +405,7 @@ import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import Dropzone from 'src/components/Dropzone.vue';
+import ImageRow from 'src/components/ImageRow.vue';
 
 // icons
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
@@ -406,6 +428,7 @@ export default defineComponent({
     RoundDetailsRow,
     InputRow,
     Dropzone,
+    ImageRow,
   },
 });
 </script>
@@ -414,7 +437,6 @@ export default defineComponent({
 
 - spread x eth to y grants banner thingy
 - links list for grants and rounds
-- about modal 
 - jazzicon images
 
 -->
