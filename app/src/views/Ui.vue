@@ -166,6 +166,11 @@
     <template v-slot:input> im an intended row but not deletable </template>
   </InputRow>
 
+  <InputRow :deleteable="false" :intended="true">
+    <template v-slot:label>Drag and Drop Area:</template>
+    <template v-slot:input><Dropzone /></template>
+  </InputRow>
+
   <InputRow :deleteable="true" :intended="true">
     <template v-slot:label>intended:</template>
     <template v-slot:input> im an intended row and deletable </template>
@@ -378,6 +383,7 @@ import CartItem from 'src/components/CartItem.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
+import Dropzone from 'src/components/Dropzone.vue';
 
 // icons
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
@@ -399,6 +405,7 @@ export default defineComponent({
     GrantDetailsRow,
     RoundDetailsRow,
     InputRow,
+    Dropzone,
   },
 });
 </script>

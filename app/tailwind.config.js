@@ -66,6 +66,19 @@ module.exports = {
       none: 'none',
     },
 
+    cursor: {
+      auto: 'auto',
+      default: 'default',
+      pointer: 'pointer',
+      wait: 'wait',
+      text: 'text',
+      move: 'move',
+      'not-allowed': 'not-allowed',
+      crosshair: 'crosshair',
+      'zoom-in': 'zoom-in',
+      copy: 'copy',
+    },
+
     nightwind: {
       // Keys specify light-mode colors, and values are overrides for Nightwind to replace them with
       colors: {
