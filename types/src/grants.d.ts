@@ -55,3 +55,10 @@ export type Claim = {
   amount: number;
   merkleProof: string[];
 };
+
+// Metadata resolve from a grant's metadata pointer URL
+export type GrantMetadata = {
+  name: string;
+  description: string;
+  logoURI: string;
+};
