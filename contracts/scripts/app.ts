@@ -13,7 +13,6 @@ import { ethers, network } from 'hardhat';
 
 import { WETH_ADDRESS, UNISWAP_FACTORY, tokens, setBalance } from '../test/utils';
 
-import { abi as SWAP_ROUTER_ABI } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json';
 import { parseUnits } from 'ethers/lib/utils';
 
 // --- Constants ---
@@ -37,10 +36,6 @@ const grants = [
 ];
 
 const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_address: string) => {
-  // --- SwapRouter --
-  //const router = await ethers.getContractAt(SWAP_ROUTER_ABI, UNISWAP_ROUTER, deployer);
-  //console.log(`Fetched SwapRouter at ${router.address}`);
-
   // --- GrantRoundManager --
   const GrantRoundManager: ContractFactory = await ethers.getContractFactory('GrantRoundManager', deployer);
   const roundManager = await (

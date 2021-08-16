@@ -66,7 +66,6 @@ const config: HardhatUserConfig = {
       accounts: {
         mnemonic,
       },
-      blockGasLimit: 50000000,
       chainId: chainIds.hardhat,
     },
     goerli: createTestnetConfig('goerli'),

@@ -19,7 +19,6 @@ const { defaultAbiCoder, hexStripZeros, hexZeroPad, keccak256 } = utils;
 // --- Constants ---
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
-//export const UNISWAP_ROUTER = '0xE592427A0AEce92De3Edee1F18E0157C05861564';
 export const UNISWAP_FACTORY = '0x1F98431c8aD98523631AE4a59f267346ea31F984';
 
 // Mapping from lowercase token symbol to properties about that token
