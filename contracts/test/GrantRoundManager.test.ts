@@ -59,7 +59,8 @@ describe('GrantRoundManager', () => {
       // Verify constructor parameters
       expect(await manager.registry()).to.equal(mockRegistry.address);
       expect(await manager.donationToken()).to.equal(tokens.gtc.address);
-      expect(await manager.WETH()).to.equal(WETH_ADDRESS);
+      expect(await manager.factory()).to.equal(UNISWAP_FACTORY);
+      expect(await manager.WETH9()).to.equal(WETH_ADDRESS);
     });
 
     it('reverts when deploying with an invalid grant registry', async () => {
