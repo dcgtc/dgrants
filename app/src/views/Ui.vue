@@ -241,15 +241,6 @@
 *
 -->
 
-  <div class="bg-teal">HTML-Fragment : Button</div>
-  <!----------------------------------------------- BUTTON -->
-  <button class="uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">Click me</button>
-
-  <!--
-*
-*
--->
-
   <div class="bg-teal">HTML-Fragment : Transaction Status</div>
   <!----------------------------------------------- transaction status -->
   <div class="px-4 md:px-12 py-8 border-b border-grey-100">
@@ -352,36 +343,20 @@
 *
 -->
 
-  <div class="bg-teal">button / button with icon</div>
+  <div class="bg-teal">button examples</div>
 
-  <div class="flex gap-8">
-    <div>
-      <button class="whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400">
-        test
-      </button>
-    </div>
+  <div class="flex flex-wrap gap-8">
+    <button class="btn">textbutton</button>
 
-    <div>
-      <button
-        class="
-          flex
-          items-center
-          gap-2
-          whitespace-nowrap
-          uppercase
-          font-medium
-          bg-grey-500
-          text-white
-          px-8
-          py-4
-          hover:bg-grey-400
-        "
-      >
-        <CollectionIcon class="stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8" />
-        <span>test</span>
-      </button>
-    </div>
+    <button class="btn">
+      <CollectionIcon />
+      <span>with icon</span>
+    </button>
+
+    <button class="btn disabled">textbutton</button>
   </div>
+
+  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 
   <!--
 * 
@@ -414,7 +389,6 @@ export default defineComponent({
   name: 'Ui',
   components: {
     CollectionIcon,
-
     BaseHeader,
     BaseFilterNav,
     BaseTitle,
@@ -437,6 +411,10 @@ export default defineComponent({
 
 - spread x eth to y grants banner thingy
 - links list for grants and rounds
-- jazzicon images
+- jazzicon images - post on discord about this error
+- animate the logo
+- button disabled / state / normal state / icon state 
+- fullscreen loading screen toggable like about page
+
 
 -->

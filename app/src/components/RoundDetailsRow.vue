@@ -22,23 +22,7 @@ this is a part of the Round Detail View
       <div class="col-span-4 md:col-span-2 xl:col-span-1">
         <div class="px-4 xl:px-12 md:text-right mb-8 xl:mb-0">
           <div class="mb-4 flex md:justify-end">
-            <button
-              class="
-                flex
-                items-center
-                gap-2
-                whitespace-nowrap
-                uppercase
-                font-medium
-                bg-grey-500
-                text-white
-                px-8
-                py-4
-                hover:bg-grey-400
-              "
-            >
-              <span>see grants</span>
-            </button>
+            <button class="btn">see grants</button>
           </div>
         </div>
       </div>
