@@ -9,5 +9,15 @@ export type CartItemOptions = {
   contributionAmount: number; // store as a human-readable number for better form UX
 };
 
+export type GrantMetadata = {
+  name: string;
+  description: string;
+  logoURI: string;
+};
+
 // Cart info used by the main Cart component
-export type CartItem = Omit<CartItemOptions, 'contributionTokenAddress'> & Grant & { contributionToken: TokenInfo };
+export type CartItem = Omit<CartItemOptions, 'contributionTokenAddress'> &
+  Grant &
+  GrantMetadata & {
+    contributionToken: TokenInfo;
+  };

@@ -1,10 +1,5 @@
 <template>
-  <Listbox
-    as="div"
-    v-model="selected"
-    :modelValue="modelValue"
-    @update:model-value="$emit('update:modelValue', $event)"
-  >
+  <Listbox as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
     <!-- <ListboxLabel class="block text-sm font-medium text-gray-700"> {{ description }} </ListboxLabel> -->
     <div class="mt-1 relative">
       <ListboxButton
@@ -24,7 +19,7 @@
           sm:text-sm
         "
       >
-        <span class="block truncate">{{ selected[label] }}</span>
+        <span class="block truncate">{{ modelValue[label] }}</span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
           <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
         </span>
@@ -88,7 +83,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 import { Listbox, ListboxButton, /* ListboxLabel, */ ListboxOption, ListboxOptions } from '@headlessui/vue';
 import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
 
@@ -97,15 +92,11 @@ export default defineComponent({
   components: { Listbox, ListboxButton, /* ListboxLabel, */ ListboxOption, ListboxOptions, CheckIcon, SelectorIcon },
   props: {
     // --- Required props ---
-    modelValue: { type: Object, required: true, default: undefined }, // from v-model, don't pass this directly
+    modelValue: { type: Object, required: true }, // from v-model, don't pass this directly
     // --- Optional props ---
-    options: { type: Array as PropType<Record<string, unknown>[]>, required: true }, // available options, must be array of objects with an `id` field
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options: { type: Array as PropType<Record<string, any>[]>, required: true }, // available options, must be array of objects with an `id` field
     label: { type: String, required: false, default: 'name' }, // option[label] is used as the string shown
-  },
-
-  setup(props) {
-    const selected = ref<any>(props.modelValue); // eslint-disable-line @typescript-eslint/no-explicit-any
-    return { selected };
   },
 });
 </script>
