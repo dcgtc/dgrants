@@ -13,8 +13,8 @@
     <!-- Cart toolbar -->
     <div class="flex justify-between mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 border-t-2 border-b-2">
       <div class="flex justify-start">
-        <button class="btn btn-flat mr-5">Save as collection</button>
-        <button class="btn btn-flat">Share cart</button>
+        <button @click="NOT_IMPLEMENTED('Save as collection')" class="btn btn-flat mr-5">Save as collection</button>
+        <button @click="NOT_IMPLEMENTED('Share cart')" class="btn btn-flat">Share cart</button>
       </div>
       <button @click="clearCartAndUpdateState" class="btn btn-flat">Clear cart</button>
     </div>
@@ -58,13 +58,16 @@
     </div>
 
     <!-- Checkout -->
-    <button @click="checkout" class="btn btn-secondary">Checkout</button>
+    <div class="mt-10">
+      <div>{{ cartSummaryString }}</div>
+      <button @click="checkout" class="btn btn-secondary">Checkout</button>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 // --- External Imports ---
-import { defineComponent, onMounted, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { XIcon } from '@heroicons/vue/solid';
 
 // --- App Imports ---
@@ -72,15 +75,23 @@ import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 import { SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/constants';
 import { BigNumberish } from 'src/utils/ethers';
-import { pushRoute, clearCart, loadCart, removeFromCart, setCart, formatDonateInputs } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 import { CartItem, CartItemOptions } from 'src/types';
+import { pushRoute, clearCart, loadCart, removeFromCart, setCart, formatDonateInputs, getCartSummary, } from 'src/utils/utils'; // prettier-ignore
 
 function useCart() {
   const { grants, poll, startPolling } = useDataStore();
   const selectedToken = ref(SUPPORTED_TOKENS[0]);
   const rawCart = ref<CartItemOptions[]>(loadCart());
   const cart = ref<CartItem[]>([]);
+  const cartSummary = computed(() => getCartSummary(cart.value)); // object where keys are token addr, values are total amount of that token in cart
+  const cartSummaryString = computed(() => {
+    // returns a string summarizing the `cartSummary`, such as `12 DAI + 4 GTC + 10 USDC`
+    const summary = Object.keys(cartSummary.value).reduce((acc, tokenAddr) => {
+      return acc + `${cartSummary.value[tokenAddr]} ${SUPPORTED_TOKENS_MAPPING[tokenAddr].symbol} + `;
+    }, '');
+    return summary.slice(0, -3); // trim the trailing ` + ` from the string
+  });
 
   // Clearing and removing cart items modifies localStorage, so we use these method to keep component state in sync
   const clearCartAndUpdateState = () => (rawCart.value = clearCart());
@@ -122,18 +133,18 @@ function useCart() {
   function checkout() {
     console.log('checkout');
     const { swaps, donations } = formatDonateInputs(cart.value);
-    swaps;
-    donations;
+    [swaps, donations]; // silence linter
   }
 
-  return { cart, checkout, clearCartAndUpdateState, removeItemAndUpdateState, selectedToken };
+  return { cart, checkout, clearCartAndUpdateState, removeItemAndUpdateState, selectedToken, cartSummaryString };
 }
 
 export default defineComponent({
   name: 'Cart',
   components: { BaseInput, BaseSelect, XIcon },
   setup() {
-    return { ...useCart(), pushRoute, SUPPORTED_TOKENS };
+    const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
+    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED };
   },
 });
 </script>

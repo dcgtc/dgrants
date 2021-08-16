@@ -4,6 +4,7 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, BigNumberish, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
+import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/constants';
 import { CartItem, CartItemOptions } from 'src/types';
 import { Donation, Grant, GrantRound, SwapSummary } from '@dgrants/types';
 
@@ -119,6 +120,17 @@ export async function getApproval(token: Contract, address: string, amount: BigN
 }
 
 // --- Other ---
+// Convert a cart into an array of objects summarizing the cart info, with human-readable values
+export function getCartSummary(cart: CartItem[]): Record<keyof typeof SUPPORTED_TOKENS_MAPPING, number> {
+  const output: Record<keyof typeof SUPPORTED_TOKENS_MAPPING, number> = {};
+  for (const item of cart) {
+    const tokenAddress = item.contributionToken.address;
+    if (tokenAddress in output) output[tokenAddress] += item.contributionAmount;
+    else output[tokenAddress] = item.contributionAmount;
+  }
+  return output;
+}
+
 // Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
 export function formatDonateInputs(cart: CartItem[]): { swaps: SwapSummary[]; donations: Donation[] } {
   const swaps: SwapSummary[] = [];
