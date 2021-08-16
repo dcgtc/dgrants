@@ -1,14 +1,17 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.5;
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-import "solidity-bytes-utils/contracts/BytesLib.sol";
+//import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
+//import "./SwapRouter.sol";
+//import "solidity-bytes-utils/contracts/BytesLib.sol";
+import "./SwapRouter.sol";
 import "./GrantRegistry.sol";
 import "./GrantRound.sol";
 
-contract GrantRoundManager {
+contract GrantRoundManager is SwapRouter {
   // --- Libraries ---
   using Address for address;
   using BytesLib for bytes;
@@ -19,21 +22,18 @@ contract GrantRoundManager {
   GrantRegistry public immutable registry;
 
   /// @notice Address of the Uniswap V3 Router used for token swaps
-  ISwapRouter public immutable router;
+  //ISwapRouter public immutable router;
 
   /// @notice Address of the ERC20 token in which donations are made
   IERC20 public immutable donationToken;
 
-  /// @notice Used during donations to temporarily store swap output amounts
   mapping(IERC20 => uint256) internal swapOutputs;
 
-  /// @notice Used during donations to temporarily store donation ratio sums to ensure totals are always 100%
   mapping(IERC20 => uint256) internal donationRatios;
 
   /// @notice WETH address
-  IERC20 public constant WETH = IERC20(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
+  IERC20 public WETH;
 
-  /// @notice Scale factor
   uint256 internal constant WAD = 1e18;
 
   /// --- Types ---
@@ -63,27 +63,29 @@ contract GrantRoundManager {
   // --- Constructor ---
   constructor(
     GrantRegistry _registry,
-    ISwapRouter _router,
-    IERC20 _donationToken
-  ) {
+    IERC20 _donationToken,
+    address _factory,
+    address _WETH9
+  ) SwapRouter(_factory, _WETH9) {
     // Validation
     require(_registry.grantCount() >= 0, "GrantRoundManager: Invalid registry");
-    require(address(_router).isContract(), "GrantRoundManager: Invalid router"); // Router interface doesn't have a state variable to check
+    //require(address(_router).isContract(), "GrantRoundManager: Invalid router"); // Router interface doesn't have a state variable to check
     require(_donationToken.totalSupply() > 0, "GrantRoundManager: Invalid token");
 
     // Set state
     registry = _registry;
-    router = _router;
+    //router = this;
+    WETH = IERC20(_WETH9);
     donationToken = _donationToken;
 
     // Token approvals of common tokens
     // TODO inherit from SwapRouter to remove the need for this approvals and extra safeTransferFrom before swap
-    IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F).safeApprove(address(_router), type(uint256).max); // DAI
-    IERC20(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F).safeApprove(address(_router), type(uint256).max); // GTC
-    IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).safeApprove(address(_router), type(uint256).max); // USDC
-    IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7).safeApprove(address(_router), type(uint256).max); // USDT
-    IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599).safeApprove(address(_router), type(uint256).max); // WBTC
-    WETH.safeApprove(address(_router), type(uint256).max); // WETH
+    IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F).safeApprove(address(this), type(uint256).max); // DAI
+    IERC20(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F).safeApprove(address(this), type(uint256).max); // GTC
+    IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).safeApprove(address(this), type(uint256).max); // USDC
+    IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7).safeApprove(address(this), type(uint256).max); // USDT
+    IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599).safeApprove(address(this), type(uint256).max); // WBTC
+    WETH.safeApprove(address(this), type(uint256).max); // WETH
   }
 
   // --- Core methods ---
@@ -204,7 +206,7 @@ contract GrantRoundManager {
       }
 
       // Otherwise, execute swap
-      ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams(
+      ExactInputParams memory params = ExactInputParams(
         _swaps[i].path,
         address(this), // send output to the contract and it will be transferred later
         _deadline,
@@ -212,7 +214,7 @@ contract GrantRoundManager {
         _swaps[i].amountOutMin
       );
       uint256 _value = _tokenIn == WETH && msg.value > 0 ? msg.value : 0;
-      swapOutputs[_tokenIn] = router.exactInput{value: _value}(params); // save off output amount for later
+      swapOutputs[_tokenIn] = this.exactInput{value: _value}(params); // save off output amount for later
     }
   }
 

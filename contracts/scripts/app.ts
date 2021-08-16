@@ -11,7 +11,7 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
 
-import { UNISWAP_ROUTER, tokens, setBalance } from '../test/utils';
+import { WETH_ADDRESS, UNISWAP_FACTORY, tokens, setBalance } from '../test/utils';
 
 import { abi as SWAP_ROUTER_ABI } from '@uniswap/v3-periphery/artifacts/contracts/SwapRouter.sol/SwapRouter.json';
 import { parseUnits } from 'ethers/lib/utils';
@@ -38,13 +38,13 @@ const grants = [
 
 const createGrantRoundFactory = async (deployer: SignerWithAddress, registry_address: string) => {
   // --- SwapRouter --
-  const router = await ethers.getContractAt(SWAP_ROUTER_ABI, UNISWAP_ROUTER, deployer);
-  console.log(`Fetched SwapRouter at ${router.address}`);
+  //const router = await ethers.getContractAt(SWAP_ROUTER_ABI, UNISWAP_ROUTER, deployer);
+  //console.log(`Fetched SwapRouter at ${router.address}`);
 
   // --- GrantRoundManager --
   const GrantRoundManager: ContractFactory = await ethers.getContractFactory('GrantRoundManager', deployer);
   const roundManager = await (
-    await GrantRoundManager.deploy(registry_address, router.address, tokens.gtc.address)
+    await GrantRoundManager.deploy(registry_address, tokens.gtc.address, UNISWAP_FACTORY, WETH_ADDRESS)
   ).deployed();
   console.log(`Deployed GrantRoundManager to ${roundManager.address}`);
 

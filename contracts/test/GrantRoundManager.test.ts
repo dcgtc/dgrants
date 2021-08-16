@@ -13,7 +13,7 @@ import { MockContract } from 'ethereum-waffle';
 import { expect } from 'chai';
 
 // --- Our imports ---
-import { ETH_ADDRESS, UNISWAP_ROUTER, tokens, approve, balanceOf, setBalance, encodeRoute, getSwapAmountOut } from './utils'; // prettier-ignore
+import { ETH_ADDRESS, WETH_ADDRESS, UNISWAP_FACTORY, tokens, approve, balanceOf, setBalance, encodeRoute, getSwapAmountOut } from './utils'; // prettier-ignore
 import { GrantRoundManager } from '../typechain';
 import { SwapSummary, Donation } from '@dgrants/types';
 
@@ -42,7 +42,12 @@ describe('GrantRoundManager', () => {
     // Deploy Manager
     const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
     manager = <GrantRoundManager>(
-      await deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, tokens.gtc.address])
+      await deployContract(user, managerArtifact, [
+        mockRegistry.address,
+        tokens.gtc.address,
+        UNISWAP_FACTORY,
+        WETH_ADDRESS,
+      ])
     );
   });
 
@@ -53,7 +58,7 @@ describe('GrantRoundManager', () => {
 
       // Verify constructor parameters
       expect(await manager.registry()).to.equal(mockRegistry.address);
-      expect(await manager.router()).to.equal(UNISWAP_ROUTER);
+      //expect(await manager.router()).to.equal(UNISWAP_ROUTER);
       expect(await manager.donationToken()).to.equal(tokens.gtc.address);
     });
 
@@ -61,29 +66,29 @@ describe('GrantRoundManager', () => {
       // Test that deployment fails if provided Registry address has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [randomAddress(), UNISWAP_ROUTER, tokens.gtc.address])
+        deployContract(user, managerArtifact, [randomAddress(), tokens.gtc.address, UNISWAP_FACTORY, WETH_ADDRESS])
       ).to.be.revertedWith('function call to a non-contract account');
     });
 
-    it('reverts when deploying with an invalid router', async () => {
+    /*it('reverts when deploying with an invalid router', async () => {
       // Test that deployment fails if provided Router address has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
         deployContract(user, managerArtifact, [mockRegistry.address, randomAddress(), tokens.gtc.address])
       ).to.be.revertedWith('GrantRoundManager: Invalid router');
-    });
+    });*/
 
     it('reverts when deploying with an invalid donation token', async () => {
       // First we test a donation token address that has no code
       const managerArtifact: Artifact = await artifacts.readArtifact('GrantRoundManager');
       await expect(
-        deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, randomAddress()])
+        deployContract(user, managerArtifact, [mockRegistry.address, randomAddress(), UNISWAP_FACTORY, WETH_ADDRESS])
       ).to.be.revertedWith('function call to a non-contract account');
 
       // Now we test a donation token that has no supply
       await mockToken.mock.totalSupply.returns('0');
       await expect(
-        deployContract(user, managerArtifact, [mockRegistry.address, UNISWAP_ROUTER, mockToken.address])
+        deployContract(user, managerArtifact, [mockRegistry.address, mockToken.address, UNISWAP_FACTORY, WETH_ADDRESS])
       ).to.be.revertedWith('GrantRoundManager: Invalid token');
     });
   });

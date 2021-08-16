@@ -66,6 +66,7 @@ const config: HardhatUserConfig = {
       accounts: {
         mnemonic,
       },
+      blockGasLimit: 50000000,
       chainId: chainIds.hardhat,
     },
     goerli: createTestnetConfig('goerli'),
@@ -80,7 +81,7 @@ const config: HardhatUserConfig = {
     tests: './test',
   },
   solidity: {
-    version: '0.8.6',
+    version: '0.7.6',
     settings: {
       metadata: {
         // Not including the metadata hash
