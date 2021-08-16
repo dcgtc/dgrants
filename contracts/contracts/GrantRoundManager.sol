@@ -4,9 +4,6 @@ pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Address.sol";
-//import "@uniswap/v3-periphery/contracts/interfaces/ISwapRouter.sol";
-//import "./SwapRouter.sol";
-//import "solidity-bytes-utils/contracts/BytesLib.sol";
 import "./SwapRouter.sol";
 import "./GrantRegistry.sol";
 import "./GrantRound.sol";
@@ -20,9 +17,6 @@ contract GrantRoundManager is SwapRouter {
   // --- Data ---
   /// @notice Address of the GrantRegistry
   GrantRegistry public immutable registry;
-
-  /// @notice Address of the Uniswap V3 Router used for token swaps
-  //ISwapRouter public immutable router;
 
   /// @notice Address of the ERC20 token in which donations are made
   IERC20 public immutable donationToken;
@@ -69,12 +63,10 @@ contract GrantRoundManager is SwapRouter {
   ) SwapRouter(_factory, _WETH9) {
     // Validation
     require(_registry.grantCount() >= 0, "GrantRoundManager: Invalid registry");
-    //require(address(_router).isContract(), "GrantRoundManager: Invalid router"); // Router interface doesn't have a state variable to check
     require(_donationToken.totalSupply() > 0, "GrantRoundManager: Invalid token");
 
     // Set state
     registry = _registry;
-    //router = this;
     WETH = IERC20(_WETH9);
     donationToken = _donationToken;
 
