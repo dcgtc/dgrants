@@ -26,7 +26,7 @@
           <div class="flex justify-between items-center px-4 py-4 sm:px-6">
             <!-- Logo and name -->
             <div class="flex items-center">
-              <img class="h-12 w-12" :src="grant.logoUrl || 'src/assets/logo.png'" alt="" />
+              <img class="h-12 w-12" :src="grant.logoURI || 'src/assets/logo.png'" alt="" />
               <p class="text-sm text-left font-medium truncate">{{ grant.grantId }} {{ grant.metaPtr }}</p>
             </div>
 
@@ -80,8 +80,7 @@ import { CartItem, CartItemOptions } from 'src/types';
 import { pushRoute, clearCart, loadCart, removeFromCart, setCart, formatDonateInputs, getCartSummary, } from 'src/utils/utils'; // prettier-ignore
 
 function useCart() {
-  const { grants, poll, startPolling } = useDataStore();
-  const selectedToken = ref(SUPPORTED_TOKENS[0]);
+  const { grants } = useDataStore();
   const rawCart = ref<CartItemOptions[]>(loadCart());
   const cart = ref<CartItem[]>([]);
   const cartSummary = computed(() => getCartSummary(cart.value)); // object where keys are token addr, values are total amount of that token in cart
@@ -113,12 +112,10 @@ function useCart() {
 
   // Initialize cart
   onMounted(async () => {
-    // Wait for poll to complete to ensure grants.value is not undefined
-    startPolling();
-    await poll();
+    // TODO wait for grants.value to be defined before loading cart
     // Update cart. TODO `grants.value.filter` may be slow for large number of grants
     cart.value = rawCart.value.map((cartItem) => {
-      const grant = grants.value.filter((grant) => grant.id.toString() === cartItem.grantId)[0];
+      const grant = grants.value?.filter((grant) => grant.id.toString() === cartItem.grantId)[0];
       return {
         ...grant,
         grantId: cartItem.grantId,
@@ -136,7 +133,7 @@ function useCart() {
     [swaps, donations]; // silence linter
   }
 
-  return { cart, checkout, clearCartAndUpdateState, removeItemAndUpdateState, selectedToken, cartSummaryString };
+  return { cart, checkout, clearCartAndUpdateState, removeItemAndUpdateState, cartSummaryString };
 }
 
 export default defineComponent({
