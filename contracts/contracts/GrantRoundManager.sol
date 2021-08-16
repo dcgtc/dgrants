@@ -25,9 +25,6 @@ contract GrantRoundManager is SwapRouter {
 
   mapping(IERC20 => uint256) internal donationRatios;
 
-  /// @notice WETH address
-  IERC20 public WETH;
-
   uint256 internal constant WAD = 1e18;
 
   /// --- Types ---
@@ -67,17 +64,7 @@ contract GrantRoundManager is SwapRouter {
 
     // Set state
     registry = _registry;
-    WETH = IERC20(_WETH9);
     donationToken = _donationToken;
-
-    // Token approvals of common tokens
-    // TODO inherit from SwapRouter to remove the need for this approvals and extra safeTransferFrom before swap
-    IERC20(0x6B175474E89094C44Da98b954EedeAC495271d0F).safeApprove(address(this), type(uint256).max); // DAI
-    IERC20(0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F).safeApprove(address(this), type(uint256).max); // GTC
-    IERC20(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48).safeApprove(address(this), type(uint256).max); // USDC
-    IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7).safeApprove(address(this), type(uint256).max); // USDT
-    IERC20(0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599).safeApprove(address(this), type(uint256).max); // WBTC
-    WETH.safeApprove(address(this), type(uint256).max); // WETH
   }
 
   // --- Core methods ---
@@ -193,7 +180,7 @@ contract GrantRoundManager is SwapRouter {
 
       // Transfer input token to this contract if required
       // TODO inherit from SwapRouter to remove the need for this
-      if (_tokenIn != WETH || msg.value == 0) {
+      if (_tokenIn != IERC20(WETH9) || msg.value == 0) {
         _tokenIn.safeTransferFrom(msg.sender, address(this), _swaps[i].amountIn);
       }
 
@@ -205,7 +192,7 @@ contract GrantRoundManager is SwapRouter {
         _swaps[i].amountIn,
         _swaps[i].amountOutMin
       );
-      uint256 _value = _tokenIn == WETH && msg.value > 0 ? msg.value : 0;
+      uint256 _value = _tokenIn == IERC20(WETH9) && msg.value > 0 ? msg.value : 0;
       swapOutputs[_tokenIn] = this.exactInput{value: _value}(params); // save off output amount for later
     }
   }
