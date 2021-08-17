@@ -82,6 +82,7 @@ import { defineComponent } from 'vue';
 import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
+  name: 'About',
   props: {
     showAbout: Boolean,
   },

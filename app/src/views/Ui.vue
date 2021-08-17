@@ -4,10 +4,6 @@
 * and need to get props / data logic.
 -->
 
-  <!--
-<jazzicon :seed="10211" :diameter="100" :colors="['#02E2AC','#757087']" />
--->
-
   <ImageRow
     label="Image 1:"
     imgsrc="http://placekitten.com/1920/1200?image=1"
