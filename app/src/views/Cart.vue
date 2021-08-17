@@ -77,7 +77,8 @@ import { SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/constants'
 import { BigNumberish } from 'src/utils/ethers';
 import useDataStore from 'src/store/data';
 import { CartItem, CartItemOptions } from 'src/types';
-import { pushRoute, clearCart, loadCart, removeFromCart, setCart, formatDonateInputs, getCartSummary, } from 'src/utils/utils'; // prettier-ignore
+import { clearCart, loadCart, removeFromCart, setCart, formatDonateInputs, getCartSummary } from 'src/utils/cart';
+import { pushRoute } from 'src/utils/utils';
 
 function useCart() {
   const { grants } = useDataStore();

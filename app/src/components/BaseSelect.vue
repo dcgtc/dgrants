@@ -1,6 +1,5 @@
 <template>
   <Listbox as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-    <!-- <ListboxLabel class="block text-sm font-medium text-gray-700"> {{ description }} </ListboxLabel> -->
     <div class="mt-1 relative">
       <ListboxButton
         class="

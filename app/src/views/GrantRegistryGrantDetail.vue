@@ -89,7 +89,8 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract, ContractTransaction } from 'src/utils/ethers';
-import { addToCart, isValidAddress, isValidUrl } from 'src/utils/utils';
+import { addToCart } from 'src/utils/cart';
+import { isValidAddress, isValidUrl } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
 
