@@ -408,9 +408,5 @@ export default defineComponent({
 - spread x eth to y grants banner thingy
 - links list for grants and rounds
 - jazzicon images - post on discord about this error
-- animate the logo
-- button disabled / state / normal state / icon state 
-- fullscreen loading screen toggable like about page
-
 
 -->
