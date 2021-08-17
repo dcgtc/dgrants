@@ -126,9 +126,10 @@ contract SwapRouter is
     require(amountOut >= params.amountOutMinimum, "Too little received");
   }
 
+  // modify function from external to public
   /// @inheritdoc ISwapRouter
   function exactInput(ExactInputParams memory params)
-    external
+    public
     payable
     override
     checkDeadline(params.deadline)
