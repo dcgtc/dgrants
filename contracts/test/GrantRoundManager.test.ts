@@ -415,7 +415,7 @@ describe('GrantRoundManager', () => {
         // Execute donations
         await approve('dai', user, manager.address);
         await approve('gtc', user, manager.address);
-        const tx = await manager.donate(swaps, deadline, donations, { value: swaps[1].amountIn, gasPrice: '0' });
+        const tx = await manager.donate(swaps, deadline, donations);
 
         // Verify GTC outputs
         expect(await balanceOf('gtc', payees[4])).to.equal(swaps[2].amountIn.mul(donations[4].ratio).div(WAD));
@@ -423,8 +423,8 @@ describe('GrantRoundManager', () => {
 
         // Verify ETH and DAI amounts, by parsing swap logs manually (i.e. hardcoding the appropriate indexes)
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-        const daiToGtcAmountOut = getSwapAmountOut([receipt.logs[6]]);
-        const ethToGtcAmountOut = getSwapAmountOut([receipt.logs[10]]);
+        const daiToGtcAmountOut = getSwapAmountOut([receipt.logs[5]]);
+        const ethToGtcAmountOut = getSwapAmountOut([receipt.logs[8]]);
 
         expect(await balanceOf('gtc', payees[0])).to.equal(daiToGtcAmountOut.mul(donations[0].ratio).div(WAD));
         expect(await balanceOf('gtc', payees[1])).to.equal(daiToGtcAmountOut.mul(donations[1].ratio).div(WAD));

@@ -178,12 +178,6 @@ contract GrantRoundManager is SwapRouter {
         continue;
       }
 
-      // Transfer input token to this contract if required
-      // TODO inherit from SwapRouter to remove the need for this
-      if (_tokenIn != IERC20(WETH9) || msg.value == 0) {
-        _tokenIn.safeTransferFrom(msg.sender, address(this), _swaps[i].amountIn);
-      }
-
       // Otherwise, execute swap
       ExactInputParams memory params = ExactInputParams(
         _swaps[i].path,
@@ -192,8 +186,7 @@ contract GrantRoundManager is SwapRouter {
         _swaps[i].amountIn,
         _swaps[i].amountOutMin
       );
-      uint256 _value = _tokenIn == IERC20(WETH9) && msg.value > 0 ? msg.value : 0;
-      swapOutputs[_tokenIn] = this.exactInput{value: _value}(params); // save off output amount for later
+      swapOutputs[_tokenIn] = exactInput(params); // save off output amount for later
     }
   }
 
