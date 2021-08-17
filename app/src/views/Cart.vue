@@ -93,9 +93,34 @@ function useCart() {
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });
 
+  // Initialize cart -- TODO wait for grants.value to be defined before loading cart
+  onMounted(async () => syncCart());
+
+  // Sync this component's cart with the localStorage cart
+  function syncCart() {
+    cart.value = rawCart.value.map((cartItem) => {
+      // TODO `grants.value.filter` may be slow for large number of grants
+      const grant = grants.value?.filter((grant) => grant.id.toString() === cartItem.grantId)[0];
+      return {
+        ...grant,
+        grantId: cartItem.grantId,
+        contributionAmount: cartItem.contributionAmount,
+        // notice we remove the cartItem.contributionTokenAddress field and replace it with the below. The token
+        // selection component uses the full TokenInfo object, so that's what the `cart` data uses instead of an address
+        contributionToken: SUPPORTED_TOKENS_MAPPING[cartItem.contributionTokenAddress],
+      } as CartItem;
+    });
+  }
+
   // Clearing and removing cart items modifies localStorage, so we use these method to keep component state in sync
-  const clearCartAndUpdateState = () => (rawCart.value = clearCart());
-  const removeItemAndUpdateState = (grantId: BigNumberish) => (rawCart.value = removeFromCart(grantId));
+  function clearCartAndUpdateState() {
+    rawCart.value = clearCart();
+    syncCart();
+  }
+  function removeItemAndUpdateState(grantId: BigNumberish) {
+    rawCart.value = removeFromCart(grantId);
+    syncCart();
+  }
 
   // Editing contribution amount or token modifies compoent state, so we use a watcher to keep localStorage data
   // in sync with cart when user modifies cart
@@ -110,23 +135,6 @@ function useCart() {
     },
     { deep: true }
   );
-
-  // Initialize cart
-  onMounted(async () => {
-    // TODO wait for grants.value to be defined before loading cart
-    // Update cart. TODO `grants.value.filter` may be slow for large number of grants
-    cart.value = rawCart.value.map((cartItem) => {
-      const grant = grants.value?.filter((grant) => grant.id.toString() === cartItem.grantId)[0];
-      return {
-        ...grant,
-        grantId: cartItem.grantId,
-        contributionAmount: cartItem.contributionAmount,
-        // notice we remove the cartItem.contributionTokenAddress field and replace it with the below. The token
-        // selection component uses the full TokenInfo object, so that's what the `cart` data uses instead of an address
-        contributionToken: SUPPORTED_TOKENS_MAPPING[cartItem.contributionTokenAddress],
-      } as CartItem;
-    });
-  });
 
   function checkout() {
     console.log('checkout');
