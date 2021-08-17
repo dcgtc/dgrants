@@ -44,12 +44,12 @@
           -->
           <div @click="$emit('toggle-about')" class="cursor-pointer hover:text-grey-500">About</div>
 
+          <!-- little dev section : delete on release ... -->
+          <div class="border-b border-grey-400 my-4"></div>
+          <!-- richards components-->
           <router-link to="ui" class="cursor-pointer hover:text-grey-500 no-underline" active-class="text-grey-500"
             >ui</router-link
           >
-
-          <div class="border-b border-grey-400 my-4"></div>
-
           <!-- a test to trigger the loading screen -->
           <div @click="$emit('toggle-loading')" class="cursor-pointer hover:text-grey-500">
             <small>dev: trigger Loading Screen</small>
