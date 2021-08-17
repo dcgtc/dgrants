@@ -70,7 +70,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { addToCart, formatAddress, pushRoute } from 'src/utils/utils';
+import { addToCart } from 'src/utils/cart';
+import { formatAddress, pushRoute } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 
 export default defineComponent({
