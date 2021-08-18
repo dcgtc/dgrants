@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
-pragma solidity ^0.8.5;
+pragma solidity ^0.7.6;
+pragma abicoder v2;
 
-import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
-import "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
+import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "@openzeppelin/contracts/cryptography/MerkleProof.sol";
 
 /**
  * @notice The `MerkleGrantRoundPayout` contract enables eligible grant owners to claim their
@@ -35,7 +36,7 @@ contract MerkleGrantRoundPayout {
   /// @notice merkle root generated from distribution
   bytes32 public immutable merkleRoot;
 
-  /// @notice packed array of booleans to keep track of claims
+  /// @dev packed array of booleans to keep track of claims
   mapping(uint256 => uint256) private claimedBitMap;
 
   /// --- Types ---
