@@ -18,4 +18,7 @@ export default defineConfig({
       zlib: require.resolve('browserify-zlib'),
     },
   },
+  optimizeDeps: {
+    exclude: ['electron'],
+  },
 });
