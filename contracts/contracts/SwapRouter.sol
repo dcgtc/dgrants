@@ -17,8 +17,16 @@ import "@uniswap/v3-periphery/contracts/libraries/PoolAddress.sol";
 import "@uniswap/v3-periphery/contracts/libraries/CallbackValidation.sol";
 import "@uniswap/v3-periphery/contracts/interfaces/external/IWETH9.sol";
 
-/// @title Uniswap V3 Swap Router
-/// @notice Router for stateless execution of swaps against Uniswap V3
+/**
+ * @title Uniswap V3 Swap Router
+ * @notice Router for stateless execution of swaps against Uniswap V3
+ * @dev code sourced from https://github.com/Uniswap/uniswap-v3-periphery/blob/main/contracts/SwapRouter.sol
+ * Changes made:
+ *  - modified exactInput function from external to public
+ *  - ran it against our prettier config
+ *  - allowed empty blocks in .solhint.json for empty constructor
+ *  - intend to create a custom SwapRouter in the future to allow for solc ^0.8.0
+ */
 contract SwapRouter is
   ISwapRouter,
   PeripheryImmutableState,
@@ -37,7 +45,7 @@ contract SwapRouter is
   /// @dev Transient storage variable used for returning the computed amount in for an exact output swap.
   uint256 private amountInCached = DEFAULT_AMOUNT_IN_CACHED;
 
-  constructor(address _factory, address _WETH9) PeripheryImmutableState(_factory, _WETH9) {}
+  constructor(address _factory, address _weth) PeripheryImmutableState(_factory, _weth) {}
 
   /// @dev Returns the pool for the given token pair and fee. The pool contract may or may not exist.
   function getPool(
@@ -126,7 +134,6 @@ contract SwapRouter is
     require(amountOut >= params.amountOutMinimum, "Too little received");
   }
 
-  // modify function from external to public
   /// @inheritdoc ISwapRouter
   function exactInput(ExactInputParams memory params)
     public
