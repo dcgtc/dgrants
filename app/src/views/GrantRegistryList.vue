@@ -61,7 +61,17 @@
           </div>
         </div>
         <div class="divide-x divide-gray-400 divide-opacity-30">
-          <button @click="addToCart(grant)" class="my-2 btn btn-primary">Add to Cart</button>
+          <button
+            v-if="isInCart(grant.id)"
+            @click="updateCart('remove', grant)"
+            class="my-2 btn btn-primary"
+            :key="forceRender"
+          >
+            Remove from Cart
+          </button>
+          <button v-else @click="updateCart('add', grant)" class="my-2 btn btn-primary" :key="forceRender">
+            Add to Cart
+          </button>
         </div>
       </li>
     </ul>
@@ -69,16 +79,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { addToCart } from 'src/utils/cart';
+import { defineComponent, ref } from 'vue';
+import { addToCart, isInCart, removeFromCart } from 'src/utils/cart';
 import { formatAddress, pushRoute } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
+import { Grant } from '@dgrants/types';
 
 export default defineComponent({
   name: 'GrantRegistryList',
   setup() {
     const { grants } = useDataStore();
-    return { addToCart, formatAddress, pushRoute, grants };
+
+    // TODO refactor cart to live in a store and reference that both here and in Cart.vue instead of forceRender hack
+    const forceRender = ref(0); // increment to force an update, used to react to localstorage changes
+    function updateCart(action: 'add' | 'remove', grant: Grant | null) {
+      if (!grant) return;
+      if (action === 'add') addToCart(grant);
+      else if (action === 'remove') removeFromCart(grant.id);
+      forceRender.value += 1;
+    }
+    return { isInCart, updateCart, formatAddress, pushRoute, grants, forceRender };
   },
 });
 </script>

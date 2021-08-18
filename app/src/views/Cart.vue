@@ -13,7 +13,6 @@
     <!-- Cart toolbar -->
     <div class="flex justify-between mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 border-t-2 border-b-2">
       <div class="flex justify-start">
-        <button @click="NOT_IMPLEMENTED('Save as collection')" class="btn btn-flat mr-5">Save as collection</button>
         <button @click="NOT_IMPLEMENTED('Share cart')" class="btn btn-flat">Share cart</button>
       </div>
       <button @click="clearCartAndUpdateState" class="btn btn-flat">Clear cart</button>
@@ -25,7 +24,10 @@
         <li v-for="grant in cart" :key="grant.grantId">
           <div class="flex justify-between items-center px-4 py-4 sm:px-6">
             <!-- Logo and name -->
-            <div class="flex items-center">
+            <div
+              class="flex items-center cursor-pointer"
+              @click="pushRoute({ name: 'dgrants-id', params: { id: grant.id.toString() } })"
+            >
               <img class="h-12 w-12" :src="grant.logoURI || 'src/assets/logo.png'" alt="" />
               <p class="text-sm text-left font-medium truncate">{{ grant.grantId }} {{ grant.metaPtr }}</p>
             </div>

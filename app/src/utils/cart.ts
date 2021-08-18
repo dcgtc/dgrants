@@ -52,6 +52,12 @@ export function removeFromCart(grantId: BigNumberish): CartItemOptions[] {
   return newCart;
 }
 
+// Returns true if the provided grantId is in the cart, false otherwise
+export function isInCart(grantId: BigNumberish): boolean {
+  const ids = loadCart().map((item) => item.grantId);
+  return ids.includes(BigNumber.from(grantId).toString());
+}
+
 // Clears the cart
 export function clearCart(): CartItemOptions[] {
   localStorage.removeItem(CART_KEY);
