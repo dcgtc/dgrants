@@ -25,6 +25,7 @@ contract GrantRoundManager is SwapRouter {
 
   mapping(IERC20 => uint256) internal donationRatios;
 
+  /// @dev Scale factor on percentages when constructing `Donation` objects. One WAD represents 100%
   uint256 internal constant WAD = 1e18;
 
   /// --- Types ---
@@ -56,8 +57,8 @@ contract GrantRoundManager is SwapRouter {
     GrantRegistry _registry,
     IERC20 _donationToken,
     address _factory,
-    address _WETH9
-  ) SwapRouter(_factory, _WETH9) {
+    address _weth
+  ) SwapRouter(_factory, _weth) {
     // Validation
     require(_registry.grantCount() >= 0, "GrantRoundManager: Invalid registry");
     require(_donationToken.totalSupply() > 0, "GrantRoundManager: Invalid token");
