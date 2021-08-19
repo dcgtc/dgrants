@@ -4,21 +4,22 @@
 -->
 
 <template>
-
-<figure class="cursor-pointer">
-  <div class="relative">
-    <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
-    <div class="group absolute bottom-0 right-0 p-4 bg-white opacity-30 hover:opacity-100">
-      <CartIcon class="icon-small" />
+  <figure class="cursor-pointer">
+    <div class="relative">
+      <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
+      <div class="absolute bottom-0 right-0">
+        <!-- when item in cart, add class "in-cart" to <button> -->
+        <button class="btn">
+          <CartIcon />
+        </button>
+      </div>
     </div>
-  </div>
-  <figcaption class="mt-4">
-    <div class="text-grey-500 font-medium truncate">Gitcoin Grants Official Matching Pool Fund</div>
-    <div><span class="text-grey-400">by</span><a class="ml-1" href="#">0xff…ffff</a></div>
-    <div><span class="text-grey-400">Raised:</span><span class="ml-1">315.355 USD</span></div>
-  </figcaption>
-</figure>
-
+    <figcaption class="mt-4">
+      <div class="text-grey-500 font-medium truncate">Gitcoin Grants Official Matching Pool Fund</div>
+      <div><span class="text-grey-400">by</span><a class="ml-1" href="#">0xff…ffff</a></div>
+      <div><span class="text-grey-400">Raised:</span><span class="ml-1">315.355 USD</span></div>
+    </figcaption>
+  </figure>
 </template>
 
 <script lang="ts">

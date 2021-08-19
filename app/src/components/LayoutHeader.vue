@@ -67,8 +67,10 @@
       <!--text-->
       <div class="hidden md:block group-hover:text-grey-500">Cart</div>
       <!--icon-->
+      <!-- when items in cart use class ="in-cart" on CartIcon -->
       <CartIcon class="icon" />
       <!--in cart number-->
+      <!-- when no items in cart, dont show a 0. show nothing in that div / or hide the div. -->
       <div class="group-hover:text-grey-500">12</div>
     </div>
 

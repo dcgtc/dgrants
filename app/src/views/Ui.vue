@@ -403,10 +403,11 @@ export default defineComponent({
 });
 </script>
 
-<!----- toto : 
+<!----- richard toto : 
 
 - spread x eth to y grants banner thingy
 - links list for grants and rounds
 - jazzicon images - post on discord about this error
+- empty cart . 
 
 -->

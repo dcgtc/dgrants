@@ -22,6 +22,7 @@ this is a part of the Grant Detail View
       <div class="col-span-4 md:col-span-2 xl:col-span-1">
         <div class="px-4 xl:px-12 md:text-right mb-8 xl:mb-0">
           <div class="mb-4 flex md:justify-end">
+            <!-- when item in cart add class "in-cart" + text in span "remove from cart"-->
             <button class="btn">
               <CartIcon />
               <span>add to cart</span>
