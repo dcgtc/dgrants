@@ -2,30 +2,28 @@
 
 This package allows you to create a distribution for a specific GrantRound based on the contributions recieved by the Grants.
 
-This can intended to be used
-  - by the dApp hosting dGrants to
-    - generate the CLR distribution at the end of the round
-    - how the prediction would vary for a grant it it were to receive a contribution on value X
-  - as a standalone to allow members of the DAO to be able to verify the distribution themselves to ensure the results are correct
+This package is intended to be used
 
-
+- by the dApp hosting dGrants to
+  - generate the CLR distribution at the end of the round
+  - how the prediction would vary for a grant it it were to receive an additional contribution of value X
+- as a standalone dApp to allow members of the DAO to verify the distribution/merkle root themselves to ensure that the results are correct
 
 ## Structure
 
 ```
 .
 ├── src
-│   ├── README.md               # Getting started guide
-│   ├── types.ts                # Typescript types
-|   ├── index.ts                # What client imports
+│   ├── README.md               # getting started guide
+│   ├── types.ts                # typescript types
+|   ├── index.ts                # root of the project, exporting public interface
 │   ├── internal
-│       ├── calc                # Contains impls of CLR algorithm
-│       ├── merkle-root         # Generates merkle root from distribution
+│       ├── calc                # folder containing implementations of CLR algorithms
+│       ├── merkle.ts           # file containing implementations to generate merkle-root and claims
 |       ├── fetch.ts            # fetch information from chain
-|       ├── main.ts             # orchestrator
+|       ├── clr.ts              # orchestrator
 └── ...
 ```
-
 
 ### fetch.ts
 
@@ -34,69 +32,83 @@ Exports function `fetch` which allows dApp to fetch contributions made to a Gran
 Argument Object: GrantRoundFetchArgs
 Response Object: GrantRoundContributions
 
-note: this can be overridden and fed into calculate , predict function as long as it response conforms to the structure of GrantRoundContributions
+note: this can be overridden and contributions can be fed directly into `calculate`/`predict`, so long as the input conforms to the structure of `GrantRoundContributions`
 
-
-### internal/cal (mandatory)
+### calc/\*.ts
 
 This folder lists out the different QF algorithms supported by dcurve
 and would need to be set when creating a new instance of CLR object
 
-| QF algorithm | How to import                               | Description                     |
-|--------------|---------------------------------------------|---------------------------------|
-| linear       | `import { linear } from @dgrants/dcurve;`   | This is QF without pairwise     |
-| pairwise     | `import { pairwise } from @dgrants/dcurve;` | This is QF which uses pairwise  |
-
+| QF algorithm | How to import                               | Description                                  |
+| ------------ | ------------------------------------------- | -------------------------------------------- |
+| linear       | `import { linear } from @dgrants/dcurve;`   | This is QF without pairwise                  |
+| pairwise     | `import { pairwise } from @dgrants/dcurve;` | This is QF which uses pairwise (coming soon) |
 
 ```javascript
 import { linear, CLR } from @dgrants/dcurve;
-const options = {
+const initArgs = {
   'calcAlgo' : linear,
-  'hashAlgo' : '...'
+  'includePayouts' : false
 }
-const clr = new CLR(options);
+const clr = new CLR(initArgs);
 ```
 
-### internal/merkle-distributor
+### merkle.ts
 
-This folder contains the logic to
+This file contains the logic to
+
 - generate merkle root of the distribution
-- verify an individual claim
+- generate/return a proof for a claim
 
-This logic has been ported over from [Uniswap/merkle-distributor](https://github.com/Uniswap/merkle-distributor) and generates the merkle root and provides means to generate a merkle root given the final distribution.
-This is what is uploaded to the `GrantRoundPayout.sol` contract
+This logic has been ported over from [Uniswap/merkle-distributor](https://github.com/Uniswap/merkle-distributor) and provides means to generate a merkle root given the final distribution.
 
+This is what will be uploaded to the `GrantRoundPayout.sol` contract
+
+### clr.ts
+
+This file orchastrates the calculation and prediction procedure, exposing two methods, calculate & predict.
 
 ## Usage
 
 ```
 // 1. Import the
-//  - CLR algorithm
-//  - hashing algorithm
 //  - fetch
-import { linear } from @dgrants/dcurve;
-import { fetch } from @dgrants/dcurve;
-import { CLR } from @dgrants/dcurve;
+//  - CLR algorithm
+//  - CLR class
+import { fetch, linear, CLR } from @dgrants/dcurve;
 
 // 2. Create instance of CLR
-const options = {
-  'calcAlgo' : linear
-}
-const clr = new CLR(options)
+
+const initArgs = {
+  calcAlgo: linear
+};
+const clr = new CLR(options);
 
 // 3. Fetch contributions
 
-const grantRound = '';
-const registry = '';
+const grantRoundFetchArgs = {
+  provider: provider,
+  grantRound: GRANT_ROUND_ADDRESS,
+  grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
+  grantRegistry: GRANT_REGISTRY_ADDRESS,
+  supportedTokens: SUPPORTED_TOKENS_MAPPING,
+  ignore: {
+    grants: [],
+    contributionAddress: []
+  }
+};
+const grantRoundContributions = fetch(fetchArgs);
 
-const contributions = fetch(grantRound, registry);
+// 4. Calculate Distribution
 
+const distribution = clr.calculate(grantRoundContributions);
 
-# 4. Calculate Distribution
-const distribution = clr.calculate(contributions)
+// 5. Predict match for a grant
 
-# 5. Predict match for a grant
-const grantId = '';
-const predicitionPoints = [1, 10];
-const prediction = clr.predict(contributions, grantId, predictionPoints)
+const grantPredictionArgs = {
+  grantId: 1,
+  predictionPoints: [1, 10, 100],
+  grantRoundContributions: contributions
+};
+const prediction = clr.predict(predictArgs);
 ```
