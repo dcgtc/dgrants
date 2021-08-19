@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "@dgrants/contracts": "^0.0.1",
+    "@dgrants/dcurve": "^0.0.1",
     "@dgrants/types": "^0.0.1",
     "@headlessui/vue": "^1.2.0",
     "@heroicons/vue": "^1.0.1",

@@ -17,10 +17,12 @@ import {
   MULTICALL_ADDRESS,
   MULTICALL_ABI,
   ERC20_ABI,
+  SUPPORTED_TOKENS_MAPPING,
 } from 'src/utils/constants';
 import { Grant, GrantRound, GrantRounds, GrantMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
 import { resolveMetaPtr } from 'src/utils/ipfs';
+import { CLR, fetch, linear, InitArgs, GrantsDistribution, GrantRoundFetchArgs } from '@dgrants/dcurve';
 
 // --- Parameters required ---
 const { provider } = useWalletStore();
@@ -35,6 +37,7 @@ const lastBlockTimestamp = ref<number>(0);
 const grants = ref<Grant[]>();
 const grantRounds = ref<GrantRounds>();
 const grantMetadata = ref<Record<string, GrantMetadataResolution>>({});
+const distributions = ref<GrantsDistribution>();
 
 // --- Store methods and exports ---
 export default function useDataStore() {
@@ -156,11 +159,33 @@ export default function useDataStore() {
       })
     );
 
+    // test/example
+    const clr = new CLR({
+      calcAlgo: linear,
+      includePayouts: true,
+    } as InitArgs);
+    // get contributions and grantRound details
+    const grantRoundArgs = await fetch({
+      provider: provider.value,
+      grantRound: '0x8B4091997E3EbB87be90cEd3e50d8Bb27e1DC742',
+      grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
+      grantRegistry: GRANT_REGISTRY_ADDRESS,
+      supportedTokens: SUPPORTED_TOKENS_MAPPING,
+      ignore: {
+        grants: [],
+        contributionAddress: [],
+      },
+    } as GrantRoundFetchArgs);
+    // calc the distributions
+    const distribution = clr.calculate(grantRoundArgs);
+    console.log(distribution);
+
     // Save off data
     lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
     lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
     grants.value = grantsList as Grant[];
     grantRounds.value = grantRoundsList as GrantRound[];
+    distributions.value = distribution;
 
     const metaPtrs = grants.value.map((grant) => grant.metaPtr);
     // Initialize metadata for metaPtrs we haven't encountered yet to status "pending"
@@ -210,5 +235,6 @@ export default function useDataStore() {
     grants: computed(() => grants.value),
     grantRounds: computed(() => grantRounds.value),
     grantMetadata: computed(() => grantMetadata.value),
+    distributions: computed(() => distributions.value),
   };
 }
