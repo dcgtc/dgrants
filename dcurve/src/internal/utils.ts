@@ -1,4 +1,4 @@
-import { GrantRoundContributions, Contribution, GrantsDistribution, GrantMatch } from 'src/types';
+import { GrantRoundContributions, Contribution, GrantsDistribution, GrantMatch } from '../../src/types';
 
 /**
  * util function which adds anon contribution of given value to the
@@ -17,12 +17,13 @@ export const addAnonContribution = (
   // create anon contribution
   const anon_contribution: Contribution = {
     grantId: grantId,
+    grantAddress: '0x0',
     address: '0x0',
     amount: amount,
   };
 
   // update grantRoundContributions to include the anon contribution
-  const contributions = grantRoundContributions.contributions;
+  const contributions = [...grantRoundContributions.contributions];
   contributions.push(anon_contribution);
 
   grantRoundContributions.contributions = contributions;
@@ -38,7 +39,8 @@ export const addAnonContribution = (
  */
 export const getGrantMatch = (grantId: number, grantsDistribution: GrantsDistribution): number => {
   const contributions: GrantMatch[] = grantsDistribution.distribution.filter(
-    (grantMatch) => (grantMatch.grantId = grantId)
+    (grantMatch) => grantMatch.grantId === grantId
   );
+
   return contributions[0].match;
 };
