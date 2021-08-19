@@ -1,4 +1,4 @@
-import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantRoundContributions, GrantsDistribution } from 'src/types';
+import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantRoundContributions, GrantsDistribution } from '../../types';
 
 /**
  * Holds the logic to determine the distribution using linear QF formula
