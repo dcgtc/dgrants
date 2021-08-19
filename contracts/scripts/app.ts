@@ -88,8 +88,11 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
   const log = manager.interface.parseLog(receipt.logs[0]);
   const { grantRound: grantRoundAddress } = log.args;
-
   console.log(`Deployed GrantRound to ${grantRoundAddress}`);
+
+  await setBalance('dai', grantRoundAddress, parseUnits('10000', 18));
+  console.log(`Set ${grantRoundAddress} totalPot`);
+
   return grantRoundAddress;
 };
 

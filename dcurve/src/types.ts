@@ -181,6 +181,7 @@ export type GrantsDistribution = {
   grantRound?: string;
   merkle?: MerkleDistributorInfo;
   hash?: string;
+  merkleError?: string;
 };
 
 // --------- CLR CALC

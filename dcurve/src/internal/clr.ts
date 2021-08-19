@@ -47,7 +47,7 @@ export class CLR {
     distribution.grantRound = grantRoundContributions.grantRound;
 
     // check if the calculation should include payouts (we cannot create a merkle without any contributions)
-    if (options.includePayouts && distribution.distribution.length) {
+    if (grantRoundContributions.totalPot && options.includePayouts) {
       // construct the payout obj by combining any grants which have the same payout address
       distribution.distribution.forEach((grantMatch: GrantMatch) => {
         // each payout address must only appear once in the payoutDistribution
@@ -71,10 +71,15 @@ export class CLR {
       });
       // record the distribution used to generate the merkle
       distribution.payoutDistribution = Object.values(payoutObj) as PayoutMatch[];
-      // generate the merkle for the payouts
-      distribution.merkle = generateMerkle(distribution.payoutDistribution, grantRoundContributions.currDecimals);
-      // set the merkleRoot as hash to allow payouts to be verifiable
-      distribution.hash = getMerkleRoot(distribution.merkle);
+      // prevent attempting to generate a merkle tree if we're missing the minimum number of leafs
+      if (distribution.payoutDistribution.length > 1) {
+        // generate the merkle tree and record the root
+        distribution.merkle = generateMerkle(distribution.payoutDistribution, grantRoundContributions.currDecimals);
+        distribution.hash = getMerkleRoot(distribution.merkle);
+      } else {
+        // empty state when we can't create a tree
+        distribution.merkleError = 'Missing required context to build tree';
+      }
     }
 
     // return distribution details (<GrantsDistribution>)
