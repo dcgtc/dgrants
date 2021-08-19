@@ -345,6 +345,7 @@
     <button class="btn">textbutton</button>
 
     <button class="btn">
+      <!-- load from fusion web3 icons the current logged in provider icon -->
       <CollectionIcon />
       <span>with icon</span>
     </button>
@@ -352,12 +353,92 @@
     <button class="btn disabled">textbutton</button>
   </div>
 
-  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
-
   <!--
 * 
 *
---></template>
+-->
+
+  <div class="bg-teal">HTML-Fragment : a list of links for round and grant detail page</div>
+
+  <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+    <div class="flex gap-x-4">
+      <span class="text-grey-400">Website:</span>
+      <a href="#" target="_blank">https://fusion.li</a>
+    </div>
+
+    <div class="flex gap-x-4">
+      <span class="text-grey-400">Github:</span>
+      <a href="#" target="_blank">https://github.com/scco/fusion</a>
+    </div>
+
+    <div class="flex gap-x-4">
+      <span class="text-grey-400">Twitter:</span>
+      <a href="#" target="_blank">https://twitter.com/schumanncombo</a>
+    </div>
+  </div>
+
+  <!--
+* CART
+*
+-->
+
+  <div class="bg-teal">HTML-Fragment : cart-page summary</div>
+
+  <div class="px-4 md:px-12">
+    <div class="py-8 border-b border-grey-100">
+      <div class="flex gap-x-4 justify-end">
+        <span class="text-grey-400">Contributing:</span>
+        <span>2.1337 ETH + 150 DAI + 1,337 PAN</span>
+      </div>
+    </div>
+
+    <div class="py-8 border-b border-grey-100">
+      <div class="flex gap-x-4 justify-end">
+        <span class="text-grey-400">Equivalent to:</span>
+        <span>4,532.21 USD</span>
+      </div>
+    </div>
+
+    <div class="py-8 border-b border-grey-100">
+      <div class="flex gap-x-4 justify-end">
+        <span class="text-grey-400">Estimated round’s matching value:</span>
+        <span>24,953.54 USD</span>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <div class="flex gap-x-4 justify-end">
+        <button class="btn">
+          <MetamaskIcon />
+          <span>checkout</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!--
+* CART EMPTY
+*
+-->
+
+  <div class="bg-teal">HTML-Fragment : cart-page empty</div>
+
+  <div class="px-4 md:px-12">
+    <div class="py-8 border-b border-grey-100">
+      <div class="flex gap-x-4 justify-end">
+        <span>Your Cart is empty.</span>
+      </div>
+    </div>
+
+    <div class="mt-12">
+      <div class="flex gap-x-4 justify-end">
+        <button class="btn">explore grants</button>
+      </div>
+    </div>
+  </div>
+
+  <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+</template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
@@ -377,6 +458,8 @@ import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import Dropzone from 'src/components/Dropzone.vue';
 import ImageRow from 'src/components/ImageRow.vue';
+
+import { MetamaskIcon as MetamaskIcon } from '@fusion-icons/vue/web3';
 
 // icons
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
@@ -399,15 +482,7 @@ export default defineComponent({
     InputRow,
     Dropzone,
     ImageRow,
+    MetamaskIcon,
   },
 });
 </script>
-
-<!----- richard toto : 
-
-- spread x eth to y grants banner thingy
-- links list for grants and rounds
-- jazzicon images - post on discord about this error
-- empty cart . 
-
--->
