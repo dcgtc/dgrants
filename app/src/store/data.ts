@@ -161,28 +161,29 @@ export default function useDataStore() {
     lastBlockTimestamp.value = (timestamp as BigNumber).toNumber();
     grants.value = grantsList as Grant[];
     grantRounds.value = grantRoundsList as GrantRound[];
+
     const metaPtrs = grants.value.map((grant) => grant.metaPtr);
+    // Initialize metadata for metaPtrs we haven't encountered yet to status "pending"
     const newMetadata = metaPtrs
-      .filter((metaPtr) => !grantMetadata.value[metaPtr]) // only want new metaPtrs
+      .filter((metaPtr) => !grantMetadata.value[metaPtr])
       .reduce((prev, cur) => {
         return {
           ...prev,
           [cur]: { status: 'pending' },
         };
       }, {});
-
+    // save these pending metadata objects to state
     grantMetadata.value = { ...grantMetadata.value, ...newMetadata };
-    await Promise.all(
-      Object.keys(newMetadata).map(async (url) => {
-        try {
-          const data = await resolveMetaPtr(url);
-          grantMetadata.value[url] = { status: 'resolved', ...data };
-        } catch (e) {
-          grantMetadata.value[url] = { status: 'error' };
-          console.error(e);
-        }
-      })
-    );
+    // resolve metadata via metaPtr and update state
+    Object.keys(newMetadata).map(async (url) => {
+      try {
+        const data = await resolveMetaPtr(url);
+        grantMetadata.value[url] = { status: 'resolved', ...data };
+      } catch (e) {
+        grantMetadata.value[url] = { status: 'error' };
+        console.error(e);
+      }
+    });
   }
 
   /**

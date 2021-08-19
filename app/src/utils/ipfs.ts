@@ -1,38 +1,46 @@
 import { create } from 'ipfs-http-client';
-import config from 'src/config';
 import { GrantMetadata } from '@dgrants/types';
 
+const config = {
+  storageEndpoint: 'https://ipfs-api.dev.fleek.cool',
+  storageHeaders: {
+    Authorization: `v2 ${import.meta.env.VITE_FLEEK_STORAGE_API_KEY}`, // or Bearer <JWT> or public <AppKey>
+  },
+  retrievalEndpoint: 'https://cloudflare-ipfs.com/ipfs',
+};
+
 const ipfs = create({
-  url: config.ipfs.endpoint,
-  headers: config.ipfs.headers,
+  url: config.storageEndpoint,
+  headers: config.storageHeaders,
 });
 
+/**
+ * Adds grant metadata to IPFS
+ * @param obj
+ * @param obj.name Name of grant
+ * @param obj.description Description of grant
+ * @returns CID
+ */
 export const createGrant = async ({ name, description }: GrantMetadata) => {
   const res = await ipfs.add(JSON.stringify({ name, description }));
   return res.cid;
 };
 
-export const createMetaPtr = ({ cid }: { cid: string }) => {
-  return `${config.ipfs.metaPtrEndpoint}/${cid}`;
+/**
+ * Creates a url for a MetaPtr
+ * @param obj
+ * @param obj.cid CID of the grant
+ * @returns string
+ */
+export const getMetaPtr = ({ cid }: { cid: string }) => {
+  return `${config.retrievalEndpoint}/${cid}`;
 };
 
-export const ipfsFetch = async ({ cid }: { cid: string }) => {
-  for await (const file of ipfs.get(cid)) {
-    if (file.type !== 'file' || !file.content) {
-      continue;
-    } else {
-      const content = [];
-      for await (const chunk of file.content) {
-        content.push(chunk);
-      }
-      return JSON.parse(content.toString());
-    }
-  }
-  throw Error('no content');
-};
-
+/**
+ * Resolves a metaPtr via fetch
+ * @param url URL of metaPtr
+ * @returns Object
+ */
 export const resolveMetaPtr = (url: string) => {
-  return ipfsFetch({
-    cid: url.split('/').reverse()[0],
-  });
+  return fetch(url).then((res) => res.json());
 };
