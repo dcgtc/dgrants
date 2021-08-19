@@ -4,12 +4,12 @@
 -->
 
 <template>
-  <figure class="cursor-pointer">
+  <figure class="group cursor-pointer">
     <div class="relative">
       <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
       <div class="absolute bottom-0 right-0">
         <!-- when item in cart, add class "in-cart" to <button> -->
-        <button class="btn">
+        <button class="btn opacity-0 group-hover:opacity-100">
           <CartIcon />
         </button>
       </div>
