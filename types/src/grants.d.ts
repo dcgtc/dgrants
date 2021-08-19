@@ -63,5 +63,5 @@ export type Claim = {
 export type GrantMetadata = {
   name: string;
   description: string;
-  logoURI: string;
+  logoURI?: string;
 };
