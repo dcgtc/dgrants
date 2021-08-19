@@ -6,7 +6,8 @@
 <template>
   <figure class="cursor-pointer">
     <div>
-      <img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />
+      <!--<img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />-->
+      <img src="../assets/building-gitcoin-keyshape-animation.svg" alt="" />
     </div>
     <figcaption class="mt-4">
       <div class="text-grey-500 font-medium truncate">Gitcoin GR11</div>
