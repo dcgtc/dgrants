@@ -8,6 +8,10 @@
     "CLR",
     "curve"
   ],
+  "main": "src/index.ts",
+  "files": [
+    "src"
+  ],
   "scripts": {
     "clean": "rimraf dist",
     "dev": "echo 'TODO'",
@@ -24,8 +28,9 @@
     "extends": "../package.json"
   },
   "dependencies": {
-    "@uniswap/merkle-distributor": "^1.0.1",
-    "ethereumjs-util": "^7.1.0",
+    "@dgrants/contracts": "^0.0.1",
+    "@dgrants/utils": "^0.0.1",
+    "buffer": "^6.0.3",
     "ethers": "^5.4.4"
   }
 }
