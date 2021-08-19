@@ -109,7 +109,7 @@ function useNewGrant() {
     if (!signer.value) throw new Error('Please connect a wallet');
     const metaPtr = await ipfs
       .createGrant({ name, description })
-      .then((cid) => ipfs.createMetaPtr({ cid: cid.toString() }));
+      .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
     const tx = await registry.createGrant(owner, payee, metaPtr);
     await tx.wait();
