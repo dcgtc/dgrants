@@ -1,5 +1,5 @@
 // CLR calc class
-export { CLR } from './internal/main';
+export { CLR } from './internal/clr';
 
 // Fetch contributions
 export { fetch } from './internal/fetch';
@@ -8,4 +8,7 @@ export { fetch } from './internal/fetch';
 export { handle as linear } from './internal/calc/linear';
 
 // Hashing commands
-export { handle as sha256 } from './internal/hash/sha256';
+export { getMerkleRoot, getMerkleProof } from './internal/merkle';
+
+// export types
+export type { InitArgs, GrantsDistribution, GrantRoundFetchArgs } from './types';
