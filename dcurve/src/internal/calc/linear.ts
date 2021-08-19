@@ -1,77 +1,79 @@
-import { CLRArgs, GrantMatch, GrantRoundContributions, GrantsDistribution, Contribution } from 'src/types';
+import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantRoundContributions, GrantsDistribution } from 'src/types';
 
 /**
  * Holds the logic to determine the distribution using linear QF formula
  * @param clrArgs
  */
 export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
-  // define local variables
-  const matchCap = Number(clrArgs.matchCap);
+  // GrantRoundContributions will define the round and hold all matching contributions
   const grantRoundContributions: GrantRoundContributions = clrArgs.contributions;
 
-  const totalPot = grantRoundContributions.totalPot;
-  const contributions: Contribution[] = grantRoundContributions.contributions;
+  // unpack grantRoundContributions to local state
+  const { totalPot, contributions } = grantRoundContributions;
 
-  let sumOfSqrtContrib = 0;
-  let sumOfContrib = 0;
+  // define local variables
   let totalMatch = 0;
   let hasSaturated = false;
-  let distribution: GrantMatch[] = [];
+  const distribution: GrantMatch[] = [];
+  const contributionsByGrantId: ContributionsByGrantId = {};
 
-  // calculate sum of sqrt of contributions and contributions
+  // pivot the contributions by project
   contributions.forEach((contribution) => {
-    // TODO: ADD TRUST BONUS SCORE
-
-    // sum of square root of contributions
-    sumOfSqrtContrib += Math.sqrt(contribution.amount);
-
-    // sum of contributions
-    sumOfContrib += contribution.amount;
-
-    const match = Math.pow(sumOfSqrtContrib, 2) - sumOfContrib;
-    const grantMatch: GrantMatch = {
-      grantId: contribution.grantId,
-      address: contribution.address,
-      match: match,
-    };
-
-    // generate the distribution without normalizing
-    if (!distribution) {
-      distribution = [grantMatch];
-    } else {
-      distribution.push(grantMatch);
+    if (!contributionsByGrantId[contribution.grantId]) {
+      contributionsByGrantId[contribution.grantId] = {
+        grantId: contribution.grantId,
+        grantAddress: contribution.grantAddress,
+        contributions: [],
+      };
     }
+    contributionsByGrantId[contribution.grantId].contributions.push(contribution);
+  });
 
+  // calculate linear matching for each Grant
+  Object.values(contributionsByGrantId).forEach((details) => {
+    let sumOfSqrtContrib = 0;
+    let sumOfContrib = 0;
+    // calculate sum of sqrt of contributions and contributions
+    details.contributions.forEach((contribution) => {
+      // TODO: ADD TRUST BONUS SCORE
+
+      // sum of square root of contributions
+      sumOfSqrtContrib += contribution.amount ** 0.5;
+
+      // sum of contributions
+      sumOfContrib += contribution.amount;
+    });
+
+    // sum of square root of contributions ^ 2 - sum of contributions
+    const match = sumOfSqrtContrib ** 2 - sumOfContrib;
+
+    // record the match for each grantId
+    distribution.push({
+      grantId: details.grantId,
+      address: details.grantAddress,
+      match: match,
+    } as GrantMatch);
+
+    // record how much of the totalPot we have allocated
     totalMatch += match;
   });
 
+  // this means the round has saturated and we have enough
+  // contributions to ensure all funds are distributed
   if (totalMatch > totalPot) {
-    // this means the round has saturated and we have enough
-    // contributions to ensure all the funds are distributed
     hasSaturated = true;
   }
 
-  /**
-   * normalize match if
-   *  - hasSaturated is true
-   *  - match of a grant exceeds set cap
-   */
-  distribution.forEach((grantMatch: GrantMatch) => {
-    if (hasSaturated) {
+  // normalize match if hasSaturated is true
+  if (hasSaturated) {
+    distribution.forEach((grantMatch: GrantMatch) => {
       // normalize match if round has saturated
       grantMatch.match = (grantMatch.match * totalPot) / totalMatch;
-    }
+    });
+  }
 
-    if (grantMatch.match >= matchCap) {
-      // normalize match if grant has match greater than cap
-      grantMatch.match = matchCap;
-    }
-  });
-
-  const grantDistribution: GrantsDistribution = {
+  return {
     distribution: distribution,
     hasSaturated: hasSaturated,
-  };
-
-  return grantDistribution;
+  } as GrantsDistribution;
 };
