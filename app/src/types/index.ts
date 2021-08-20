@@ -9,9 +9,8 @@ export type CartItemOptions = {
   contributionAmount: number; // store as a human-readable number for better form UX
 };
 
-// Cart info used by the main Cart component
-export type CartItem = Omit<CartItemOptions, 'contributionTokenAddress'> &
-  Grant &
-  GrantMetadata & {
-    contributionToken: TokenInfo;
-  };
+// Cart info used by the main Cart component -- GrantMetadata is optional as we don't have it immediately on page load
+type ContributionToken = { contributionToken: TokenInfo };
+export type CartItem =
+  | (Omit<CartItemOptions, 'contributionTokenAddress'> & Grant & ContributionToken & GrantMetadata)
+  | (Omit<CartItemOptions, 'contributionTokenAddress'> & Grant & ContributionToken);
