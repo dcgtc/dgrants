@@ -96,7 +96,34 @@
       border-b border-grey-100
     "
   >
-    <GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard /><GrantCard />
+    <GrantCard
+      name="Fusion"
+      address="0x11…1111"
+      raised="1 USD"
+      imgurl="http://placekitten.com/1920/1080?image=1"
+      :incart="true"
+    />
+    <GrantCard
+      name="Turbogeth"
+      address="0x22…2222"
+      raised="100 USD"
+      imgurl="http://placekitten.com/1920/1080?image=2"
+      :incart="false"
+    />
+    <GrantCard
+      name="Kinetics"
+      address="0x33…3333"
+      raised="1.000 USD"
+      imgurl="http://placekitten.com/1920/1080?image=3"
+      :incart="true"
+    />
+    <GrantCard
+      name="Bankless"
+      address="0x44…4444"
+      raised="10.000 USD"
+      imgurl="http://placekitten.com/1920/1080?image=4"
+      :incart="false"
+    />
   </section>
 
   <!--
