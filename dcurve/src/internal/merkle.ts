@@ -11,11 +11,11 @@ export type { MerkleDistributorInfo };
 /**
  * Generates hash of the GrantsDistribution distribution
  * @param distribution - PayoutMatch[]
- * @param matchTokenDecimals - The number of decimals used by the distributed token
+ * @param matchingTokenDecimals - The number of decimals used by the distributed token
  * @returns {MerkleDistributorInfo} - merkle tree of the distribution
  * https://github.com/Uniswap/merkle-distributor
  */
-export const generateMerkle = (distribution: PayoutMatch[], matchTokenDecimals: number) => {
+export const generateMerkle = (distribution: PayoutMatch[], matchingTokenDecimals: number) => {
   // collect the input
   const merkleInput: NewFormat[] = [];
 
@@ -23,7 +23,7 @@ export const generateMerkle = (distribution: PayoutMatch[], matchTokenDecimals: 
   distribution.forEach((payoutMatch: PayoutMatch) => {
     merkleInput.push({
       address: payoutMatch.address,
-      earnings: parseUnits(payoutMatch.match.toString(), matchTokenDecimals).toHexString(),
+      earnings: parseUnits(payoutMatch.match.toString(), matchingTokenDecimals).toHexString(),
       reasons: '',
     });
   });
@@ -35,13 +35,13 @@ export const generateMerkle = (distribution: PayoutMatch[], matchTokenDecimals: 
 /**
  * Generates hash of the GrantsDistribution distribution
  * @param distribution - PayoutMatch[]
- * @param matchTokenDecimals - The number of decimals used by the distributed token
+ * @param matchingTokenDecimals - The number of decimals used by the distributed token
  * @returns {string} - merkle root hash of the distribution
  * https://github.com/Uniswap/merkle-distributor
  */
-export const generateMerkleRoot = (distribution: PayoutMatch[], matchTokenDecimals: number): string => {
+export const generateMerkleRoot = (distribution: PayoutMatch[], matchingTokenDecimals: number): string => {
   // get the merkleTree
-  const merkleDistributorInfo: MerkleDistributorInfo = generateMerkle(distribution, matchTokenDecimals);
+  const merkleDistributorInfo: MerkleDistributorInfo = generateMerkle(distribution, matchingTokenDecimals);
 
   // return merkleRoot
   return merkleDistributorInfo.merkleRoot;
@@ -51,17 +51,17 @@ export const generateMerkleRoot = (distribution: PayoutMatch[], matchTokenDecima
  * Generates merkle and outputs the proof of the GrantsDistribution distribution
  * @param address - address to find in the distribution
  * @param distribution - PayoutMatch[]
- * @param matchTokenDecimals - The number of decimals used by the distributed token
+ * @param matchingTokenDecimals - The number of decimals used by the distributed token
  * @returns {string[]} - merkle proof for the provided address
  * https://github.com/Uniswap/merkle-distributor
  */
 export const generateMerkleProof = (
   address: string,
   distribution: PayoutMatch[],
-  matchTokenDecimals: number
+  matchingTokenDecimals: number
 ): string[] => {
   // get the merkleTree
-  const merkleDistributorInfo: MerkleDistributorInfo = generateMerkle(distribution, matchTokenDecimals);
+  const merkleDistributorInfo: MerkleDistributorInfo = generateMerkle(distribution, matchingTokenDecimals);
 
   // return proof for address
   return merkleDistributorInfo.claims[address].proof;
