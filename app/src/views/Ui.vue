@@ -147,7 +147,21 @@
       border-b border-grey-100
     "
   >
-    <RoundCard /><RoundCard /><RoundCard /><RoundCard />
+    <RoundCard
+      name="Building Gitcoin"
+      imgurl="../src/assets/building-gitcoin-keyshape-animation.svg"
+      address="0x55…5555"
+      grants="12"
+      funds="500.000 USD"
+    />
+
+    <RoundCard
+      name="Safe the Cats"
+      imgurl="http://placekitten.com/1920/1080?image=4"
+      address="0x66…6666"
+      grants="2"
+      funds="1 USD"
+    />
   </section>
 
   <!--
