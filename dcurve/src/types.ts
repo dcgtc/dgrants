@@ -63,13 +63,13 @@ export type ContributionsByGrantId = {
  * @type Contribution
  * @field {grantRound} grant round address
  * @field {totalPot} total pot amount in the round
- * @field {matchTokenDecimals} the number of decimals used by the rounds currency
+ * @field {matchingTokenDecimals} the number of decimals used by the rounds matching currency
  * @field {[contributions]} contributions in that round
  */
 export type GrantRoundContributions = {
   grantRound: string;
   totalPot: number;
-  matchTokenDecimals: number;
+  matchingTokenDecimals: number;
   contributions: Contribution[];
 };
 

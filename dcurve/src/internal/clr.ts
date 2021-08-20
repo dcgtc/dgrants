@@ -76,7 +76,7 @@ export class CLR {
         // generate the merkle tree and record the root
         distribution.merkle = generateMerkle(
           distribution.payoutDistribution,
-          grantRoundContributions.matchTokenDecimals
+          grantRoundContributions.matchingTokenDecimals
         );
         distribution.hash = getMerkleRoot(distribution.merkle);
       } else {

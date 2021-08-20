@@ -2,8 +2,9 @@
 
 import { Contract } from 'ethers';
 import { Contribution, GrantRoundContributions, GrantRoundFetchArgs } from '../../src/types';
-import { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
 import { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
+import { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
+import { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
 import { formatUnits } from 'ethers/lib/utils';
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint)'];
@@ -13,14 +14,17 @@ const ERC20_ABI = ['function balanceOf(address) view returns (uint)'];
  * @param {GrantRoundFetchArgs}
  */
 export const fetch = async (args: GrantRoundFetchArgs) => {
-  // fetch grantRoundManager
-  const roundManager = new Contract(args.grantRoundManager, GRANT_ROUND_MANAGER_ABI, args.provider);
   // fetch the grantList
   const registry = new Contract(args.grantRegistry, GRANT_REGISTRY_ABI, args.provider);
+  // fetch the grantRound
+  const round = new Contract(args.grantRound, GRANT_ROUND_ABI, args.provider);
+  // fetch grantRoundManager
+  const roundManager = new Contract(args.grantRoundManager, GRANT_ROUND_MANAGER_ABI, args.provider);
 
   // set-up
-  const [allGrants, donationToken, grantDonations] = await Promise.all([
+  const [allGrants, matchingToken, donationToken, grantDonations] = await Promise.all([
     registry.getAllGrants(), // TODO: https://github.com/dcgtc/dgrants/pull/91#discussion_r692567688
+    round.matchingToken(),
     roundManager.donationToken(),
     roundManager.queryFilter(roundManager.filters.GrantDonation()), // TODO: https://github.com/dcgtc/dgrants/pull/91#discussion_r692569977
   ]);
@@ -32,8 +36,8 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
     return grants;
   }, {});
 
-  // get donation token info
-  const donationTokenContract = new Contract(donationToken, ERC20_ABI, args.provider);
+  // get token info
+  const matchingTokenContract = new Contract(matchingToken, ERC20_ABI, args.provider);
 
   // fetch & ignore Contributions
   const contributions: Contribution[] = [];
@@ -66,9 +70,9 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
   return {
     grantRound: args.grantRound,
     totalPot: parseFloat(
-      formatUnits(await donationTokenContract.balanceOf(args.grantRound), args.supportedTokens[donationToken].decimals)
+      formatUnits(await matchingTokenContract.balanceOf(args.grantRound), args.supportedTokens[matchingToken].decimals)
     ),
-    matchTokenDecimals: args.supportedTokens[donationToken].decimals,
+    matchingTokenDecimals: args.supportedTokens[matchingToken].decimals,
     contributions: contributions,
   } as GrantRoundContributions;
 };
