@@ -91,7 +91,7 @@ export default defineComponent({
   },
   data() {
     return {
-      data: '',
+      data: {},
     };
   },
 });
