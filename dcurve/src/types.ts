@@ -37,7 +37,7 @@ export type GrantRoundFetchArgs = {
  * @field {amount} contribution amount
  */
 export type Contribution = {
-  grantId: number;
+  grantId: string;
   grantAddress: string;
   address: string;
   amount: number;
@@ -50,8 +50,8 @@ export type Contribution = {
  * @field {value} contributions (Contribution)
  */
 export type ContributionsByGrantId = {
-  [grantId: number]: {
-    grantId: number;
+  [grantId: string]: {
+    grantId: string;
     grantAddress: string;
     contributions: Contribution[];
   };
@@ -63,13 +63,13 @@ export type ContributionsByGrantId = {
  * @type Contribution
  * @field {grantRound} grant round address
  * @field {totalPot} total pot amount in the round
- * @field {currDecimals} the number of decimals used by the rounds currency
+ * @field {matchTokenDecimals} the number of decimals used by the rounds currency
  * @field {[contributions]} contributions in that round
  */
 export type GrantRoundContributions = {
   grantRound: string;
   totalPot: number;
-  currDecimals: number;
+  matchTokenDecimals: number;
   contributions: Contribution[];
 };
 
@@ -84,7 +84,7 @@ export type GrantRoundContributions = {
  * @field {[grantRoundContributions]} contributions in that round
  */
 export type GrantPredictionArgs = {
-  grantId: number;
+  grantId: string;
   predictionPoints: number[];
   grantRoundContributions: GrantRoundContributions;
 };
@@ -113,7 +113,7 @@ export type GrantPrediction = {
  * @field {[GrantPrediction]} list of GrantPrediction
  */
 export type GrantPredictions = {
-  grantId: number;
+  grantId: string;
   grantRound: string;
   predictions: GrantPrediction[];
 };
@@ -128,7 +128,7 @@ export type GrantPredictions = {
  * @field {match} match amount
  */
 export type GrantMatch = {
-  grantId: number;
+  grantId: string;
   address: string;
   match: number;
 };
@@ -151,7 +151,7 @@ export type InitArgs = {
  * @field {match} match amount
  */
 export type PayoutMatch = {
-  grantIds: number[];
+  grantIds: string[];
   address: string;
   match: number;
 };
