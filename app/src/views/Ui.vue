@@ -478,6 +478,8 @@
     </div>
   </div>
 
+  <Jazzicon width="64" address="0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199" />
+
   <br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
 </template>
 
@@ -499,6 +501,7 @@ import RoundDetailsRow from 'src/components/RoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import Dropzone from 'src/components/Dropzone.vue';
 import ImageRow from 'src/components/ImageRow.vue';
+import Jazzicon from 'src/components/Jazzicon.vue';
 
 // identicons ( https://www.npmjs.com/package/vue3-jazzicon )
 // import Jazzicon from 'vue3-jazzicon/src/components';
@@ -526,6 +529,7 @@ export default defineComponent({
     Dropzone,
     ImageRow,
     MetamaskIcon,
+    Jazzicon,
   },
 });
 </script>
