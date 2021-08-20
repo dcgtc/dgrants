@@ -23,7 +23,7 @@
     "prettier": "prettier --write ."
   },
   "bugs": {
-    "url": "https://github.com/dcgtc/dgrants/dcurve/issues"
+    "url": "https://github.com/dcgtc/dgrants/issues"
   },
   "volta": {
     "extends": "../package.json"

@@ -13,7 +13,7 @@ import {
   PayoutMatches,
 } from '../../src/types';
 import { generateMerkle, getMerkleRoot } from './merkle';
-import { addAnonContribution, getGrantMatch } from './utils';
+import { addAnonymousContribution, getGrantMatch } from './utils';
 
 // polyfill Buffer for use in browser
 import { Buffer } from 'buffer/';
@@ -23,7 +23,7 @@ Object.defineProperty(window, 'Buffer', { value: Buffer });
 export class CLR {
   _options: InitArgs;
 
-  constructor(options: InitArgs) {
+  constructor(readonly options: InitArgs) {
     this._options = options;
   }
 
@@ -120,7 +120,7 @@ export class CLR {
       // calculate distribution with anon contribution
       const newDistribution: GrantsDistribution = calcAlgo({
         // add anon contribution of value predictionPoint
-        contributions: addAnonContribution(grantId, { ...grantRoundContributions }, predictionPoint),
+        contributions: addAnonymousContribution(grantId, { ...grantRoundContributions }, predictionPoint),
         // allow for overrides to set calc algo
         ...options,
       } as CLRArgs);

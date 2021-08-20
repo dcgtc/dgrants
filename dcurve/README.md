@@ -7,7 +7,7 @@ This package is intended to be used
 - by the dApp hosting dGrants to
   - generate the CLR distribution at the end of the round
   - how the prediction would vary for a grant it it were to receive an additional contribution of value X
-- as a standalone dApp to allow members of the DAO to verify the distribution/merkle root themselves to ensure that the results are correct
+- as a standalone CLI tool to allow members of the DAO to verify the distribution/merkle root themselves to ensure that the results are correct
 
 ## Structure
 
@@ -66,7 +66,7 @@ This is what will be uploaded to the `GrantRoundPayout.sol` contract
 
 ### clr.ts
 
-This file orchastrates the calculation and prediction procedure, exposing two methods, calculate & predict.
+This file orchestrates the calculation and prediction procedure, exposing two methods, `calculate` & `predict`.
 
 ## Usage
 

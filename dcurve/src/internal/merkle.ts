@@ -6,7 +6,6 @@ import {
 } from '@dgrants/utils/src/merkle-distributor/parse-balance-map';
 import { PayoutMatch } from '../types';
 
-// export MerkleDistributorInfo
 export type { MerkleDistributorInfo };
 
 /**
