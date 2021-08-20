@@ -28,8 +28,12 @@
               class="flex items-center cursor-pointer"
               @click="pushRoute({ name: 'dgrants-id', params: { id: item.id.toString() } })"
             >
-              <img class="h-12 w-12" src="src/assets/logo.png" alt="" />
-              <p class="text-sm text-left font-medium truncate">{{ item.grantId }} {{ item.metaPtr }}</p>
+              <img
+                class="h-12 w-12"
+                :src="grantMetadata[item.metaPtr].logoURI || 'src/assets/logo.png'"
+                alt="Grant logo"
+              />
+              <p class="ml-4 text-sm text-left font-medium truncate">{{ grantMetadata[item.metaPtr].name }}</p>
             </div>
 
             <!-- Contribution info -->
@@ -90,6 +94,7 @@ import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
+import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { SUPPORTED_TOKENS } from 'src/utils/constants';
 import { pushRoute } from 'src/utils/utils';
@@ -115,8 +120,9 @@ export default defineComponent({
   name: 'Cart',
   components: { BaseInput, BaseSelect, XIcon },
   setup() {
+    const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED };
+    return { ...useCart(), pushRoute, grantMetadata, SUPPORTED_TOKENS, NOT_IMPLEMENTED };
   },
 });
 </script>
