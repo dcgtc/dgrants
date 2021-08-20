@@ -33,7 +33,7 @@ export default defineComponent({
     name: String,
     imgurl: String,
     address: String,
-    grants: Number,
+    grants: String,
     funds: String,
   },
   components: {},

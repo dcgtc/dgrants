@@ -7,7 +7,7 @@ this is a part of the Round Detail View
     <div class="grid grid-cols-4 gap-8">
       <div class="col-span-4 xl:col-span-2">
         <!--<img class="shadow-light" src="http://placekitten.com/1920/1080?image=1" />-->
-        <img :src="imgurl" alt="" />
+        <img src="../assets/building-gitcoin-keyshape-animation.svg" alt="" />
       </div>
 
       <div class="col-span-4 md:col-span-2 xl:col-span-1 mb-8 xl:mb-0">
