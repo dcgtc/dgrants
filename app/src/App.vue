@@ -8,19 +8,22 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import useSettingsStore from 'src/store/settings';
-import useWalletStore from 'src/store/wallet';
 import LayoutHeader from './components/LayoutHeader.vue';
 import LayoutFooter from './components/LayoutFooter.vue';
+import useCartStore from 'src/store/cart';
+import useSettingsStore from 'src/store/settings';
+import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'App',
   components: { LayoutHeader, LayoutFooter },
   setup() {
-    // Load settings and try connecting user's wallet on page load
+    // Load cart, load settings, and try connecting user's wallet on page load
+    const { initializeCart } = useCartStore();
     const { connectWallet } = useWalletStore();
     const { lastWallet, initializeSettings } = useSettingsStore();
     onMounted(async () => {
+      initializeCart();
       await initializeSettings();
       if (lastWallet.value) await connectWallet(lastWallet.value);
     });

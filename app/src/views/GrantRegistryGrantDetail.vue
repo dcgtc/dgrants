@@ -7,17 +7,10 @@
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
 
-    <button
-      v-if="isInCart(grant.id)"
-      @click="updateCart('remove', grant)"
-      class="mt-5 btn btn-primary"
-      :key="forceRender"
-    >
+    <button v-if="isInCart(grant.id)" @click="removeFromCart(grant?.id)" class="mt-5 btn btn-primary">
       Remove from Cart
     </button>
-    <button v-else @click="updateCart('add', grant)" class="mt-5 btn btn-primary" :key="forceRender">
-      Add to Cart
-    </button>
+    <button v-else @click="addToCart(grant?.id)" class="mt-5 btn btn-primary">Add to Cart</button>
     <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
   </div>
 
@@ -91,16 +84,15 @@ import { computed, defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import BaseInput from 'src/components/BaseInput.vue';
 // --- Store ---
+import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract, ContractTransaction } from 'src/utils/ethers';
-import { addToCart, isInCart, removeFromCart } from 'src/utils/cart';
 import { isValidAddress, isValidUrl } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
-import { Grant } from '@dgrants/types';
 
 function useGrantDetail() {
   const { grants, poll, grantMetadata: metadata } = useDataStore();
@@ -191,15 +183,8 @@ export default defineComponent({
   name: 'GrantRegistryGrantDetail',
   components: { BaseInput },
   setup() {
-    // TODO refactor cart to live in a store and reference that both here and in Cart.vue instead of forceRender hack
-    const forceRender = ref(0); // increment to force an update, used to react to localstorage changes
-    function updateCart(action: 'add' | 'remove', grant: Grant | null) {
-      if (!grant) return;
-      if (action === 'add') addToCart(grant);
-      else if (action === 'remove') removeFromCart(grant.id);
-      forceRender.value += 1;
-    }
-    return { ...useGrantDetail(), isInCart, updateCart, forceRender };
+    const { addToCart, isInCart, removeFromCart } = useCartStore();
+    return { isInCart, addToCart, removeFromCart, ...useGrantDetail() };
   },
 });
 </script>
