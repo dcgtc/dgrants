@@ -500,10 +500,12 @@ import InputRow from 'src/components/InputRow.vue';
 import Dropzone from 'src/components/Dropzone.vue';
 import ImageRow from 'src/components/ImageRow.vue';
 
-import { MetamaskIcon as MetamaskIcon } from '@fusion-icons/vue/web3';
+// identicons ( https://www.npmjs.com/package/vue3-jazzicon )
+// import Jazzicon from 'vue3-jazzicon/src/components';
 
 // icons
 import { ViewListIcon as CollectionIcon } from '@fusion-icons/vue/interface';
+import { MetamaskIcon as MetamaskIcon } from '@fusion-icons/vue/web3';
 
 export default defineComponent({
   name: 'Ui',
