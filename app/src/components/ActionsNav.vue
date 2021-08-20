@@ -24,19 +24,19 @@ as i remember philip told something like this ( i forgot )
 <template>
   <div class="px-4 md:px-12 py-8 border-b border-grey-100">
     <div class="flex flex-wrap gap-x-6 gap-y-4">
-      <div class="item">
+      <div class="flex items-center gap-x-2 cursor-pointer group">
         <CollectionIcon class="icon" />
-        <span>Save</span>
+        <span class="text-grey-400 group-hover:text-grey-500">Save</span>
       </div>
 
-      <div class="item">
+      <div class="flex items-center gap-x-2 cursor-pointer group">
         <ShareIcon class="icon" />
-        <span>Share</span>
+        <span class="text-grey-400 group-hover:text-grey-500">Share</span>
       </div>
 
-      <div class="item ml-auto">
+      <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
         <XIcon class="icon" />
-        <span>Clear</span>
+        <span class="text-grey-400 group-hover:text-grey-500">Clear</span>
       </div>
     </div>
   </div>
@@ -70,17 +70,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style scoped>
-.item {
-  @apply group flex items-center gap-x-2 cursor-pointer;
-}
-
-.item svg {
-  @apply cursor-pointer;
-}
-
-.item span {
-  @apply text-grey-400 group-hover:text-grey-500;
-}
-</style>
