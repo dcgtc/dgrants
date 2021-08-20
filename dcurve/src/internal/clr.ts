@@ -56,8 +56,8 @@ export class CLR {
         if (payoutObj[grantMatch.address]) {
           // get the current set of grantIds
           const currentGrantIds = payoutObj[grantMatch.address].grantIds;
-          // add the set of grantIds to the arr and filter duplicates
-          grantIds = grantIds.concat(currentGrantIds).filter((item, pos) => currentGrantIds.indexOf(item) === pos);
+          // add the set of grantIds to the arr and dedupe
+          grantIds = [...new Set(grantIds.concat(currentGrantIds))];
         }
         // ensure the payout address has a match to claim
         if (grantMatch.match) {
@@ -74,7 +74,10 @@ export class CLR {
       // prevent attempting to generate a merkle tree if we're missing the minimum number of leafs
       if (distribution.payoutDistribution.length > 1) {
         // generate the merkle tree and record the root
-        distribution.merkle = generateMerkle(distribution.payoutDistribution, grantRoundContributions.currDecimals);
+        distribution.merkle = generateMerkle(
+          distribution.payoutDistribution,
+          grantRoundContributions.matchTokenDecimals
+        );
         distribution.hash = getMerkleRoot(distribution.merkle);
       } else {
         // empty state when we can't create a tree
@@ -101,7 +104,7 @@ export class CLR {
     const calcAlgo = options['calcAlgo'];
 
     // unpack the prediction arguments
-    const grantId: number = args.grantId;
+    const grantId: string = args.grantId;
     const predictionPoints: number[] = args.predictionPoints;
     const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
     const predictions: GrantPrediction[] = [];

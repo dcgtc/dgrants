@@ -4,6 +4,7 @@ import { Contract } from 'ethers';
 import { Contribution, GrantRoundContributions, GrantRoundFetchArgs } from '../../src/types';
 import { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
 import { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
+import { formatUnits } from 'ethers/lib/utils';
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint)'];
 
@@ -26,7 +27,7 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
 
   // collect the grants into a grantId->payoutAddress obj
   const grantsDict = allGrants.reduce((grants: Record<string, string>, grant: Record<string, string>, key: number) => {
-    grants[key] = grant.payee;
+    grants[key.toString()] = grant.payee;
 
     return grants;
   }, {});
@@ -43,7 +44,7 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
     const tx = await contribution.getTransaction();
 
     // check that the contribution is valid
-    const grantId = contribution?.args?.grantId.toNumber();
+    const grantId = contribution?.args?.grantId.toString();
     const inRound = contribution?.args?.rounds.includes(args.grantRound);
     const isIgnoredGrant = args?.ignore?.grants?.includes(grantId);
     const isIgnoredContributor = args?.ignore?.contributionAddress?.indexOf(tx.from) !== -1;
@@ -52,7 +53,9 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
     if (inRound && !isIgnoredGrant && !isIgnoredContributor) {
       contributions.push({
         grantId: grantId,
-        amount: contribution?.args?.donationAmount / 10 ** args.supportedTokens[donationToken].decimals,
+        amount: parseFloat(
+          formatUnits(contribution?.args?.donationAmount, args.supportedTokens[donationToken].decimals)
+        ),
         grantAddress: grantsDict[grantId],
         address: tx.from,
       });
@@ -62,9 +65,10 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
   // return contributions as GrantRoundContributions
   return {
     grantRound: args.grantRound,
-    totalPot:
-      (await donationTokenContract.balanceOf(args.grantRound)) / 10 ** args.supportedTokens[donationToken].decimals,
-    currDecimals: 18,
+    totalPot: parseFloat(
+      formatUnits(await donationTokenContract.balanceOf(args.grantRound), args.supportedTokens[donationToken].decimals)
+    ),
+    matchTokenDecimals: args.supportedTokens[donationToken].decimals,
     contributions: contributions,
   } as GrantRoundContributions;
 };
