@@ -1,7 +1,7 @@
 import { BigNumber, BigNumberish, BytesLike } from 'ethers';
 import { TokenInfo } from '@uniswap/token-lists';
 
-// --- Types ---
+// --- Grants ---
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for
 // handling the Grant struct as done below
 export type GrantObject = {
@@ -10,13 +10,20 @@ export type GrantObject = {
   payee: string;
   metaPtr: string;
 };
-
-export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
-export type GrantMetadataResolution = Partial<GrantMetadata> & { status: GrantMetadataStatus };
 export type GrantArray = [BigNumber, string, string, string];
 export type GrantEthers = GrantArray & GrantObject;
 export type Grant = GrantObject | GrantEthers;
 
+// Metadata resolve from a grant's metadata pointer URL
+export type GrantMetadata = {
+  name: string;
+  description: string;
+  logoURI?: string;
+};
+export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
+export type GrantMetadataResolution = Partial<GrantMetadata> & { status: GrantMetadataStatus };
+
+// --- Contributions ---
 // SwapSummary struct from GrantRoundManager
 export interface SwapSummary {
   amountIn: BigNumberish;
@@ -32,6 +39,7 @@ export interface Donation {
   rounds: string[];
 }
 
+// --- Grant Rounds ---
 // GrantRound object from GrantRoundManager
 export type GrantRound = {
   address: string;
@@ -57,11 +65,4 @@ export type Claim = {
   payee: string;
   amount: number;
   merkleProof: string[];
-};
-
-// Metadata resolve from a grant's metadata pointer URL
-export type GrantMetadata = {
-  name: string;
-  description: string;
-  logoURI?: string;
 };
