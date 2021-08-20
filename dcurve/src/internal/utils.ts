@@ -1,21 +1,24 @@
 import { GrantRoundContributions, Contribution, GrantsDistribution, GrantMatch } from '../../src/types';
 
 /**
- * util function which adds anon contribution of given value to the
- * grantRoundContributions for given grant
+ * util function which adds anonymous contribution of given value to the
+ * grantRoundContributions for given grant.
+ * This function would be used to update the input contributions
+ * by adding a contribution of value `amount` to grant `grantId` which would be used to
+ * calculate the predicted match
  *
  * @param grantId
  * @param grantRoundContributions
  * @param amount
  * @returns grantRoundContributions
  */
-export const addAnonContribution = (
+export const addAnonymousContribution = (
   grantId: number,
   grantRoundContributions: GrantRoundContributions,
   amount: number
 ): GrantRoundContributions => {
-  // create anon contribution
-  const anon_contribution: Contribution = {
+  // create anonymous contribution
+  const anonymous_contribution: Contribution = {
     grantId: grantId,
     grantAddress: '0x0',
     address: '0x0',
@@ -24,7 +27,7 @@ export const addAnonContribution = (
 
   // update grantRoundContributions to include the anon contribution
   const contributions = [...grantRoundContributions.contributions];
-  contributions.push(anon_contribution);
+  contributions.push(anonymous_contribution);
 
   grantRoundContributions.contributions = contributions;
   return grantRoundContributions;

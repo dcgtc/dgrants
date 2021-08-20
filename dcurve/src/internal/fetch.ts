@@ -18,25 +18,23 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
   const registry = new Contract(args.grantRegistry, GRANT_REGISTRY_ABI, args.provider);
 
   // set-up
-  const values = await Promise.all([
-    registry.getAllGrants(),
+  const [allGrants, donationToken, grantDonations] = await Promise.all([
+    registry.getAllGrants(), // TODO: https://github.com/dcgtc/dgrants/pull/91#discussion_r692567688
     roundManager.donationToken(),
-    roundManager.queryFilter(roundManager.filters.GrantDonation()),
+    roundManager.queryFilter(roundManager.filters.GrantDonation()), // TODO: https://github.com/dcgtc/dgrants/pull/91#discussion_r692569977
   ]);
 
   // collect the grants into a grantId->payoutAddress obj
-  const grantsList = values[0].reduce((grants: Record<string, string>, grant: Record<string, string>, key: number) => {
+  const grantsDict = allGrants.reduce((grants: Record<string, string>, grant: Record<string, string>, key: number) => {
     grants[key] = grant.payee;
 
     return grants;
   }, {});
 
   // get donation token info
-  const donationToken = values[1];
   const donationTokenContract = new Contract(donationToken, ERC20_ABI, args.provider);
 
   // fetch & ignore Contributions
-  const grantDonations = values[2];
   const contributions: Contribution[] = [];
 
   // records matching contributions in the expected format (Contribution[])
@@ -45,18 +43,17 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
     const tx = await contribution.getTransaction();
 
     // check that the contribution is valid
-    const inRound = contribution?.args?.rounds.indexOf(args.grantRound) !== -1;
-    const isIgnoredGrant =
-      args.ignore && args.ignore.grants && args.ignore.grants?.indexOf(contribution?.args?.grantId.toNumber()) !== -1;
-    const isIgnoredContributor =
-      args.ignore && args.ignore.contributionAddress && args.ignore.contributionAddress?.indexOf(tx.from) !== -1;
+    const grantId = contribution?.args?.grantId.toNumber();
+    const inRound = contribution?.args?.rounds.includes(args.grantRound);
+    const isIgnoredGrant = args?.ignore?.grants?.includes(grantId);
+    const isIgnoredContributor = args?.ignore?.contributionAddress?.indexOf(tx.from) !== -1;
 
     // only include transactions from this grantRound which havent been ignored
     if (inRound && !isIgnoredGrant && !isIgnoredContributor) {
       contributions.push({
-        grantId: contribution?.args?.grantId.toNumber(),
+        grantId: grantId,
         amount: contribution?.args?.donationAmount / 10 ** args.supportedTokens[donationToken].decimals,
-        grantAddress: grantsList[contribution?.args?.grantId.toNumber()],
+        grantAddress: grantsDict[grantId],
         address: tx.from,
       });
     }
