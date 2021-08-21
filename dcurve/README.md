@@ -41,8 +41,13 @@ and would need to be set when creating a new instance of CLR object
 
 | QF algorithm | How to import                               | Description                                  |
 | ------------ | ------------------------------------------- | -------------------------------------------- |
-| linear       | `import { linear } from @dgrants/dcurve;`   | This is QF without pairwise                  |
-| pairwise     | `import { pairwise } from @dgrants/dcurve;` | This is QF which uses pairwise (coming soon) |
+| linear       | `import { linear } from @dgrants/dcurve;`   | The non-pairwise, original quadratic matching formula makes the inherent assumption that all agents participating in a grant round are fully uncoordinated. Therefore, we follow the formula where the amount received by a grant is proportional to the square of the sum of the square roots of contributions received less the sum of the total contributions for the grant.|
+| pairwise     | `import { pairwise } from @dgrants/dcurve;` | The pairwise quadratic matching formula takes into account that some agents are coordinating while contributing to grants and that this coordination should be penalized.
+
+This can be represented mathematically as a coordination coefficient, 1 if the agents are fully uncoordinated and 0 (no matching should occur) if the agents are fully coordinated. This is theoretical of course, and the applicable concept is that the more coordinated a pair of contributors are, the higher the penalty. In order to discover the level of coordination between users for each grant, this means we must take a permutation of all contributors who contributed to a grant and look across how many grants they both contributed to, to assess how much penalty a user pair would incur.
+
+The trade off is the calculation speed of the formula and the inherent collusion resistance. Non-pairwise gives us faster calculation speeds and the possibility of accurately estimating CLR match amounts with no collusion detection. Pairwise, to some degree, protects against collusion tactics, but the complexity and overhead of running user to user permutations puts limitations on predicting match amounts and quickly running calculations.
+ (coming soon) |
 
 ```javascript
 import { linear, CLR } from @dgrants/dcurve;
