@@ -9,7 +9,7 @@ import { Artifact } from 'hardhat/types';
 import { balanceOf, setBalance, tokens } from './utils';
 import { BalanceTree } from '../../utils/src/merkle-distributor/balance-tree';
 import { BigNumber, Contract, utils } from 'ethers';
-import { Claim } from '../../types/src/grants';
+import { Claim } from '../../types/src';
 
 // --- Parse and define helpers ---
 const { deployContract } = waffle;

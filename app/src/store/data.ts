@@ -3,7 +3,7 @@
  */
 
 // --- External imports ---
-import { computed, markRaw, ref } from 'vue';
+import { computed, markRaw, Ref, ref } from 'vue';
 
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
@@ -19,7 +19,7 @@ import {
   ERC20_ABI,
   SUPPORTED_TOKENS_MAPPING,
 } from 'src/utils/constants';
-import { Grant, GrantRound, GrantRounds, GrantMetadataResolution } from '@dgrants/types';
+import { Grant, GrantRound, GrantRounds, GrantMetadataResolution, GrantRoundMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
 import { resolveMetaPtr } from 'src/utils/ipfs';
 import { CLR, fetch, linear, InitArgs, GrantsDistribution, GrantRoundFetchArgs } from '@dgrants/dcurve';
@@ -34,10 +34,13 @@ const roundManager = ref<Contract>();
 // Most recent data read is saved as state
 const lastBlockNumber = ref<number>(0);
 const lastBlockTimestamp = ref<number>(0);
+
 const grants = ref<Grant[]>();
-const grantRounds = ref<GrantRounds>();
 const grantMetadata = ref<Record<string, GrantMetadataResolution>>({});
 const distributions = ref<GrantsDistribution>();
+
+const grantRounds = ref<GrantRounds>();
+const grantRoundMetadata = ref<Record<string, GrantRoundMetadataResolution>>({});
 
 // --- Store methods and exports ---
 export default function useDataStore() {
@@ -187,10 +190,22 @@ export default function useDataStore() {
     grantRounds.value = grantRoundsList as GrantRound[];
     distributions.value = distribution;
 
-    const metaPtrs = grants.value.map((grant) => grant.metaPtr);
-    // Initialize metadata for metaPtrs we haven't encountered yet to status "pending"
+    // Fetch Metadata
+    const grantMetaPtrs = grants.value.map((grant) => grant.metaPtr);
+    const grantRoundMetaPtrs = grantRounds.value.map((grantRound) => grantRound.metaPtr);
+    void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
+    void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
+  }
+
+  /**
+   * @notice Helper method that fetches metadata for a Grant or GrantRound, and saves the data
+   * to the state as soon as it's received
+   * @param metaPtrs Array of URLs to resolve
+   * @param metadata Name of the store's ref to assign resolve metadata to
+   */
+  async function fetchMetaPtrs(metaPtrs: string[], metadata: Ref) {
     const newMetadata = metaPtrs
-      .filter((metaPtr) => !grantMetadata.value[metaPtr])
+      .filter((metaPtr) => !metadata.value[metaPtr])
       .reduce((prev, cur) => {
         return {
           ...prev,
@@ -198,17 +213,19 @@ export default function useDataStore() {
         };
       }, {});
     // save these pending metadata objects to state
-    grantMetadata.value = { ...grantMetadata.value, ...newMetadata };
+    metadata.value = { ...metadata.value, ...newMetadata };
     // resolve metadata via metaPtr and update state
     Object.keys(newMetadata).map(async (url) => {
       try {
         const data = await resolveMetaPtr(url);
-        grantMetadata.value[url] = { status: 'resolved', ...data };
+        metadata.value[url] = { status: 'resolved', ...data };
       } catch (e) {
-        grantMetadata.value[url] = { status: 'error' };
+        metadata.value[url] = { status: 'error' };
         console.error(e);
       }
     });
+
+    return metadata;
   }
 
   /**
@@ -235,6 +252,7 @@ export default function useDataStore() {
     grants: computed(() => grants.value),
     grantRounds: computed(() => grantRounds.value),
     grantMetadata: computed(() => grantMetadata.value),
+    grantRoundMetadata: computed(() => grantRoundMetadata.value),
     distributions: computed(() => distributions.value),
   };
 }
