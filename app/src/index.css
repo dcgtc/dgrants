@@ -54,30 +54,6 @@
   .indent {
     text-indent: 1em;
   }
-  .link {
-    @apply text-grey-500 underline cursor-pointer;
-  }
-}
-
-/* Add styles to utilities      */
-@layer utilities {
-  .icon,
-  .icon-small,
-  .icon-large {
-    @apply object-contain stroke-2 stroke-grey-400 group-hover:stroke-grey-500 hover:stroke-grey-500;
-  }
-
-  .icon {
-    @apply h-10 w-10 md:h-14 md:w-14;
-  }
-
-  .icon-small {
-    @apply h-6 w-6 md:h-10 md:w-10;
-  }
-
-  .icon-large {
-    @apply h-16 w-16 md:h-20 md:w-20;
-  }
 
   .link {
     @apply text-grey-500 underline cursor-pointer;
@@ -93,5 +69,44 @@
 
   .btn svg {
     @apply stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8;
+  }
+}
+
+/* Add styles to utilities      */
+@layer utilities {
+  .icon,
+  .icon-small,
+  .icon-large {
+    @apply object-contain stroke-2 stroke-grey-400 group-hover:stroke-grey-500 hover:stroke-grey-500;
+  }
+
+  .icon.in-cart {
+    @apply stroke-teal;
+  }
+
+  .icon {
+    @apply h-10 w-10 md:h-14 md:w-14;
+  }
+
+  .icon-small {
+    @apply h-6 w-6 md:h-10 md:w-10;
+    object-fit: contain;
+  }
+
+  .icon-large {
+    @apply h-16 w-16 md:h-20 md:w-20;
+    object-fit: contain;
+  }
+
+  .btn {
+    @apply flex items-center gap-x-2 whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400;
+  }
+
+  .btn svg {
+    @apply stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8;
+  }
+
+  .btn.in-cart {
+    @apply bg-teal hover:bg-grey-400 opacity-100;
   }
 }
