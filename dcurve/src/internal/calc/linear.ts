@@ -35,7 +35,6 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
     let sumOfContrib = 0;
     // calculate sum of sqrt of contributions and contributions
     details.contributions.forEach((contribution) => {
-      // TODO: ADD TRUST BONUS SCORE
 
       // sum of square root of contributions
       sumOfSqrtContrib += contribution.amount ** 0.5;
@@ -46,6 +45,12 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
 
     // sum of square root of contributions ^ 2 - sum of contributions
     const match = sumOfSqrtContrib ** 2 - sumOfContrib;
+
+    // TODO: ADD TRUST BONUS SCORE HERE
+    // API CALL TO TRUST BONUS API 
+    // GET SCORE FROM CONTRIBUTIONS ADDRESS 
+    // MULTIPLY SCORE WITH match VARIABLE IN LINE 47
+    // 0.5 AS DEFAULT IF NO TRUST BONUSES PERFORMED, UP TO 1.5
 
     // record the match for each grantId
     distribution.push({
