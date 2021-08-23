@@ -62,7 +62,7 @@
             </div>
           </div>
         </div>
-        <div class="divide-x divide-gray-400 divide-opacity-30">
+        <div class="divide-x divide-gray-400 divide-opacity-30 flex justify-center">
           <button v-if="isInCart(grant.id)" @click="removeFromCart(grant.id)" class="my-2 btn btn-primary">
             Remove from Cart
           </button>

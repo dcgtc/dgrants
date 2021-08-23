@@ -51,8 +51,9 @@
       <p>
         Metadata URL: <a class="link" :href="grantRound.metaPtr" target="_blank">{{ grantRound.metaPtr }}</a>
       </p>
-
-      <button @click="startContributing" class="btn btn-primary mt-6">Contribute to the matching fund</button>
+      <div class="flex justify-center">
+        <button @click="startContributing" class="btn btn-primary mt-6">Contribute to the matching fund</button>
+      </div>
     </div>
     <div v-else-if="grantRound.error">
       <span>{{ grantRound.error }}</span>

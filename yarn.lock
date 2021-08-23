@@ -876,6 +876,11 @@
     "@ethersproject/properties" "^5.4.0"
     "@ethersproject/strings" "^5.4.0"
 
+"@fusion-icons/vue@^0.0.0":
+  version "0.0.0"
+  resolved "https://registry.yarnpkg.com/@fusion-icons/vue/-/vue-0.0.0.tgz#e4077fe9e31bd723cf7fabf45934e0af4efe1688"
+  integrity sha512-eHsBJjQi31rKb4gPkYMEucPkkUXUqUprGf4usc/SnW0VtpLyj2GX+fjQANAUvW6lzW5EvW9UgoadiZ0pK5rmAQ==
+
 "@gnosis.pm/safe-apps-provider@^0.5.0":
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/@gnosis.pm/safe-apps-provider/-/safe-apps-provider-0.5.0.tgz#e0121553ef22c1458eb95cf0afed14e8c2570ae3"

@@ -6,12 +6,13 @@
     <p>Description: {{ grantMetadata?.description }}</p>
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
-
-    <button v-if="isInCart(grant.id)" @click="removeFromCart(grant?.id)" class="mt-5 btn btn-primary">
-      Remove from Cart
-    </button>
-    <button v-else @click="addToCart(grant?.id)" class="mt-5 btn btn-primary">Add to Cart</button>
-    <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
+    <div class="flex justify-center">
+      <button v-if="isInCart(grant.id)" @click="removeFromCart(grant?.id)" class="mt-5 btn btn-primary">
+        Remove from Cart
+      </button>
+      <button v-else @click="addToCart(grant?.id)" class="mt-5 btn btn-primary">Add to Cart</button>
+      <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
+    </div>
   </div>
 
   <!-- Editing grant -->

@@ -6,7 +6,7 @@
     <div>Date: {{ date }}</div>
   </div>
 
-  <div class="mt-6">
+  <div class="flex justify-center mt-6">
     <button @click="pushRoute({ name: 'dgrants-rounds-list' })" class="btn btn-primary mr-3">Grant Rounds</button>
     <button @click="pushRoute({ name: 'dgrants' })" class="btn btn-primary mr-3">Grants Registry</button>
   </div>
