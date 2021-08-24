@@ -82,7 +82,17 @@ async function getRoute(tokens: SupportedToken[]): Promise<Route<Token, Token>> 
     poolPromises.push(getPoolInstance(inputToken, outputToken));
   });
   const pools = await Promise.all(poolPromises);
-  return new Route(pools, pools[0].token0, pools[pools.length - 1].token1);
+
+  // Get input token. First we guess that our input token is token 0 for a pool, and if not then it must be token 1
+  const inSymbol = tokens[0] === 'eth' ? 'weth' : tokens[0];
+  let inToken = pools.find((pool) => pool.token0.symbol?.toLowerCase() === inSymbol)?.token0;
+  inToken = inToken ? inToken : pools.find((pool) => pool.token1.symbol?.toLowerCase() === inSymbol)?.token1;
+
+  // Get output token using same process
+  const outSymbol = tokens[tokens.length - 1] === 'eth' ? 'weth' : tokens[tokens.length - 1];
+  let outToken = pools.find((pool) => pool.token0.symbol?.toLowerCase() === outSymbol)?.token0;
+  outToken = outToken ? outToken : pools.find((pool) => pool.token1.symbol?.toLowerCase() === outSymbol)?.token1;
+  return new Route(pools, inToken as Token, outToken as Token);
 }
 
 async function getPoolInstance(token0: SupportedToken, token1: SupportedToken): Promise<Pool> {
