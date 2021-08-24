@@ -17,6 +17,7 @@
             >
               {{ link.name }}
             </router-link>
+            <button @click="$emit('toggleAbout')" class="font-medium text-gray-500 hover:text-gray-900">About</button>
           </div>
         </div>
         <div class="ml-10 space-x-4">
@@ -54,7 +55,6 @@ import { WarningIcon } from '@fusion-icons/vue/interface';
 // Header menu bar items
 const navigation = [
   { name: 'Home', href: '/' },
-  { name: 'About', href: '/about' },
   { name: 'Cart', href: '/cart' },
   { name: 'Contact', href: '/contact' },
 ];
@@ -62,6 +62,7 @@ const navigation = [
 export default defineComponent({
   name: 'LayoutHeader',
   components: { WarningIcon },
+  emits: ['toggleAbout'],
   setup() {
     const { connectWallet, isSupportedNetwork, userDisplayName } = useWalletStore();
     return { connectWallet, isSupportedNetwork, navigation, userDisplayName };
