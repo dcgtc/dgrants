@@ -8,8 +8,8 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
-import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/constants';
-import { BigNumber, BigNumberish, isAddress } from 'src/utils/ethers';
+import { SUPPORTED_TOKENS_MAPPING, WAD } from 'src/utils/constants';
+import { BigNumber, BigNumberish, hexDataSlice, isAddress, parseUnits } from 'src/utils/ethers';
 import useDataStore from 'src/store/data';
 
 // --- Constants and helpers ---
@@ -18,7 +18,7 @@ const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495
 const DEFAULT_CONTRIBUTION_AMOUNT = 5; // this is converted to a parsed BigNumber at checkout
 const EMPTY_CART: CartItemOptions[] = []; // and empty cart is identified by an empty array
 
-const { grants } = useDataStore();
+const { grants, grantRounds } = useDataStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
@@ -155,6 +155,14 @@ export default function useCartStore() {
     setCart(EMPTY_CART);
   }
 
+  /**
+   * @notice Executes donations
+   */
+  function checkout() {
+    console.log('checking out', cart.value);
+    console.log(cartDonationInputs.value);
+  }
+
   // --- Getters ---
   /**
    * @notice Returns true if the provided grantId is in the cart, false otherwise
@@ -182,14 +190,37 @@ export default function useCartStore() {
   /**
    * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
    */
-  const cartDonationInputs = computed((): { swaps: SwapSummary[]; donations: Donation[] } => {
-    // TODO this method should return the methods needed to execute the swap
-    const swaps: SwapSummary[] = [];
-    const donations: Donation[] = [];
-    for (const item of cart.value) {
-      item;
-    }
-    return { swaps, donations };
+  const cartDonationInputs = computed((): { swaps: SwapSummary[]; donations: Donation[]; deadline: number } => {
+    // Get the swaps array
+    const swaps: SwapSummary[] = Object.keys(cartSummary.value).map((tokenAddress) => {
+      const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
+      const amountOutMin = '1'; // TODO improve this
+      const path = ''; // TODO
+      return { amountIn, amountOutMin, path };
+    });
+
+    // Get the donations array
+    const donations: Donation[] = cart.value.map((item) => {
+      // Extract data we already have
+      const { grantId, contributionAmount, contributionToken } = item;
+      const tokenAddress = contributionToken.address;
+      const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
+      const donationAmount = parseUnits(String(contributionAmount), SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals);
+
+      // Compute ratio
+      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress);
+      if (!swap) throw new Error('Could not find matching swap for donation');
+      const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
+
+      // Return donation object
+      return { grantId, token: tokenAddress, ratio, rounds };
+    });
+
+    // Return all inputs needed for checkout, using a deadline 20 minutes from now
+    const now = new Date().getTime();
+    const nowPlus20Minutes = new Date(now + 20 * 60 * 1000).getTime();
+    return { swaps, donations, deadline: Math.floor(nowPlus20Minutes / 1000) };
   });
 
   /**
@@ -214,6 +245,7 @@ export default function useCartStore() {
     cartSummaryString,
     // Mutations
     addToCart,
+    checkout,
     clearCart,
     initializeCart,
     isInCart,

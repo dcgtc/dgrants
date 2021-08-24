@@ -20,6 +20,7 @@
     "@heroicons/vue": "^1.0.1",
     "@tailwindcss/forms": "^0.3.3",
     "@uniswap/token-lists": "^1.0.0-beta.25",
+    "@uniswap/v3-sdk": "^3.3.2",
     "assert": "^2.0.0",
     "bnc-onboard": "~1.30.0",
     "browserify-zlib": "^0.2.0",
