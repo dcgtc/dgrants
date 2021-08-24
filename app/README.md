@@ -12,11 +12,16 @@ Ethereum frontend app built with the following stack:
 
 ## Setup
 
-For local testing, add a network to MetaMask with the following information:
+Install MetaMask and configure it with the default Hardhat mnemonic of `test test test test test test test test test test test junk`.
+If you already have MetaMask installed, it may be easier to create a new browser profile called "Hardhat" so you can configure MetaMask with this mnemonic without affecting your existing MetaMask installation.
+
+Then, add a network to MetaMask with the following information:
 
 - Name: Hardhat
 - New RPC URL: http://127.0.0.1:8545
 - Chain ID: 31337
+
+This configuration is required to ensure your account is funded with tokens for testing. You can now build the app with:
 
 ```sh
 # Install packages
