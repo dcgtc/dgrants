@@ -108,7 +108,7 @@ const grantRoundContributions = fetch(fetchArgs);
 
 // 4. Calculate Distribution
 
-const distribution = clr.calculate(grantRoundContributions);
+const distribution = await clr.calculate(grantRoundContributions);
 
 // 5. Predict match for a grant
 
@@ -117,5 +117,5 @@ const grantPredictionArgs = {
   predictionPoints: [1, 10, 100],
   grantRoundContributions: contributions
 };
-const prediction = clr.predict(predictArgs);
+const prediction = await clr.predict(predictArgs);
 ```

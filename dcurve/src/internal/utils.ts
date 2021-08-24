@@ -1,4 +1,5 @@
 import { GrantRoundContributions, Contribution, GrantsDistribution, GrantMatch } from '../../src/types';
+import axios from 'axios';
 
 /**
  * util function which adds anonymous contribution of given value to the
@@ -46,4 +47,27 @@ export const getGrantMatch = (grantId: string, grantsDistribution: GrantsDistrib
   );
 
   return contributions[0].match;
+};
+
+/**
+ * @notice fetches the trust bonus score for a list of addresses
+ * from the gitcoin trust-bonus API
+ *
+ * @param address
+ * @param defaultScore
+ * @returns
+ */
+export const fetchTrustBonusScore = async (addresses: string[]) => {
+  const url = 'https://gitcoin.co/grants/v1/api/trust-bonus';
+  const params = {
+    addresses: addresses.join(','),
+  };
+
+  try {
+    const response = await axios.get(url, { params: params });
+    return response.data;
+  } catch (err) {
+    console.error('fetchTrustBonusScore:', err);
+    return [];
+  }
 };
