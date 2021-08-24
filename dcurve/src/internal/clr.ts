@@ -18,7 +18,7 @@ import { addAnonymousContribution, getGrantMatch } from './utils';
 // polyfill Buffer for use in browser
 import { Buffer } from 'buffer/';
 // set to window (TODO: make this work in vite.config.ts)
-Object.defineProperty(window, 'Buffer', { value: Buffer });
+Object.defineProperty(global, 'Buffer', { value: Buffer });
 
 export class CLR {
   _options: InitArgs;
