@@ -27,7 +27,10 @@ export class CLR {
     this._options = options;
   }
 
-  calculate(grantRoundContributions: GrantRoundContributions, _options?: Record<string, unknown>): GrantsDistribution {
+  async calculate(
+    grantRoundContributions: GrantRoundContributions,
+    _options?: Record<string, unknown>
+  ): Promise<GrantsDistribution> {
     // allow the options to be overridden
     const options = Object.assign(this._options, _options || {});
 
@@ -38,7 +41,7 @@ export class CLR {
     const payoutObj: PayoutMatches = {};
 
     // calculate distribution based on contributions
-    const distribution: GrantsDistribution = calcAlgo({
+    const distribution: GrantsDistribution = await calcAlgo({
       contributions: grantRoundContributions,
       ...options,
     } as CLRArgs);
@@ -96,7 +99,7 @@ export class CLR {
    *
    * @returns GrantPredictions
    */
-  predict(args: GrantPredictionArgs, _options?: Record<string, unknown>): GrantPredictions {
+  async predict(args: GrantPredictionArgs, _options?: Record<string, unknown>): Promise<GrantPredictions> {
     // allow the options to be overridden
     const options = Object.assign(this._options, _options || {});
 
@@ -110,7 +113,7 @@ export class CLR {
     const predictions: GrantPrediction[] = [];
 
     // calculate distribution based on current contribution
-    const distribution: GrantsDistribution = calcAlgo({
+    const distribution: GrantsDistribution = await calcAlgo({
       contributions: grantRoundContributions,
       ...(options || {}),
     } as CLRArgs);
@@ -119,9 +122,9 @@ export class CLR {
     const currentGrantMatch = getGrantMatch(grantId, distribution);
 
     // calculate predicted distribution for each predictionPoint
-    predictionPoints.forEach((predictionPoint) => {
+    predictionPoints.forEach(async (predictionPoint) => {
       // calculate distribution with anon contribution
-      const newDistribution: GrantsDistribution = calcAlgo({
+      const newDistribution: GrantsDistribution = await calcAlgo({
         // add anon contribution of value predictionPoint
         contributions: addAnonymousContribution(grantId, { ...grantRoundContributions }, predictionPoint),
         // allow for overrides to set calc algo

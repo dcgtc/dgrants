@@ -1,10 +1,16 @@
 import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantRoundContributions, GrantsDistribution } from '../../types';
+import { fetchTrustBonusScore } from '../utils';
+
+type TrustBonusScore = {
+  address: string;
+  score: number;
+};
 
 /**
  * Holds the logic to determine the distribution using linear QF formula
  * @param clrArgs
  */
-export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
+export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
   // GrantRoundContributions will define the round and hold all matching contributions
   const grantRoundContributions: GrantRoundContributions = clrArgs.contributions;
 
@@ -17,6 +23,8 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
   const distribution: GrantMatch[] = [];
   const contributionsByGrantId: ContributionsByGrantId = {};
 
+  let contributionAddresses: string[] = [];
+
   // pivot the contributions by project
   contributions.forEach((contribution) => {
     if (!contributionsByGrantId[contribution.grantId]) {
@@ -25,9 +33,17 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
         grantAddress: contribution.grantAddress,
         contributions: [],
       };
+
+      contributionAddresses.push(contribution.address);
     }
     contributionsByGrantId[contribution.grantId].contributions.push(contribution);
   });
+
+  // ensure contributionAddresses is unique list
+  contributionAddresses = [...new Set(contributionAddresses)];
+
+  // fetch trust bonus scores of contributors
+  const trustBonusScores = await fetchTrustBonusScore(contributionAddresses);
 
   // calculate linear matching for each Grant
   Object.values(contributionsByGrantId).forEach((details) => {
@@ -35,21 +51,25 @@ export const handle = (clrArgs: CLRArgs): GrantsDistribution => {
     let sumOfContrib = 0;
     // calculate sum of sqrt of contributions and contributions
     details.contributions.forEach((contribution) => {
-      // sum of square root of contributions
-      sumOfSqrtContrib += contribution.amount ** 0.5;
+      // get contributor's trust bonus score
+      const trustBonusScore = trustBonusScores.find(
+        (trustScore: TrustBonusScore) => trustScore.address == contribution.address
+      );
+
+      const score = trustBonusScore ? trustBonusScore.score : 0.5;
+
+      // multiply the trust bonus with the contirbution
+      const weightedContribution = contribution.amount * score;
+
+      // sum of square root of contribution
+      sumOfSqrtContrib += weightedContribution ** 0.5;
 
       // sum of contributions
-      sumOfContrib += contribution.amount;
+      sumOfContrib += weightedContribution;
     });
 
     // sum of square root of contributions ^ 2 - sum of contributions
     const match = sumOfSqrtContrib ** 2 - sumOfContrib;
-
-    // TODO: ADD TRUST BONUS SCORE HERE
-    // API CALL TO TRUST BONUS API
-    // GET SCORE FROM CONTRIBUTIONS ADDRESS
-    // MULTIPLY SCORE WITH match VARIABLE IN LINE 47
-    // 0.5 AS DEFAULT IF NO TRUST BONUSES PERFORMED, UP TO 1.5
 
     // record the match for each grantId
     distribution.push({

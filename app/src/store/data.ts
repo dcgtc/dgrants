@@ -180,7 +180,7 @@ export default function useDataStore() {
       },
     } as GrantRoundFetchArgs);
     // calc the distributions
-    const distribution = clr.calculate(grantRoundArgs);
+    const distribution = await clr.calculate(grantRoundArgs);
     console.log(distribution);
 
     // Save off data

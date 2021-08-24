@@ -139,7 +139,7 @@ export type GrantMatch = {
  * @field {calcAlgo} command handle to use for calulation
  */
 export type InitArgs = {
-  calcAlgo: (clrArgs: CLRArgs) => GrantsDistribution;
+  calcAlgo: (clrArgs: CLRArgs) => Promise<GrantsDistribution>;
   includePayouts?: boolean;
 };
 
