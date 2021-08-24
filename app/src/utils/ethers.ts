@@ -18,6 +18,7 @@
 export type { BigNumberish } from 'ethers';
 export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
+export { hexDataSlice } from '@ethersproject/bytes';
 export { Contract } from '@ethersproject/contracts';
 export type { ContractTransaction } from '@ethersproject/contracts';
 export type { Network } from '@ethersproject/networks';

@@ -30,10 +30,10 @@
             >
               <img
                 class="h-12 w-12"
-                :src="grantMetadata[item.metaPtr].logoURI || 'src/assets/logo.png'"
+                :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/logo.png'"
                 alt="Grant logo"
               />
-              <p class="ml-4 text-sm text-left font-medium truncate">{{ grantMetadata[item.metaPtr].name }}</p>
+              <p class="ml-4 text-sm text-left font-medium truncate">{{ grantMetadata[item.metaPtr]?.name }}</p>
             </div>
 
             <!-- Contribution info -->
@@ -100,19 +100,8 @@ import { SUPPORTED_TOKENS } from 'src/utils/constants';
 import { pushRoute } from 'src/utils/utils';
 
 function useCart() {
-  const { cart, cartDonationInputs, cartSummaryString, removeFromCart, clearCart, initializeCart, updateCart } = useCartStore(); // prettier-ignore
-
-  // Make sure cart store is initialized
-  onMounted(() => initializeCart());
-
-  /**
-   * @notice Execute donations TODO
-   */
-  function checkout() {
-    console.log('checkout');
-    cartDonationInputs; // TODO use this for the inputs
-  }
-
+  const { cart, cartSummaryString, removeFromCart, clearCart, initializeCart, updateCart, checkout } = useCartStore(); // prettier-ignore
+  onMounted(() => initializeCart()); // make sure cart store is initialized
   return { cart, updateCart, clearCart, removeFromCart, cartSummaryString, checkout };
 }
 

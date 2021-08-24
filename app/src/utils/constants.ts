@@ -20,6 +20,7 @@ export const MULTICALL_ABI = [
 ];
 
 // Data for Grants contracts
+export const WAD = '1000000000000000000'; // 1e18
 export const GRANT_REGISTRY_ADDRESS = '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3';
 export const GRANT_ROUND_MANAGER_ADDRESS = '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016';
 export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
