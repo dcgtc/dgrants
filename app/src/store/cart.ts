@@ -8,15 +8,48 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
-import { SUPPORTED_TOKENS_MAPPING, WAD } from 'src/utils/constants';
-import { BigNumber, BigNumberish, hexDataSlice, isAddress, parseUnits } from 'src/utils/ethers';
+import {
+  ERC20_ABI,
+  ETH_ADDRESS,
+  GRANT_ROUND_MANAGER_ABI,
+  GRANT_ROUND_MANAGER_ADDRESS,
+  SUPPORTED_TOKENS_MAPPING,
+  WAD,
+  WETH_ADDRESS,
+} from 'src/utils/constants';
+import {
+  BigNumber,
+  BigNumberish,
+  Contract,
+  ContractTransaction,
+  hexDataSlice,
+  MaxUint256,
+  isAddress,
+  parseUnits,
+  getAddress,
+} from 'src/utils/ethers';
 import useDataStore from 'src/store/data';
+import useWalletStore from 'src/store/wallet';
 
 // --- Constants and helpers ---
 const CART_KEY = 'cart';
 const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
 const DEFAULT_CONTRIBUTION_AMOUNT = 5; // this is converted to a parsed BigNumber at checkout
 const EMPTY_CART: CartItemOptions[] = []; // and empty cart is identified by an empty array
+// Hardcoded swap paths based on a input token and swapping to DAI, based on most liquid pairs: https://info.uniswap.org/#/
+// TODO replace with more robust swap path logic
+const SWAP_PATHS = {
+  // ETH to DAI through the 0.3% pool
+  '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  // USDC to DAI through the 0.05% pool
+  '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48': '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb480001f46b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  // GTC to ETH through 1% pool, ETH to DAI through 0.3% pool
+  '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F': '0xde30da39c46104798bb5aa3fe8b9e0e1f348163f002710c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  // UNI to ETH through 0.3% pool, ETH to DAI through 0.3% pool
+  '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984000bb8c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  // DAI "swap path" is just its token address for our router
+  '0x6B175474E89094C44Da98b954EedeAC495271d0F': '0x6b175474e89094c44da98b954eedeac495271d0f',
+};
 
 const { grants, grantRounds } = useDataStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
@@ -158,9 +191,37 @@ export default function useCartStore() {
   /**
    * @notice Executes donations
    */
-  function checkout() {
-    console.log('checking out', cart.value);
-    console.log(cartDonationInputs.value);
+  async function checkout() {
+    const { signer, userAddress } = useWalletStore();
+    const { swaps, donations, deadline } = cartDonationInputs.value;
+    const manager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, signer.value);
+    const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
+
+    // Execute approvals if required
+    for (const swap of swaps) {
+      const tokenAddress = getInputToken(swap);
+      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
+      const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
+      const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
+      if (allowance.lt(swap.amountIn)) {
+        const tx = <ContractTransaction>await token.approve(manager.address, MaxUint256);
+        await tx.wait(); // we wait for each approval to be mined to avoid gas estimation complexity
+      }
+    }
+
+    // Determine if we need to send value with this transaction
+    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS);
+    const value = ethSwap ? ethSwap.amountIn : 0;
+
+    // Execute donation
+    const tx = <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
+    const receipt = await tx.wait();
+    if (!receipt.status) {
+      alert('error');
+      return;
+    }
+    alert('success');
+    clearCart();
   }
 
   // --- Getters ---
@@ -196,7 +257,7 @@ export default function useCartStore() {
       const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
       const amountOutMin = '1'; // TODO improve this
-      const path = ''; // TODO
+      const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>tokenAddress];
       return { amountIn, amountOutMin, path };
     });
 
@@ -204,18 +265,22 @@ export default function useCartStore() {
     const donations: Donation[] = cart.value.map((item) => {
       // Extract data we already have
       const { grantId, contributionAmount, contributionToken } = item;
-      const tokenAddress = contributionToken.address;
+      const isEth = contributionToken.address === ETH_ADDRESS;
+      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
       const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
-      const donationAmount = parseUnits(String(contributionAmount), SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals);
+      const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const donationAmount = parseUnits(String(contributionAmount), decimals);
 
       // Compute ratio
-      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress);
+      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress.toLowerCase());
       if (!swap) throw new Error('Could not find matching swap for donation');
       const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
 
       // Return donation object
       return { grantId, token: tokenAddress, ratio, rounds };
     });
+
+    // TODO If ratios don't sum to 100% for a given token, fix that. Test this with 3 items in cart
 
     // Return all inputs needed for checkout, using a deadline 20 minutes from now
     const now = new Date().getTime();

@@ -27,6 +27,8 @@ export const tokens = {
   weth: { address: WETH_ADDRESS, name: 'Wrapped Ether', symbol: 'WETH', decimals: 18, mappingSlot: '0x3' },
   dai: { address: '0x6B175474E89094C44Da98b954EedeAC495271d0F', name: "Dai", symbol: "DAI", decimals: 18, mappingSlot: '0x2' }, // prettier-ignore
   gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', name: "Gitcoin", symbol: "GTC", decimals: 18, mappingSlot: '0x5' }, // prettier-ignore
+  usdc: { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', name: "USD Coin", symbol: "USDC", decimals: 6, mappingSlot: '0x9' }, // prettier-ignore
+  uni: { address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', name: "Uniswap", symbol: "UNI", decimals: 18, mappingSlot: '0x4' }, // prettier-ignore
 };
 
 // This type is our list of tokens supported in the "Token Helpers" section

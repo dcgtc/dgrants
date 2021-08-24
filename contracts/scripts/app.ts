@@ -10,9 +10,7 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 import { Contract, ContractFactory } from 'ethers';
 import { ethers, network } from 'hardhat';
-
 import { WETH_ADDRESS, UNISWAP_FACTORY, tokens, setBalance, approve, setNextBlockTimestamp } from '../test/utils';
-
 import { parseUnits } from 'ethers/lib/utils';
 
 const fixtureGrants = async (deployer: SignerWithAddress) => {
@@ -138,6 +136,8 @@ async function main(): Promise<void> {
     signers.map(async (signer) => {
       await setBalance('gtc', signer.address, parseUnits('10000', 18));
       await setBalance('dai', signer.address, parseUnits('10000', 18));
+      await setBalance('usdc', signer.address, parseUnits('10000', 6));
+      await setBalance('uni', signer.address, parseUnits('10000', 18));
     })
   );
   console.log(`Funded ${signers.length} accounts`);
