@@ -130,22 +130,22 @@ export default function useCartStore() {
    * @dev Used to keep localStorage in sync with store when the `cart` ref is modified directly via v-model in Cart.vue
    * @dev NOTE: You MUST call this when directly modifying the `cart` ref via v-model
    * @param grantId Grant ID to update
-   * @param data A token address to update the token, or a number to update the amount
+   * @param data A token address to update the token, or a human-readable number to update the amount
    */
-  function updateCart(grantId: BigNumberish, data: BigNumberish) {
+  function updateCart(grantId: BigNumberish, data: string | number) {
     // Get index of the grant to replace
     const _lsCart = lsCart.value;
     const index = _lsCart.findIndex((item) => item.grantId === toString(grantId));
 
-    // Handle token address update
-    if (isAddress(toHex(data))) {
+    // Handle token address update (type check is because if `data` is a decimal number `toHex` would fail)
+    if (typeof data !== 'number' && isAddress(toHex(data))) {
       _lsCart[index] = { ..._lsCart[index], contributionTokenAddress: toHex(data) };
       setCart(_lsCart);
       return;
     }
 
     // Handle amount update
-    const amount = BigNumber.from(data).toNumber();
+    const amount = Number(data);
     _lsCart[index] = { ..._lsCart[index], contributionAmount: amount };
     setCart(_lsCart);
   }
