@@ -15,13 +15,17 @@
  * Read more at https://github.com/vitejs/vite/issues/731
  */
 
-export type { BigNumberish } from 'ethers';
+// --- Types ---
+export type { BigNumberish } from '@ethersproject/bignumber';
+export type { ContractTransaction } from '@ethersproject/contracts';
+export type { BytesLike } from '@ethersproject/bytes';
+export type { Network } from '@ethersproject/networks';
+
+// --- Methods and classes ---
 export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
 export { hexDataSlice } from '@ethersproject/bytes';
 export { Contract } from '@ethersproject/contracts';
-export type { ContractTransaction } from '@ethersproject/contracts';
-export type { Network } from '@ethersproject/networks';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 export { commify, formatUnits, parseUnits } from '@ethersproject/units';
 export { MaxUint256 } from '@ethersproject/constants';
