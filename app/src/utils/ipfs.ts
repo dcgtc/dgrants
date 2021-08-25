@@ -9,7 +9,7 @@ const config = {
   retrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
 };
 
-const ipfs = create({
+export const ipfs = create({
   url: config.storageEndpoint,
   headers: config.storageHeaders,
 });

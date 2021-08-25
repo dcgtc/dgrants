@@ -1,13 +1,22 @@
-import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantRoundContributions, GrantsDistribution } from '../../types';
-import { fetchTrustBonusScore } from '../utils';
-
-type TrustBonusScore = {
-  address: string;
-  score: number;
-};
+import {
+  CLRArgs,
+  ContributionsByGrantId,
+  GrantMatch,
+  GrantRoundContributions,
+  GrantsDistribution,
+  TrustBonusScore,
+} from '../../types';
+import { fetchTrustBonusScore, uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
+import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/ipfs';
 
 /**
- * Holds the logic to determine the distribution using linear QF formula
+ * @notice Contains the logic to determine the distribution using linear QF formula.
+ *
+ * Additonally :
+ *  - will fetches trust bonus scores using `fetchTrustBonusScore`
+ *  -
+ *  - also supports uploading the score onto IPFS and returning the hash.
+ *
  * @param clrArgs
  */
 export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
@@ -23,7 +32,7 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
   const distribution: GrantMatch[] = [];
   const contributionsByGrantId: ContributionsByGrantId = {};
 
-  let contributionAddresses: string[] = [];
+  const contributionAddresses: Set<string> = new Set();
 
   // pivot the contributions by project
   contributions.forEach((contribution) => {
@@ -33,17 +42,31 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
         grantAddress: contribution.grantAddress,
         contributions: [],
       };
-
-      contributionAddresses.push(contribution.address);
+      contributionAddresses.add(contribution.address);
     }
     contributionsByGrantId[contribution.grantId].contributions.push(contribution);
   });
 
-  // ensure contributionAddresses is unique list
-  contributionAddresses = [...new Set(contributionAddresses)];
+  let trustBonusScores = clrArgs.trustBonusScores || [];
+  let trustBonusMetaPtr = clrArgs.trustBonusMetaPtr;
 
-  // fetch trust bonus scores of contributors
-  const trustBonusScores = await fetchTrustBonusScore(contributionAddresses);
+  if (!trustBonusScores.length) {
+    if (clrArgs.trustBonusMetaPtr) {
+      // fetch trust bonus scores from metaPtr
+      const url = getMetaPtr({ cid: clrArgs.trustBonusMetaPtr });
+      trustBonusScores = await resolveMetaPtr(url);
+    } else {
+      // fetch trust bonus scores from gitcoin API
+      const { data, status } = await fetchTrustBonusScore([...contributionAddresses]);
+      if (!status.ok) console.error(status.message);
+      trustBonusScores = data;
+    }
+
+    // upload trust bonus to IPFS and store hash
+    if (!trustBonusMetaPtr && trustBonusScores) {
+      trustBonusMetaPtr = (await uploadTrustBonusScores(trustBonusScores)).toString();
+    }
+  }
 
   // calculate linear matching for each Grant
   Object.values(contributionsByGrantId).forEach((details) => {
@@ -99,5 +122,6 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
   return {
     distribution: distribution,
     hasSaturated: hasSaturated,
+    trustBonusMetaPtr: trustBonusMetaPtr,
   } as GrantsDistribution;
 };

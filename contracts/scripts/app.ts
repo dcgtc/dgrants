@@ -140,6 +140,7 @@ async function main(): Promise<void> {
       await setBalance('uni', signer.address, parseUnits('10000', 18));
     })
   );
+
   console.log(`Funded ${signers.length} accounts`);
 
   // --- GrantRegistry Setup ---

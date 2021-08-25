@@ -182,6 +182,7 @@ export default function useDataStore() {
     // calc the distributions
     const distribution = await clr.calculate(grantRoundArgs);
     console.log(distribution);
+    console.log(await clr.verify(grantRoundArgs, distribution.trustBonusMetaPtr, distribution.hash));
 
     // Save off data
     lastBlockNumber.value = (blockNumber as BigNumber).toNumber();
