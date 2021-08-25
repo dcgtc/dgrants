@@ -20,6 +20,7 @@ import {
 import {
   BigNumber,
   BigNumberish,
+  BytesLike,
   Contract,
   ContractTransaction,
   hexDataSlice,
@@ -193,7 +194,7 @@ export default function useCartStore() {
    */
   async function checkout() {
     const { signer, userAddress } = useWalletStore();
-    const { swaps, donations, deadline } = cartDonationInputs.value;
+    const { swaps, donations, deadline } = await getCartDonationInputs();
     const manager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, signer.value);
     const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
 
@@ -224,6 +225,46 @@ export default function useCartStore() {
     clearCart();
   }
 
+  /**
+   * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
+   */
+  async function getCartDonationInputs(): Promise<{ swaps: SwapSummary[]; donations: Donation[]; deadline: number }> {
+    // Get the swaps array
+    const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
+      const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
+      const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>tokenAddress];
+      // Use Uniswap's Quoter.sol to get amountOutMin, unless the path indicates so swap is required
+      const amountOutMin = path.length === 42 ? amountIn : await quoteExactInput(path, amountIn);
+      return { amountIn, amountOutMin, path };
+    });
+    const swaps = <SwapSummary[]>await Promise.all(swapPromises);
+
+    // Get the donations array
+    const donations: Donation[] = cart.value.map((item) => {
+      // Extract data we already have
+      const { grantId, contributionAmount, contributionToken } = item;
+      const isEth = contributionToken.address === ETH_ADDRESS;
+      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
+      const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
+      const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const donationAmount = parseUnits(String(contributionAmount), decimals);
+
+      // Compute ratio
+      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress.toLowerCase());
+      if (!swap) throw new Error('Could not find matching swap for donation');
+      const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
+
+      // Return donation object
+      return { grantId, token: tokenAddress, ratio, rounds };
+    });
+
+    // Return all inputs needed for checkout, using a deadline 20 minutes from now
+    const now = new Date().getTime();
+    const nowPlus20Minutes = new Date(now + 20 * 60 * 1000).getTime();
+    return { swaps, donations: fixDonationRoundingErrors(donations), deadline: Math.floor(nowPlus20Minutes / 1000) };
+  }
+
   // --- Getters ---
   /**
    * @notice Returns true if the provided grantId is in the cart, false otherwise
@@ -249,44 +290,6 @@ export default function useCartStore() {
   });
 
   /**
-   * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
-   */
-  const cartDonationInputs = computed((): { swaps: SwapSummary[]; donations: Donation[]; deadline: number } => {
-    // Get the swaps array
-    const swaps: SwapSummary[] = Object.keys(cartSummary.value).map((tokenAddress) => {
-      const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
-      const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
-      const amountOutMin = '1'; // TODO improve this
-      const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>tokenAddress];
-      return { amountIn, amountOutMin, path };
-    });
-
-    // Get the donations array
-    const donations: Donation[] = cart.value.map((item) => {
-      // Extract data we already have
-      const { grantId, contributionAmount, contributionToken } = item;
-      const isEth = contributionToken.address === ETH_ADDRESS;
-      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
-      const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
-      const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
-      const donationAmount = parseUnits(String(contributionAmount), decimals);
-
-      // Compute ratio
-      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress.toLowerCase());
-      if (!swap) throw new Error('Could not find matching swap for donation');
-      const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
-
-      // Return donation object
-      return { grantId, token: tokenAddress, ratio, rounds };
-    });
-
-    // Return all inputs needed for checkout, using a deadline 20 minutes from now
-    const now = new Date().getTime();
-    const nowPlus20Minutes = new Date(now + 20 * 60 * 1000).getTime();
-    return { swaps, donations: fixDonationRoundingErrors(donations), deadline: Math.floor(nowPlus20Minutes / 1000) };
-  });
-
-  /**
    * @notice Returns a summary of items in the cart, e.g. "50 DAI" or "20 DAI + 0.5 ETH + 30 GTC"
    */
   const cartSummaryString = computed(() => {
@@ -297,14 +300,13 @@ export default function useCartStore() {
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });
 
+  // Only export additional items as they are needed outside the store
   return {
     // Store
     // WARNING: Be careful -- the `cart` ref is directly exposed so it can be edited by v-model, so just make
     // sure to call `updateCart()` with the appropriate inputs whenever the `cart` ref is modified
     cart,
     // Getters
-    cartDonationInputs,
-    cartSummary,
     cartSummaryString,
     // Mutations
     addToCart,
@@ -316,6 +318,8 @@ export default function useCartStore() {
     updateCart,
   };
 }
+
+// --- Pure functions (not reliant on state) ---
 
 /**
  * @notice Takes an array of donation data, and adjusts the ratios so they sum to 1e18 for each set of tokens
@@ -342,4 +346,17 @@ function fixDonationRoundingErrors(donations: Donation[]) {
   });
 
   return donations;
+}
+
+/**
+ * @notice Returns the amountOutMin expected for a given trade assuming 0.5% slippage
+ * @param path Swap path
+ * @param amountIn Swap input amount, as a full integer
+ */
+async function quoteExactInput(path: BytesLike, amountIn: BigNumberish): Promise<BigNumber> {
+  const { provider } = useWalletStore();
+  const abi = ['function quoteExactInput(bytes memory path, uint256 amountIn) external view returns (uint256 amountOut)']; // prettier-ignore
+  const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, provider.value);
+  const amountOut = await quoter.quoteExactInput(path, amountIn);
+  return amountOut.mul(995).div(1000); // multiplying by 995/1000 is equivalent to 0.5% slippage
 }
