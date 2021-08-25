@@ -55,7 +55,7 @@
           <!-- Submit button -->
           <button
             type="submit"
-            class="btn btn-primary w-full"
+            class="btn btn-primary w-full text-center"
             :class="{ 'btn-primary-disabled': !isFormValid }"
             :disabled="!isFormValid"
           >

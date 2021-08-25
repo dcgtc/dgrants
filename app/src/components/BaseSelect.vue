@@ -19,8 +19,8 @@
         "
       >
         <span class="block truncate">{{ modelValue[label] }}</span>
-        <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
-          <SelectorIcon class="h-5 w-5 text-gray-400" aria-hidden="true" />
+        <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none w-12">
+          <ArrowBottom2Icon class="icon icon-primary" aria-hidden="true" />
         </span>
       </ListboxButton>
 
@@ -56,7 +56,7 @@
           >
             <li
               :class="[
-                active ? 'text-white bg-indigo-600' : 'text-gray-900',
+                active ? 'text-white bg-grey-500' : 'text-gray-900',
                 'cursor-default select-none relative py-2 pl-3 pr-9',
               ]"
             >
@@ -64,14 +64,11 @@
                 {{ option[label] }}
               </span>
 
-              <span
-                v-if="selected"
-                :class="[
-                  active ? 'text-white' : 'text-indigo-600',
-                  'absolute inset-y-0 right-0 flex items-center pr-4',
-                ]"
-              >
-                <CheckIcon class="h-5 w-5" aria-hidden="true" />
+              <span v-if="selected" :class="['absolute inset-y-0 right-0 flex items-center pr-4 w-12']">
+                <CheckIcon
+                  :class="['icon icon-heavy', active ? 'stroke-white' : 'stroke-grey-400']"
+                  aria-hidden="true"
+                />
               </span>
             </li>
           </ListboxOption>
@@ -84,11 +81,18 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Listbox, ListboxButton, /* ListboxLabel, */ ListboxOption, ListboxOptions } from '@headlessui/vue';
-import { CheckIcon, SelectorIcon } from '@heroicons/vue/solid';
+import { CheckIcon, ArrowBottom2Icon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'BaseSelect',
-  components: { Listbox, ListboxButton, /* ListboxLabel, */ ListboxOption, ListboxOptions, CheckIcon, SelectorIcon },
+  components: {
+    Listbox,
+    ListboxButton,
+    /* ListboxLabel, */ ListboxOption,
+    ListboxOptions,
+    CheckIcon,
+    ArrowBottom2Icon,
+  },
   props: {
     // --- Required props ---
     modelValue: { type: Object, required: true }, // from v-model, don't pass this directly

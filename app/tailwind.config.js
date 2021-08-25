@@ -2,19 +2,18 @@ const colors = require('tailwindcss/colors'); // eslint-disable-line @typescript
 
 module.exports = {
   purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
-  darkMode: 'class',
   // Default theme: https://github.com/tailwindlabs/tailwindcss/blob/master/stubs/defaultConfig.stub.js#L7
   theme: {
     fontFamily: {
       sans: ['"Source Code Pro"', 'monospace'],
     },
     fontSize: {
-      sm: ['100%', '170%'],
-      md: ['110%', '170%'],
-      lg: ['120%', '170%'],
-      xl: ['130%', '170%'],
-      xxl: ['140%', '170%'],
-      headline: ['150%', '170%'],
+      sm: ['100%', '150%'],
+      md: ['100%', '150%'],
+      lg: ['100%', '150%'],
+      xl: ['110%', '150%'],
+      xxl: ['110%', '150%'],
+      headline: ['140%', '150%'],
     },
     colors: {
       transparent: 'transparent',
@@ -48,25 +47,11 @@ module.exports = {
       light: '0px 0px 40px 0px rgba(14, 3, 51, .1)',
       none: 'none',
     },
-    cursor: {
-      auto: 'auto',
-      default: 'default',
-      pointer: 'pointer',
-      wait: 'wait',
-      text: 'text',
-      move: 'move',
-      'not-allowed': 'not-allowed',
-      crosshair: 'crosshair',
-      'zoom-in': 'zoom-in',
-      copy: 'copy',
-    },
-    nightwind: {
-      // Keys specify light-mode colors, and values are overrides for Nightwind to replace them with
-      colors: {
-        white: 'gray.900',
-        gray: {
-          50: 'gray.800',
-        },
+    extend: {
+      cursor: {
+        crosshair: 'crosshair',
+        'zoom-in': 'zoom-in',
+        copy: 'copy',
       },
     },
   },
@@ -76,5 +61,5 @@ module.exports = {
       stroke: ['group-hover', 'hover'],
     },
   },
-  plugins: [require('@tailwindcss/forms'), require('nightwind')],
+  plugins: [require('@tailwindcss/forms')],
 };

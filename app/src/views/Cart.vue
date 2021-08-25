@@ -33,7 +33,9 @@
                 :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/logo.png'"
                 alt="Grant logo"
               />
-              <p class="ml-4 text-sm text-left font-medium truncate">{{ grantMetadata[item.metaPtr]?.name }}</p>
+              <p class="ml-4 text-sm text-left font-medium truncate max-w-lg">
+                {{ grantMetadata[item.metaPtr]?.name }}
+              </p>
             </div>
 
             <!-- Contribution info -->
@@ -49,6 +51,7 @@
                   type="number"
                 />
                 <BaseSelect
+                  class="ml-2"
                   :modelValue="item.contributionToken"
                   @update:modelValue="
                     item.contributionToken = $event;
@@ -66,9 +69,9 @@
 
               <!-- Delete from cart -->
               <div>
-                <XIcon
+                <CloseIcon
                   @click="removeFromCart(item.grantId)"
-                  class="cursor-pointer flex-none h-5 w-5 text-gray-400"
+                  class="icon cursor-pointer flex-none h-5 w-5 text-gray-400"
                   aria-hidden="true"
                 />
               </div>
@@ -81,15 +84,19 @@
     <!-- Checkout -->
     <div class="mt-10">
       <div>{{ cartSummaryString }}</div>
-      <button @click="checkout" class="btn btn-secondary">Checkout</button>
+      <div class="flex justify-center mt-5">
+        <button @click="checkout" class="btn btn-secondary">Checkout</button>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+// --- External Imports ---
 import { defineComponent, onMounted } from 'vue';
-// --- Components ---
-import { XIcon } from '@heroicons/vue/solid';
+import { CloseIcon } from '@fusion-icons/vue/interface';
+
+// --- App Imports ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 // --- Store ---
@@ -107,7 +114,7 @@ function useCart() {
 
 export default defineComponent({
   name: 'Cart',
-  components: { BaseInput, BaseSelect, XIcon },
+  components: { BaseInput, BaseSelect, CloseIcon },
   setup() {
     const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);

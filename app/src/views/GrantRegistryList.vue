@@ -5,7 +5,9 @@
     <div class="mb-10">
       <h2 class="text-lg mb-3">Create New Grant</h2>
       <div class="mb-1">Click the button below to create a new grant</div>
-      <button @click="pushRoute({ name: 'dgrants-new' })" class="btn btn-secondary mt-6">Create Grant</button>
+      <div class="flex justify-center">
+        <button @click="pushRoute({ name: 'dgrants-new' })" class="btn btn-secondary mt-6">Create Grant</button>
+      </div>
     </div>
 
     <!-- View Existing Grants -->
