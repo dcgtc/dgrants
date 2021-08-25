@@ -110,11 +110,13 @@ export class CLR {
     const grantId: string = args.grantId;
     const predictionPoints: number[] = args.predictionPoints;
     const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
+    const trustBonusScores = args.trustBonusScores;
     const predictions: GrantPrediction[] = [];
 
     // calculate distribution based on current contribution
     const distribution: GrantsDistribution = await calcAlgo({
       contributions: grantRoundContributions,
+      trustBonusScores: trustBonusScores,
       ...(options || {}),
     } as CLRArgs);
 
@@ -127,6 +129,7 @@ export class CLR {
       const newDistribution: GrantsDistribution = await calcAlgo({
         // add anon contribution of value predictionPoint
         contributions: addAnonymousContribution(grantId, { ...grantRoundContributions }, predictionPoint),
+        trustBonusScores: trustBonusScores,
         // allow for overrides to set calc algo
         ...options,
       } as CLRArgs);
@@ -148,6 +151,39 @@ export class CLR {
       grantRound: grantRoundContributions.grantRound,
       predictions: predictions,
     } as GrantPredictions;
+  }
+
+  /**
+   * Verifies hash based on distribution & the trust bonus score
+   *
+   * @param grantRoundContributions
+   * @param trustBonusMetaPtr
+   * @param hash
+   * @returns Boolean
+   */
+  async verify(
+    grantRoundContributions: GrantRoundContributions,
+    trustBonusMetaPtr: string,
+    hash: string
+  ): Promise<boolean> {
+    const _options = {
+      trustBonusMetaPtr: trustBonusMetaPtr,
+    };
+
+    const distribution = await this.calculate(grantRoundContributions, _options);
+    if (distribution.hash == hash) {
+      console.log('####################\n DISTRIBUTION VERIFIED\n####################');
+      return true;
+    }
+
+    console.log(
+      `####################\n
+      ERROR: DISTRIBUTION DOES NOT MATCH. \n
+      Input Hash: ${hash} \n
+      Calculated Hash: ${distribution.hash} \n
+      ####################`
+    );
+    return false;
   }
 }
 
