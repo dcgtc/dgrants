@@ -85,15 +85,13 @@ This file orchestrates the calculation and prediction procedure, exposing two me
 import { fetch, linear, CLR } from @dgrants/dcurve;
 
 // 2. Create instance of CLR
-
 const initArgs = {
   calcAlgo: linear
 };
 const clr = new CLR(options);
 
 // 3. Fetch contributions
-
-const grantRoundFetchArgs = {
+const fetchArgs = {
   provider: provider,
   grantRound: GRANT_ROUND_ADDRESS,
   grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
@@ -106,16 +104,21 @@ const grantRoundFetchArgs = {
 };
 const grantRoundContributions = fetch(fetchArgs);
 
-// 4. Calculate Distribution
-
-const distribution = await clr.calculate(grantRoundContributions);
-
-// 5. Predict match for a grant
-
+// 4. Predict match for a grant
 const grantPredictionArgs = {
   grantId: 1,
   predictionPoints: [1, 10, 100],
   grantRoundContributions: contributions
 };
 const prediction = await clr.predict(predictArgs);
+
+// 5. Calculate Distribution + Uploads Trust Bonus Score to IPFS
+const distribution = await clr.calculate(grantRoundContributions);
+
+
+// 6. Verify Distribution given trustBonusMetaPtr
+
+const trustBonusMetaPtr = '...';
+const hash = '...';
+await clr.verify(grantRoundContributions, trustBonusMetaPtr, hash);
 ```

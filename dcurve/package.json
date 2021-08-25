@@ -31,7 +31,6 @@
   "dependencies": {
     "@dgrants/contracts": "^0.0.1",
     "@dgrants/utils": "^0.0.1",
-    "axios": "^0.21.1",
     "buffer": "^6.0.3",
     "ethers": "^5.4.4"
   }

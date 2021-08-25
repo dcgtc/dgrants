@@ -82,11 +82,13 @@ export type GrantRoundContributions = {
  * @field {grantId} grants id
  * @field {predictionPoints} array of prediction points
  * @field {[grantRoundContributions]} contributions in that round
+ * @field {[trustBonusScores]} trust bonus scores
  */
 export type GrantPredictionArgs = {
   grantId: string;
   predictionPoints: number[];
   grantRoundContributions: GrantRoundContributions;
+  trustBonusScores?: TrustBonusScore[];
 };
 
 /**
@@ -134,6 +136,16 @@ export type GrantMatch = {
 };
 
 /**
+ * Individual address trust bonus score
+ * @field {address} address
+ * @field {score} trust bonus score
+ */
+export type TrustBonusScore = {
+  address: string;
+  score: number;
+};
+
+/**
  * Options fed into CLR class
  * @type InitArgs
  * @field {calcAlgo} command handle to use for calulation
@@ -171,16 +183,19 @@ export type PayoutMatches = {
  * @type GrantsDistribution
  * @field {distribution} the distribution
  * @field {hasSaturated} flag to signify round is saturated
- * @field {grantRound} grant round address used for identification
  * @field {hash} hash of the distribution
+ * @field {trustBonusMetaPtr} metaPtr location
+ * @field {grantRound} grant round address used for identification
+ * @field {merkleError} error generated while genrating merkle root
  */
 export type GrantsDistribution = {
   distribution: GrantMatch[];
   payoutDistribution: PayoutMatch[];
   hasSaturated: boolean;
+  hash: string;
+  trustBonusMetaPtr: string;
   grantRound?: string;
   merkle?: MerkleDistributorInfo;
-  hash?: string;
   merkleError?: string;
 };
 
@@ -191,7 +206,10 @@ export type GrantsDistribution = {
  *
  * @type CLRArgs
  * @field {contributions}
+ * @field {trustBonusMetaPtr} trust bonus scores meta Ptr
  */
 export type CLRArgs = {
   contributions: GrantRoundContributions;
+  trustBonusMetaPtr?: string;
+  trustBonusScores?: TrustBonusScore[];
 };
