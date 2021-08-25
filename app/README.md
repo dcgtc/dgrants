@@ -21,7 +21,11 @@ Then, add a network to MetaMask with the following information:
 - New RPC URL: http://127.0.0.1:8545
 - Chain ID: 31337
 
-This configuration is required to ensure your account is funded with tokens for testing. You can now build the app with:
+This configuration is required to ensure your account is funded with tokens for testing.
+When you rebuild the app, you'll likely need to reset MetaMask so the nonces match what the local network expects.
+You can do this in MetaMask by clicking the circle in the top right > Settings > Advanced > Reset Account.
+
+You can now build the app with:
 
 ```sh
 # Install packages
