@@ -280,12 +280,10 @@ export default function useCartStore() {
       return { grantId, token: tokenAddress, ratio, rounds };
     });
 
-    // TODO If ratios don't sum to 100% for a given token, fix that. Test this with 3 items in cart
-
     // Return all inputs needed for checkout, using a deadline 20 minutes from now
     const now = new Date().getTime();
     const nowPlus20Minutes = new Date(now + 20 * 60 * 1000).getTime();
-    return { swaps, donations, deadline: Math.floor(nowPlus20Minutes / 1000) };
+    return { swaps, donations: fixDonationRoundingErrors(donations), deadline: Math.floor(nowPlus20Minutes / 1000) };
   });
 
   /**
@@ -317,4 +315,31 @@ export default function useCartStore() {
     removeFromCart,
     updateCart,
   };
+}
+
+/**
+ * @notice Takes an array of donation data, and adjusts the ratios so they sum to 1e18 for each set of tokens
+ * @dev For each token, we adjust the first item in the cart to force the sum to be 100%. The adjustments will only
+ * affect donation amounts by a few wei, so practically it doesn't matter which item the adjustment is applied to.
+ * We run the same logic on each iteration, but because it's fixed during the first iteration for a given token,
+ * subsequent iterations that operate on a donation item with the same token are no-ops. This is necessary because
+ * ratios are calculated with integer division, which truncates. For example, if you had 3 items of 5 DAI each in
+ * your cart, the ratios would be 33.333% each and would not sum to 100%. This method fixes that so one of the items
+ * is 33.334%
+ * @param donations Donations to adjust
+ */
+function fixDonationRoundingErrors(donations: Donation[]) {
+  donations.forEach((donation, index) => {
+    const { token, ratio } = donation;
+
+    // Get the sum of all items using this token
+    const sum = donations.reduce((acc, curr) => acc.add(curr.token === token ? curr.ratio : 0), BigNumber.from(0));
+    if (sum.gt(WAD)) throw new Error('Ratios sum to greater than 100%');
+
+    // Make adjustments are necessary based on the total ratio
+    const shortfall = BigNumber.from(WAD).sub(sum); // if sum is already 100%, we add zero, no explicit check that sum is 100% is required
+    donations[index] = { ...donation, ratio: BigNumber.from(ratio).add(shortfall) }; // apply fix to donation item
+  });
+
+  return donations;
 }
