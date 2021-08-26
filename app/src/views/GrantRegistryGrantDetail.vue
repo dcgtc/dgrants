@@ -14,7 +14,7 @@
         Remove from Cart
       </button>
       <button v-else @click="addToCart(grant?.id)" class="mt-5 btn btn-primary">Add to Cart</button>
-      <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
+      <button v-if="isOwner" @click="enableEdit()" class="mt-5 btn btn-secondary">Edit Grant</button>
     </div>
   </div>
 
@@ -62,7 +62,7 @@
             errorMsg="Please enter a name"
           />
 
-          <!-- Grant Description -->
+          <!-- Grant description -->
           <BaseInput
             v-model="form.description"
             description="Your grant's description"
@@ -70,6 +70,39 @@
             label="Grant description"
             :rules="isDefined"
             errorMsg="Please enter a description"
+          />
+
+          <!-- Grant website -->
+          <BaseInput
+            v-model="form.website"
+            description="Your grant's website"
+            id="grant-website"
+            label="Grant website"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
+          />
+
+          <!-- Grant github -->
+          <BaseInput
+            v-model="form.github"
+            description="Your grant's github"
+            id="grant-github"
+            label="Grant github"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
+          />
+
+          <!-- Grant twitter handle -->
+          <BaseInput
+            v-model="form.handle"
+            description="Your grant's twitter handle"
+            id="grant-handle"
+            label="Grant twitter"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
           />
 
           <!-- Submit and cancel buttons -->
@@ -145,23 +178,29 @@ function useGrantDetail() {
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
 
-  const form = ref<{ owner: string; payee: string; name: string; description: string }>({
+  const form = ref<{ owner: string; payee: string; name: string; description: string; website: string; github: string; handle: string; }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
     name: grantMetadata.value?.name || '',
     description: grantMetadata.value?.description || '',
+    website: grantMetadata.value?.properties?.projectWebsite || '',
+    github: grantMetadata.value?.properties?.projectGithub || '',
+    handle: grantMetadata.value?.properties?.twitterHandle || '',
   });
 
   const isFormValid = computed(() => {
     if (!grant.value) return false;
-    const { owner, payee, name, description } = form.value;
+    const { owner, payee, name, description, website, github, handle } = form.value;
     const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isDefined(name) && isDefined(description);
 
     const areFieldsUpdated =
       owner !== grant.value.owner ||
       payee !== grant.value.payee ||
       name !== grantMetadata.value?.name ||
-      description !== grantMetadata.value?.description;
+      description !== grantMetadata.value?.description ||
+      website !== grantMetadata.value?.properties?.projectWebsite ||
+      github !== grantMetadata.value?.properties?.projectGithub ||
+      handle !== grantMetadata.value?.properties?.twitterHandle; 
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -170,11 +209,8 @@ function useGrantDetail() {
    * @notice Resets the form values that user may have changed, and hides the edit window
    */
   function cancelEdits() {
-    // Reset form values
-    form.value.owner = grant.value?.owner || '';
-    form.value.payee = grant.value?.payee || '';
-    form.value.name = grantMetadata.value?.name || '';
-    form.value.description = grantMetadata.value?.description || '';
+    prefillEditForm();
+
     // Hide edit form
     isEditing.value = false;
   }
@@ -184,7 +220,7 @@ function useGrantDetail() {
    */
   async function saveEdits() {
     // Validation
-    const { owner, payee, name, description } = form.value;
+    const { owner, payee, name, description, website, github, handle } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -197,9 +233,12 @@ function useGrantDetail() {
     let metaPtr = g.metaPtr;
 
     const gMetadata = grantMetadata.value;
-    const isMetaPtrUpdated = name != gMetadata?.name || description != gMetadata?.description;
+    const isMetaPtrUpdated = name !== gMetadata?.name || description !== gMetadata?.description || website !== gMetadata?.properties?.projectWebsite || github !== gMetadata?.properties?.projectGithub || handle !== gMetadata?.properties?.twitterHandle;
+    const properties = { projectWebsite: website, projectGithub: github, twitterHandle: handle };
     if (isMetaPtrUpdated) {
-      metaPtr = await ipfs.createGrant({ name, description }).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
+      metaPtr = await ipfs
+        .uploadGrantMetadata({ name, description, properties })
+        .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     }
 
     if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {
@@ -222,6 +261,29 @@ function useGrantDetail() {
     cancelEdits(); // reset form ref and toggle page state back to display mode
   }
 
+  /**
+   * @notice Loads the default values into edit form, and shows the edit window
+   */
+  function enableEdit() {
+    prefillEditForm();
+
+    // Enable edit form
+    isEditing.value = true;
+  }
+
+  /**
+   * @notice util function which prefills edit form
+   */
+  function prefillEditForm() {
+    form.value.owner = grant.value?.owner || '';
+    form.value.payee = grant.value?.payee || '';
+    form.value.name = grantMetadata.value?.name || '';
+    form.value.description = grantMetadata.value?.description || '';
+    form.value.website = grantMetadata.value?.properties?.projectWebsite || '';
+    form.value.github = grantMetadata.value?.properties?.projectGithub || '';
+    form.value.handle = grantMetadata.value?.properties?.twitterHandle || '';
+  }
+
   return {
     hasWebsite,
     hasGithub,
@@ -237,6 +299,7 @@ function useGrantDetail() {
     form,
     cancelEdits,
     saveEdits,
+    enableEdit,
   };
 }
 

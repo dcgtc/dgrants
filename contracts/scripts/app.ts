@@ -19,17 +19,17 @@ const fixtureGrants = async (deployer: SignerWithAddress) => {
     {
       owner: '0x34f4E532a33EB545941e914B25Efe348Aea31f0A',
       payee: '0x06c94663E5884BE4cCe85F0869e95C7712d34803',
-      metaPtr: 'https://cloudflare-ipfs.com/ipfs/QmYT6JiErQL4asYs4JxBnojCam562kssJdCaUpHq6DHDou',
+      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmYT6JiErQL4asYs4JxBnojCam562kssJdCaUpHq6DHDou',
     },
     {
       owner: '0x58E52440F56f2A5307772Ec881BCEf2c15e988Ab',
       payee: '0x6f02c37ea174DD05f20aC118da725ffa6A40B990',
-      metaPtr: 'https://cloudflare-ipfs.com/ipfs/QmeqiDZMA41ekPV9BJDx3VGtJbxU34YSS3oorLA8cPuib6',
+      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmeqiDZMA41ekPV9BJDx3VGtJbxU34YSS3oorLA8cPuib6',
     },
     {
       owner: '0x1fB6C46e6aDD95698352707D7f93a31030c80a0B',
       payee: '0x834e659c6757E250db500fe869877311Bb552966',
-      metaPtr: 'https://cloudflare-ipfs.com/ipfs/QmUjvKXg8CDHHr6NomKo5HowC2ofSmxebP628pnAomNAuA',
+      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmUjvKXg8CDHHr6NomKo5HowC2ofSmxebP628pnAomNAuA',
     },
   ];
 
@@ -67,7 +67,7 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   const metadataAdmin = '0x34f4E532a33EB545941e914B25Efe348Aea31f0A';
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
   const matchingToken = tokens.dai.address;
-  const metaPtr = 'https://cloudflare-ipfs.com/ipfs/bafybeighltnmw24tlbyulaiim3qh4lhjz3mfylilvsmr7atyyke2bfv7pe';
+  const metaPtr = 'https://ipfs-dev.fleek.co/ipfs/bafybeighltnmw24tlbyulaiim3qh4lhjz3mfylilvsmr7atyyke2bfv7pe';
   const minContribution = ethers.constants.One;
 
   const tx = await manager.createGrantRound(
