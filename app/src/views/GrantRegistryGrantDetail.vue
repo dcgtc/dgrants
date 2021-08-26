@@ -11,7 +11,7 @@
         Remove from Cart
       </button>
       <button v-else @click="addToCart(grant?.id)" class="mt-5 btn btn-primary">Add to Cart</button>
-      <button v-if="isOwner" @click="isEditing = true" class="mt-5 btn btn-secondary">Edit Grant</button>
+      <button v-if="isOwner" @click="enableEdit()" class="mt-5 btn btn-secondary">Edit Grant</button>
     </div>
   </div>
 
@@ -147,11 +147,8 @@ function useGrantDetail() {
    * @notice Resets the form values that user may have changed, and hides the edit window
    */
   function cancelEdits() {
-    // Reset form values
-    form.value.owner = grant.value?.owner || '';
-    form.value.payee = grant.value?.payee || '';
-    form.value.name = grantMetadata.value?.name || '';
-    form.value.description = grantMetadata.value?.description || '';
+    prefillEditForm();
+
     // Hide edit form
     isEditing.value = false;
   }
@@ -174,9 +171,11 @@ function useGrantDetail() {
     let metaPtr = g.metaPtr;
 
     const gMetadata = grantMetadata.value;
-    const isMetaPtrUpdated = name != gMetadata?.name || description != gMetadata?.description;
+    const isMetaPtrUpdated = name !== gMetadata?.name || description !== gMetadata?.description;
     if (isMetaPtrUpdated) {
-      metaPtr = await ipfs.createGrant({ name, description }).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
+      metaPtr = await ipfs
+        .uploadGrantMetadata({ name, description })
+        .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     }
 
     if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {
@@ -199,6 +198,26 @@ function useGrantDetail() {
     cancelEdits(); // reset form ref and toggle page state back to display mode
   }
 
+  /**
+   * @notice Loads the default values into edit form, and shows the edit window
+   */
+  function enableEdit() {
+    prefillEditForm();
+
+    // Enable edit form
+    isEditing.value = true;
+  }
+
+  /**
+   * @notice util function which prefills edit form
+   */
+  function prefillEditForm() {
+    form.value.owner = grant.value?.owner || '';
+    form.value.payee = grant.value?.payee || '';
+    form.value.name = grantMetadata.value?.name || '';
+    form.value.description = grantMetadata.value?.description || '';
+  }
+
   return {
     isEditing,
     isOwner,
@@ -211,6 +230,7 @@ function useGrantDetail() {
     form,
     cancelEdits,
     saveEdits,
+    enableEdit,
   };
 }
 

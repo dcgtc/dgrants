@@ -6,7 +6,7 @@ const config = {
   storageHeaders: {
     Authorization: `v2 ${import.meta.env.VITE_FLEEK_STORAGE_API_KEY}`, // or Bearer <JWT> or public <AppKey>
   },
-  retrievalEndpoint: 'https://cloudflare-ipfs.com/ipfs',
+  retrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
 };
 
 const ipfs = create({
@@ -21,7 +21,7 @@ const ipfs = create({
  * @param obj.description Description of grant
  * @returns CID
  */
-export const createGrant = async ({ name, description }: GrantMetadata) => {
+export const uploadGrantMetadata = async ({ name, description }: GrantMetadata) => {
   const res = await ipfs.add(JSON.stringify({ name, description }));
   return res.cid;
 };
