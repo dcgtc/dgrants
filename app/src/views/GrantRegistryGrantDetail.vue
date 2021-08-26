@@ -26,7 +26,7 @@
         src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
         alt="Workflow"
       />
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Edit Grant {{ grant.id.toString() }}</h2>
+      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Edit Grant {{ grantMetadata?.name }}</h2>
     </div>
 
     <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
@@ -52,14 +52,24 @@
             errorMsg="Please enter a valid address"
           />
 
-          <!-- Metadata pointer -->
+          <!-- Grant name -->
           <BaseInput
-            v-model="form.metaPtr"
-            description="URL containing additional details about this grant"
-            id="metadata-url"
-            label="Metadata URL"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
+            v-model="form.name"
+            description="Your grant's name"
+            id="grant-name"
+            label="Grant name"
+            :rules="isDefined"
+            errorMsg="Please enter a name"
+          />
+
+          <!-- Grant Description -->
+          <BaseInput
+            v-model="form.description"
+            description="Your grant's description"
+            id="grant-description"
+            label="Grant description"
+            :rules="isDefined"
+            errorMsg="Please enter a description"
           />
 
           <!-- Submit and cancel buttons -->
@@ -94,9 +104,10 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract, ContractTransaction } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl } from 'src/utils/utils';
+import { isValidAddress, isValidUrl, isDefined } from 'src/utils/utils';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
+import * as ipfs from 'src/utils/ipfs';
 
 function useGrantDetail() {
   const { grants, poll, grantMetadata: metadata } = useDataStore();
@@ -133,16 +144,25 @@ function useGrantDetail() {
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
-  const form = ref<{ owner: string; payee: string; metaPtr: string }>({
+
+  const form = ref<{ owner: string; payee: string; name: string; description: string }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
-    metaPtr: grant.value?.metaPtr || '',
+    name: grantMetadata.value?.name || '',
+    description: grantMetadata.value?.description || '',
   });
+
   const isFormValid = computed(() => {
     if (!grant.value) return false;
-    const { owner, payee, metaPtr } = form.value;
-    const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isValidUrl(metaPtr);
-    const areFieldsUpdated = owner !== grant.value.owner || payee !== grant.value.payee || metaPtr !== grant.value.metaPtr; // prettier-ignore
+    const { owner, payee, name, description } = form.value;
+    const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isDefined(name) && isDefined(description);
+
+    const areFieldsUpdated =
+      owner !== grant.value.owner ||
+      payee !== grant.value.payee ||
+      name !== grantMetadata.value?.name ||
+      description !== grantMetadata.value?.description;
+
     return areFieldsValid && areFieldsUpdated;
   });
 
@@ -153,7 +173,8 @@ function useGrantDetail() {
     // Reset form values
     form.value.owner = grant.value?.owner || '';
     form.value.payee = grant.value?.payee || '';
-    form.value.metaPtr = grant.value?.metaPtr || '';
+    form.value.name = grantMetadata.value?.name || '';
+    form.value.description = grantMetadata.value?.description || '';
     // Hide edit form
     isEditing.value = false;
   }
@@ -163,7 +184,7 @@ function useGrantDetail() {
    */
   async function saveEdits() {
     // Validation
-    const { owner, payee, metaPtr } = form.value;
+    const { owner, payee, name, description } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -173,13 +194,25 @@ function useGrantDetail() {
     // Determine which update method to call
     let tx: ContractTransaction;
     const g = grant.value; // for better readability in the if statements
-    if (owner !== g.owner && payee === g.payee && metaPtr === g.metaPtr) {
+    let metaPtr = g.metaPtr;
+
+    const gMetadata = grantMetadata.value;
+    const isMetaPtrUpdated = name != gMetadata?.name || description != gMetadata?.description;
+    if (isMetaPtrUpdated) {
+      metaPtr = await ipfs.createGrant({ name, description }).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
+    }
+
+    if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {
+      // update Grant Owner
       tx = await registry.updateGrantOwner(g.id, owner);
-    } else if (owner === g.owner && payee !== g.payee && metaPtr === g.metaPtr) {
+    } else if (owner === g.owner && payee !== g.payee && !isMetaPtrUpdated) {
+      // update Grant Payee
       tx = await registry.updateGrantPayee(g.id, payee);
-    } else if (owner === g.owner && payee === g.payee && metaPtr !== g.metaPtr) {
+    } else if (owner === g.owner && payee === g.payee && isMetaPtrUpdated) {
+      // update Grant MetaPtr
       tx = await registry.updateGrantMetaPtr(g.id, metaPtr);
     } else {
+      // update all
       tx = await registry.updateGrant(g.id, owner, payee, metaPtr);
     }
 
@@ -197,6 +230,7 @@ function useGrantDetail() {
     isOwner,
     isValidAddress,
     isValidUrl,
+    isDefined,
     isFormValid,
     grant,
     grantMetadata,
