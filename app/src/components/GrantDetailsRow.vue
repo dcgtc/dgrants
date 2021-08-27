@@ -44,7 +44,7 @@
             </div>
 
             <div>
-              <div class="truncate">
+              <div>
                 10 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
                 <span v-for="(round, index) in roundDetails" :key="index">
                   {{ round.prediction10 }} {{ round.matchingToken.symbol
@@ -52,7 +52,7 @@
                 </span>
                 Matching
               </div>
-              <div class="truncate">
+              <div>
                 100 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
                 <span v-for="(round, index) in roundDetails" :key="index">
                   {{ round.prediction100 }} {{ round.matchingToken.symbol
