@@ -60,6 +60,11 @@
 import { defineComponent } from 'vue';
 import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 
+type Contributor = {
+  login: string;
+  html_url: string;
+};
+
 export default defineComponent({
   name: 'About',
   props: {
@@ -70,13 +75,23 @@ export default defineComponent({
   },
   data() {
     return {
-      contributors: [] as { login: string; html_url: string }[],
+      contributors: [] as Contributor[],
     };
   },
   emits: ['toggleAbout'],
   async created() {
-    const response = await fetch('https://api.github.com/repos/dcgtc/dgrants/contributors');
-    this.contributors = await response.json();
+    try {
+      const url = 'https://api.github.com/repos/dcgtc/dgrants/contributors';
+      const response = await fetch(url);
+      this.contributors = await response.json();
+    } catch {
+      this.contributors = [
+        {
+          login: 'dGrants',
+          html_url: 'https://github.com/dcgtc/dgrants/contributors',
+        },
+      ];
+    }
   },
 });
 </script>
