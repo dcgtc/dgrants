@@ -1,4 +1,5 @@
 import { BigNumber } from 'ethers';
+import { TokenInfo } from '@uniswap/token-lists';
 
 // --- Grants ---
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for
@@ -21,3 +22,17 @@ export type GrantMetadata = {
 };
 export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
 export type GrantMetadataResolution = Partial<GrantMetadata> & { status: GrantMetadataStatus };
+
+// Details of a grant in a round
+export type GrantsRoundDetails = {
+  address: string;
+  metaPtr: string;
+  name: string;
+  matchingToken: TokenInfo;
+  donationToken: TokenInfo;
+  contributions: Array<Object>;
+  matching: number;
+  prediction10: number;
+  prediction100: number;
+  balance: number;
+};
