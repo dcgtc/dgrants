@@ -15,6 +15,6 @@ export type FilterItem = {
   menu?: {
     title?: string;
     action?: (payload: MouseEvent) => void;
-    seperator?: Boolean;
+    seperator?: boolean;
   }[];
 };

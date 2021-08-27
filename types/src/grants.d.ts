@@ -35,7 +35,7 @@ export type GrantsRoundDetails = {
   name: string;
   matchingToken: TokenInfo;
   donationToken: TokenInfo;
-  contributions: Array<Object>;
+  contributions: (false | Event)[];
   matching: number;
   prediction10: number;
   prediction100: number;
