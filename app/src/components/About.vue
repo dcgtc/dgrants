@@ -70,7 +70,7 @@ export default defineComponent({
   },
   data() {
     return {
-      contributors: [],
+      contributors: [] as { login: string; html_url: string }[],
     };
   },
   emits: ['toggleAbout'],
