@@ -98,6 +98,10 @@
     @apply stroke-teal;
   }
 
+  .icon-disabled {
+    @apply stroke-grey-200;
+  }
+
   .icon-heavy {
     @apply stroke-4;
   }
@@ -107,7 +111,7 @@
   }
 
   .btn svg {
-    @apply stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8;
+    @apply stroke-3 stroke-white object-contain h-6 w-6;
   }
 
   .btn.in-cart {

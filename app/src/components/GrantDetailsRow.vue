@@ -61,6 +61,10 @@
                 Matching
               </div>
             </div>
+            <div class="flex justify-center mb-6 xl:justify-end">
+              <!-- allow extra buttons to be defined in the parent -->
+              <slot name="extraButtons"></slot>
+            </div>
           </div>
         </div>
         <div class="text-left col-span-11 col-start-2">
