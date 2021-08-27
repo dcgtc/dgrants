@@ -11,6 +11,7 @@
   #app {
     @apply text-grey-500; /* Default font color */
     @apply text-sm md:text-md lg:text-lg xl:text-xl 2xl:text-xxl;
+    @apply font-sans;
     font-kerning: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
