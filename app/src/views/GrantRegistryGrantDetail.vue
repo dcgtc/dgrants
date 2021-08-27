@@ -16,8 +16,11 @@
       :totalRaised="grantContributionsTotal"
       :roundDetails="grantContributionsByRound"
     >
-      <template v-slot:extraButtons>
-        <button v-if="isOwner" @click="enableEdit()" class="mt-5 btn btn-secondary">Edit Grant</button>
+      <template v-slot:extraLinks>
+        <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
+          <EditIcon class="icon-primary stroke-2 w-9" />
+          <span class="text-grey-400 group-hover:text-grey-500">Edit Grant</span>
+        </div>
       </template>
     </GrantDetailsRow>
 
@@ -67,103 +70,102 @@
 
   <!-- Editing grant -->
   <div v-else-if="grant && !loading" class="flex flex-col justify-center sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img
-        class="mx-auto h-12 w-auto"
-        src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-        alt="Workflow"
-      />
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Edit Grant {{ grantMetadata?.name }}</h2>
+    <div class="sm:mx-auto sm:w-full mt-5 md:mt-20 mb-12 md:mb-24">
+      <h1>Edit Grant</h1>
+      <h1>"{{ grantMetadata?.name }}"</h1>
     </div>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
-      <div class="py-8 px-4 border border-gray-200 shadow sm:rounded-lg sm:px-6 bg-gray-50">
-        <form class="space-y-6" @submit.prevent="saveEdits">
-          <!-- Owner address -->
-          <BaseInput
-            v-model="form.owner"
-            description="The owner has permission to edit the grant"
-            id="owner-address"
-            label="Owner address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+    <BaseFilterNav :active="selectedEdit" :items="editNav" />
 
-          <!-- Payee address -->
-          <BaseInput
-            v-model="form.payee"
-            description="The address contributions and matching funds are sent to"
-            id="payee-address"
-            label="Payee address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+    <div v-if="selectedEdit == 0" class="text-left">
+      <form class="space-y-5" @submit.prevent="saveEdits">
+        <!-- Owner address -->
+        <BaseInput
+          v-model="form.owner"
+          description="The owner has permission to edit the grant"
+          id="owner-address"
+          label="Owner address"
+          :rules="isValidAddress"
+          errorMsg="Please enter a valid address"
+        />
 
-          <!-- Grant name -->
-          <BaseInput
-            v-model="form.name"
-            description="Your grant's name"
-            id="grant-name"
-            label="Grant name"
-            :rules="isDefined"
-            errorMsg="Please enter a name"
-          />
+        <!-- Payee address -->
+        <BaseInput
+          v-model="form.payee"
+          description="The address contributions and matching funds are sent to"
+          id="payee-address"
+          label="Payee address"
+          :rules="isValidAddress"
+          errorMsg="Please enter a valid address"
+        />
 
-          <!-- Grant description -->
-          <BaseInput
-            v-model="form.description"
-            description="Your grant's description"
-            id="grant-description"
-            label="Grant description"
-            :rules="isDefined"
-            errorMsg="Please enter a description"
-          />
+        <!-- Grant name -->
+        <BaseInput
+          v-model="form.name"
+          description="Your grant's name"
+          id="grant-name"
+          label="Grant name"
+          :rules="isDefined"
+          errorMsg="Please enter a name"
+        />
 
-          <!-- Grant website -->
-          <BaseInput
-            v-model="form.website"
-            description="Your grant's website"
-            id="grant-website"
-            label="Grant website"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
-            :required="false"
-          />
+        <!-- Grant Description -->
+        <BaseTextarea
+          v-model="form.description"
+          :placeholder="LOREM_IPSOM_TEXT"
+          id="grant-description"
+          label="Grant description"
+          :required="true"
+          :rules="isDefined"
+          errorMsg="Please enter a description"
+        />
 
-          <!-- Grant github -->
-          <BaseInput
-            v-model="form.github"
-            description="Your grant's github"
-            id="grant-github"
-            label="Grant github"
-            :rules="isValidGithubUrl"
-            errorMsg="Please enter a valid Github URL"
-            :required="false"
-          />
+        <!-- Grant website -->
+        <BaseInput
+          v-model="form.website"
+          description="Your grant's website"
+          id="grant-website"
+          label="Grant website"
+          :rules="isValidUrl"
+          errorMsg="Please enter a valid URL"
+          :required="false"
+        />
 
-          <!-- Grant twitter handle -->
-          <BaseInput
-            v-model="form.twitter"
-            description="Your grant's twitter handle"
-            id="grant-handle"
-            label="Grant twitter"
-            :rules="isValidTwitter"
-            errorMsg="Please enter a valid Twitter handle"
-            :required="false"
-          />
+        <!-- Grant github -->
+        <BaseInput
+          v-model="form.github"
+          description="Your grant's github"
+          id="grant-github"
+          label="Grant github"
+          :rules="isValidGithubUrl"
+          errorMsg="Please enter a valid Github URL"
+          :required="false"
+        />
 
-          <!-- Submit and cancel buttons -->
+        <!-- Grant twitter handle -->
+        <BaseInput
+          v-model="form.twitter"
+          description="Your grant's twitter handle"
+          id="grant-handle"
+          label="Grant twitter"
+          :rules="isValidTwitter"
+          errorMsg="Please enter a valid Twitter handle"
+          :required="false"
+        />
+
+        <!-- Submit and cancel buttons -->
+        <div class="flex justify-end pt-6">
           <button
             type="submit"
-            class="btn btn-primary w-full"
+            class="btn btn-primary mr-5"
             :class="{ disabled: !isFormValid }"
             :disabled="!isFormValid"
           >
-            Save Edits
+            Update Grant
           </button>
-          <button @click.prevent="cancelEdits" class="btn btn-outline w-full">Cancel</button>
-        </form>
-      </div>
+          <button @click.prevent="cancelEdits" class="btn btn-outline">Cancel</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -191,6 +193,7 @@ import {
   GRANT_ROUND_MANAGER_ABI,
   GRANT_ROUND_MANAGER_ADDRESS,
   SUPPORTED_TOKENS_MAPPING,
+  LOREM_IPSOM_TEXT,
 } from 'src/utils/constants';
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
 import {
@@ -209,12 +212,15 @@ import * as ipfs from 'src/utils/ipfs';
 import { Breadcrumb, FilterNavItem, GrantRound, GrantsRoundDetails } from '@dgrants/types';
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
+import BaseTextarea from 'src/components/BaseTextarea.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
+// --- Icons ---
+import { Edit2Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 function useGrantDetail() {
   // --- get current state ---
@@ -239,6 +245,7 @@ function useGrantDetail() {
   // --- expose Grant/round details ---
   const loading = ref(true);
   const selectedRound = ref(0);
+  const selectedEdit = ref(0);
   const grantContibutions = ref();
   const grantContributionsTotal = ref();
   const grantContributionsByRound = ref();
@@ -397,6 +404,19 @@ function useGrantDetail() {
       ]
   );
 
+  // --- Edit Grant display details ---
+  const editNav = computed(
+    () =>
+      <FilterNavItem[]>[
+        {
+          label: 'Details',
+          action: () => {
+            selectedEdit.value = 0;
+          },
+        },
+      ]
+  );
+
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
@@ -492,6 +512,8 @@ function useGrantDetail() {
       tx = await registry.updateGrant(g.id, owner, payee, metaPtr);
     }
 
+    // TODO: show waiting state screen
+
     // After tx mines, poll so the store has the latest data, then navigate to the grant page
     await tx.wait();
     await poll();
@@ -541,18 +563,30 @@ function useGrantDetail() {
     enableEdit,
     breadcrumb,
     contributionsNav,
+    editNav,
     nextGrant,
     lastGrant,
     selectedRound,
+    selectedEdit,
     grantContibutions,
     grantContributionsTotal,
     grantContributionsByRound,
+    LOREM_IPSOM_TEXT,
   };
 }
 
 export default defineComponent({
   name: 'GrantRegistryGrantDetail',
-  components: { BaseInput, SectionHeader, ContributionRow, BaseHeader, BaseFilterNav, GrantDetailsRow },
+  components: {
+    BaseInput,
+    BaseTextarea,
+    SectionHeader,
+    ContributionRow,
+    BaseHeader,
+    BaseFilterNav,
+    GrantDetailsRow,
+    EditIcon,
+  },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
