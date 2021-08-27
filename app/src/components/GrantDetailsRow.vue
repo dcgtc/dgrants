@@ -77,6 +77,10 @@
         </div>
         <div class="text-left col-span-11 col-start-2">
           <div class="flex flex-wrap gap-x-6 gap-y-4">
+            <!-- allow extra buttons to be defined in the parent -->
+            <slot name="extraLinks"></slot>
+
+            <!-- Share -->
             <div class="flex items-center gap-x-2 cursor-pointer group">
               <ShareIcon class="icon-primary stroke-2 w-9" />
               <span class="text-grey-400 group-hover:text-grey-500">Share</span>

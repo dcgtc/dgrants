@@ -1,101 +1,103 @@
 <template>
-  <div class="flex flex-col justify-center sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img
-        class="mx-auto h-12 w-auto"
-        src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-        alt="Workflow"
-      />
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Create New Grant</h2>
+  <div class="flex flex-col justify-center sm:px-6 lg:px-8 mb-40">
+    <div class="sm:mx-auto sm:w-full sm:max-w-md mt-5 md:mt-20 mb-12 md:mb-24">
+      <h1>Setup Grant</h1>
     </div>
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
-      <div class="py-8 px-4 border border-gray-200 shadow sm:rounded-lg sm:px-6 bg-gray-50">
-        <form class="space-y-6" @submit.prevent="createGrant">
-          <!-- Owner address -->
-          <BaseInput
-            v-model="form.owner"
-            description="The owner has permission to edit the grant"
-            id="owner-address"
-            label="Owner address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+    <div class="text-left">
+      <form class="space-y-5" @submit.prevent="createGrant">
+        <p class="border-b border-grey-100"></p>
 
-          <!-- Payee address -->
-          <BaseInput
-            v-model="form.payee"
-            description="The address contributions and matching funds are sent to"
-            id="payee-address"
-            label="Payee address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+        <!-- Grant name -->
+        <BaseInput
+          v-model="form.name"
+          placeholder="Fusion – Icon Pack for Cryptonauts"
+          id="grant-name"
+          label="Title"
+          :rules="isDefined"
+          errorMsg="Please enter a name"
+        />
 
-          <!-- Grant name -->
-          <BaseInput
-            v-model="form.name"
-            description="Your grant's name"
-            id="grant-name"
-            label="Grant name"
-            :rules="isDefined"
-            errorMsg="Please enter a name"
-          />
+        <!-- Owner address -->
+        <BaseInput
+          v-model="form.owner"
+          placeholder="0xBADCdDEA250f1e317Ba59999232464933C4E8D90"
+          description="has permission to edit the grant"
+          id="owner-address"
+          label="Owner address"
+          :rules="isValidAddress"
+          errorMsg="Please enter a valid address"
+        />
 
-          <!-- Grant description -->
-          <BaseInput
-            v-model="form.description"
-            description="Your grant's description"
-            id="grant-description"
-            label="Grant description"
-            :rules="isDefined"
-            errorMsg="Please enter a description"
-          />
+        <!-- Payee address -->
+        <BaseInput
+          v-model="form.payee"
+          placeholder="0xBADCdDEA250f1e317Ba59999232464933C4E8D90"
+          description="contributions and matching funds are sent to"
+          id="payee-address"
+          label="Payee address"
+          :rules="isValidAddress"
+          errorMsg="Please enter a valid address"
+        />
 
-          <!-- Grant website -->
-          <BaseInput
-            v-model="form.website"
-            description="Your grant's website"
-            id="grant-website"
-            label="Grant website"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
-            :required="false"
-          />
+        <!-- Grant Description -->
+        <BaseTextarea
+          v-model="form.description"
+          :placeholder="LOREM_IPSOM_TEXT"
+          id="grant-description"
+          label="Grant description"
+          :required="true"
+          :rules="isDefined"
+          errorMsg="Please enter a description"
+        />
 
-          <!-- Grant github -->
-          <BaseInput
-            v-model="form.github"
-            description="Your grant's github"
-            id="grant-github"
-            label="Grant github"
-            :rules="isValidGithubUrl"
-            errorMsg="Please enter a valid Github URL"
-            :required="false"
-          />
+         <!-- Grant website -->
+        <BaseInput
+          v-model="form.website"
+          description="Your grant's website"
+          id="grant-website"
+          label="Grant website"
+          :rules="isValidUrl"
+          errorMsg="Please enter a valid URL"
+          :required="false"
+        />
 
-          <!-- Grant twitter handle -->
-          <BaseInput
-            v-model="form.twitter"
-            description="Your grant's twitter handle"
-            id="grant-handle"
-            label="Grant twitter"
-            :rules="isValidTwitter"
-            errorMsg="Please enter a valid Twitter handle"
-            :required="false"
-          />
+        <!-- Grant github -->
+        <BaseInput
+          v-model="form.github"
+          description="Your grant's github"
+          id="grant-github"
+          label="Grant github"
+          :rules="isValidGithubUrl"
+          errorMsg="Please enter a valid Github URL"
+          :required="false"
+        />
 
-          <!-- Submit button -->
-          <button
-            type="submit"
-            class="btn btn-primary w-full text-center"
-            :class="{ disabled: !isFormValid }"
-            :disabled="!isFormValid"
-          >
-            Create Grant
-          </button>
-        </form>
-      </div>
+        <!-- Grant twitter handle -->
+        <BaseInput
+          v-model="form.twitter"
+          description="Your grant's twitter handle"
+          id="grant-handle"
+          label="Grant twitter"
+          :rules="isValidTwitter"
+          errorMsg="Please enter a valid Twitter handle"
+          :required="false"
+        />
+
+        <!-- Submit button -->
+        <button
+          type="submit"
+          class="btn btn-primary float-right"
+          :class="{ disabled: !isFormValid }"
+          :disabled="!isFormValid"
+        >
+          Create Grant
+        </button>
+
+        <p v-if="!isFormValid" class="text-center text-grey-400">
+          *Please fill in all required fields
+        </p>
+      </form>
     </div>
   </div>
 </template>
@@ -103,11 +105,13 @@
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
 import BaseInput from 'src/components/BaseInput.vue';
+import BaseTextarea from 'src/components/BaseTextarea.vue';
+
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
+import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { Contract } from 'src/utils/ethers';
 import {
   isValidAddress,
@@ -165,7 +169,9 @@ function useNewGrant() {
       .uploadGrantMetadata({ name, description, properties })
       .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
+
     const tx = await registry.createGrant(owner, payee, metaPtr);
+    // TODO: show waiting state screen
     await tx.wait();
 
     // Parse receipt to find the grant ID
@@ -177,12 +183,22 @@ function useNewGrant() {
     await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
-  return { createGrant, isValidAddress, isValidUrl, isValidGithubUrl, isValidTwitter, isFormValid, isDefined, form };
+  return {
+    createGrant,
+    isValidAddress,
+    isValidUrl,
+    isValidGithubUrl,
+    isValidTwitter,
+    isFormValid,
+    isDefined,
+    form,
+    LOREM_IPSOM_TEXT,
+  };
 }
 
 export default defineComponent({
   name: 'GrantRegistryNewGrant',
-  components: { BaseInput },
+  components: { BaseInput, BaseTextarea },
   setup() {
     return { ...useNewGrant() };
   },

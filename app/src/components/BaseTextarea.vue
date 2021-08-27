@@ -1,33 +1,18 @@
 <template>
   <div class="grid grid-cols-12 py-5 items-center gap-m-8 border-b border-grey-100">
     <div class="col-span-12 md:col-span-3 mb-3 md:mb-0 grid-rows-3">
-      <label :for="id" class="text-grey-400">
-        {{ label }} <span v-if=required class="">(optional)</span>:
-      </label>
+      <label :for="id" class="text-grey-400"> {{ label }}: </label>
     </div>
 
     <div class="col-span-10 md:col-span-6">
-      <input
+      <textarea
         v-model="val"
         @input="onInput"
-        :class="[
-          'hy',
-          'appearance-none',
-          'bg-white',
-          'block',
-          'px-3',
-          'py-4',
-          'border border-grey-400',
-          'shadow-sm',
-          'placeholder-grey-400',
-          'focus:outline-none focus:ring-primary-500 focus:border-primary-500',
-          'sm:text-sm',
-          width,
-          !isValid ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' : '',
-        ]"
+        :class="{ 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': !isValid }"
         :id="id"
         :name="id"
         :required="required"
+        :rows="rows"
         :type="type"
         :readonly="readonly"
         :disabled="disabled"
@@ -47,11 +32,12 @@ import { computed, defineComponent, ref } from 'vue';
 import { WarningIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
-  name: 'BaseInput',
+  name: 'BaseTextarea',
   components: { WarningIcon },
   props: {
     // --- Required props ---
     modelValue: { type: [String, Number], required: true, default: undefined }, // from v-model, don't pass this directly
+
     // --- Optional props ---
     label: { type: String, required: false, default: undefined }, // field label
     description: { type: String, required: false, default: undefined }, // field description
@@ -59,10 +45,10 @@ export default defineComponent({
     id: { type: String, required: false, default: undefined }, // id, for accessibility
     placeholder: { type: String, required: false, default: undefined }, // input placeholder text
     type: { type: String, required: false, default: 'text' }, // input type
-    required: { type: Boolean, required: false, default: true }, // is required
     readonly: { type: Boolean, required: false, default: false }, // is readonly
+    rows: { type: Number, required: false, default: 10 }, // rows in textarea
+    required: { type: Boolean, required: false, default: false }, // is required field
     disabled: { type: Boolean, required: false, default: false }, // is disabled
-    width: { type: String, required: false, default: 'w-full' }, // input field width
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,
