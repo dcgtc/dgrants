@@ -51,6 +51,10 @@ export default defineComponent({
   color: #2c3e50;
 }
 
+#app-main {
+  text-align: center;
+}
+
 #nav {
   padding: 30px;
 }
