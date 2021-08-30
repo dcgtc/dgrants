@@ -11,7 +11,7 @@
     <!--optional by address last seen / last  updated " "byWhen"  -->
     <div v-if="by">
       <span class="text-grey-400 mr-4">by</span>
-      <a class="mr-4">{{ by }}</a>
+      <a class="link mr-4" :href="`https://etherscan.io/address/${owner}`">{{ by }}</a>
       <span v-if="byWhen" class="italic text-grey-400">{{ byWhen }}</span>
     </div>
 

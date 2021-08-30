@@ -1,6 +1,6 @@
 <template>
   <!-- Grant details -->
-  <div v-if="!isEditing && grant">
+  <div v-if="!isEditing && grant && !loading">
     <BaseHeader
       :breadcrumbContent="breadcrumb"
       :name="grantMetadata?.name || ''"
@@ -15,7 +15,7 @@
       :grant="grant"
       :logoURI="grantMetadata?.logoURI || '/src/assets/logo.png'"
       :payoutAddress="grant.payee"
-      :totalRaised="grantTotalContributions"
+      :totalRaised="grantContributionsTotal"
       :roundDetails="grantContributionsByRound"
     >
       <template v-slot:extraButtons>
@@ -68,7 +68,7 @@
   </div>
 
   <!-- Editing grant -->
-  <div v-else-if="grant" class="flex flex-col justify-center sm:px-6 lg:px-8">
+  <div v-else-if="grant && !loading" class="flex flex-col justify-center sm:px-6 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
       <img
         class="mx-auto h-12 w-auto"
@@ -137,8 +137,12 @@
   </div>
 
   <!-- No grant selected -->
-  <div v-else>
+  <div v-else-if="!grant">
     <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant selected</h2>
+  </div>
+
+  <div v-else>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Loading...</h2>
   </div>
 </template>
 
@@ -158,12 +162,12 @@ import {
   SUPPORTED_TOKENS_MAPPING,
 } from 'src/utils/constants';
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl, isDefined } from 'src/utils/utils';
+import { isValidAddress, isValidUrl, isDefined, roundNumber } from 'src/utils/utils';
 import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
 import * as ipfs from 'src/utils/ipfs';
 // --- Types ---
-import { Breadcrumb, FilterItem, GrantsRoundDetails } from '@dgrants/types';
+import { Breadcrumb, FilterItem, GrantRound, GrantsRoundDetails } from '@dgrants/types';
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
@@ -174,18 +178,18 @@ import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 
 function useGrantDetail() {
+  // --- get current state ---
   const {
-    grants,
     poll,
+    grants,
     grantMetadata: metadata,
     grantRounds: rounds,
     grantRoundMetadata: roundsMetadata,
   } = useDataStore();
   const { signer, provider, userAddress } = useWalletStore();
-
   const route = useRoute();
 
-  // --- Grant data ---
+  // --- expose grant data ---
   const grant = computed(() => {
     if (!grants.value) return null; // array type unsupported
     return grants.value[grantId.value];
@@ -193,62 +197,87 @@ function useGrantDetail() {
   const grantId = computed(() => Number(route.params.id));
   const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
 
-  // --- Grant/round details ---
+  // --- expose Grant/round details ---
+  const loading = ref(true);
+  const selectedRound = ref(0);
+  const grantContibutions = ref();
+  const grantContributionsTotal = ref();
+  const grantContributionsByRound = ref();
+
+  // init and assign the calc algorithm to CLR
   const clr = new CLR({
     calcAlgo: linear,
   } as InitArgs);
 
-  const selectedRound = ref(0);
-  const grantContibutions = ref();
-  const grantTotalContributions = ref();
-  const grantContributionsByRound = ref();
+  // returns the predicition curve for this grant in the given round
+  const getPredictionForGrantInRound = async (clr: CLR, grantId: string, round: GrantRound) => {
+    return await clr.predict({
+      grantId: grantId,
+      predictionPoints: [0, 10, 100],
+      grantRoundContributions: await fetch({
+        provider: provider.value,
+        grantRound: round.address,
+        grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
+        grantRegistry: GRANT_REGISTRY_ADDRESS,
+        supportedTokens: SUPPORTED_TOKENS_MAPPING,
+        // should these be pulled from an endpoint?
+        ignore: {
+          grants: [],
+          contributionAddress: [],
+        },
+      }),
+    });
+  };
+
+  // gets all contributions to this grant
+  const getContributions = async () => {
+    // all contributions will pass through the roundManager, and the roundManager will ensure theres only one donationToken currency shared between rounds
+    const roundManager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, provider.value);
+    // get every contribution for this grantId (ignoring the round for now)
+    const contributions = await roundManager.queryFilter(roundManager.filters.GrantDonation(hexlify(grantId.value)));
+
+    // attach the from address (the contributor) to the contribution object
+    return await Promise.all(
+      contributions.reverse().map(async (contribution) => {
+        const tx = await contribution.getTransaction();
+
+        return { ...contribution, from: tx.from };
+      })
+    );
+  };
 
   // Note: Should this state be cached between calls? How will we manage invalidations?
   watch(
     () => [grantId.value, rounds.value, roundsMetadata.value],
     async () => {
-      // all contributions will pass through the roundManager, and the roundManager will ensure theres only one donationToken currency shared between rounds
-      const roundManager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, provider.value);
-      // get every contribution for this grantId (ignoring the round for now)
-      let contributions = await roundManager.queryFilter(roundManager.filters.GrantDonation(hexlify(grantId.value)));
-      // attach the sender to the contribution object
-      contributions = await Promise.all(
-        contributions.map(async (contribution) => {
-          const tx = await contribution.getTransaction();
-
-          return { ...contribution, from: tx.from };
-        })
-      );
-      // record contributions
-      grantContibutions.value = contributions;
+      // enter loading state between loads
+      loading.value = true;
+      // get all contributions for this grant
+      const contributions = await getContributions();
       // sum all contributions made against this grant
-      grantTotalContributions.value = `${formatUnits(
-        contributions.reduce((carr, contrib) => contrib?.args?.donationAmount.add(carr), 0).toString(),
-        rounds.value && rounds.value[0].donationToken.decimals
+      const contributionsTotal = `${roundNumber(
+        formatUnits(
+          contributions.reduce((carr, contrib) => contrib?.args?.donationAmount.add(carr), 0).toString(),
+          rounds.value && rounds.value[0].donationToken.decimals
+        ),
+        2
       )} ${rounds.value && rounds.value[0].donationToken.symbol}`;
       // collect this grants details from every round that it is a member of (should we use the metadata here?)
-      grantContributionsByRound.value = await Promise.all(
+      const contributionsByRound = await Promise.all(
         (rounds.value || []).map(async (round) => {
-          // calc the predicition curve
-          const prediction = clr.predict({
-            grantId: String(grantId.value),
-            predictionPoints: [0, 10, 100],
-            grantRoundContributions: await fetch({
-              provider: provider.value,
-              grantRound: round.address,
-              grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
-              grantRegistry: GRANT_REGISTRY_ADDRESS,
-              supportedTokens: SUPPORTED_TOKENS_MAPPING,
-              ignore: {
-                grants: [],
-                contributionAddress: [],
-              },
-            }),
-          });
-          // collect each rounds contributions/balance/prediction etc
+          // this prediciton will refetch all contributions made in this round - should we cache the result of dcurve/fetch?
+          const prediction = await getPredictionForGrantInRound(clr, String(grantId.value), round);
+          // filter only contributions which should be considered for this round (should we also/only check metadata here?)
           const roundContributions = contributions
             .map((contrib) => (contrib?.args?.rounds.includes(round.address) ? contrib : false))
             .filter((c) => c);
+          // sum the contributions which were made against this round
+          const roundsContributionTotal = formatUnits(
+            roundContributions
+              .reduce((carr, contrib) => (contrib ? contrib.args?.donationAmount.add(carr) : carr), 0)
+              .toString(),
+            round.donationToken.decimals
+          );
 
           return {
             address: round.address,
@@ -257,20 +286,19 @@ function useGrantDetail() {
             matchingToken: round.matchingToken,
             donationToken: round.donationToken,
             contributions: roundContributions,
-            matching: Math.round(prediction.predictions[0].predictedGrantMatch * 100) / 100,
-            prediction10: Math.round(prediction.predictions[1].predictionDiff * 100) / 100,
-            prediction100: Math.round(prediction.predictions[2].predictionDiff * 100) / 100,
-            balance: parseFloat(
-              formatUnits(
-                roundContributions
-                  .reduce((carr, contrib) => (contrib ? contrib.args?.donationAmount.add(carr) : carr), 0)
-                  .toString(),
-                round.donationToken.decimals
-              )
-            ),
+            balance: roundNumber(roundsContributionTotal, 2),
+            matching: roundNumber(prediction.predictions[0].predictedGrantMatch, 2),
+            prediction10: roundNumber(prediction.predictions[1].predictionDiff, 2),
+            prediction100: roundNumber(prediction.predictions[2].predictionDiff, 2),
           } as GrantsRoundDetails;
         })
       );
+      // save off data
+      grantContibutions.value = contributions;
+      grantContributionsTotal.value = contributionsTotal;
+      grantContributionsByRound.value = contributionsByRound;
+      // finished loading required state
+      loading.value = false;
     },
     { immediate: true }
   );
@@ -328,7 +356,7 @@ function useGrantDetail() {
   );
 
   // --- Edit capabilities ---
-  const isOwner = computed(() => true);
+  const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
 
   const form = ref<{ owner: string; payee: string; name: string; description: string }>({
@@ -365,7 +393,7 @@ function useGrantDetail() {
   /**
    * @notice Saves edits
    */
-  async function saveEdits() {
+  const saveEdits = async () => {
     // Validation
     const { owner, payee, name, description } = form.value;
     if (!grant.value) throw new Error('No grant selected');
@@ -405,7 +433,7 @@ function useGrantDetail() {
     await tx.wait();
     await poll();
     cancelEdits(); // reset form ref and toggle page state back to display mode
-  }
+  };
 
   /**
    * @notice Loads the default values into edit form, and shows the edit window
@@ -428,6 +456,7 @@ function useGrantDetail() {
   }
 
   return {
+    loading,
     grantId,
     rounds,
     isEditing,
@@ -448,7 +477,7 @@ function useGrantDetail() {
     lastGrant,
     selectedRound,
     grantContibutions,
-    grantTotalContributions,
+    grantContributionsTotal,
     grantContributionsByRound,
   };
 }

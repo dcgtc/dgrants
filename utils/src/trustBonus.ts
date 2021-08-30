@@ -31,7 +31,7 @@ export const fetchTrustBonusScore = async (addresses: string[]): Promise<TrustBo
   const url = `https://gitcoin.co/grants/v1/api/trust-bonus?addresses=${addresses.join(',')}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetch(url, { mode: 'no-cors' });
     const trustBonusScores = await response.json();
     result.data = trustBonusScores;
     return result;

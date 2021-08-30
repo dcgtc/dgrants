@@ -11,7 +11,10 @@
           <div class="px-4 xl:px-0 xl:pt-2">
             <div><span class="text-grey-400 mr-4">Raised:</span>{{ totalRaised }}</div>
             <div>
-              <span class="text-grey-400 mr-4">Address:</span><a href="">{{ formatAddress(payoutAddress) }}</a>
+              <span class="text-grey-400 mr-4">Address:</span>
+              <a class="link" :href="`https://etherscan.io/address/${payoutAddress}`">
+                {{ formatAddress(payoutAddress) }}
+              </a>
             </div>
             <div class="xl:pt-6">
               <span class="text-grey-400 mr-4">In Round:</span>
