@@ -13,8 +13,17 @@ export function formatAddress(address: string) {
   return `${address.slice(0, 6)}…${address.slice(38)}`;
 }
 
+// Is the given val defined?
 export function isDefined(val: unknown) {
   return !!val;
+}
+
+// Accepts number or string and rounds it to the given number of decimals
+export function roundNumber(number: string | number, decimals: number) {
+  const mul = 10 ** decimals;
+  const num = typeof number == 'number' ? number : parseFloat(number);
+
+  return Math.round(num * mul) / mul;
 }
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is

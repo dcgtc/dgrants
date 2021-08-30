@@ -124,26 +124,28 @@ export class CLR {
     const currentGrantMatch = getGrantMatch(grantId, distribution);
 
     // calculate predicted distribution for each predictionPoint
-    predictionPoints.forEach(async (predictionPoint) => {
-      // calculate distribution with anon contribution
-      const newDistribution: GrantsDistribution = await calcAlgo({
-        // add anon contribution of value predictionPoint
-        contributions: addAnonymousContribution(grantId, { ...grantRoundContributions }, predictionPoint),
-        trustBonusScores: trustBonusScores,
-        // allow for overrides to set calc algo
-        ...options,
-      } as CLRArgs);
+    void (await Promise.all(
+      predictionPoints.map(async (predictionPoint) => {
+        // calculate distribution with anon contribution
+        const newDistribution: GrantsDistribution = await calcAlgo({
+          // add anon contribution of value predictionPoint
+          contributions: addAnonymousContribution(grantId, { ...grantRoundContributions }, predictionPoint),
+          trustBonusScores: trustBonusScores,
+          // allow for overrides to set calc algo
+          ...options,
+        } as CLRArgs);
 
-      // retrieve only this grantId from the predicted distribution
-      const predictedGrantMatch = getGrantMatch(grantId, newDistribution);
+        // retrieve only this grantId from the predicted distribution
+        const predictedGrantMatch = getGrantMatch(grantId, newDistribution);
 
-      // push the prediction for the predictionPoint
-      predictions.push({
-        predictionPoint: predictionPoint,
-        predictedGrantMatch: predictedGrantMatch,
-        predictionDiff: predictedGrantMatch - currentGrantMatch,
-      } as GrantPrediction);
-    });
+        // push the prediction for the predictionPoint
+        predictions.push({
+          predictionPoint: predictionPoint,
+          predictedGrantMatch: predictedGrantMatch,
+          predictionDiff: predictedGrantMatch - currentGrantMatch,
+        } as GrantPrediction);
+      })
+    ));
 
     // return the GrantPredictions
     return {

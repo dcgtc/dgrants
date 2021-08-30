@@ -10,7 +10,9 @@
             </figure>
             <div>
               <div v-if="contribution.from">
-                <a href="">{{ formatAddress(contribution.from) }}</a>
+                <a class="link" :href="`https://etherscan.io/address/${contribution.from}`">{{
+                  formatAddress(contribution.from)
+                }}</a>
               </div>
               <div class="text-grey-400">#{{ contribution.blockNumber }}</div>
             </div>
@@ -20,7 +22,9 @@
         <!-- tx -->
         <div class="truncate">
           <div class="truncate">
-            <a href="">{{ contribution.transactionHash }}</a>
+            <a class="link" :href="`https://etherscan.io/tx/${contribution.transactionHash}`">{{
+              contribution.transactionHash
+            }}</a>
           </div>
           <div class="text-grey-400">Success</div>
         </div>
@@ -28,7 +32,8 @@
         <!-- donation-->
         <div class="truncate text-left md:text-right">
           <div>
-            {{ formatUnits(contribution.args.donationAmount, donationToken.decimals) }} {{ donationToken.symbol }}
+            {{ roundNumber(formatUnits(contribution.args.donationAmount, donationToken.decimals), 2) }}
+            {{ donationToken.symbol }}
           </div>
         </div>
       </div>
@@ -40,7 +45,7 @@
 import { defineComponent } from 'vue';
 import Jazzicon from 'src/components/Jazzicon.vue';
 import { formatUnits } from 'src/utils/ethers';
-import { formatAddress } from 'src/utils/utils';
+import { formatAddress, roundNumber } from 'src/utils/utils';
 
 export default defineComponent({
   name: 'ContributionRow',
@@ -50,7 +55,7 @@ export default defineComponent({
   },
   components: { Jazzicon },
   setup() {
-    return { formatUnits, formatAddress };
+    return { formatUnits, formatAddress, roundNumber };
   },
 });
 </script>
