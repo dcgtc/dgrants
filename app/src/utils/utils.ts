@@ -36,9 +36,15 @@ export function daysAgo(val = 0) {
   return formatter.format(Math.round(deltaDays), 'days');
 }
 
-// convert a unix ts to a toLocaleString
+// Convert a unix ts to a toLocaleString
 export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
+}
+
+// Formats a number for display to the user, by rounding to the specified number of decimals and adding commas
+export function formatNumber(value: BigNumberish, decimals: number): string {
+  value = Number(value);
+  return commify(parseFloat(value.toFixed(decimals)));
 }
 
 // --- Validation ---
