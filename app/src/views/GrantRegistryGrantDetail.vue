@@ -4,6 +4,9 @@
     <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Grant Details</h1>
     <p>Name: {{ grantMetadata?.name }}</p>
     <p>Description: {{ grantMetadata?.description }}</p>
+    <p v-if="hasWebsite">Website: {{ grantMetadata?.properties?.projectWebsite }}</p>
+    <p v-if="hasGithub">Github: {{ grantMetadata?.properties?.projectGithub }}</p>
+    <p v-if="hasHandle">Twitter: {{ grantMetadata?.properties?.twitterHandle }}</p>
     <p>Owner: {{ grant.owner }}</p>
     <p>Payee: {{ grant.payee }}</p>
     <div class="flex justify-center">
@@ -107,6 +110,26 @@ function useGrantDetail() {
   });
   const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
 
+  // --- Check properties ---
+  const hasWebsite = computed(() =>
+    grant.value
+      ? metadata.value[grant.value.metaPtr]?.properties?.projectWebsite !== undefined &&
+        metadata.value[grant.value.metaPtr]?.properties?.projectWebsite !== ''
+      : false
+  );
+  const hasGithub = computed(() =>
+    grant.value
+      ? metadata.value[grant.value.metaPtr]?.properties?.projectGithub !== undefined &&
+        metadata.value[grant.value.metaPtr]?.properties?.projectGithub !== ''
+      : false
+  );
+  const hasHandle = computed(() =>
+    grant.value
+      ? metadata.value[grant.value.metaPtr]?.properties?.twitterHandle !== undefined &&
+        metadata.value[grant.value.metaPtr]?.properties?.twitterHandle !== ''
+      : false
+  );
+
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
@@ -167,6 +190,9 @@ function useGrantDetail() {
   }
 
   return {
+    hasWebsite,
+    hasGithub,
+    hasHandle,
     isEditing,
     isOwner,
     isValidAddress,

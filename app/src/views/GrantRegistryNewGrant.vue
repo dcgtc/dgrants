@@ -42,7 +42,7 @@
             errorMsg="Please enter a name"
           />
 
-          <!-- Grant name -->
+          <!-- Grant description -->
           <BaseInput
             v-model="form.description"
             description="Your grant's description"
@@ -50,6 +50,39 @@
             label="Grant description"
             :rules="isDefined"
             errorMsg="Please enter a description"
+          />
+
+          <!-- Grant website -->
+          <BaseInput
+            v-model="form.website"
+            description="Your grant's website"
+            id="grant-website"
+            label="Grant website"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
+          />
+
+          <!-- Grant github -->
+          <BaseInput
+            v-model="form.github"
+            description="Your grant's github"
+            id="grant-github"
+            label="Grant github"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
+          />
+
+          <!-- Grant twitter handle -->
+          <BaseInput
+            v-model="form.handle"
+            description="Your grant's twitter handle"
+            id="grant-handle"
+            label="Grant twitter"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
           />
 
           <!-- Submit button -->
@@ -86,11 +119,22 @@ function useNewGrant() {
   const { poll } = useDataStore();
 
   // Define form fields and parameters
-  const form = ref<{ owner: string; payee: string; name: string; description: string }>({
+  const form = ref<{
+    owner: string;
+    payee: string;
+    name: string;
+    description: string;
+    website: string;
+    github: string;
+    handle: string;
+  }>({
     owner: '',
     payee: '',
     name: '',
     description: '',
+    website: '',
+    github: '',
+    handle: '',
   });
   const isFormValid = computed(
     () =>
@@ -105,10 +149,11 @@ function useNewGrant() {
    */
   async function createGrant() {
     // Send transaction
-    const { owner, payee, name, description } = form.value;
+    const { owner, payee, name, description, website, github, handle } = form.value;
+    const properties = { projectWebsite: website, projectGithub: github, twitterHandle: handle };
     if (!signer.value) throw new Error('Please connect a wallet');
     const metaPtr = await ipfs
-      .createGrant({ name, description })
+      .createGrant({ name, description, properties })
       .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
     const tx = await registry.createGrant(owner, payee, metaPtr);
