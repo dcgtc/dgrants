@@ -23,12 +23,14 @@ import {
   BytesLike,
   Contract,
   ContractTransaction,
+  formatUnits,
   hexDataSlice,
   MaxUint256,
   isAddress,
   parseUnits,
   getAddress,
 } from 'src/utils/ethers';
+import { formatNumber } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 
@@ -198,6 +200,11 @@ export default function useCartStore() {
     const manager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, signer.value);
     const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
 
+    // Check all balances
+    for (const swap of swaps) {
+      await assertSufficientBalance(getInputToken(swap), swap.amountIn);
+    }
+
     // Execute approvals if required
     for (const swap of swaps) {
       const tokenAddress = getInputToken(swap);
@@ -359,4 +366,28 @@ async function quoteExactInput(path: BytesLike, amountIn: BigNumberish): Promise
   const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, provider.value);
   const amountOut = await quoter.quoteExactInput(path, amountIn);
   return amountOut.mul(995).div(1000); // multiplying by 995/1000 is equivalent to 0.5% slippage
+}
+
+/**
+ * @notice Throws an error if the user does not have sufficient balance for the specified token
+ * @param tokenAddress Address of the token to check
+ * @param requiredAmount Amount required as a raw number, e.g. 5e18 if the user needs 5 DAI
+ * @returns True if the user has sufficient balance, or throws otherwise
+ */
+async function assertSufficientBalance(tokenAddress: string, requiredAmount: BigNumberish): Promise<boolean> {
+  const { provider, userAddress } = useWalletStore();
+  const abi = ['function balanceOf(address) view returns (uint256)'];
+  console.log('tokenAddress: ', tokenAddress);
+  const token = new Contract(tokenAddress, abi, provider.value);
+  const balance = await token.balanceOf(userAddress.value);
+  if (balance.lt(requiredAmount)) {
+    const tokenInfo = SUPPORTED_TOKENS_MAPPING[token.address];
+    const { symbol, decimals } = tokenInfo;
+    const balanceNeeds = formatNumber(formatUnits(requiredAmount, decimals), 4);
+    const balanceHas = formatNumber(formatUnits(balance, decimals), 4);
+    throw new Error(
+      `Insufficient ${symbol} balance: Current cart requires ${balanceNeeds} ${symbol}, but you only have ${balanceHas} ${symbol}`
+    );
+  }
+  return true;
 }
