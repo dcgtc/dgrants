@@ -25,6 +25,11 @@ export type GrantRoundMetadata = {
   name: string;
   description: string;
   grants: BigNumberish[];
+  properties: {
+    projectWebsite: string;
+    projectGithub: string;
+    twitterHandle: string;
+  };
 };
 export type GrantRoundMetadataStatus = 'resolved' | 'pending' | 'error';
 export type GrantRoundMetadataResolution = Partial<GrantRoundMetadata> & { status: GrantRoundMetadataStatus };

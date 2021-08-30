@@ -195,6 +195,7 @@ function useGrantDetail() {
   const grantId = computed(() => Number(route.params.id));
   const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
 
+<<<<<<< HEAD
   // --- expose Grant/round details ---
   const loading = ref(true);
   const selectedRound = ref(0);

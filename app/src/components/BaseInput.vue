@@ -23,7 +23,7 @@
         ]"
         :id="id"
         :name="id"
-        :required="true"
+        :required="required"
         :type="type"
         :readonly="readonly"
         :disabled="disabled"
@@ -53,6 +53,7 @@ export default defineComponent({
     id: { type: String, required: false, default: undefined }, // id, for accessibility
     placeholder: { type: String, required: false, default: undefined }, // input placeholder text
     type: { type: String, required: false, default: 'text' }, // input type
+    required: { type: Boolean, required: false, default: true }, // is required
     readonly: { type: Boolean, required: false, default: false }, // is readonly
     disabled: { type: Boolean, required: false, default: false }, // is disabled
     width: { type: String, required: false, default: 'w-full' }, // input field width

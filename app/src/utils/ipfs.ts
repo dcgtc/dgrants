@@ -21,8 +21,8 @@ export const ipfs = create({
  * @param obj.description Description of grant
  * @returns CID
  */
-export const uploadGrantMetadata = async ({ name, description }: GrantMetadata) => {
-  const res = await ipfs.add(JSON.stringify({ name, description }));
+export const uploadGrantMetadata = async ({ name, description, properties }: GrantMetadata) => {
+  const res = await ipfs.add(JSON.stringify({ name, description, properties }));
   return res.cid;
 };
 
