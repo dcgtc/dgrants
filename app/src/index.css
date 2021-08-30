@@ -19,6 +19,10 @@
     scroll-behavior: smooth;
   }
 
+  .bn-notify-custom .bn-notify-notification {
+    font-family: Source Code Pro, monospace;
+  }
+
   h1 {
     @apply text-headline;
   }
