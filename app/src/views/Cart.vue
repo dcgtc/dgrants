@@ -1,6 +1,6 @@
 <template>
   <!-- Header -->
-  <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Cart {{ cart.length }}</h1>
+  <BaseHeader :name="`My Cart (${cart.length})`" />
 
   <!-- Empty cart -->
   <div v-if="cart.length === 0">
@@ -11,18 +11,24 @@
   <!-- Cart has items -->
   <div v-else>
     <!-- Cart toolbar -->
-    <div class="flex justify-between mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 border-t-2 border-b-2">
-      <div class="flex justify-start">
-        <button @click="NOT_IMPLEMENTED('Share cart')" class="btn btn-flat">Share cart</button>
+    <div
+      class="flex justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-grey-100 text-grey-400"
+    >
+      <div class="flex items-center justify-start">
+        <div @click="NOT_IMPLEMENTED('Share cart')" class="flex items-center justify-start cursor-pointer">
+          <ArrowToprightIcon class="icon-small icon-primary mr-2" /> Share cart
+        </div>
       </div>
-      <button @click="clearCart" class="btn btn-flat">Clear cart</button>
+      <div @click="clearCart" class="flex items-center justify-end cursor-pointer">
+        <CloseIcon class="icon-small icon-primary mr-2" /> Clear cart
+      </div>
     </div>
     <!-- Cart items -->
-    <div class="bg-white shadow sm:rounded-md max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2">
-      <ul class="divide-y divide-gray-200">
+    <div class="bg-white shadow sm:rounded-md max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <ul>
         <!-- For each grant in the cart -->
         <li v-for="item in cart" :key="item.grantId">
-          <div class="flex justify-between items-center px-4 py-4 sm:px-6">
+          <div class="flex justify-between items-center border-b border-grey-100 py-10">
             <!-- Logo and name -->
             <div
               class="flex items-center cursor-pointer"
@@ -41,17 +47,19 @@
             <!-- Contribution info -->
             <div class="flex space-x-2 items-center">
               <!-- Contribution token and amount -->
-              <div class="flex-none flex">
+              <div class="flex">
+                <!-- We use a -1px right margin so overlapping borders don't make the border thicker -->
                 <BaseInput
+                  style="margin-right: -1px"
                   :modelValue="item.contributionAmount"
                   @update:modelValue="
                     item.contributionAmount = Number($event);
                     updateCart(item.grantId, item.contributionAmount);
                   "
                   type="number"
+                  width="w-36"
                 />
                 <BaseSelect
-                  class="ml-2"
                   :modelValue="item.contributionToken"
                   @update:modelValue="
                     item.contributionToken = $event;
@@ -63,17 +71,15 @@
               </div>
 
               <!-- Match estimate -->
-              <div class="flex-none hidden md:block">
-                <p class="text-sm text-left text-gray-400">not in an active round</p>
+              <!-- TODO use real match estimates -->
+              <div class="flex-none hidden md:block px-4">
+                <p v-if="true" class="text-sm text-left text-grey-300">not in an active round</p>
+                <p v-else class="text-sm text-left text-grey-500">USD estimated matching</p>
               </div>
 
               <!-- Delete from cart -->
               <div>
-                <CloseIcon
-                  @click="removeFromCart(item.grantId)"
-                  class="icon cursor-pointer flex-none h-5 w-5 text-gray-400"
-                  aria-hidden="true"
-                />
+                <CloseIcon @click="removeFromCart(item.grantId)" class="icon-small icon-primary" />
               </div>
             </div>
           </div>
@@ -82,10 +88,16 @@
     </div>
 
     <!-- Checkout -->
-    <div class="mt-10">
-      <div>{{ cartSummaryString }}</div>
-      <div class="flex justify-center mt-5">
-        <button @click="checkout" class="btn btn-secondary">Checkout</button>
+    <div class="bg-white shadow sm:rounded-md max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-right">
+      <div class="border-b border-grey-100 py-8">
+        <span class="text-grey-300">Contributing:</span> {{ cartSummaryString }}
+      </div>
+      <div class="border-b border-grey-100 py-8"><span class="text-grey-300">Equivalent to:</span> TODO USD</div>
+      <div class="border-b border-grey-100 py-8">
+        <span class="text-grey-300">Estimated matching value:</span> TODO USD
+      </div>
+      <div class="py-8 flex justify-end">
+        <button @click="checkout" class="btn">Checkout</button>
       </div>
     </div>
   </div>
@@ -94,9 +106,9 @@
 <script lang="ts">
 // --- External Imports ---
 import { defineComponent, onMounted } from 'vue';
-import { CloseIcon } from '@fusion-icons/vue/interface';
-
+import { ArrowToprightIcon, CloseIcon } from '@fusion-icons/vue/interface';
 // --- App Imports ---
+import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 // --- Store ---
@@ -114,7 +126,7 @@ function useCart() {
 
 export default defineComponent({
   name: 'Cart',
-  components: { BaseInput, BaseSelect, CloseIcon },
+  components: { BaseHeader, BaseInput, BaseSelect, ArrowToprightIcon, CloseIcon },
   setup() {
     const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
