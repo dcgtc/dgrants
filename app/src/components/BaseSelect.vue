@@ -5,13 +5,12 @@
         class="
           bg-white
           relative
-          w-24
-          border border-gray-300
-          rounded-md
+          w-28
+          border border-grey-400
           shadow-sm
           pl-3
           pr-10
-          py-2
+          py-4
           text-left
           cursor-default
           focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500

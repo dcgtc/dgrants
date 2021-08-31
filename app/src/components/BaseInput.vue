@@ -6,22 +6,21 @@
       <input
         v-model="val"
         @input="onInput"
-        :class="{ 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': !isValid }"
-        class="
-          hy
-          appearance-none
-          bg-white
-          block
-          w-full
-          px-3
-          py-2
-          border border-gray-300
-          rounded-md
-          shadow-sm
-          placeholder-gray-400
-          focus:outline-none focus:ring-primary-500 focus:border-primary-500
-          sm:text-sm
-        "
+        :class="[
+          'hy',
+          'appearance-none',
+          'bg-white',
+          'block',
+          'px-3',
+          'py-4',
+          'border border-grey-400',
+          'shadow-sm',
+          'placeholder-grey-400',
+          'focus:outline-none focus:ring-primary-500 focus:border-primary-500',
+          'sm:text-sm',
+          width,
+          !isValid ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' : '',
+        ]"
         :id="id"
         :name="id"
         :required="true"
@@ -56,6 +55,7 @@ export default defineComponent({
     type: { type: String, required: false, default: 'text' }, // input type
     readonly: { type: Boolean, required: false, default: false }, // is readonly
     disabled: { type: Boolean, required: false, default: false }, // is disabled
+    width: { type: String, required: false, default: 'w-full' }, // input field width
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,
