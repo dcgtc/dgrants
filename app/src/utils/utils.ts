@@ -47,6 +47,11 @@ export function isValidUrl(val: string | undefined) {
   return val && val.includes('://'); // TODO more robust URL validation
 }
 
+// Returns true if the provided URL is a valid Github URL
+export function isValidGithubUrl(val: string | undefined) {
+  return val && val.includes('://github.com/');
+}
+
 // Returns true if the provided address is valid (TODO support ENS)
 export function isValidAddress(val: string | undefined) {
   return val && isAddress(val);
