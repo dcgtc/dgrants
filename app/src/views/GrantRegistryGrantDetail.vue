@@ -143,12 +143,10 @@
 
           <!-- Grant twitter handle -->
           <BaseInput
-            v-model="form.handle"
+            v-model="form.twitter"
             description="Your grant's twitter handle"
             id="grant-handle"
             label="Grant twitter"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
             :required="false"
           />
 
@@ -228,7 +226,6 @@ function useGrantDetail() {
   const grantId = computed(() => Number(route.params.id));
   const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
 
-<<<<<<< HEAD
   // --- expose Grant/round details ---
   const loading = ref(true);
   const selectedRound = ref(0);
@@ -394,23 +391,37 @@ function useGrantDetail() {
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
 
-  const form = ref<{ owner: string; payee: string; name: string; description: string }>({
+  const form = ref<{
+    owner: string;
+    payee: string;
+    name: string;
+    description: string;
+    website: string;
+    github: string;
+    twitter: string;
+  }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
     name: grantMetadata.value?.name || '',
     description: grantMetadata.value?.description || '',
+    website: grantMetadata.value?.properties?.websiteURI || '',
+    github: grantMetadata.value?.properties?.githubURI || '',
+    twitter: grantMetadata.value?.properties?.twitterURI || '',
   });
 
   const isFormValid = computed(() => {
     if (!grant.value) return false;
-    const { owner, payee, name, description } = form.value;
+    const { owner, payee, name, description, website, github, twitter } = form.value;
     const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isDefined(name) && isDefined(description);
 
     const areFieldsUpdated =
       owner !== grant.value.owner ||
       payee !== grant.value.payee ||
       name !== grantMetadata.value?.name ||
-      description !== grantMetadata.value?.description;
+      description !== grantMetadata.value?.description ||
+      website !== grantMetadata.value?.properties?.websiteURI ||
+      github !== grantMetadata.value?.properties?.githubURI ||
+      twitter !== grantMetadata.value?.properties?.twitterURI;
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -430,7 +441,7 @@ function useGrantDetail() {
    */
   const saveEdits = async () => {
     // Validation
-    const { owner, payee, name, description } = form.value;
+    const { owner, payee, name, description, website, github, twitter } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -443,7 +454,13 @@ function useGrantDetail() {
     let metaPtr = g.metaPtr;
 
     const gMetadata = grantMetadata.value;
-    const isMetaPtrUpdated = name !== gMetadata?.name || description !== gMetadata?.description;
+    const isMetaPtrUpdated =
+      name !== gMetadata?.name ||
+      description !== gMetadata?.description ||
+      website !== gMetadata?.properties?.websiteURI ||
+      github !== gMetadata?.properties?.githubURI ||
+      twitter !== gMetadata?.properties?.twitterURI;
+    const properties = { websiteURI: website, githubURI: github, twitterURI: twitter };
     if (isMetaPtrUpdated) {
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description })
@@ -488,12 +505,21 @@ function useGrantDetail() {
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
+    form.value.website = grantMetadata.value?.properties?.websiteURI || '';
+    form.value.github = grantMetadata.value?.properties?.githubURI || '';
+    form.value.twitter = grantMetadata.value?.properties?.twitterURI || '';
   }
 
   return {
     loading,
     grantId,
     rounds,
+  }
+
+  return {
+    hasWebsite,
+    hasGithub,
+    hasTwitter,
     isEditing,
     isOwner,
     isValidAddress,

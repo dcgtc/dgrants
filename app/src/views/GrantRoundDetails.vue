@@ -7,9 +7,9 @@
       </h1>
       <p>Name: {{ grantRoundMetadata?.name }}</p>
       <p>Description: {{ grantRoundMetadata?.description }}</p>
-      <p v-if="hasWebsite">Website: {{ grantRoundMetadata?.properties?.projectWebsite }}</p>
-      <p v-if="hasGithub">Github: {{ grantRoundMetadata?.properties?.projectGithub }}</p>
-      <p v-if="hasHandle">Twitter: {{ grantRoundMetadata?.properties?.twitterHandle }}</p>
+      <p v-if="hasWebsite">Website: {{ grantRoundMetadata?.properties?.websiteURI }}</p>
+      <p v-if="hasGithub">Github: {{ grantRoundMetadata?.properties?.githubURI }}</p>
+      <p v-if="hasTwitter">Twitter: {{ grantRoundMetadata?.properties?.twitterURI }}</p>
       <p>Status: {{ grantRound.status }}</p>
       <p>
         Funds:
@@ -206,20 +206,20 @@ function useGrantRoundDetail() {
   // --- Check properties ---
   const hasWebsite = computed(() =>
     grantRound.value
-      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.projectWebsite !== undefined &&
-        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.projectWebsite !== ''
+      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.websiteURI !== undefined &&
+        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.websiteURI !== ''
       : false
   );
   const hasGithub = computed(() =>
     grantRound.value
-      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.projectGithub !== undefined &&
-        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.projectGithub !== ''
+      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.githubURI !== undefined &&
+        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.githubURI !== ''
       : false
   );
-  const hasHandle = computed(() =>
+  const hasTwitter = computed(() =>
     grantRound.value
-      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.twitterHandle !== undefined &&
-        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.twitterHandle !== ''
+      ? _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.twitterURI !== undefined &&
+        _grantRoundMetadata.value[grantRound.value.metaPtr]?.properties?.twitterURI !== ''
       : false
   );
 
@@ -312,7 +312,7 @@ function useGrantRoundDetail() {
     BigNumber,
     hasWebsite,
     hasGithub,
-    hasHandle,
+    hasTwitter,
     hasStatus,
     daysAgo,
     formatAddress,

@@ -76,12 +76,10 @@
 
           <!-- Grant twitter handle -->
           <BaseInput
-            v-model="form.handle"
+            v-model="form.twitter"
             description="Your grant's twitter handle"
             id="grant-handle"
             label="Grant twitter"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
             :required="false"
           />
 
@@ -126,7 +124,7 @@ function useNewGrant() {
     description: string;
     website: string;
     github: string;
-    handle: string;
+    twitter: string;
   }>({
     owner: '',
     payee: '',
@@ -134,7 +132,7 @@ function useNewGrant() {
     description: '',
     website: '',
     github: '',
-    handle: '',
+    twitter: '',
   });
   const isFormValid = computed(
     () =>
@@ -149,8 +147,8 @@ function useNewGrant() {
    */
   async function createGrant() {
     // Send transaction
-    const { owner, payee, name, description, website, github, handle } = form.value;
-    const properties = { projectWebsite: website, projectGithub: github, twitterHandle: handle };
+    const { owner, payee, name, description, website, github, twitter } = form.value;
+    const properties = { websiteURI: website, githubURI: github, twitterURI: twitter };
     if (!signer.value) throw new Error('Please connect a wallet');
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, properties })
