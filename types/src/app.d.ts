@@ -5,10 +5,10 @@
 export type RouteTarget = {
   name: string; // the routes name we're navigating to
   params?: {
-    [key: string]: string|number // any params we want to feed into the route
+    [key: string]: string | number; // any params we want to feed into the route
   };
   query?: {
-    [key: string]: string|number // any query string elements we want to feed into the route
+    [key: string]: string | number; // any query string elements we want to feed into the route
   };
 };
 
@@ -36,4 +36,4 @@ export type FilterNavItem = {
 export type FilterNavButton = {
   label: string; // label to display in the button
   action?: (payload: MouseEvent) => void; // action to take when we click the button
-}
+};

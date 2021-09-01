@@ -4,7 +4,6 @@
       <div class="flex flex-wrap content-center gap-x-8">
         <div class="cursor-pointer uppercase font-medium">
           {{ title }}
-          <span v-if="counter" class="ml-2 text-grey-400">({{ counter }})</span>
         </div>
       </div>
     </div>
@@ -15,10 +14,9 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: 'BaseTitle',
+  name: 'SectionHeader',
   props: {
     title: { type: String, required: false, default: undefined },
-    counter: { type: Number, required: false, default: undefined },
   },
 });
 </script>

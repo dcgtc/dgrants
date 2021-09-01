@@ -19,11 +19,13 @@ export type GrantMetadata = {
   name: string;
   description: string;
   logoURI?: string;
-  quote?: string;
-  lastUpdated?: string;
-  projectWebsite?: string;
-  projectGithub?: string;
-  twitterHandle?: string;
+  properties?: {
+    websiteURI?: string;
+    githubURI?: string;
+    twitterURI?: string;
+  } & {
+    [key: string]: string; // for extensions/flexibility
+  };
 };
 export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
 export type GrantMetadataResolution = Partial<GrantMetadata> & {
