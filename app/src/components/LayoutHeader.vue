@@ -35,38 +35,38 @@
         <router-link
           v-for="link in navigation"
           :key="link.name"
-          :to="link.href"
+          :to="{ name: link.name }"
           active-class="font-bold"
           exact
           class="font-medium text-gray-500 hover:text-gray-900"
         >
-          {{ link.name }}
+          {{ link.label }}
         </router-link>
         <div class="border-b border-grey-400 my-4"></div>
-        <button @click="$emit('toggleAbout')" class="font-medium text-gray-500 hover:text-gray-900 uppercase">
+        <button @click="emitEvent('toggleAbout')" class="font-medium text-gray-500 hover:text-gray-900 uppercase">
           About
         </button>
       </div>
     </div>
 
-    <div v-if="userDisplayName" class="ml-auto flex items-center gap-x-4 md:gap-x-8">
-      <div class="flex items-center gap-x-2 h-14 group cursor-pointer">
+    <div v-if="userAddress" class="ml-auto flex items-center gap-x-4 md:gap-x-8">
+      <router-link :to="{ name: 'Cart' }" class="flex items-center gap-x-2 h-14 group cursor-pointer">
         <div class="hidden md:block group-hover:text-grey-500">Cart</div>
         <CartIcon class="icon-small icon-primary" />
-        <div class="group-hover:text-grey-500">12</div>
-      </div>
+        <div class="group-hover:text-grey-500">{{ cartItemsCount }}</div>
+      </router-link>
 
       <div class="border-r border-grey-100 h-14"></div>
 
       <div class="group relative">
-        <div class="flex items-center h-16 gap-x-2 space-x-4 group cursor-pointer">
+        <div class="flex items-center h-16 gap-x-2 space-x-2 group cursor-pointer">
           <div class="hidden md:block group-hover:text-grey-500">
             <span>{{ userDisplayName }}</span>
           </div>
-          <figure>
-            <Jazzicon :address="userAddress" :key="userAddress" width="40" />
-          </figure>
-          <div>
+          <div class="flex items-center">
+            <figure>
+              <Jazzicon :address="userAddress" :key="userAddress" :width="40" />
+            </figure>
             <ArrowBottomIcon class="icon-small icon-primary" />
           </div>
         </div>
@@ -80,7 +80,6 @@
             border border-grey-400
             p-5
             right-2
-            md:right-20
             bg-white
             text-grey-400
             flex-col
@@ -92,7 +91,6 @@
           "
         >
           <div>{{ userDisplayName }}</div>
-          <div>{{ balance }} ETH</div>
           <div class="border-b border-grey-400 my-4"></div>
 
           <button
@@ -102,7 +100,7 @@
             change wallet
           </button>
           <button
-            @click="disconnect"
+            @click="disconnectWallet"
             class="cursor-pointer hover:text-grey-500 flex no-underline uppercase font-medium"
           >
             disconnect wallet
@@ -126,54 +124,45 @@
 </template>
 
 <script lang="ts">
+// --- External Imports ---
 import { defineComponent } from 'vue';
-import useWalletStore from 'src/store/wallet';
 import { WarningIcon } from '@fusion-icons/vue/interface';
 import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
 import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
-import Jazzicon from 'src/components/Jazzicon.vue';
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
-import { formatEther, JsonRpcProvider, Web3Provider } from 'src/utils/ethers';
+// --- App Imports ---
+import Jazzicon from 'src/components/Jazzicon.vue';
+// --- Store ---
+import useWalletStore from 'src/store/wallet';
+import useCartStore from 'src/store/cart';
 
 // Header menu bar items
 const navigation = [
-  { name: 'Home', href: '/' },
-  { name: 'Cart', href: '/cart' },
+  { label: 'Home', name: 'Home' },
+  { label: 'Cart', name: 'Cart' },
 ];
+
+// Composition function for wallet management in the header. All reading/writing related to the user's wallet
+// is managed in this composition function, which reads/writes to/from src/store/wallet.ts store
+function useWalletConnection() {
+  const { connectWallet, disconnectWallet, changeWallet, isSupportedNetwork, userDisplayName, userAddress } =
+    useWalletStore();
+
+  return { disconnectWallet, changeWallet, connectWallet, isSupportedNetwork, userDisplayName, userAddress };
+}
 
 export default defineComponent({
   name: 'LayoutHeader',
   components: { ConnectWalletIcon, ArrowBottomIcon, CartIcon, Jazzicon, WarningIcon },
-  emits: ['toggleAbout'],
-  data() {
+  setup(_props, context) {
+    const { cartItemsCount } = useCartStore();
+    const emitEvent = (eventName: string) => context.emit(eventName);
     return {
-      balance: '0',
-      provider: null as Web3Provider | JsonRpcProvider | null,
+      cartItemsCount,
+      navigation,
+      emitEvent,
+      ...useWalletConnection(),
     };
-  },
-  watch: {
-    userAddress: 'updateBalance',
-  },
-  methods: {
-    async updateBalance() {
-      if (!this.userAddress) {
-        return;
-      }
-      const balance = await this.provider?.getBalance?.(this.userAddress);
-      this.balance = formatEther(balance ?? '0');
-    },
-    disconnect() {
-      // ToDo implement disconnect
-      console.log('disconnecting');
-    },
-    changeWallet() {
-      // ToDo implement changeWallet
-      console.log('changing wallets');
-    },
-  },
-  setup() {
-    const { connectWallet, isSupportedNetwork, provider, userDisplayName, userAddress } = useWalletStore();
-    return { connectWallet, isSupportedNetwork, navigation, provider, userDisplayName, userAddress };
   },
 });
 </script>
