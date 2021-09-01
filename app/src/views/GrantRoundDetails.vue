@@ -125,7 +125,7 @@
           <button
             type="submit"
             class="btn btn-primary w-full"
-            :class="{ 'btn-primary-disabled': !isFormValid }"
+            :class="{ disabled: !isFormValid }"
             :disabled="!isFormValid"
           >
             Send Contribution
