@@ -194,7 +194,7 @@ export default function useCartStore() {
   /**
    * @notice Executes donations
    */
-  async function checkout() {
+  async function checkout(): Promise<ContractTransaction> {
     const { signer, userAddress } = useWalletStore();
     const { swaps, donations, deadline } = await getCartDonationInputs();
     const manager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, signer.value);
@@ -222,14 +222,7 @@ export default function useCartStore() {
     const value = ethSwap ? ethSwap.amountIn : 0;
 
     // Execute donation
-    const tx = <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
-    const receipt = await tx.wait();
-    if (!receipt.status) {
-      alert('error');
-      return;
-    }
-    alert('success');
-    clearCart();
+    return <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
   }
 
   /**
