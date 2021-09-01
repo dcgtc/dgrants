@@ -8,11 +8,13 @@
     <!-- optional subline -->
     <h1 v-if="tagline">“{{ tagline }}”</h1>
 
-    <!--optional by address last seen / last  updated " "byWhen"  -->
-    <div v-if="by">
+    <!--optional by address last seen / last  updated  -->
+    <div v-if="formattedOwner">
       <span class="text-grey-400 mr-4">by</span>
-      <a class="link mr-4" :href="`https://etherscan.io/address/${owner}`">{{ by }}</a>
-      <span v-if="byWhen" class="italic text-grey-400">{{ byWhen }}</span>
+      <a class="link mr-4" :href="`https://etherscan.io/address/${owner}`" target="_blank" rel="noopener noreferrer">{{
+        formattedOwner
+      }}</a>
+      <span v-if="formattedLastUpdated" class="italic text-grey-400">{{ formattedLastUpdated }}</span>
     </div>
 
     <!-- optional quote -->
@@ -21,18 +23,20 @@
     <span>
       <!-- optional navigation to jump to next item in a list -->
       <router-link
-        :class="['group', 'inline', 'p-6', 'absolute', 'right-0', !nextPath ? 'cursor-default' : '']"
+        v-if="nextPath"
+        :class="['group', 'inline', 'p-6', 'absolute', 'right-0']"
         style="top: 50%; transform: translateY(-50%)"
         :to="nextPath"
       >
-        <ArrowRightIcon :class="['icon', nextPath ? 'icon-primary' : 'icon-disabled']" />
+        <ArrowRightIcon :class="['icon', 'icon-primary']" />
       </router-link>
       <router-link
-        :class="['group', 'inline', 'p-6', 'absolute', 'left-0', !lastPath ? 'cursor-default' : '']"
+        v-if="lastPath"
+        :class="['group', 'inline', 'p-6', 'absolute', 'left-0']"
         style="top: 50%; transform: translateY(-50%)"
         :to="lastPath"
       >
-        <ArrowLeftIcon :class="['icon', lastPath ? 'icon-primary' : 'icon-disabled']" />
+        <ArrowLeftIcon :class="['icon', 'icon-primary']" />
       </router-link>
     </span>
   </header>
@@ -40,11 +44,11 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
-// types
-import { Breadcrumb as BreadcrumbType } from '@dgrants/types';
-// components
+// --- Types ---
+import { RouteTarget, Breadcrumb as BreadcrumbType } from '@dgrants/types';
+// --- Components ---
 import Breadcrumb from 'src/components/Breadcrumb.vue';
-// icons
+// --- Icons ---
 import { ArrowLeft4Icon as ArrowLeftIcon } from '@fusion-icons/vue/interface';
 import { ArrowRight4Icon as ArrowRightIcon } from '@fusion-icons/vue/interface';
 import { daysAgo, formatAddress } from 'src/utils/utils';
@@ -58,15 +62,17 @@ export default defineComponent({
     owner: { type: String, required: false, default: undefined },
     lastUpdated: { type: String, required: false, default: undefined },
     quote: { type: String, required: false, default: undefined },
-    nextPath: { type: String, required: false, default: undefined },
-    lastPath: { type: String, required: false, default: undefined },
+    nextPath: { type: Object as PropType<RouteTarget>, required: false, default: undefined },
+    lastPath: { type: Object as PropType<RouteTarget>, required: false, default: undefined },
   },
   components: { ArrowLeftIcon, ArrowRightIcon, Breadcrumb },
   setup(props) {
-    const by = computed(() => (props.owner ? formatAddress(props.owner) : false));
-    const byWhen = computed(() => (props.lastUpdated ? daysAgo(new Date(props.lastUpdated).getTime() / 1000) : false));
+    const formattedOwner = computed(() => (props.owner ? formatAddress(props.owner) : false));
+    const formattedLastUpdated = computed(() =>
+      props.lastUpdated ? daysAgo(new Date(props.lastUpdated).getTime() / 1000) : false
+    );
 
-    return { by, byWhen };
+    return { formattedOwner, formattedLastUpdated };
   },
 });
 </script>

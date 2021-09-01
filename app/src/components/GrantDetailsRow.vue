@@ -3,7 +3,7 @@
     <div class="grid grid-cols-4 gap-0">
       <!-- img -->
       <div class="col-span-4 md:col-span-2 shadow-light flex">
-        <img class="m-auto" :src="logoURI" />
+        <img class="m-auto" :src="logoURI || '/src/assets/logo.png'" />
       </div>
       <div class="col-span-4 md:col-span-2 grid grid-cols-12 pt-8">
         <!-- raised, contract, round, matching -->
@@ -12,7 +12,12 @@
             <div><span class="text-grey-400 mr-4">Raised:</span>{{ totalRaised }}</div>
             <div>
               <span class="text-grey-400 mr-4">Address:</span>
-              <a class="link" :href="`https://etherscan.io/address/${payoutAddress}`">
+              <a
+                class="link"
+                :href="`https://etherscan.io/address/${payoutAddress}`"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {{ formatAddress(payoutAddress) }}
               </a>
             </div>
@@ -85,21 +90,25 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
+// --- Data ---
+import useCartStore from 'src/store/cart';
+// --- Types ---
+import { Grant, GrantsRoundDetails } from '@dgrants/types';
+// --- Utils/helper ---
+import { formatAddress } from 'src/utils/utils';
+// --- Components/icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
-import { formatAddress } from 'src/utils/utils';
-import useCartStore from 'src/store/cart';
-import { GrantsRoundDetails } from '@dgrants/types';
 
 export default defineComponent({
   name: 'GrantDetailsRow',
   components: { CartIcon, ShareIcon },
   props: {
-    grant: { type: Object, required: false, default: () => ({}) },
+    grant: { type: Object as PropType<Grant>, required: true },
+    roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: true },
     logoURI: { type: String, required: false, default: undefined },
     payoutAddress: { type: String, required: false, default: '0x0' },
     totalRaised: { type: String, required: false, default: '0' },
-    roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: false, default: () => [] },
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();

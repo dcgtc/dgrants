@@ -3,7 +3,7 @@
  */
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
-import { BigNumber, BigNumberish, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
+import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
 import { GrantRound } from '@dgrants/types';
 
 // --- Formatters ---
@@ -18,12 +18,11 @@ export function isDefined(val: unknown) {
   return !!val;
 }
 
-// Accepts number or string and rounds it to the given number of decimals
-export function roundNumber(number: string | number, decimals: number) {
-  const mul = 10 ** decimals;
-  const num = typeof number == 'number' ? number : parseFloat(number);
-
-  return Math.round(num * mul) / mul;
+// Formats a number for display to the user, by rounding to the specified number of decimals and adding commas
+export function formatNumber(value: BigNumberish, decimals: number): string {
+  // `BigNumber.from()` can't take decimal inputs
+  value = typeof value === 'number' || typeof value === 'string' ? Number(value) : BigNumber.from(value);
+  return commify(parseFloat(String(value)).toFixed(decimals));
 }
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is

@@ -1,4 +1,4 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, Event } from 'ethers';
 import { TokenInfo } from '@uniswap/token-lists';
 
 // --- Grants ---
@@ -26,7 +26,12 @@ export type GrantMetadata = {
   twitterHandle?: string;
 };
 export type GrantMetadataStatus = 'resolved' | 'pending' | 'error';
-export type GrantMetadataResolution = Partial<GrantMetadata> & { status: GrantMetadataStatus };
+export type GrantMetadataResolution = Partial<GrantMetadata> & {
+  status: GrantMetadataStatus;
+};
+
+// Details of a contribution
+export type ContributionEvent = Event & { from: string; donationToken: TokenInfo };
 
 // Details of a grant in a round
 export type GrantsRoundDetails = {
@@ -35,9 +40,9 @@ export type GrantsRoundDetails = {
   name: string;
   matchingToken: TokenInfo;
   donationToken: TokenInfo;
-  contributions: (false | Event)[];
-  matching: number;
-  prediction10: number;
-  prediction100: number;
-  balance: number;
+  contributions: ContributionEvent[];
+  matching: string;
+  prediction10: string;
+  prediction100: string;
+  balance: string;
 };

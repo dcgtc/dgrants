@@ -14,6 +14,8 @@
           class="link"
           :title="grantRound.matchingToken.name"
           :href="`https://etherscan.io/token/${grantRound.matchingToken.address}?a=${grantRound.address}`"
+          target="_blank"
+          rel="noopener noreferrer"
         >
           {{ grantRound.funds.toString() }} {{ grantRound.matchingToken.symbol }}
         </a>
@@ -36,19 +38,33 @@
       </p>
       <p>
         Metadata Admin:
-        <a class="link" :href="`https://etherscan.io/address/${grantRound.metadataAdmin}`">{{
-          grantRound.metadataAdmin
-        }}</a>
+        <a
+          class="link"
+          :href="`https://etherscan.io/address/${grantRound.metadataAdmin}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ grantRound.metadataAdmin }}</a
+        >
       </p>
       <p>
         Payout Admin:
-        <a class="link" :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`">{{
-          grantRound.payoutAdmin
-        }}</a>
+        <a
+          class="link"
+          :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ grantRound.payoutAdmin }}</a
+        >
       </p>
       <p>
         Address:
-        <a class="link" :href="`https://etherscan.io/address/${grantRound.address}`">{{ grantRound.address }}</a>
+        <a
+          class="link"
+          :href="`https://etherscan.io/address/${grantRound.address}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ grantRound.address }}</a
+        >
       </p>
 
       <div class="flex justify-center">
