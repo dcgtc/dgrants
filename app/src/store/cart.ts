@@ -300,11 +300,6 @@ export default function useCartStore() {
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });
 
-  /**
-   * @notice Returns the amount of items in the cart
-   */
-  const cartItemsCount = computed(() => Object.entries(cartSummary.value).length);
-
   // Only export additional items as they are needed outside the store
   return {
     // Store
@@ -312,7 +307,7 @@ export default function useCartStore() {
     // sure to call `updateCart()` with the appropriate inputs whenever the `cart` ref is modified
     cart,
     // Getters
-    cartItemsCount,
+    cartItemsCount: computed(() => cart.value.length),
     cartSummaryString,
     // Mutations
     addToCart,
