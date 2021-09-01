@@ -7,7 +7,7 @@
     <div class="px-4 md:px-12 m-auto bg-white">
       <div class="border-grey-500 border-2 px-4 md:px-12 relative" @click.stop>
         <div class="absolute top-6 right-6">
-          <XIcon @click="$emit('toggleAbout')" class="icon icon-primary cursor-pointer" />
+          <XIcon @click="emitEvent('toggleAbout')" class="icon icon-primary cursor-pointer" />
         </div>
 
         <div class="mt-8">

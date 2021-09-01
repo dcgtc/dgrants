@@ -27,5 +27,5 @@ export { BigNumber } from '@ethersproject/bignumber';
 export { hexDataSlice } from '@ethersproject/bytes';
 export { Contract } from '@ethersproject/contracts';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
-export { commify, formatEther, formatUnits, parseUnits } from '@ethersproject/units';
+export { commify, formatUnits, parseUnits } from '@ethersproject/units';
 export { MaxUint256 } from '@ethersproject/constants';
