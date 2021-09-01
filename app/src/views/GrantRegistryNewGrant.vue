@@ -107,7 +107,14 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI } from 'src/utils/constants';
 import { Contract } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl, isValidGithubUrl, isDefined, pushRoute } from 'src/utils/utils';
+import {
+  isValidAddress,
+  isValidUrl,
+  isValidGithubUrl,
+  isDefined,
+  pushRoute,
+  urlFromTwitterHandle,
+} from 'src/utils/utils';
 import * as ipfs from 'src/utils/ipfs';
 // --- Types ---
 import { GrantRegistry } from '@dgrants/contracts';
@@ -148,7 +155,8 @@ function useNewGrant() {
   async function createGrant() {
     // Send transaction
     const { owner, payee, name, description, website, github, twitter } = form.value;
-    const properties = { websiteURI: website, githubURI: github, twitterURI: twitter };
+    const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
+    const properties = { websiteURI: website, githubURI: github, twitterURI };
     if (!signer.value) throw new Error('Please connect a wallet');
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, properties })

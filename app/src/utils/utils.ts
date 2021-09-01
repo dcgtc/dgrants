@@ -41,6 +41,12 @@ export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
 }
 
+// Normalize twitter handle
+export function urlFromTwitterHandle(handle: string) {
+  const twitterHandle = handle.includes('@') ? handle.substring(1) : handle;
+  return 'https://twitter.com/' + twitterHandle;
+}
+
 // --- Validation ---
 // Returns true if the provided URL is a valid URL
 export function isValidUrl(val: string | undefined) {

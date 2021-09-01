@@ -460,8 +460,9 @@ function useGrantDetail() {
       website !== gMetadata?.properties?.websiteURI ||
       github !== gMetadata?.properties?.githubURI ||
       twitter !== gMetadata?.properties?.twitterURI;
-    const properties = { websiteURI: website, githubURI: github, twitterURI: twitter };
     if (isMetaPtrUpdated) {
+      const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
+      const properties = { websiteURI: website, githubURI: github, twitterURI };
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description })
         .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
