@@ -1,15 +1,13 @@
 <template>
-  <!-- Header -->
-  <BaseHeader :name="`My Cart (${cart.length})`" />
-
   <!-- Empty cart -->
-  <div v-if="cart.length === 0">
-    <div>Your cart is empty</div>
-    <button @click="pushRoute({ name: 'dgrants' })" class="btn btn-primary mt-6">Browse Grants</button>
+  <div v-if="!txHash && cart.length === 0">
+    <div class="mt-10">Your cart is empty</div>
+    <button @click="pushRoute({ name: 'dgrants' })" class="btn btn-primary mx-auto mt-6">Browse Grants</button>
   </div>
 
-  <!-- Cart has items -->
-  <div v-else>
+  <!-- Cart has items and no checkout transaction -->
+  <div v-else-if="!txHash">
+    <BaseHeader :name="`My Cart (${cart.length})`" />
     <!-- Cart toolbar -->
     <div
       class="flex justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-grey-100 text-grey-400"
@@ -97,20 +95,33 @@
         <span class="text-grey-300">Estimated matching value:</span> TODO USD
       </div>
       <div class="py-8 flex justify-end">
-        <button @click="checkout" class="btn">Checkout</button>
+        <button @click="executeCheckout" class="btn">Checkout</button>
       </div>
     </div>
+  </div>
+
+  <!-- Checkout transaction is pending -->
+  <div v-else-if="txHash">
+    <!-- We use a -1px bottom margin so overlapping borders of BaseHeader and TransactionStatus don't make the border thicker -->
+    <BaseHeader name="Checkout Transaction Status" style="margin-bottom: -1px" />
+    <TransactionStatus
+      @onReceipt="completeCheckout"
+      :hash="txHash"
+      buttonLabel="Home"
+      :buttonAction="() => pushRoute({ name: 'Home' })"
+    />
   </div>
 </template>
 
 <script lang="ts">
 // --- External Imports ---
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import { ArrowToprightIcon, CloseIcon } from '@fusion-icons/vue/interface';
 // --- App Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
+import TransactionStatus from 'src/components/TransactionStatus.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
@@ -120,13 +131,26 @@ import { pushRoute } from 'src/utils/utils';
 
 function useCart() {
   const { cart, cartSummaryString, removeFromCart, clearCart, initializeCart, updateCart, checkout } = useCartStore(); // prettier-ignore
+
   onMounted(() => initializeCart()); // make sure cart store is initialized
-  return { cart, updateCart, clearCart, removeFromCart, cartSummaryString, checkout };
+  const txHash = ref<string>();
+  const status = ref<'not started' | 'pending' | 'success' | 'failure'>('pending');
+
+  async function executeCheckout() {
+    const tx = await checkout();
+    txHash.value = tx.hash;
+  }
+
+  function completeCheckout(success: boolean) {
+    if (success) clearCart();
+  }
+
+  return { txHash, status, cart, updateCart, clearCart, removeFromCart, cartSummaryString, executeCheckout, completeCheckout }; // prettier-ignore
 }
 
 export default defineComponent({
   name: 'Cart',
-  components: { BaseHeader, BaseInput, BaseSelect, ArrowToprightIcon, CloseIcon },
+  components: { BaseHeader, BaseInput, BaseSelect, TransactionStatus, ArrowToprightIcon, CloseIcon },
   setup() {
     const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
