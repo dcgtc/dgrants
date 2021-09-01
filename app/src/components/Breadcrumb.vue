@@ -23,7 +23,7 @@ import { Breadcrumb } from '@dgrants/types';
 import { ArrowRight2Icon as ArrowRightSmallIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
-  name: 'BaseHeader',
+  name: 'Breadcrumb',
   props: {
     path: { type: Array as PropType<Breadcrumb[]>, required: true },
   },

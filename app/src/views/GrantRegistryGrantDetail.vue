@@ -21,7 +21,7 @@
       </template>
     </GrantDetailsRow>
 
-    <BaseTitle title="Description" />
+    <SectionHeader title="Description" />
 
     <div class="border-b border-grey-100">
       <p class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
@@ -29,22 +29,22 @@
       </p>
     </div>
 
-    <BaseTitle title="Links" />
+    <SectionHeader title="Links" />
 
     <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
       <div class="flex gap-x-4">
         <span class="text-grey-400">Website:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.projectWebsite || 'undefined' }}</a>
+        <a href="#" target="_blank">{{ grantMetadata?.properties?.websiteURI || 'undefined' }}</a>
       </div>
 
       <div class="flex gap-x-4">
         <span class="text-grey-400">Github:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.projectGithub || 'undefined' }}</a>
+        <a href="#" target="_blank">{{ grantMetadata?.properties?.githubURI || 'undefined' }}</a>
       </div>
 
       <div class="flex gap-x-4">
         <span class="text-grey-400">Twitter:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.twitterHandle || 'undefined' }}</a>
+        <a href="#" target="_blank">{{ grantMetadata?.properties?.twitterURI || 'undefined' }}</a>
       </div>
     </div>
 
@@ -169,7 +169,7 @@ import { Breadcrumb, FilterNavItem, GrantRound, GrantsRoundDetails } from '@dgra
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
-import BaseTitle from 'src/components/BaseTitle.vue';
+import SectionHeader from 'src/components/SectionHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
@@ -485,7 +485,7 @@ function useGrantDetail() {
 
 export default defineComponent({
   name: 'GrantRegistryGrantDetail',
-  components: { BaseInput, BaseTitle, ContributionRow, BaseHeader, BaseFilterNav, GrantDetailsRow },
+  components: { BaseInput, SectionHeader, ContributionRow, BaseHeader, BaseFilterNav, GrantDetailsRow },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
