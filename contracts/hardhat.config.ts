@@ -61,7 +61,8 @@ const config: HardhatUserConfig = {
   },
   networks: {
     hardhat: {
-      hardfork: 'berlin', // not using London for now, for backwards compatibility with test suite
+      hardfork: 'london',
+      initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
       forking: { url: `https://mainnet.infura.io/v3/${infuraApiKey}` },
       accounts: {
         mnemonic,
