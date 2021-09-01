@@ -4,8 +4,6 @@
     <BaseHeader
       :breadcrumbContent="breadcrumb"
       :name="grantMetadata?.name || ''"
-      :quote="grantMetadata?.quote"
-      :lastUpdated="grantMetadata?.lastUpdated"
       :owner="grant.owner"
       :nextPath="nextGrant"
       :lastPath="lastGrant"
