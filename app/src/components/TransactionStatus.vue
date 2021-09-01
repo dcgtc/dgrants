@@ -2,7 +2,7 @@
   <!-- Transaction hash -->
   <div :class="[...rowClasses, 'border-t', 'border-b', 'border-grey-100']">
     <div class="mr-4 w-28">Hash:</div>
-    <a :href="etherscanUrl" class="link text-grey-400">{{ hash }}</a>
+    <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer" class="link text-grey-400">{{ hash }}</a>
   </div>
   <!-- Status -->
   <div :class="[...rowClasses, 'border-b', 'border-grey-100']">
