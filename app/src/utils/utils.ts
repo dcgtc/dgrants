@@ -41,12 +41,6 @@ export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
 }
 
-// Formats a number for display to the user, by rounding to the specified number of decimals and adding commas
-export function formatNumber(value: BigNumberish, decimals: number): string {
-  value = Number(value);
-  return commify(parseFloat(value.toFixed(decimals)));
-}
-
 // --- Validation ---
 // Returns true if the provided URL is a valid URL
 export function isValidUrl(val: string | undefined) {
