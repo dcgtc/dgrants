@@ -1,5 +1,6 @@
 import BNotify, { NotificationType } from 'bnc-notify';
 import { JsonRpcProvider } from 'src/utils/ethers';
+import { getEtherscanUrl } from 'src/utils/utils';
 
 // Instantiate Blocknative's notify.js. We don't pass a dappId/networkId so we can use in UI only mode for any
 // notifications we need, i.e. not just Blocknative transaction notifications
@@ -68,16 +69,4 @@ export async function txNotify(txHash: string, provider: JsonRpcProvider) {
     onclick,
     type: status ? 'success' : 'error',
   });
-}
-
-/**
- * @notice Generates the Etherscan URL based on the given `txHash` and `chainId`
- */
-function getEtherscanUrl(txHash: string, chainId: number) {
-  // Only mainnet is supported, but we include chain ID 31337 for local testing against Hardhat
-  let networkPrefix = '';
-  if (chainId === 1) networkPrefix = 'etherscan.io';
-  else if (chainId === 31337) networkPrefix = 'etherscan.io';
-  else throw new Error(`Could not generate Etherscan URL: Invalid chain ID ${chainId}`);
-  return `https://${networkPrefix}/tx/${txHash}`;
 }
