@@ -1,11 +1,11 @@
 <template>
   <div
     :class="[showAbout ? 'flex' : 'hidden']"
-    class="h-screen fixed w-full"
-    style="z-index: 10000; background-color: #ffffffdd"
+    class="h-screen fixed w-full z-50 bg-white bg-opacity-80"
+    @click="emitEvent('toggleAbout')"
   >
     <div class="px-4 md:px-12 m-auto bg-white">
-      <div class="border-grey-500 border-2 px-4 md:px-12 relative">
+      <div class="border-grey-500 border-2 px-4 md:px-12 relative" @click.stop>
         <div class="absolute top-6 right-6">
           <XIcon @click="$emit('toggleAbout')" class="icon icon-primary cursor-pointer" />
         </div>
@@ -33,7 +33,7 @@
           <!-- ToDo. Link to the real dGrant grant -->
           <router-link
             to="/dgrants/0"
-            @click="$emit('toggleAbout')"
+            @click="emitEvent('toggleAbout')"
             class="gap-2 whitespace-nowrap uppercase font-medium bg-grey-500 text-white px-8 py-4 hover:bg-grey-400"
           >
             <span>donate to <span class="text-teal">d</span>grants</span>
@@ -78,7 +78,10 @@ export default defineComponent({
       contributors: [] as Contributor[],
     };
   },
-  emits: ['toggleAbout'],
+  setup(_props, context) {
+    const emitEvent = (eventName: string) => context.emit(eventName);
+    return { emitEvent };
+  },
   async created() {
     try {
       const url = 'https://api.github.com/repos/dcgtc/dgrants/contributors';

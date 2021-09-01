@@ -110,6 +110,24 @@ export default function useWalletStore() {
     await configureProvider(); // load info based on user's address
   }
 
+  /**
+   * @notice Disconnect the current user wallet
+   */
+  function disconnectWallet() {
+    // If user doesn't have a connected wallet, return
+    if (!userAddress.value) return;
+
+    resetState();
+    onboard.walletReset();
+  }
+
+  /**
+   * @notice Change wallet
+   */
+  async function changeWallet() {
+    console.log('ToDo. ChangeWallet');
+  }
+
   // ----------------------------------------------------- Actions -----------------------------------------------------
 
   // When user connects their wallet, we call this method to update the provider
@@ -166,6 +184,8 @@ export default function useWalletStore() {
     // Methods
     configureProvider,
     connectWallet,
+    disconnectWallet,
+    changeWallet,
     setProvider,
     // Properties
     isSupportedNetwork: computed(() => (network.value ? supportedChainIds.includes(network.value.chainId) : true)), // assume valid if we have no network information
