@@ -20,6 +20,6 @@
   "dependencies": {
     "@types/ethereumjs-util": "^6.1.0",
     "ethereumjs-util": "^7.1.0",
-    "ethers": "^5.4.4"
+    "ethers": "^5.4.6"
   }
 }
