@@ -98,10 +98,6 @@
     @apply stroke-teal;
   }
 
-  .icon-disabled {
-    @apply stroke-grey-200;
-  }
-
   .icon-heavy {
     @apply stroke-4;
   }
