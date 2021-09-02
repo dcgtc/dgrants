@@ -1,8 +1,16 @@
 import hre from 'hardhat';
+import { create } from 'ipfs-http-client';
 import { ScriptLogger } from './ScriptLogger';
 import params from './deploy-poc.config';
 
 const { ethers } = hre;
+
+const ipfs = create({
+  url: 'https://ipfs-api.dev.fleek.cool',
+  headers: {
+    Authorization: `v2 ${process.env.FLEEK_STORAGE_API_KEY}`,
+  },
+});
 
 // IIFE async function so "await"s can be performed for each operation
 (async function () {
@@ -41,7 +49,13 @@ const { ethers } = hre;
     await roundManager.deployed();
     logger.recordContract('GrantRoundManager', roundManager.address);
 
+    // Upload the Round metadata to IPFS
+    const res = await ipfs.add(networkParams.metadataJson);
+    const metadataCid = res.cid.toString();
+    logger.recordAction('PublishGrantRoundMetadata', metadataCid);
+
     // Create the GrantRound
+    const metadataPtr = `${networkParams.ipfsRetrievalEndpoint}/${metadataCid}`;
     const createGrantRoundTxReceipt = await roundManager.createGrantRound(
       networkParams.metadataAdmin,
       networkParams.payoutAdmin,
@@ -49,7 +63,7 @@ const { ethers } = hre;
       registry.address, // TODO: evaluate why we're passing this at all
       networkParams.roundStartTime,
       networkParams.roundEndTime,
-      'https://placeholder.for.metaptr',
+      metadataPtr,
       networkParams.minContribution
     );
     await createGrantRoundTxReceipt.wait();
