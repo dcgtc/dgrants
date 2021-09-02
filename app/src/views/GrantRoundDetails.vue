@@ -7,13 +7,13 @@
       </h1>
       <p>Name: {{ grantRoundMetadata?.name }}</p>
       <p>Description: {{ grantRoundMetadata?.description }}</p>
-      <p v-if="hasProperty(grantRoundMetadata?.properties?.websiteURI)">
+      <p v-if="isDefined(grantRoundMetadata?.properties?.websiteURI)">
         Website: {{ grantRoundMetadata?.properties?.websiteURI }}
       </p>
-      <p v-if="hasProperty(grantRoundMetadata?.properties?.githubURI)">
+      <p v-if="isDefined(grantRoundMetadata?.properties?.githubURI)">
         Github: {{ grantRoundMetadata?.properties?.githubURI }}
       </p>
-      <p v-if="hasProperty(grantRoundMetadata?.properties?.twitterURI)">
+      <p v-if="isDefined(grantRoundMetadata?.properties?.twitterURI)">
         Twitter: {{ grantRoundMetadata?.properties?.twitterURI }}
       </p>
       <p>Status: {{ grantRound.status }}</p>
@@ -173,9 +173,9 @@ import {
   formatAddress,
   isValidAddress,
   isValidUrl,
+  isDefined,
   checkAllowance,
   getApproval,
-  hasProperty,
   hasStatus,
 } from 'src/utils/utils';
 // --- Types ---
@@ -297,7 +297,6 @@ function useGrantRoundDetail() {
 
   return {
     BigNumber,
-    hasProperty,
     hasStatus,
     daysAgo,
     formatAddress,
@@ -305,6 +304,7 @@ function useGrantRoundDetail() {
     isContributing,
     isValidAddress,
     isValidUrl,
+    isDefined,
     isFormValid,
     grants,
     grantMetadata,

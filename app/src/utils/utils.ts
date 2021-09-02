@@ -79,11 +79,6 @@ export async function getApproval(token: Contract, address: string, amount: BigN
 }
 
 // --- Other ---
-// Check if property exists
-export function hasProperty(property: string | undefined) {
-  return property !== undefined && property !== '';
-}
-
 // Check against the grantRounds status for a match
 export function hasStatus(status: string) {
   // returns a fn (currying the given status)

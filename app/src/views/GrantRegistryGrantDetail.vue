@@ -191,7 +191,7 @@ import {
   SUPPORTED_TOKENS_MAPPING,
 } from 'src/utils/constants';
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl, isDefined, formatNumber, urlFromTwitterHandle } from 'src/utils/utils';
+import { isValidAddress, isValidUrl, isValidGithubUrl, isDefined, formatNumber, urlFromTwitterHandle } from 'src/utils/utils';
 import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
 import * as ipfs from 'src/utils/ipfs';
