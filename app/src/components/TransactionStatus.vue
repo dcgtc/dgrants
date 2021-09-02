@@ -29,7 +29,7 @@
     </div>
     <button
       v-if="label"
-      @click="action ? action : () => ({})"
+      @click="action ? action() : () => ({})"
       class="btn"
       :class="{ disabled: status === 'pending' }"
       :disabled="status === 'pending'"
