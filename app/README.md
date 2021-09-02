@@ -1,4 +1,4 @@
-# Ethereum App Template
+# dGrants Frontend Application
 
 Ethereum frontend app built with the following stack:
 
@@ -54,16 +54,3 @@ If you send a transaction in MetaMask against your local node, then restart your
 If you see `project ID does not have access to archive state` in the terminal, simply quit the process and re-run `yarn dev`. This happens because Infura only gives access to the last 128 blocks of data (~30 minutes), unless you pay for an archive node plan. If you leave your forked mainnet node running for longer than this, it tries to query for data older than 128 blocks and fails. Restarting your node re-forks from the latest mainnet block.
 
 If the app loads and the block number is zero after connecting your wallet, there's likely a `CALL_EXCEPTION` in the console. Simply refresh the page and this should be fixed.
-
-## Notes / Customization
-
-Notes on customizing this app:
-
-- Primary and secondary theme colors are defined in `tailwind.config.js`. Other colors are inlined as classes, e.g. `text-gray-400`.
-- Vite does not use `process.env.MY_VARIABLE` for environment variables, but instead uses `import.meta.env.VITE_MY_VARIABLE`. Values in `.env` that are prefixed with `VITE_` are automatically included. Update the type definitions in `src/shims.d.ts` for any new environment variables
-- The Vue router is configured to use `history` mode and assumes the app is hosted at the domain root. Both of these defaults can be changed in `src/router/index.ts`
-- Blocknative's [onboard.js](https://docs.blocknative.com/onboard) is used for connecting wallets. Like Vue 3, Vite does not automatically polyfill defaults like `os`, `http`, and `crypto` that are needed by onboard.js, so we `require` this in `vite.config.ts`
-- The store modules live in `src/store`, and there are three setup by default
-  - `wallet.ts` manages the user's wallet connection
-  - `data.ts` atomically polls for data each block using `Multicall2`
-  - `settings.ts` saves and manages user settings such as dark mode and wallet selection

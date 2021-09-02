@@ -6,18 +6,25 @@ Reading and following these guidelines will help us make the contribution proces
 
 ## Quicklinks
 
-* [Code of Conduct](#code-of-conduct)
-* [Getting Started](#getting-started)
-    * [Discussions](#discussions)
-      * [Ideas](#ideas)
-      * [Architecture & Design](#architecture-&-design)
-      * [Dev Meta](#dev-meta)
-      * [Show and Tell](#show-and-tell)
-    * [Issues](#issues)
-    * [Pull Requests](#pull-requests)
-      * [Git Rebase Workflow](#git-rebase-workflow)
-    * [Development Process](#development-process)
-* [Getting Help](#getting-help)
+- [Contributing to dGrants](#contributing-to-dgrants)
+  - [Quicklinks](#quicklinks)
+  - [Code of Conduct](#code-of-conduct)
+  - [Getting Started](#getting-started)
+    - [Discussions](#discussions)
+      - [Ideas](#ideas)
+      - [Architecture & Design](#architecture--design)
+    - [Dev Meta](#dev-meta)
+    - [Show and Tell](#show-and-tell)
+    - [Issues](#issues)
+    - [Pull Requests](#pull-requests)
+      - [Git Rebase Workflow](#git-rebase-workflow)
+      - [Advantages of Rebase Workflow](#advantages-of-rebase-workflow)
+  - [App Contribution Guidelines](#app-contribution-guidelines)
+    - [Overview](#overview)
+    - [Composition API](#composition-api)
+    - [State Management](#state-management)
+    - [Other Notes](#other-notes)
+  - [Getting Help](#getting-help)
 
 ## Code of Conduct
 
@@ -154,6 +161,64 @@ git push origin HEAD # This will close the PR
 * Encourages the developer of the feature to be the one that resolves merge conflicts related to said feature, reducing the likelihood of a bug or regression slipping in due to conflict resolution
 * Keeps commit history clean and easy to read
 
+
+## App Contribution Guidelines
+
+This section details the app architecture, conventions, and best practices.
+Please read this section before making contributions within the `app` directory.
+
+### Overview
+
+Please start by reading [`app/README.md`](app//README.md) for a high-level overview of the app and how to get started developing with it.
+
+### Composition API
+
+The app is written with the Vue 3 Composition API because it's much better at keeping code organized (especially for larger codebases), and because it provides better TypeScript support.
+All pages and components should be written using the Composition API, and not the standard Options API.
+If you are unfamiliar with the Composition API, you can read more about it [here](https://v3.vuejs.org/guide/composition-api-introduction.html#why-composition-api).
+
+Check out [`GrantRegistryNewGrant.vue`](app/src/views/GrantRegistryNewGrant.vue) for an example of a component that uses the Composition API.
+In the Composition API docs referenced earlier, most examples put everything within the `setup()` method.
+This is ok, but typically should only be done for simple components. For more complex components, logic and variables should be moved in composition functions, like the `useNewGrant()` method defined in `GrantRegistryNewGrant.vue`.
+
+### State Management
+
+This app uses its own state management pattern based on the Composition API, largely based on the pattern detailed in [this article](https://vueschool.io/articles/vuejs-tutorials/state-management-with-composition-api/).
+The comments in [`wallet.ts`](app/src/store/wallet.ts) also provide details on this store pattern.
+
+As a general rule of thumb, whenever you need to read or fetch more data from somewhere, it should be done in:
+- `wallet.ts` for anything related to the user's wallet, e.g. token balances or ENS name
+- `data.ts` for generic data fetching, such as reading a list of grant data from the `GrantRegistry` contract
+- `cart.ts` for anything related to a user's cart and the checkout process
+- `settings.ts` for user settings, which are saved in the browser's local storage
+
+If you are writing a component or page that derives something from data that's already in a store, use a computed property and export the data from the store.
+See the `userDisplayName` example in `wallet.ts` as an example.
+That computed property is inlined since it's simple, but more complex computed properties can be extracted like `cartSummary` in `cart.ts`. If your computed property needs to be async, use a watcher instead.
+
+Not every state variable, method, and computed property needs to be exported from the store module.
+Only export aspects that are needed in other components or pages to keep interfaces and intentions clean and clear.
+
+Do not export state variables directly from the store, as this is almost never required.
+This is because in general state should not be mutated directly, but instead should only be mutated through a method exported from the store. In `cart.ts` we directly export the `cart` variable for simplicity when a user is editing their cart. However, a cleaner way might be to create a local copy of `cart` when `Cart.vue` mounts, and have `Cart.vue` call `updateCart` whenever the user edits their cart.
+
+### Other Notes
+
+- Comments are good! Please add lots of comments to your code so intentions are clear to all contributors.
+
+- When using props, be explicit about the prop type. For example, don't use `Array` as a prop type. Instead use `Array as PropType<GrantsRoundDetails[]>`. Also make sure to specify if the prop is required, and if not, specify the default value. See `GrantDetailsRow.vue` for an example of well-declared props.
+
+- Keep things DRY. If you implement something twice, pull out the logic into a shared method or as a helper method in `app/src/utils/*.ts`.
+
+- Whenever imported something from ethers.js, instead of importing it directly from the package, import it from `app/src/utils/ethers.ts`, (and add more exports to that file if needed). This is done to prevent components having 5-10 lines of ethers imports when used heavily in a file, while still allowing for tree-shaking during build.
+
+- For files with a lot of imports, keep the imports organized. Add some comments if it helps, as done in `Cart.vue`.
+
+- All `*.vue` files in the `app/src/views` folder are pages. A page **must** have it's own route defined in `app/src/router/index.ts`, otherwise it's not a page and should instead be in the `app/src/components` folder.
+
+- Vite does not use `process.env.MY_VARIABLE` for environment variables, but instead uses `import.meta.env.VITE_MY_VARIABLE`. Values in `.env` that are prefixed with `VITE_` are automatically included. Update the type definitions in `src/shims.d.ts` for any new environment variable
+
+- Blocknative's [onboard.js](https://docs.blocknative.com/onboard) is used for connecting wallets. Like Vue 3, Vite does not automatically polyfill defaults like `os`, `http`, and `crypto` that are needed by onboard.js, so we `require` these as needed in `vite.config.ts` or `index.html`
 
 ## Getting Help
 
