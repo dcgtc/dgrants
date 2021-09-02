@@ -21,7 +21,4 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['electron'],
   },
-  define: {
-    'process.env': process.env,
-  },
 });

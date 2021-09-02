@@ -8,6 +8,8 @@
       "noUnusedLocals": true,
       "noUnusedParameters": true,
       "noImplicitReturns": true,
-      "declaration": true
+      "declaration": true,
+      "resolveJsonModule": true,
+      "esModuleInterop": true
     }
   }
