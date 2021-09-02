@@ -45,5 +45,5 @@ export const getGrantMatch = (grantId: string, grantsDistribution: GrantsDistrib
     (grantMatch) => grantMatch.grantId === grantId
   );
 
-  return contributions[0].match;
+  return contributions[0]?.match || 0;
 };
