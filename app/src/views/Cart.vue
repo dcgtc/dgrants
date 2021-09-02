@@ -34,7 +34,7 @@
             >
               <img
                 class="h-12 w-12"
-                :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/logo.png'"
+                :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/logo.svg'"
                 alt="Grant logo"
               />
               <p class="ml-4 text-sm text-left font-medium truncate max-w-lg">

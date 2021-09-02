@@ -3,7 +3,7 @@
     <div class="grid grid-cols-4 gap-0">
       <!-- img -->
       <div class="col-span-4 md:col-span-2 shadow-light flex">
-        <img class="m-auto" :src="logoURI || '/src/assets/logo.png'" />
+        <img class="m-auto" :src="logoURI || '/src/assets/logo.svg'" />
       </div>
       <div class="col-span-4 md:col-span-2 grid grid-cols-12 pt-8">
         <!-- raised, contract, round, matching -->
