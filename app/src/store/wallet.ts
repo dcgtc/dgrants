@@ -125,7 +125,21 @@ export default function useWalletStore() {
    * @notice Change wallet
    */
   async function changeWallet() {
-    console.log('ToDo. ChangeWallet');
+    const prevWallet = onboard.getState().wallet;
+    try {
+      await onboard.walletSelect();
+      await onboard.walletCheck();
+      await configureProvider();
+    } catch (error) {
+      if (prevWallet.name) {
+        // changing wallet failed. Restoring previous wallet
+        await onboard.walletSelect(prevWallet.name);
+      } else {
+        // this shouldn't happen because to change a wallet you need a previous wallet
+        // defaulting to disconnecting if we reach this point
+        disconnectWallet();
+      }
+    }
   }
 
   // ----------------------------------------------------- Actions -----------------------------------------------------
