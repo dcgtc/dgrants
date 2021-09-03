@@ -31,20 +31,23 @@
 
     <SectionHeader title="Links" />
 
-    <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+    <div
+      v-if="isDefined(grantMetadata?.properties?.websiteURI)"
+      class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4"
+    >
       <div class="flex gap-x-4">
         <span class="text-grey-400">Website:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.properties?.websiteURI || 'undefined' }}</a>
+        <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{ grantMetadata?.properties?.websiteURI }}</a>
       </div>
 
-      <div class="flex gap-x-4">
+      <div v-if="isDefined(grantMetadata?.properties?.githubURI)" class="flex gap-x-4">
         <span class="text-grey-400">Github:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.properties?.githubURI || 'undefined' }}</a>
+        <a :href="grantMetadata?.properties?.githubURI" target="_blank">{{ grantMetadata?.properties?.githubURI }}</a>
       </div>
 
-      <div class="flex gap-x-4">
+      <div v-if="isDefined(grantMetadata?.properties?.twitterURI)" class="flex gap-x-4">
         <span class="text-grey-400">Twitter:</span>
-        <a href="#" target="_blank">{{ grantMetadata?.properties?.twitterURI || 'undefined' }}</a>
+        <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{ grantMetadata?.properties?.twitterURI }}</a>
       </div>
     </div>
 
