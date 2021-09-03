@@ -1,6 +1,7 @@
 {
   "name": "dgrants",
   "version": "0.0.1",
+  "public": "app/dist",
   "private": true,
   "workspaces": [
     "app",

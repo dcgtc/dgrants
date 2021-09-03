@@ -2,6 +2,7 @@
   "name": "@dgrants/app",
   "version": "0.0.1",
   "private": true,
+  "public": "dist",
   "scripts": {
     "clean": "rimraf dist",
     "dev": "vite",
