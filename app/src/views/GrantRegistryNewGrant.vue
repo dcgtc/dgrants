@@ -55,10 +55,9 @@
           errorMsg="Please enter a description"
         />
 
-         <!-- Grant website -->
+        <!-- Grant website -->
         <BaseInput
           v-model="form.website"
-          description="Your grant's website"
           id="grant-website"
           label="Grant website"
           :rules="isValidUrl"
@@ -69,7 +68,6 @@
         <!-- Grant github -->
         <BaseInput
           v-model="form.github"
-          description="Your grant's github"
           id="grant-github"
           label="Grant github"
           :rules="isValidGithubUrl"
@@ -80,7 +78,6 @@
         <!-- Grant twitter handle -->
         <BaseInput
           v-model="form.twitter"
-          description="Your grant's twitter handle"
           id="grant-handle"
           label="Grant twitter"
           :rules="isValidTwitter"
