@@ -1,38 +1,46 @@
 <template>
-  <!-- Grant details -->
-  <div v-if="!isEditing && grant && !loading">
-    <BaseHeader
-      :breadcrumbContent="breadcrumb"
-      :name="grantMetadata?.name || ''"
-      :owner="grant.owner"
-      :nextPath="nextGrant"
-      :lastPath="lastGrant"
-    />
+  <!-- Transaction Loading Page -->
+  <div v-if="txHash">
+    <BaseHeader name="Update Grant : Transaction Status" />
+    <TransactionStatus :hash="txHash" buttonLabel="CONTINUE" :buttonAction="() => cancelEdits()" />
+  </div>
 
-    <GrantDetailsRow
-      :grant="grant"
-      :logoURI="grantMetadata?.logoURI"
-      :payoutAddress="grant.payee"
-      :totalRaised="grantContributionsTotal"
-      :roundDetails="grantContributionsByRound"
-    >
-      <template v-slot:extraLinks>
-        <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
-          <EditIcon class="icon-primary stroke-2 w-9" />
-          <span class="text-grey-400 group-hover:text-grey-500">Edit Grant</span>
-        </div>
-      </template>
-    </GrantDetailsRow>
+  <!-- Grant has loaded -->
+  <template v-else-if="!loading && grant">
+    <!-- Grant details -->
+    <div v-if="!isEditing">
+      <BaseHeader
+        :breadcrumbContent="breadcrumb"
+        :name="grantMetadata?.name || ''"
+        :owner="grant.owner"
+        :nextPath="nextGrant"
+        :lastPath="lastGrant"
+      />
 
-    <SectionHeader title="Description" />
+      <GrantDetailsRow
+        :grant="grant"
+        :logoURI="grantMetadata?.logoURI"
+        :payoutAddress="grant.payee"
+        :totalRaised="grantContributionsTotal"
+        :roundDetails="grantContributionsByRound"
+      >
+        <template v-slot:extraLinks>
+          <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
+            <EditIcon class="icon-primary stroke-2 w-9" />
+            <span class="text-grey-400 group-hover:text-grey-500">Edit Grant</span>
+          </div>
+        </template>
+      </GrantDetailsRow>
 
-    <div class="border-b border-grey-100">
-      <p class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
-        {{ grantMetadata?.description }}
-      </p>
-    </div>
+      <SectionHeader title="Description" />
 
-    <SectionHeader title="Links" />
+      <div class="border-b border-grey-100">
+        <p style="white-space: pre-line" class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
+          {{ grantMetadata?.description }}
+        </p>
+      </div>
+
+      <SectionHeader title="Links" />
 
     <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
       <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
@@ -49,125 +57,121 @@
         <span class="text-grey-400">Twitter:</span>
         <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{ grantMetadata?.properties?.twitterURI }}</a>
       </div>
-    </div>
 
-    <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
+      <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
 
-    <div v-if="selectedRound == 0">
-      <div v-for="(contribution, index) in grantContibutions" :key="Number(index)">
-        <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
-      </div>
-    </div>
-    <div v-else>
-      <div
-        v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
-        :key="Number(index)"
-      >
-        <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
-      </div>
-    </div>
-  </div>
-
-  <!-- Editing grant -->
-  <div v-else-if="grant && !loading" class="flex flex-col justify-center sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full mt-5 md:mt-20 mb-12 md:mb-24">
-      <h1>Edit Grant</h1>
-      <h1>"{{ grantMetadata?.name }}"</h1>
-    </div>
-
-    <BaseFilterNav :active="selectedEdit" :items="editNav" />
-
-    <div v-if="selectedEdit == 0" class="text-left">
-      <form class="space-y-5" @submit.prevent="saveEdits">
-        <!-- Owner address -->
-        <BaseInput
-          v-model="form.owner"
-          description="The owner has permission to edit the grant"
-          id="owner-address"
-          label="Owner address"
-          :rules="isValidAddress"
-          errorMsg="Please enter a valid address"
-        />
-
-        <!-- Payee address -->
-        <BaseInput
-          v-model="form.payee"
-          description="The address contributions and matching funds are sent to"
-          id="payee-address"
-          label="Payee address"
-          :rules="isValidAddress"
-          errorMsg="Please enter a valid address"
-        />
-
-        <!-- Grant name -->
-        <BaseInput
-          v-model="form.name"
-          description="Your grant's name"
-          id="grant-name"
-          label="Grant name"
-          :rules="isDefined"
-          errorMsg="Please enter a name"
-        />
-
-        <!-- Grant Description -->
-        <BaseTextarea
-          v-model="form.description"
-          :placeholder="LOREM_IPSOM_TEXT"
-          id="grant-description"
-          label="Grant description"
-          :required="true"
-          :rules="isDefined"
-          errorMsg="Please enter a description"
-        />
-
-        <!-- Grant website -->
-        <BaseInput
-          v-model="form.website"
-          description="Your grant's website"
-          id="grant-website"
-          label="Grant website"
-          :rules="isValidUrl"
-          errorMsg="Please enter a valid URL"
-          :required="false"
-        />
-
-        <!-- Grant github -->
-        <BaseInput
-          v-model="form.github"
-          description="Your grant's github"
-          id="grant-github"
-          label="Grant github"
-          :rules="isValidGithubUrl"
-          errorMsg="Please enter a valid Github URL"
-          :required="false"
-        />
-
-        <!-- Grant twitter handle -->
-        <BaseInput
-          v-model="form.twitter"
-          description="Your grant's twitter handle"
-          id="grant-handle"
-          label="Grant twitter"
-          :rules="isValidTwitter"
-          errorMsg="Please enter a valid Twitter handle"
-          :required="false"
-        />
-
-        <!-- Submit and cancel buttons -->
-        <div class="flex justify-end pt-6">
-          <button
-            type="submit"
-            class="btn btn-primary mr-5"
-            :class="{ disabled: !isFormValid }"
-            :disabled="!isFormValid"
-          >
-            Update Grant
-          </button>
-          <button @click.prevent="cancelEdits" class="btn btn-outline">Cancel</button>
+      <div v-if="selectedRound == 0">
+        <div v-for="(contribution, index) in grantContibutions" :key="Number(index)">
+          <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
         </div>
-      </form>
+      </div>
+      <div v-else>
+        <div
+          v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
+          :key="Number(index)"
+        >
+          <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+        </div>
+      </div>
     </div>
-  </div>
+
+    <!-- Editing grant -->
+    <div v-else class="flex flex-col justify-center sm:px-6 lg:px-8">
+      <BaseHeader name="Edit Grant" :tagline="grantMetadata?.name" />
+      <BaseFilterNav :active="selectedEdit" :items="editNav" />
+
+      <div v-if="selectedEdit == 0" class="text-left">
+        <form class="space-y-5" @submit.prevent="saveEdits">
+          <!-- Owner address -->
+          <BaseInput
+            v-model="form.owner"
+            description="The owner has permission to edit the grant"
+            id="owner-address"
+            label="Owner address"
+            :rules="isValidAddress"
+            errorMsg="Please enter a valid address"
+          />
+
+          <!-- Payee address -->
+          <BaseInput
+            v-model="form.payee"
+            description="The address contributions and matching funds are sent to"
+            id="payee-address"
+            label="Payee address"
+            :rules="isValidAddress"
+            errorMsg="Please enter a valid address"
+          />
+
+          <!-- Grant name -->
+          <BaseInput
+            v-model="form.name"
+            description="Your grant's name"
+            id="grant-name"
+            label="Grant name"
+            :rules="isDefined"
+            errorMsg="Please enter a name"
+          />
+
+          <!-- Grant Description -->
+          <BaseTextarea
+            v-model="form.description"
+            :placeholder="LOREM_IPSOM_TEXT"
+            id="grant-description"
+            label="Grant description"
+            :required="true"
+            :rules="isDefined"
+            errorMsg="Please enter a description"
+          />
+
+          <!-- Grant website -->
+          <BaseInput
+            v-model="form.website"
+            description="Your grant's website"
+            id="grant-website"
+            label="Grant website"
+            :rules="isValidUrl"
+            errorMsg="Please enter a valid URL"
+            :required="false"
+          />
+
+          <!-- Grant github -->
+          <BaseInput
+            v-model="form.github"
+            description="Your grant's github"
+            id="grant-github"
+            label="Grant github"
+            :rules="isValidGithubUrl"
+            errorMsg="Please enter a valid Github URL"
+            :required="false"
+          />
+
+          <!-- Grant twitter handle -->
+          <BaseInput
+            v-model="form.twitter"
+            description="Your grant's twitter handle"
+            id="grant-handle"
+            label="Grant twitter"
+            :rules="isValidTwitter"
+            errorMsg="Please enter a valid Twitter handle"
+            :required="false"
+          />
+          
+          <!-- Submit and cancel buttons -->
+          <div class="flex justify-end pt-6">
+            <button
+              type="submit"
+              class="btn btn-primary mr-5"
+              :class="{ disabled: !isFormValid }"
+              :disabled="!isFormValid"
+            >
+              Update Grant
+            </button>
+            <button @click.prevent="cancelEdits" class="btn btn-outline">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </template>
 
   <!-- No grant selected -->
   <div v-else-if="!grant">
@@ -218,6 +222,7 @@ import SectionHeader from 'src/components/SectionHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
+import TransactionStatus from 'src/components/TransactionStatus.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 // --- Icons ---
 import { Edit2Icon as EditIcon } from '@fusion-icons/vue/interface';
@@ -249,6 +254,8 @@ function useGrantDetail() {
   const grantContibutions = ref();
   const grantContributionsTotal = ref();
   const grantContributionsByRound = ref();
+
+  const txHash = ref<string>();
 
   // init and assign the calc algorithm to CLR
   const clr = new CLR({
@@ -464,6 +471,7 @@ function useGrantDetail() {
 
     // Hide edit form
     isEditing.value = false;
+    txHash.value = undefined;
   }
 
   /**
@@ -512,12 +520,11 @@ function useGrantDetail() {
       tx = await registry.updateGrant(g.id, owner, payee, metaPtr);
     }
 
-    // TODO: show waiting state screen
+    txHash.value = tx.hash;
 
     // After tx mines, poll so the store has the latest data, then navigate to the grant page
     await tx.wait();
     await poll();
-    cancelEdits(); // reset form ref and toggle page state back to display mode
   };
 
   /**
@@ -572,6 +579,7 @@ function useGrantDetail() {
     grantContributionsTotal,
     grantContributionsByRound,
     LOREM_IPSOM_TEXT,
+    txHash,
   };
 }
 
@@ -586,6 +594,7 @@ export default defineComponent({
     BaseFilterNav,
     GrantDetailsRow,
     EditIcon,
+    TransactionStatus,
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();

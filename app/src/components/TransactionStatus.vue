@@ -1,41 +1,52 @@
 <template>
   <!-- Transaction hash -->
-  <div :class="[...rowClasses, 'border-t', 'border-b', 'border-grey-100']">
-    <div class="mr-4 w-28">Hash:</div>
-    <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer" class="link text-grey-400">{{ hash }}</a>
+  <div :class="[...rowClasses, 'border-b', 'border-grey-100']">
+    <div class="col-span-12 md:col-span-3 grid-rows-3">Hash:</div>
+    <div class="col-span-10 md:col-span-6">
+      <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer" class="link text-grey-400">{{ hash }}</a>
+    </div>
   </div>
   <!-- Status -->
   <div :class="[...rowClasses, 'border-b', 'border-grey-100']">
-    <div class="mr-4 w-28">Status:</div>
-    <div v-if="status === 'pending'" class="text-grey-500">
+    <div class="col-span-12 md:col-span-3 grid-rows-3">Status:</div>
+
+    <div v-if="status === 'pending'" class="text-grey-500 col-span-10 md:col-span-6">
       <span class="border-2 p-4 mr-8">Pending</span>
       Pending for {{ timeString }}
     </div>
-    <div v-else-if="status === 'success'" class="text-grey-500">
+
+    <div v-else-if="status === 'success'" class="text-grey-500 col-span-10 md:col-span-6">
       <span class="text-teal border-teal border-2 p-4 mr-8">Success</span>
       Confirmed in {{ timeString }}
     </div>
-    <div v-else-if="status === 'failed'" class="text-grey-500">
+
+    <div v-else-if="status === 'failed'" class="text-grey-500 col-span-10 md:col-span-6">
       <span class="text-pink border-pink border-2 p-4 mr-8 px-8">Fail</span>
       Failed after {{ timeString }}
     </div>
   </div>
+
   <!-- Copy + button -->
-  <div :class="[...rowClasses, 'justify-between']">
-    <div v-if="status === 'pending'" class="text-grey-500">Your transaction is pending.</div>
-    <div v-else-if="status === 'success'" class="text-grey-500">Transaction successful!</div>
-    <div v-else-if="status === 'failed'" class="text-grey-500">
-      Something went wrong. Please check the transaction and try again.
+  <div :class="[...rowClasses]">
+    <div class="text-grey-500 col-span-10 my-auto">
+      <template v-if="status === 'pending'"> Your transaction is pending. </template>
+      <template v-if="status === 'success'"> Transaction successful! </template>
+      <template v-if="status === 'failed'">
+        Something went wrong. Please check the transaction and try again.
+      </template>
     </div>
-    <button
-      v-if="label"
-      @click="action ? action() : () => ({})"
-      class="btn"
-      :class="{ disabled: status === 'pending' }"
-      :disabled="status === 'pending'"
-    >
-      {{ label }}
-    </button>
+
+    <div class="col-span-2">
+      <button
+        v-if="label"
+        @click="action ? action() : () => ({})"
+        class="btn"
+        :class="{ disabled: status === 'pending' }"
+        :disabled="status === 'pending'"
+      >
+        {{ label }}
+      </button>
+    </div>
   </div>
 </template>
 
@@ -47,15 +58,14 @@ import useWalletStore from 'src/store/wallet';
 const emittedEventName = 'onReceipt'; // emitted once we receive the transaction receipt
 const rowClasses = [
   // styles applied to all rows in the HTML template
-  'flex',
-  'justify-start',
-  'items-center',
   'text-grey-400',
   'text-left',
   'py-10',
   'px-4',
   'sm:px-6',
   'lg:px-8',
+  'grid',
+  'grid-cols-12',
 ];
 
 function useTransactionStatus(hash: string, context: SetupContext<'onReceipt'[]>) {
