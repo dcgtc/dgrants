@@ -31,11 +31,8 @@
 
     <SectionHeader title="Links" />
 
-    <div
-      v-if="isDefined(grantMetadata?.properties?.websiteURI)"
-      class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4"
-    >
-      <div class="flex gap-x-4">
+    <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+      <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
         <span class="text-grey-400">Website:</span>
         <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{ grantMetadata?.properties?.websiteURI }}</a>
       </div>

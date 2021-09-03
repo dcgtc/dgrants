@@ -62,7 +62,7 @@ export function isValidGithubUrl(val: string | undefined) {
 export function isValidTwitter(val: string | undefined) {
   if (val === undefined) return true;
   const handle = val.includes('@') ? val.substring(1) : val;
-  return !isValidUrl(handle) && handle.length <= 15;
+  return /^[a-zA-Z0-9_]{1,15}$/.test(handle);
 }
 
 // Returns true if the provided address is valid (TODO support ENS)
