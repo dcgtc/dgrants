@@ -23,6 +23,7 @@ Reading and following these guidelines will help us make the contribution proces
     - [Overview](#overview)
     - [Composition API](#composition-api)
     - [State Management](#state-management)
+    - [Style Guide](#style-guide)
     - [Other Notes](#other-notes)
   - [Getting Help](#getting-help)
 
@@ -201,6 +202,18 @@ Only export aspects that are needed in other components or pages to keep interfa
 
 Do not export state variables directly from the store, as this is almost never required.
 This is because in general state should not be mutated directly, but instead should only be mutated through a method exported from the store. In `cart.ts` we directly export the `cart` variable for simplicity when a user is editing their cart. However, a cleaner way might be to create a local copy of `cart` when `Cart.vue` mounts, and have `Cart.vue` call `updateCart` whenever the user edits their cart.
+
+### Style Guide
+
+In general, the app follows the recommendations of the official [Vue Style Guide](https://vuejs.org/v2/style-guide/), which should be followed as much as possible.
+Please read through this guide if you are unfamiliar with it.
+
+For example, in `app/src/components` many components start with the `Base*` prefix, as suggested by the style guide.
+These components come with default styles and features like error handling, and should be used over standard HTML elements whenever possible.
+
+Similarly, components often follow a naming convention where the first part of the component name describes the parent component, and the second part describes the child and its specific functionality.
+Be sure to follow this naming convention as appropriate.
+
 
 ### Other Notes
 
