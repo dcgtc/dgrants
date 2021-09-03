@@ -18,6 +18,11 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/dgrants/rounds/', name: 'dgrants-rounds-list', component: () => import('../views/GrantRoundsList.vue') },
   {
     path: '/dgrants/rounds/:address',
+    name: 'dgrants-round',
+    component: () => import('../views/GrantRound.vue'),
+  },
+  {
+    path: '/dgrants/rounds/:address/grants',
     name: 'dgrants-round-details',
     component: () => import('../views/GrantRoundDetails.vue'),
   },
