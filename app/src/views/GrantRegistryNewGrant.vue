@@ -80,6 +80,8 @@
             description="Your grant's twitter handle"
             id="grant-handle"
             label="Grant twitter"
+            :rules="isValidTwitter"
+            errorMsg="Please enter a valid Twitter handle"
             :required="false"
           />
 
@@ -111,6 +113,7 @@ import {
   isValidAddress,
   isValidUrl,
   isValidGithubUrl,
+  isValidTwitter,
   isDefined,
   pushRoute,
   urlFromTwitterHandle,
@@ -174,7 +177,7 @@ function useNewGrant() {
     await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
-  return { createGrant, isValidAddress, isValidUrl, isValidGithubUrl, isFormValid, isDefined, form };
+  return { createGrant, isValidAddress, isValidUrl, isValidGithubUrl, isValidTwitter, isFormValid, isDefined, form };
 }
 
 export default defineComponent({

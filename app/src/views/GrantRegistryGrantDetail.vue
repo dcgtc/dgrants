@@ -150,6 +150,8 @@
             description="Your grant's twitter handle"
             id="grant-handle"
             label="Grant twitter"
+            :rules="isValidTwitter"
+            errorMsg="Please enter a valid Twitter handle"
             :required="false"
           />
 
@@ -198,6 +200,7 @@ import {
   isValidAddress,
   isValidUrl,
   isValidGithubUrl,
+  isValidTwitter,
   isDefined,
   formatNumber,
   urlFromTwitterHandle,
@@ -530,6 +533,7 @@ function useGrantDetail() {
     isValidAddress,
     isValidUrl,
     isValidGithubUrl,
+    isValidTwitter,
     isDefined,
     isFormValid,
     grant,

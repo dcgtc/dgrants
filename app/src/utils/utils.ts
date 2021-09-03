@@ -58,6 +58,13 @@ export function isValidGithubUrl(val: string | undefined) {
   return val && val.includes('://github.com/');
 }
 
+// Returns true if the provided twitter handle is valid
+export function isValidTwitter(val: string | undefined) {
+  if (val === undefined) return true;
+  const handle = val.includes('@') ? val.substring(1) : val;
+  return !isValidUrl(handle) && handle.length <= 15;
+}
+
 // Returns true if the provided address is valid (TODO support ENS)
 export function isValidAddress(val: string | undefined) {
   return val && isAddress(val);
