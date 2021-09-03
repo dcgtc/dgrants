@@ -1,23 +1,22 @@
 <template>
-  <Listbox as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
-    <div class="mt-1 relative">
-      <ListboxButton
-        class="
-          bg-white
-          relative
-          w-28
-          border border-grey-400
-          shadow-sm
-          pl-3
-          pr-10
-          py-4
-          text-left
-          cursor-default
-          focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500
-          sm:text-sm
-        "
-      >
-        <span class="block truncate">{{ modelValue[label] }}</span>
+  <Listbox :class="width" as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
+    <div class="relative">
+      <!-- not realy happy with using the headless ui just for having a non-native input-select field ( <ListboxButton> and <ListboxOptions> ) 
+      1. its impossible without hardcoding heights to mix native input fields and this fake
+      input selects ... i would prefer regular native input type select and get rid
+      of that dependency as it is not realy helpfull here -->
+
+      <!-- example code would be like this :
+      <select name="token" class="border-l-0 w-1/2">
+        <option value="eth">ETH</option>
+        <option value="dai">DAI</option>
+        <option value="gtc">GTC</option>
+        <option value="weth">WETH</option>
+      </select>
+      -->
+
+      <ListboxButton class="group w-full p-4 border border-grey-400 hover:border-grey-500">
+        <span class="block truncate text-left">{{ modelValue[label] }}</span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none w-12">
           <ArrowBottom2Icon class="icon icon-primary" aria-hidden="true" />
         </span>
@@ -32,18 +31,17 @@
           class="
             absolute
             z-10
-            mt-1
             w-full
             bg-white
-            shadow-lg
-            max-h-60
-            rounded-md
-            py-1
-            text-base text-left
-            ring-1 ring-black ring-opacity-5
+            text-left
             overflow-auto
-            focus:outline-none
-            sm:text-sm
+            border border-grey-400
+            p-5
+            font-medium
+            bg-white
+            text-grey-400
+            uppercase
+            whitespace-nowrap
           "
         >
           <ListboxOption
@@ -53,21 +51,9 @@
             :value="option"
             v-slot="{ active, selected }"
           >
-            <li
-              :class="[
-                active ? 'text-white bg-grey-500' : 'text-gray-900',
-                'cursor-default select-none relative py-2 pl-3 pr-9',
-              ]"
-            >
-              <span :class="[selected ? 'font-semibold' : 'font-normal', 'block truncate']">
+            <li :class="[active ? 'text-grey-500' : '', 'cursor-pointer select-none relative']">
+              <span :class="[selected ? 'text-grey-500' : '', 'block truncate']">
                 {{ option[label] }}
-              </span>
-
-              <span v-if="selected" :class="['absolute inset-y-0 right-0 flex items-center pr-4 w-12']">
-                <CheckIcon
-                  :class="['icon icon-heavy', active ? 'stroke-white' : 'stroke-grey-400']"
-                  aria-hidden="true"
-                />
               </span>
             </li>
           </ListboxOption>
@@ -80,7 +66,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
 import { Listbox, ListboxButton, /* ListboxLabel, */ ListboxOption, ListboxOptions } from '@headlessui/vue';
-import { CheckIcon, ArrowBottom2Icon } from '@fusion-icons/vue/interface';
+import { ArrowBottom2Icon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'BaseSelect',
@@ -89,7 +75,6 @@ export default defineComponent({
     ListboxButton,
     /* ListboxLabel, */ ListboxOption,
     ListboxOptions,
-    CheckIcon,
     ArrowBottom2Icon,
   },
   props: {
@@ -99,6 +84,7 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: { type: Array as PropType<Record<string, any>[]>, required: true }, // available options, must be array of objects with an `id` field
     label: { type: String, required: false, default: 'name' }, // option[label] is used as the string shown
+    width: { type: String, required: false, default: 'w-full' }, // input field width
   },
 });
 </script>
