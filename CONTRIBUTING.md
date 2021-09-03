@@ -19,7 +19,7 @@ Reading and following these guidelines will help us make the contribution proces
     - [Pull Requests](#pull-requests)
       - [Git Rebase Workflow](#git-rebase-workflow)
       - [Advantages of Rebase Workflow](#advantages-of-rebase-workflow)
-  - [App Contribution Guidelines](#app-contribution-guidelines)
+  - [Frontend Contribution Guidelines](#frontend-contribution-guidelines)
     - [Overview](#overview)
     - [Composition API](#composition-api)
     - [State Management](#state-management)
@@ -139,7 +139,7 @@ The developer or developers working on said feature are responsible for keeping 
 git checkout main
 git pull origin main # get the latest
 git checkout my-feature-branch
-git rebase my-feature-branch main
+git rebase main
 ```
 
 If conflicts are found, you will have to resolve them now. See [here](https://docs.github.com/en/get-started/using-git/resolving-merge-conflicts-after-a-git-rebase) for more info on resolving merge conflicts when rebasing. After successfully rebasing, force push back to your feature branch, but *never* force push to `main`:
@@ -163,9 +163,9 @@ git push origin HEAD # This will close the PR
 * Keeps commit history clean and easy to read
 
 
-## App Contribution Guidelines
+## Frontend Contribution Guidelines
 
-This section details the app architecture, conventions, and best practices.
+This section details the frontend architecture, conventions, and best practices.
 Please read this section before making contributions within the `app` directory.
 
 ### Overview
@@ -180,7 +180,7 @@ If you are unfamiliar with the Composition API, you can read more about it [here
 
 Check out [`GrantRegistryNewGrant.vue`](app/src/views/GrantRegistryNewGrant.vue) for an example of a component that uses the Composition API.
 In the Composition API docs referenced earlier, most examples put everything within the `setup()` method.
-This is ok, but typically should only be done for simple components. For more complex components, logic and variables should be moved in composition functions, like the `useNewGrant()` method defined in `GrantRegistryNewGrant.vue`.
+This is ok for simple components. For more complex components, logic and variables should be moved in composition functions, like the `useNewGrant()` method defined in `GrantRegistryNewGrant.vue`.
 
 ### State Management
 
