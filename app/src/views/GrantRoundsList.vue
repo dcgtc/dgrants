@@ -10,7 +10,7 @@
         <li
           v-for="(grantRound, index) in list.rounds"
           :key="index"
-          @click="pushRoute({ name: 'dgrants-round-details', params: { address: grantRound.address } })"
+          @click="pushRoute({ name: 'dgrants-round', params: { address: grantRound.address } })"
           class="
             col-span-1
             bg-white
