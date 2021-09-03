@@ -1,5 +1,14 @@
 <template>
-  <div class="grid grid-cols-12 py-5 items-center gap-m-8 border-b border-grey-100">
+  <div
+    :class="[
+      'grid',
+      'grid-cols-12',
+      'items-center',
+      'gap-m-8',
+      'border-grey-100',
+      showBorder ? 'py-5 border-b' : 'py-1',
+    ]"
+  >
     <div class="col-span-12 md:col-span-3 mb-3 md:mb-0 grid-rows-3">
       <label :for="id" class="text-grey-400">
         {{ label }} <span v-if=required class="">(optional)</span>:
@@ -63,6 +72,7 @@ export default defineComponent({
     readonly: { type: Boolean, required: false, default: false }, // is readonly
     disabled: { type: Boolean, required: false, default: false }, // is disabled
     width: { type: String, required: false, default: 'w-full' }, // input field width
+    showBorder: { type: Boolean, requred: false, default: true }, // show border below input
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,

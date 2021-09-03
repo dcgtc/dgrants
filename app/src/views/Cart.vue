@@ -56,6 +56,7 @@
                   "
                   type="number"
                   width="w-36"
+                  :showBorder="false"
                 />
                 <BaseSelect
                   :modelValue="item.contributionToken"
@@ -117,7 +118,7 @@
 // --- External Imports ---
 import { defineComponent, onMounted, ref } from 'vue';
 import { ArrowToprightIcon, CloseIcon } from '@fusion-icons/vue/interface';
-// --- App Imports ---
+// --- Component Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';

@@ -1,13 +1,17 @@
 <template>
-  <div class="flex flex-col justify-center sm:px-6 lg:px-8 mb-40">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md mt-5 md:mt-20 mb-12 md:mb-24">
-      <h1>Setup Grant</h1>
-    </div>
+  <div v-if="txHash">
+    <BaseHeader name="Create Grant : Transaction Status" />
+    <TransactionStatus
+      :hash="txHash"
+      buttonLabel="CONTINUE"
+      :buttonAction="() => (grantId ? pushRoute({ name: 'dgrants-id', params: { id: grantId } }) : null)"
+    />
+  </div>
 
+  <div v-else class="flex flex-col justify-center sm:px-6 lg:px-8 mb-40">
+    <BaseHeader name="Setup Grant" />
     <div class="text-left">
       <form class="space-y-5" @submit.prevent="createGrant">
-        <p class="border-b border-grey-100"></p>
-
         <!-- Grant name -->
         <BaseInput
           v-model="form.name"
@@ -94,19 +98,20 @@
           Create Grant
         </button>
 
-        <p v-if="!isFormValid" class="text-center text-grey-400">
-          *Please fill in all required fields
-        </p>
+        <p v-if="!isFormValid" class="text-center text-grey-400">* Please fill in all required fields</p>
       </form>
     </div>
   </div>
 </template>
 
 <script lang="ts">
+// --- External Imports ---
 import { computed, defineComponent, ref } from 'vue';
+// --- Component Imports ---
+import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
-
+import TransactionStatus from 'src/components/TransactionStatus.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -129,6 +134,9 @@ import { GrantRegistry } from '@dgrants/contracts';
 function useNewGrant() {
   const { signer } = useWalletStore();
   const { poll } = useDataStore();
+
+  const txHash = ref<string>();
+  const grantId = ref<string>();
 
   // Define form fields and parameters
   const form = ref<{
@@ -171,6 +179,7 @@ function useNewGrant() {
     const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
 
     const tx = await registry.createGrant(owner, payee, metaPtr);
+    txHash.value = tx.hash;
     // TODO: show waiting state screen
     await tx.wait();
 
@@ -178,9 +187,9 @@ function useNewGrant() {
     const receipt = await signer.value.provider.getTransactionReceipt(tx.hash);
     const log = registry.interface.parseLog(receipt.logs[0]); // there is only one emitted event
 
+    grantId.value = log.args.id;
     // Poll so the store has the latest data, then navigate to the grant page
     await poll();
-    await pushRoute({ name: 'dgrants-id', params: { id: log.args.id.toString() } });
   }
 
   return {
@@ -193,12 +202,15 @@ function useNewGrant() {
     isDefined,
     form,
     LOREM_IPSOM_TEXT,
+    txHash,
+    grantId,
+    pushRoute,
   };
 }
 
 export default defineComponent({
   name: 'GrantRegistryNewGrant',
-  components: { BaseInput, BaseTextarea },
+  components: { BaseInput, BaseTextarea, TransactionStatus, BaseHeader },
   setup() {
     return { ...useNewGrant() };
   },
