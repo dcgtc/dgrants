@@ -119,37 +119,6 @@
             errorMsg="Please enter a description"
           />
 
-          <!-- Grant website -->
-          <BaseInput
-            v-model="form.website"
-            description="Your grant's website"
-            id="grant-website"
-            label="Grant website"
-            :rules="isValidUrl"
-            errorMsg="Please enter a valid URL"
-            :required="false"
-          />
-
-          <!-- Grant github -->
-          <BaseInput
-            v-model="form.github"
-            description="Your grant's github"
-            id="grant-github"
-            label="Grant github"
-            :rules="isValidGithubUrl"
-            errorMsg="Please enter a valid Github URL"
-            :required="false"
-          />
-
-          <!-- Grant twitter handle -->
-          <BaseInput
-            v-model="form.twitter"
-            description="Your grant's twitter handle"
-            id="grant-handle"
-            label="Grant twitter"
-            :required="false"
-          />
-
           <!-- Submit and cancel buttons -->
           <button
             type="submit"
@@ -191,7 +160,7 @@ import {
   SUPPORTED_TOKENS_MAPPING,
 } from 'src/utils/constants';
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
-import { isValidAddress, isValidUrl, isValidGithubUrl, isDefined, formatNumber, urlFromTwitterHandle } from 'src/utils/utils';
+import { isValidAddress, isValidUrl, isDefined, formatNumber } from 'src/utils/utils';
 import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
 import * as ipfs from 'src/utils/ipfs';
@@ -391,37 +360,23 @@ function useGrantDetail() {
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
 
-  const form = ref<{
-    owner: string;
-    payee: string;
-    name: string;
-    description: string;
-    website: string;
-    github: string;
-    twitter: string;
-  }>({
+  const form = ref<{ owner: string; payee: string; name: string; description: string }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
     name: grantMetadata.value?.name || '',
     description: grantMetadata.value?.description || '',
-    website: grantMetadata.value?.properties?.websiteURI || '',
-    github: grantMetadata.value?.properties?.githubURI || '',
-    twitter: grantMetadata.value?.properties?.twitterURI || '',
   });
 
   const isFormValid = computed(() => {
     if (!grant.value) return false;
-    const { owner, payee, name, description, website, github, twitter } = form.value;
+    const { owner, payee, name, description } = form.value;
     const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isDefined(name) && isDefined(description);
 
     const areFieldsUpdated =
       owner !== grant.value.owner ||
       payee !== grant.value.payee ||
       name !== grantMetadata.value?.name ||
-      description !== grantMetadata.value?.description ||
-      website !== grantMetadata.value?.properties?.websiteURI ||
-      github !== grantMetadata.value?.properties?.githubURI ||
-      twitter !== grantMetadata.value?.properties?.twitterURI;
+      description !== grantMetadata.value?.description;
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -441,7 +396,7 @@ function useGrantDetail() {
    */
   const saveEdits = async () => {
     // Validation
-    const { owner, payee, name, description, website, github, twitter } = form.value;
+    const { owner, payee, name, description } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -454,15 +409,8 @@ function useGrantDetail() {
     let metaPtr = g.metaPtr;
 
     const gMetadata = grantMetadata.value;
-    const isMetaPtrUpdated =
-      name !== gMetadata?.name ||
-      description !== gMetadata?.description ||
-      website !== gMetadata?.properties?.websiteURI ||
-      github !== gMetadata?.properties?.githubURI ||
-      twitter !== gMetadata?.properties?.twitterURI;
+    const isMetaPtrUpdated = name !== gMetadata?.name || description !== gMetadata?.description;
     if (isMetaPtrUpdated) {
-      const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
-      const properties = { websiteURI: website, githubURI: github, twitterURI };
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description })
         .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
@@ -506,23 +454,16 @@ function useGrantDetail() {
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.website = grantMetadata.value?.properties?.websiteURI || '';
-    form.value.github = grantMetadata.value?.properties?.githubURI || '';
-    form.value.twitter = grantMetadata.value?.properties?.twitterURI || '';
   }
 
   return {
     loading,
     grantId,
     rounds,
-  }
-
-  return {
     isEditing,
     isOwner,
     isValidAddress,
     isValidUrl,
-    isValidGithubUrl,
     isDefined,
     isFormValid,
     grant,

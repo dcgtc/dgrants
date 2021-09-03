@@ -7,15 +7,6 @@
       </h1>
       <p>Name: {{ grantRoundMetadata?.name }}</p>
       <p>Description: {{ grantRoundMetadata?.description }}</p>
-      <p v-if="isDefined(grantRoundMetadata?.properties?.websiteURI)">
-        Website: {{ grantRoundMetadata?.properties?.websiteURI }}
-      </p>
-      <p v-if="isDefined(grantRoundMetadata?.properties?.githubURI)">
-        Github: {{ grantRoundMetadata?.properties?.githubURI }}
-      </p>
-      <p v-if="isDefined(grantRoundMetadata?.properties?.twitterURI)">
-        Twitter: {{ grantRoundMetadata?.properties?.twitterURI }}
-      </p>
       <p>Status: {{ grantRound.status }}</p>
       <p>
         Funds:
@@ -173,7 +164,6 @@ import {
   formatAddress,
   isValidAddress,
   isValidUrl,
-  isDefined,
   checkAllowance,
   getApproval,
   hasStatus,
@@ -304,7 +294,6 @@ function useGrantRoundDetail() {
     isContributing,
     isValidAddress,
     isValidUrl,
-    isDefined,
     isFormValid,
     grants,
     grantMetadata,
