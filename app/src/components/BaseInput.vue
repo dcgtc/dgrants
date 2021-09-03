@@ -10,9 +10,7 @@
     ]"
   >
     <div class="col-span-12 md:col-span-3 mb-3 md:mb-0 grid-rows-3">
-      <label :for="id" class="text-grey-400">
-        {{ label }} <span v-if=required class="">(optional)</span>:
-      </label>
+      <label :for="id" class="text-grey-400"> {{ label }} <span v-if="!required" class="">(optional)</span>: </label>
     </div>
 
     <div class="col-span-10 md:col-span-6">

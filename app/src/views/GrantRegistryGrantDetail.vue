@@ -40,37 +40,45 @@
         </p>
       </div>
 
+      <!-- LINKS -->
       <SectionHeader title="Links" />
+      <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+        <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
+          <span class="text-grey-400">Website:</span>
+          <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{
+            grantMetadata?.properties?.websiteURI
+          }}</a>
+        </div>
 
-    <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
-      <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
-        <span class="text-grey-400">Website:</span>
-        <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{ grantMetadata?.properties?.websiteURI }}</a>
-      </div>
+        <div v-if="isDefined(grantMetadata?.properties?.githubURI)" class="flex gap-x-4">
+          <span class="text-grey-400">Github:</span>
+          <a :href="grantMetadata?.properties?.githubURI" target="_blank">{{ grantMetadata?.properties?.githubURI }}</a>
+        </div>
 
-      <div v-if="isDefined(grantMetadata?.properties?.githubURI)" class="flex gap-x-4">
-        <span class="text-grey-400">Github:</span>
-        <a :href="grantMetadata?.properties?.githubURI" target="_blank">{{ grantMetadata?.properties?.githubURI }}</a>
-      </div>
-
-      <div v-if="isDefined(grantMetadata?.properties?.twitterURI)" class="flex gap-x-4">
-        <span class="text-grey-400">Twitter:</span>
-        <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{ grantMetadata?.properties?.twitterURI }}</a>
-      </div>
-
-      <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
-
-      <div v-if="selectedRound == 0">
-        <div v-for="(contribution, index) in grantContibutions" :key="Number(index)">
-          <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+        <div v-if="isDefined(grantMetadata?.properties?.twitterURI)" class="flex gap-x-4">
+          <span class="text-grey-400">Twitter:</span>
+          <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{
+            grantMetadata?.properties?.twitterURI
+          }}</a>
         </div>
       </div>
-      <div v-else>
-        <div
-          v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
-          :key="Number(index)"
-        >
-          <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+
+      <!-- CONTRIBUTIONS -->
+      <SectionHeader title="Contributions" />
+      <div>
+        <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
+        <div v-if="selectedRound == 0">
+          <div v-for="(contribution, index) in grantContibutions" :key="Number(index)">
+            <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+          </div>
+        </div>
+        <div v-else>
+          <div
+            v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
+            :key="Number(index)"
+          >
+            <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+          </div>
         </div>
       </div>
     </div>
@@ -126,7 +134,6 @@
           <!-- Grant website -->
           <BaseInput
             v-model="form.website"
-            description="Your grant's website"
             id="grant-website"
             label="Grant website"
             :rules="isValidUrl"
@@ -137,7 +144,6 @@
           <!-- Grant github -->
           <BaseInput
             v-model="form.github"
-            description="Your grant's github"
             id="grant-github"
             label="Grant github"
             :rules="isValidGithubUrl"
@@ -148,14 +154,13 @@
           <!-- Grant twitter handle -->
           <BaseInput
             v-model="form.twitter"
-            description="Your grant's twitter handle"
             id="grant-handle"
             label="Grant twitter"
             :rules="isValidTwitter"
             errorMsg="Please enter a valid Twitter handle"
             :required="false"
           />
-          
+
           <!-- Submit and cancel buttons -->
           <div class="flex justify-end pt-6">
             <button
