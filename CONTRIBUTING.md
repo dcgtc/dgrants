@@ -23,7 +23,8 @@ Reading and following these guidelines will help us make the contribution proces
     - [Overview](#overview)
     - [Composition API](#composition-api)
     - [State Management](#state-management)
-    - [Style Guide](#style-guide)
+    - [Code Style Guide](#code-style-guide)
+    - [CSS Approach](#css-approach)
     - [Other Notes](#other-notes)
   - [Getting Help](#getting-help)
 
@@ -203,7 +204,7 @@ Only export aspects that are needed in other components or pages to keep interfa
 Do not export state variables directly from the store, as this is almost never required.
 This is because in general state should not be mutated directly, but instead should only be mutated through a method exported from the store. In `cart.ts` we directly export the `cart` variable for simplicity when a user is editing their cart. However, a cleaner way might be to create a local copy of `cart` when `Cart.vue` mounts, and have `Cart.vue` call `updateCart` whenever the user edits their cart.
 
-### Style Guide
+### Code Style Guide
 
 In general, the app follows the recommendations of the official [Vue Style Guide](https://vuejs.org/v2/style-guide/), which should be followed as much as possible.
 Please read through this guide if you are unfamiliar with it.
@@ -213,6 +214,15 @@ These components come with default styles and features like error handling, and 
 
 Similarly, components often follow a naming convention where the first part of the component name describes the parent component, and the second part describes the child and its specific functionality.
 Be sure to follow this naming convention as appropriate.
+
+### CSS Approach
+
+All styling is done using [Tailwind](https://tailwindcss.com/docs) classes, and the frontend's customizations for tailwind such as custom colors and fonts can be found in `tailwind.config.js`.
+Custom classes that are built on existing Tailwind classes can be found in `app/src/index.css`.
+
+When styling components, avoid `style` tags, and use tailwind classes or the custom classes from `index.css` instead.
+If required, you can create new classes in the `index.css` file using Tailwind's `@apply` functionality, and this is preferred over creating local styles within a component.
+Defining classes in `index.css` makes it easier to discover and reuse existing classes, whereas classes defined in and scoped to a component may be hard to find and result in conflicting definitions that may be tricky to debug.
 
 
 ### Other Notes
