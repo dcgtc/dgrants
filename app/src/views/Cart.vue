@@ -1,102 +1,133 @@
 <template>
   <!-- Empty cart -->
   <div v-if="!txHash && cart.length === 0">
-    <div class="mt-10">Your cart is empty</div>
-    <button @click="pushRoute({ name: 'dgrants' })" class="btn btn-primary mx-auto mt-6">Browse Grants</button>
+    <BaseHeader :name="`My Cart (${cart.length})`" />
+
+    <div class="px-4 md:px-12">
+      <div class="py-8 border-b border-grey-100">
+        <div class="flex gap-x-4 justify-end">
+          <span>Your Cart is empty.</span>
+        </div>
+      </div>
+
+      <div class="mt-12">
+        <div class="flex gap-x-4 justify-end">
+          <button @click="pushRoute({ name: 'dgrants' })" class="btn">explore grants</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Cart has items and no checkout transaction -->
   <div v-else-if="!txHash">
     <BaseHeader :name="`My Cart (${cart.length})`" />
-    <!-- Cart toolbar -->
-    <div
-      class="flex justify-between max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 border-b border-grey-100 text-grey-400"
-    >
-      <div class="flex items-center justify-start">
-        <div @click="NOT_IMPLEMENTED('Share cart')" class="flex items-center justify-start cursor-pointer">
-          <ArrowToprightIcon class="icon-small icon-primary mr-2" /> Share cart
+
+    <!-- Action Nav / Cart Toolbar ( Share & Clear Cart -->
+    <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+      <div class="flex flex-wrap gap-x-6 gap-y-4">
+        <div @click="NOT_IMPLEMENTED('Share cart')" class="flex items-center gap-x-2 cursor-pointer group">
+          <ArrowToprightIcon class="icon icon-small icon-primary" />
+          <span class="text-grey-400 group-hover:text-grey-500">Share</span>
+        </div>
+
+        <div @click="clearCart" class="flex items-center gap-x-2 cursor-pointer group ml-auto">
+          <CloseIcon class="icon icon-small icon-primary" />
+          <span class="text-grey-400 group-hover:text-grey-500">Clear</span>
         </div>
       </div>
-      <div @click="clearCart" class="flex items-center justify-end cursor-pointer">
-        <CloseIcon class="icon-small icon-primary mr-2" /> Clear cart
-      </div>
     </div>
-    <!-- Cart items -->
-    <div class="bg-white shadow sm:rounded-md max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <ul>
-        <!-- For each grant in the cart -->
-        <li v-for="item in cart" :key="item.grantId">
-          <div class="flex justify-between items-center border-b border-grey-100 py-10">
-            <!-- Logo and name -->
-            <div
-              class="flex items-center cursor-pointer"
-              @click="pushRoute({ name: 'dgrants-id', params: { id: item.id.toString() } })"
-            >
-              <img
-                class="h-12 w-12"
-                :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/logo.svg'"
-                alt="Grant logo"
-              />
-              <p class="ml-4 text-sm text-left font-medium truncate max-w-lg">
-                {{ grantMetadata[item.metaPtr]?.name }}
-              </p>
-            </div>
 
-            <!-- Contribution info -->
-            <div class="flex space-x-2 items-center">
-              <!-- Contribution token and amount -->
-              <div class="flex">
-                <!-- We use a -1px right margin so overlapping borders don't make the border thicker -->
-                <BaseInput
-                  style="margin-right: -1px"
-                  :modelValue="item.contributionAmount"
-                  @update:modelValue="
-                    item.contributionAmount = Number($event);
-                    updateCart(item.grantId, item.contributionAmount);
-                  "
-                  type="number"
-                  width="w-36"
-                  :showBorder="false"
-                />
-                <BaseSelect
-                  :modelValue="item.contributionToken"
-                  @update:modelValue="
-                    item.contributionToken = $event;
-                    updateCart(item.grantId, item.contributionToken.address);
-                  "
-                  :options="SUPPORTED_TOKENS"
-                  label="symbol"
-                />
+    <!-- Cart Items -->
+    <div v-for="item in cart" :key="item.grantId" class="px-4 md:px-12">
+      <div class="py-8 border-b border-grey-100">
+        <div class="grid grid-flow-col items-center gap-x-8">
+          <div>
+            <div class="grid grid-cols-4 items-center gap-x-8 gap-y-4">
+              <!-- image -->
+              <div class="col-span-4 lg:col-span-1">
+                <figure class="max-w-lg">
+                  <img
+                    class="shadow-light"
+                    :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/placeholder_grant.svg'"
+                  />
+                </figure>
               </div>
-
-              <!-- Match estimate -->
-              <!-- TODO use real match estimates -->
-              <div class="flex-none hidden md:block px-4">
-                <p v-if="true" class="text-sm text-left text-grey-300">not in an active round</p>
-                <p v-else class="text-sm text-left text-grey-500">USD estimated matching</p>
+              <!-- text -->
+              <div class="col-span-4 lg:col-span-1">
+                <div>{{ grantMetadata[item.metaPtr]?.name }}</div>
               </div>
+              <!-- input -->
+              <div class="col-span-4 lg:col-span-1">
+                <div class="flex">
+                  <BaseInput
+                    :modelValue="item.contributionAmount"
+                    @update:modelValue="
+                      item.contributionAmount = Number($event);
+                      updateCart(item.grantId, item.contributionAmount);
+                    "
+                    type="number"
+                    width="w-1/2"
+                    customcss="border-r-0"
+                  />
 
-              <!-- Delete from cart -->
-              <div>
-                <CloseIcon @click="removeFromCart(item.grantId)" class="icon-small icon-primary" />
+                  <BaseSelect
+                    :modelValue="item.contributionToken"
+                    @update:modelValue="
+                      item.contributionToken = $event;
+                      updateCart(item.grantId, item.contributionToken.address);
+                    "
+                    :options="SUPPORTED_TOKENS"
+                    label="symbol"
+                    width="w-1/2"
+                  />
+                </div>
+              </div>
+              <!-- matching -->
+              <div class="col-span-4 lg:col-span-1">
+                <div class="text-grey-400 text-left lg:text-right">
+                  <!-- TODO use real match estimates -->
+                  <p v-if="true">not in an active round</p>
+                  <p v-else>USD estimated matching</p>
+                </div>
               </div>
             </div>
           </div>
-        </li>
-      </ul>
+
+          <div class="justify-self-end">
+            <CloseIcon @click="removeFromCart(item.grantId)" class="icon icon-small icon-primary cursor-pointer" />
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Checkout -->
-    <div class="bg-white shadow sm:rounded-md max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-right">
-      <div class="border-b border-grey-100 py-8">
-        <span class="text-grey-300">Contributing:</span> {{ cartSummaryString }}
+
+    <div class="px-4 md:px-12">
+      <div class="py-8 border-b border-grey-100">
+        <div class="flex gap-x-4 justify-end">
+          <span class="text-grey-400">Contributing:</span>
+          <span>{{ cartSummaryString }}</span>
+        </div>
       </div>
-      <div class="border-b border-grey-100 py-8"><span class="text-grey-300">Equivalent to:</span> TODO USD</div>
-      <div class="border-b border-grey-100 py-8">
-        <span class="text-grey-300">Estimated matching value:</span> TODO USD
+
+      <div class="py-8 border-b border-grey-100">
+        <div class="flex gap-x-4 justify-end">
+          <span class="text-grey-400">Equivalent to:</span>
+          <span>TODO</span>
+        </div>
       </div>
-      <div class="py-8 flex justify-end">
-        <button @click="executeCheckout" class="btn">Checkout</button>
+
+      <div class="py-8 border-b border-grey-100">
+        <div class="flex gap-x-4 justify-end">
+          <span class="text-grey-400">Estimated matching value:</span>
+          <span>TODO</span>
+        </div>
+      </div>
+
+      <div class="mt-12 mb-12">
+        <div class="flex gap-x-4 justify-end">
+          <button @click="executeCheckout" class="btn">checkout</button>
+        </div>
       </div>
     </div>
   </div>

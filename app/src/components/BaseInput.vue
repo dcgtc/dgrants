@@ -1,37 +1,12 @@
 <template>
-  <div
-    :class="[
-      'grid',
-      'grid-cols-12',
-      'items-center',
-      'gap-m-8',
-      'border-grey-100',
-      showBorder ? 'py-5 border-b' : 'py-1',
-    ]"
-  >
-    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0 grid-rows-3">
-      <label :for="id" class="text-grey-400"> {{ label }} <span v-if="!required" class="">(optional)</span>: </label>
-    </div>
-
-    <div class="col-span-10 md:col-span-6">
+  <div :class="width">
+    <label :for="id" class="block text-sm font-medium text-gray-700"> {{ label }} </label>
+    <p :for="id" class="text-gray-500 text-sm">{{ description }}</p>
+    <div>
       <input
         v-model="val"
         @input="onInput"
-        :class="[
-          'hy',
-          'appearance-none',
-          'bg-white',
-          'block',
-          'px-3',
-          'py-4',
-          'border border-grey-400',
-          'shadow-sm',
-          'placeholder-grey-400',
-          'focus:outline-none focus:ring-primary-500 focus:border-primary-500',
-          'sm:text-sm',
-          width,
-          !isValid ? 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500' : '',
-        ]"
+        :class="[!isValid ? 'border-pink text-pink' : '', customcss ? customcss : '']"
         :id="id"
         :name="id"
         :required="required"
@@ -70,7 +45,8 @@ export default defineComponent({
     readonly: { type: Boolean, required: false, default: false }, // is readonly
     disabled: { type: Boolean, required: false, default: false }, // is disabled
     width: { type: String, required: false, default: 'w-full' }, // input field width
-    showBorder: { type: Boolean, requred: false, default: true }, // show border below input
+    customcss: { type: String, required: false, default: '' }, // add custom css stylings
+
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,
