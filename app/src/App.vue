@@ -1,8 +1,8 @@
 <template>
   <About :showAbout="showAbout" @toggle-about="toggleAbout" />
-  <div class="flex flex-col min-h-screen">
+  <div>
     <layout-header id="header" @toggle-about="toggleAbout" />
-    <main id="app-main" class="flex-grow bg-white"><router-view /></main>
+    <main id="app-main"><router-view /></main>
   </div>
 </template>
 
@@ -40,28 +40,3 @@ export default defineComponent({
   },
 });
 </script>
-
-<style>
-#app {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-
-#app-main {
-  text-align: center;
-}
-
-#nav {
-  padding: 30px;
-}
-
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
-}
-
-#nav a.router-link-exact-active {
-  color: #42b983;
-}
-</style>
