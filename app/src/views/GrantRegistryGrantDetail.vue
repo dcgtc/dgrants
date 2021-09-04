@@ -15,11 +15,23 @@
       :payoutAddress="grant.payee"
       :totalRaised="grantContributionsTotal"
       :roundDetails="grantContributionsByRound"
-    >
-      <template v-slot:extraButtons>
-        <button v-if="isOwner" @click="enableEdit()" class="mt-5 btn btn-secondary">Edit Grant</button>
-      </template>
-    </GrantDetailsRow>
+    />
+
+    <!-- Interactions Bar ( Share, Collection, Edit and so on ) -->
+    <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+      <div class="flex flex-wrap gap-x-6 gap-y-4">
+        <!--share : todo on click what to do-->
+        <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
+          <ShareIcon class="icon icon-primary icon-small" />
+          <span class="text-grey-400 group-hover:text-grey-500">Share</span>
+        </div>
+        <!--edit for owner-->
+        <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
+          <EditIcon class="icon icon-primary icon-small" />
+          <span class="text-grey-400 group-hover:text-grey-500">Edit</span>
+        </div>
+      </div>
+    </div>
 
     <SectionHeader title="Description" />
 
@@ -215,6 +227,9 @@ import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
+// --- Icons ---
+import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 function useGrantDetail() {
   // --- get current state ---
@@ -552,7 +567,16 @@ function useGrantDetail() {
 
 export default defineComponent({
   name: 'GrantRegistryGrantDetail',
-  components: { BaseInput, SectionHeader, ContributionRow, BaseHeader, BaseFilterNav, GrantDetailsRow },
+  components: {
+    BaseInput,
+    SectionHeader,
+    ContributionRow,
+    BaseHeader,
+    BaseFilterNav,
+    GrantDetailsRow,
+    ShareIcon,
+    EditIcon,
+  },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
