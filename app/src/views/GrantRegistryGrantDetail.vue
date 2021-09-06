@@ -213,6 +213,7 @@ import {
   isDefined,
   formatNumber,
   urlFromTwitterHandle,
+  cleanTwitterUrl,
 } from 'src/utils/utils';
 import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
@@ -448,7 +449,7 @@ function useGrantDetail() {
     description: grantMetadata.value?.description || '',
     website: grantMetadata.value?.properties?.websiteURI || '',
     github: grantMetadata.value?.properties?.githubURI || '',
-    twitter: grantMetadata.value?.properties?.twitterURI || '',
+    twitter: cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '',
   });
 
   const isFormValid = computed(() => {
@@ -463,7 +464,7 @@ function useGrantDetail() {
       description !== grantMetadata.value?.description ||
       website !== grantMetadata.value?.properties?.websiteURI ||
       github !== grantMetadata.value?.properties?.githubURI ||
-      twitter !== grantMetadata.value?.properties?.twitterURI;
+      twitter !== cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI);
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -502,7 +503,7 @@ function useGrantDetail() {
       description !== gMetadata?.description ||
       website !== gMetadata?.properties?.websiteURI ||
       github !== gMetadata?.properties?.githubURI ||
-      twitter !== gMetadata?.properties?.twitterURI;
+      twitter !== cleanTwitterUrl(gMetadata?.properties?.twitterURI);
     if (isMetaPtrUpdated) {
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
@@ -552,7 +553,7 @@ function useGrantDetail() {
     form.value.description = grantMetadata.value?.description || '';
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
-    form.value.twitter = grantMetadata.value?.properties?.twitterURI || '';
+    form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';
   }
 
   return {
