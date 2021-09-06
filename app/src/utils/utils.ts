@@ -47,6 +47,11 @@ export function urlFromTwitterHandle(handle: string) {
   return 'https://twitter.com/' + twitterHandle;
 }
 
+// Clean twitter url and return the handle
+export function cleanTwitterUrl(url: string | undefined) {
+  return url ? url.replace('https://twitter.com/', '') : undefined;
+}
+
 // --- Validation ---
 // Returns true if the provided URL is a valid URL
 export function isValidUrl(val: string | undefined) {
@@ -60,7 +65,7 @@ export function isValidGithubUrl(val: string | undefined) {
 
 // Returns true if the provided twitter handle is valid
 export function isValidTwitter(val: string | undefined) {
-  if (val === undefined) return true;
+  if (!val) return true;
   const handle = val.includes('@') ? val.substring(1) : val;
   return /^[a-zA-Z0-9_]{1,15}$/.test(handle);
 }
