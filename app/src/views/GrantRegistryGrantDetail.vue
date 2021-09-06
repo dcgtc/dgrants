@@ -136,7 +136,7 @@
             v-model="form.website"
             id="grant-website"
             label="Grant website"
-            :rules="isValidUrl"
+            :rules="isValidWebsite"
             errorMsg="Please enter a valid URL"
             :required="false"
           />
@@ -146,7 +146,7 @@
             v-model="form.github"
             id="grant-github"
             label="Grant github"
-            :rules="isValidGithubUrl"
+            :rules="isValidGithub"
             errorMsg="Please enter a valid Github URL"
             :required="false"
           />
@@ -207,8 +207,8 @@ import {
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
 import {
   isValidAddress,
-  isValidUrl,
-  isValidGithubUrl,
+  isValidWebsite,
+  isValidGithub,
   isValidTwitter,
   isDefined,
   formatNumber,
@@ -455,7 +455,14 @@ function useGrantDetail() {
   const isFormValid = computed(() => {
     if (!grant.value) return false;
     const { owner, payee, name, description, website, github, twitter } = form.value;
-    const areFieldsValid = isValidAddress(owner) && isValidAddress(payee) && isDefined(name) && isDefined(description);
+    const areFieldsValid =
+      isValidAddress(owner) &&
+      isValidAddress(payee) &&
+      isDefined(name) &&
+      isDefined(description) &&
+      isValidWebsite(website) &&
+      isValidGithub(github) &&
+      isValidTwitter(twitter);
 
     const areFieldsUpdated =
       owner !== grant.value.owner ||
@@ -563,8 +570,8 @@ function useGrantDetail() {
     isEditing,
     isOwner,
     isValidAddress,
-    isValidUrl,
-    isValidGithubUrl,
+    isValidWebsite,
+    isValidGithub,
     isValidTwitter,
     isDefined,
     isFormValid,

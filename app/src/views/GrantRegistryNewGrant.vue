@@ -60,7 +60,7 @@
           v-model="form.website"
           id="grant-website"
           label="Grant website"
-          :rules="isValidUrl"
+          :rules="isValidWebsite"
           errorMsg="Please enter a valid URL"
           :required="false"
         />
@@ -70,7 +70,7 @@
           v-model="form.github"
           id="grant-github"
           label="Grant github"
-          :rules="isValidGithubUrl"
+          :rules="isValidGithub"
           errorMsg="Please enter a valid Github URL"
           :required="false"
         />
@@ -117,8 +117,8 @@ import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, LOREM_IPSOM_TEXT } from 'sr
 import { Contract } from 'src/utils/ethers';
 import {
   isValidAddress,
-  isValidUrl,
-  isValidGithubUrl,
+  isValidWebsite,
+  isValidGithub,
   isValidTwitter,
   isDefined,
   pushRoute,
@@ -158,7 +158,10 @@ function useNewGrant() {
       isValidAddress(form.value.owner) &&
       isValidAddress(form.value.payee) &&
       isDefined(form.value.name) &&
-      isDefined(form.value.description)
+      isDefined(form.value.description) &&
+      isValidWebsite(form.value.website) &&
+      isValidGithub(form.value.github) &&
+      isValidTwitter(form.value.twitter)
   );
 
   /**
@@ -192,8 +195,8 @@ function useNewGrant() {
   return {
     createGrant,
     isValidAddress,
-    isValidUrl,
-    isValidGithubUrl,
+    isValidWebsite,
+    isValidGithub,
     isValidTwitter,
     isFormValid,
     isDefined,
