@@ -54,13 +54,19 @@ export function cleanTwitterUrl(url: string | undefined) {
 
 // --- Validation ---
 // Returns true if the provided URL is a valid URL
-export function isValidUrl(val: string | undefined) {
-  return val && val.includes('://'); // TODO more robust URL validation
+export function isValidUrl(val: string) {
+  // TODO more robust URL validation
+  return (val.includes('http') || val.includes('https')) && val.includes('://') && val.includes('.');
+}
+
+// Returns true if the provided website is a valid option
+export function isValidWebsite(val: string | undefined) {
+  return val ? isValidUrl(val) : true;
 }
 
 // Returns true if the provided URL is a valid Github URL
-export function isValidGithubUrl(val: string | undefined) {
-  return val && val.includes('://github.com/');
+export function isValidGithub(val: string | undefined) {
+  return val ? val.includes('://github.com/') : true;
 }
 
 // Returns true if the provided twitter handle is valid
