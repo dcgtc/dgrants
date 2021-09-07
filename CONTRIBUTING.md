@@ -206,7 +206,7 @@ This is because in general state should not be mutated directly, but instead sho
 
 ### Code Style Guide
 
-In general, the app follows the recommendations of the official [Vue Style Guide](https://vuejs.org/v2/style-guide/), which should be followed as much as possible.
+In general, the app follows the recommendations of the official [Vue Style Guide](https://v3.vuejs.org/style-guide/), which should be followed as much as possible.
 Please read through this guide if you are unfamiliar with it.
 
 For example, in `app/src/components` many components start with the `Base*` prefix, as suggested by the style guide.
