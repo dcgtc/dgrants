@@ -29,6 +29,7 @@
     "hardhat-gas-reporter": "^1.0.4",
     "ipfs-http-client": "^52.0.3",
     "mocha": "^8.1.3",
+    "mocha-chai-jest-snapshot": "^1.1.3",
     "prettier": "^2.1.2",
     "prettier-plugin-solidity": "^1.0.0-beta.9",
     "shelljs": "^0.8.4",
