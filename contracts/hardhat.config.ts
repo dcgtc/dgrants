@@ -31,14 +31,14 @@ if (!mnemonic) {
   mnemonic = 'test test test test test test test test test test test junk';
 }
 
-let infuraApiKey = process.env.INFURA_ID as string;
-if (!infuraApiKey) {
-  console.warn('Please set your INFURA_ID in a .env file');
-  infuraApiKey = '00000000000000000000000000000000';
+let alchemyApiKey = process.env.ALCHEMY_API_KEY as string;
+if (!alchemyApiKey) {
+  console.warn('Please set your ALCHEMY_API_KEY in a .env file');
+  alchemyApiKey = '00000000000000000000000000000000';
 }
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
-  const url: string = 'https://' + network + '.infura.io/v3/' + infuraApiKey;
+  const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
   return {
     accounts: {
       count: 10,
@@ -63,7 +63,10 @@ const config: HardhatUserConfig = {
     hardhat: {
       hardfork: 'london',
       initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
-      forking: { url: `https://mainnet.infura.io/v3/${infuraApiKey}` },
+      forking: {
+        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`,
+        blockNumber: 13186295,
+      },
       accounts: {
         mnemonic,
       },
