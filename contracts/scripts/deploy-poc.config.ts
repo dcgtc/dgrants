@@ -2,9 +2,11 @@ import metadataRaw from './grant-round-metadata.json';
 const metadataJson = JSON.stringify(metadataRaw);
 
 type NetworkParams = {
+  // GrantRoundManager parameters
   donationToken: string;
   uniswapFactory: string;
   weth: string;
+  // GrantRound parameters
   metadataAdmin: string;
   payoutAdmin: string;
   matchingToken: string;
