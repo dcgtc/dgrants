@@ -21,23 +21,24 @@ contract GrantRoundManager is SwapRouter {
   /// @notice Address of the ERC20 token in which donations are made
   IERC20 public immutable donationToken;
 
+  /// @dev Used for saving off swap output amounts for verifying input parameters
   mapping(IERC20 => uint256) internal swapOutputs;
 
+  /// @dev Used for saving off contribution ratios for verifying input parameters
   mapping(IERC20 => uint256) internal donationRatios;
 
   /// @dev Scale factor on percentages when constructing `Donation` objects. One WAD represents 100%
   uint256 internal constant WAD = 1e18;
 
   /// --- Types ---
-  /// @notice Defines the total `amount` of the specified `token` that needs to be swapped to `donationToken`. If
-  /// `path == donationToken`, no swap is required and we just transfer the tokens
+  /// @dev Defines the total `amountIn` of the first token in `path` that needs to be swapped to `donationToken`
   struct SwapSummary {
     uint256 amountIn;
     uint256 amountOutMin; // minimum amount to be returned after swap
-    bytes path;
+    bytes path; // Use `path == donationToken` to indicate no swap is required and just transfer the tokens directly
   }
 
-  /// @notice Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/multihop-swaps
+  /// @dev Donation inputs and Uniswap V3 swap inputs: https://docs.uniswap.org/protocol/guides/swaps/multihop-swaps
   struct Donation {
     uint96 grantId; // grant ID to which donation is being made
     IERC20 token; // address of the token to donate
@@ -69,7 +70,6 @@ contract GrantRoundManager is SwapRouter {
   }
 
   // --- Core methods ---
-
   /**
    * @notice Creates a new GrantRound
    * @param _owner Grant round owner that has permission to update the metadata pointer
@@ -114,7 +114,6 @@ contract GrantRoundManager is SwapRouter {
    * @param _donations Array of donations to execute
    * @dev `_deadline` is not part of the `_swaps` array since all swaps can use the same `_deadline` to save some gas
    * @dev Caller must ensure the input tokens to the _swaps array are unique
-   * @dev Does not verify
    */
   function donate(
     SwapSummary[] calldata _swaps,
