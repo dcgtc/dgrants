@@ -46,7 +46,7 @@ Copy `contracts/.env.template` to `contracts/.env` and edit, providing your own 
 cp contracts/.env.template contracts/.env
 ```
 
-You will have to supply an [Infura](https://infura.io/) Project ID. An account with their free tier is sufficient for development. You'll also need a [Fleek](https://fleek.co/) IPFS endpoint key in your .env file.
+You will have to supply an [Alchemy](https://www.alchemy.com//) API Key. An account with their free tier is sufficient for development. You'll also need a [Fleek](https://fleek.co/) IPFS endpoint key in your .env file.
 
 ### Develop
 

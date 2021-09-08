@@ -54,6 +54,6 @@ jobs:
       - name: Run test
         run: yarn test
         env:
-          INFURA_ID: ${{ secrets.INFURA_ID }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
       - name: Run lint
         run: yarn lint

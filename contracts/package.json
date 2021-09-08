@@ -67,7 +67,7 @@
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
     "test": "hardhat test",
     "typechain": "hardhat typechain",
-    "app:node": "INFURA_ID=$(grep INFURA_ID .env | cut -d '=' -f2) && yarn hardhat node --fork \"https://mainnet.infura.io/v3/$INFURA_ID\"",
+    "app:node": "ALCHEMY_API_KEY=$(grep ALCHEMY_API_KEY .env | cut -d '=' -f2) && yarn hardhat node --fork \"https://eth-mainnet.alchemyapi.io/v2/$ALCHEMY_API_KEY\"",
     "app:setup": "hardhat run scripts/app.ts --network localhost"
   },
   "volta": {
