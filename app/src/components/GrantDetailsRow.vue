@@ -6,76 +6,65 @@
     </div>
 
     <!--grid:right (txt)-->
-    <div class="my-6">
-      <!--subgrid-->
-      <div class="grid grid-cols-1 xl:grid-cols-2 gap-8">
-        <!--subgrid:left (raised, contract, round, matching )-->
-        <div class="">
-          <!-- raised -->
-          <div><span class="text-grey-400 mr-4">Raised:</span>{{ totalRaised }}</div>
+    <div class="my-6 px-8 md:px-0">
+      <!-- raised -->
+      <div><span class="text-grey-400 mr-4">Raised:</span>{{ totalRaised }}</div>
 
-          <!--contract-->
-          <div>
-            <span class="text-grey-400 mr-4">Contract:</span>
-            <a
-              class="link"
-              :href="`https://etherscan.io/address/${payoutAddress}`"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ formatAddress(payoutAddress) }}</a
-            >
-          </div>
+      <!--contract-->
+      <div>
+        <span class="text-grey-400 mr-4">Contract:</span>
+        <a
+          class="link"
+          :href="`https://etherscan.io/address/${payoutAddress}`"
+          target="_blank"
+          rel="noopener noreferrer"
+          >{{ formatAddress(payoutAddress) }}</a
+        >
+      </div>
 
-          <!--round-->
-          <div>
-            <span class="text-grey-400 mr-4">In Round:</span>
-            <span v-for="(round, index) in roundDetails" :key="index">
-              {{ round.name }}<span v-if="index + 1 < roundDetails.length">, </span>
-            </span>
-          </div>
+      <!--round-->
+      <div>
+        <span class="text-grey-400 mr-4">In Round:</span>
+        <span v-for="(round, index) in roundDetails" :key="index">
+          {{ round.name }}<span v-if="index + 1 < roundDetails.length">, </span>
+        </span>
+      </div>
 
-          <!--matching-->
-          <div>
-            <span class="text-grey-400 mr-4">Matching:</span>
-            <span v-for="(round, index) in roundDetails" :key="index">
-              {{ round.matching }} {{ round.matchingToken.symbol }}
-              <span v-if="index + 1 < roundDetails.length">, </span>
-            </span>
-          </div>
+      <!--matching-->
+      <div>
+        <span class="text-grey-400 mr-4">Matching:</span>
+        <span v-for="(round, index) in roundDetails" :key="index">
+          {{ round.matching }} {{ round.matchingToken.symbol }}
+          <span v-if="index + 1 < roundDetails.length">, </span>
+        </span>
+      </div>
+
+      <!-- button -->
+      <div class="mt-8">
+        <button v-if="isInCart(grant?.id)" @click="removeFromCart(grant?.id)" class="btn in-cart btn-primary">
+          <CartIcon class="icon-small" />Remove
+        </button>
+
+        <button v-else @click="addToCart(grant?.id)" class="btn btn-primary"><CartIcon class="icon-small" />Add</button>
+      </div>
+
+      <!-- matching example -->
+      <div class="mt-4">
+        <div>
+          10 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
+          <span v-for="(round, index) in roundDetails" :key="index">
+            {{ round.prediction10 }} {{ round.matchingToken.symbol
+            }}<span v-if="index + 1 < roundDetails.length">, </span>
+          </span>
+          Matching
         </div>
-
-        <!--subgrid:right ( donate button, matching example )-->
-        <div class="pr-12">
-          <!-- button -->
-          <div class="text-right xl:flex xl:justify-end">
-            <button v-if="isInCart(grant?.id)" @click="removeFromCart(grant?.id)" class="btn in-cart btn-primary">
-              <CartIcon class="icon-small" />Remove
-            </button>
-
-            <button v-else @click="addToCart(grant?.id)" class="btn btn-primary">
-              <CartIcon class="icon-small" />Add
-            </button>
-          </div>
-
-          <!-- matching example -->
-          <div class="mt-4">
-            <div class="xl:text-right">
-              10 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
-              <span v-for="(round, index) in roundDetails" :key="index">
-                {{ round.prediction10 }} {{ round.matchingToken.symbol
-                }}<span v-if="index + 1 < roundDetails.length">, </span>
-              </span>
-              Matching
-            </div>
-            <div class="xl:text-right">
-              100 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
-              <span v-for="(round, index) in roundDetails" :key="index">
-                {{ round.prediction100 }} {{ round.matchingToken.symbol
-                }}<span v-if="index + 1 < roundDetails.length">, </span>
-              </span>
-              Matching
-            </div>
-          </div>
+        <div>
+          100 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
+          <span v-for="(round, index) in roundDetails" :key="index">
+            {{ round.prediction100 }} {{ round.matchingToken.symbol
+            }}<span v-if="index + 1 < roundDetails.length">, </span>
+          </span>
+          Matching
         </div>
       </div>
     </div>
