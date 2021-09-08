@@ -1,4 +1,15 @@
 import fs from 'fs';
+import readline from 'readline';
+
+export const waitForInput = (query: string) => {
+  const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
+  return new Promise((resolve) =>
+    rl.question(query, (ans) => {
+      rl.close();
+      resolve(ans);
+    })
+  );
+};
 
 export class ScriptLogger {
   // filenames
@@ -17,6 +28,23 @@ export class ScriptLogger {
     this.folderName = folder;
     this.fileName = `${this.folderName}/${deployName}-${network}-${now}.json`;
     this.latestFileName = `${this.folderName}/${deployName}-${network}-latest.json`;
+  }
+
+  async confirmContinue() {
+    console.log(`Deploying to: ${this.network}`);
+    console.log(`Deployer address: ${this.deployer}`);
+    console.log('Deployment configuration');
+    console.log('------------------------');
+
+    for (const param in this.config) {
+      const value = this.config[param];
+      console.log(`  ${param}: ${value}`);
+    }
+
+    const response = await waitForInput('\nDo you want to continue with deployment? y/N\n');
+    if (response !== 'y') {
+      throw new Error('User chose to cancel deployment');
+    }
   }
 
   recordContract(name: string, address: string) {

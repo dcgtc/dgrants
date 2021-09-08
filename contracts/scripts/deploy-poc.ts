@@ -15,7 +15,6 @@ const ipfs = create({
 // IIFE async function so "await"s can be performed for each operation
 (async function () {
   const network = hre.network.name;
-  console.log(`Deploying to ${network}`);
 
   const logger = new ScriptLogger('poc', network);
 
@@ -29,8 +28,10 @@ const ipfs = create({
 
     // Get the deployer address
     const [deployer] = await ethers.getSigners();
-    console.log(`Deployer: ${deployer.address}`);
     logger.deployer = deployer.address;
+
+    // Get confirmation from user before beginning deployment
+    await logger.confirmContinue();
 
     // Deploy the GrantRegistry
     const GrantRegistry = await ethers.getContractFactory('GrantRegistry', deployer);
