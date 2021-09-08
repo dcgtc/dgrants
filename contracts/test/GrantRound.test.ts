@@ -206,7 +206,7 @@ describe('GrantRound', function () {
       const { roundContract } = await loadFixture(setup);
       await timeTravel(endTime + 1);
       await expect(roundContract.connect(mpUser).addMatchingFunds(donorAmount)).to.be.revertedWith(
-        'GrantRound: Action cannot be performed as the round has ended'
+        'GrantRound: Method must be called before round has ended'
       );
     });
   });

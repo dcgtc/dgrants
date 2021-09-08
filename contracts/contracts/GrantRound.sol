@@ -94,7 +94,8 @@ contract GrantRound {
    * @notice Before the round ends this method accepts matching pool funds
    * @param _amount The amount of matching token that will be sent to the contract for the matching pool
    */
-  function addMatchingFunds(uint256 _amount) external beforeRoundEnd {
+  function addMatchingFunds(uint256 _amount) external {
+    require(block.timestamp < endTime, "GrantRound: Method must be called before round has ended");
     matchingToken.safeTransferFrom(msg.sender, address(this), _amount);
   }
 
@@ -102,7 +103,8 @@ contract GrantRound {
    * @notice When the round ends the payoutAdmin can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
-  function payoutGrants(address _payoutAddress) external afterRoundEnd {
+  function payoutGrants(address _payoutAddress) external {
+    require(block.timestamp >= endTime, "GrantRound: Method must be called after round has ended");
     require(msg.sender == payoutAdmin, "GrantRound: Only the payout administrator can call this method");
     uint256 balance = matchingToken.balanceOf(address(this));
     hasPaidOut = true;
@@ -126,22 +128,5 @@ contract GrantRound {
    */
   function isActive() public view returns (bool) {
     return block.timestamp >= startTime && block.timestamp < endTime;
-  }
-
-  // --- Modifiers ---
-
-  modifier beforeRoundEnd() {
-    require(block.timestamp < endTime, "GrantRound: Action cannot be performed as the round has ended");
-    _;
-  }
-
-  modifier activeRound() {
-    require(isActive(), "GrantRound: Donations must be sent during an active round");
-    _;
-  }
-
-  modifier afterRoundEnd() {
-    require(block.timestamp >= endTime, "GrantRound: Method must be called after round has ended");
-    _;
   }
 }

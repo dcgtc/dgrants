@@ -103,12 +103,9 @@ contract GrantRegistry {
     address _payee,
     string calldata _metaPtr
   ) external {
-    Grant storage grant = grants[_id];
-    require(msg.sender == grant.owner, "Not authorized");
-    grant.owner = _owner;
-    grant.payee = _payee;
-    grant.metaPtr = _metaPtr;
-    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+    require(msg.sender == grants[_id].owner, "Not authorized");
+    grants[_id] = Grant({id: _id, owner: _owner, payee: _payee, metaPtr: _metaPtr});
+    emit GrantUpdated(_id, _owner, _payee, _metaPtr);
   }
 
   // --- View functions ---
