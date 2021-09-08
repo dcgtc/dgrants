@@ -1,31 +1,83 @@
 <template>
-  <!-- Create New Grant -->
-  <div class="mb-10">
-    <h2 class="text-lg mb-3">Create New Grant</h2>
-    <div class="mb-1">Click the button below to create a new grant</div>
-    <div class="flex justify-center">
-      <button @click="pushRoute({ name: 'dgrants-new' })" class="btn btn-secondary mt-6">Create Grant</button>
-    </div>
-  </div>
+  <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
 
-  <!-- View Existing Grants -->
-  <h2 class="text-lg mb-3">Grant Registry List</h2>
-  <div class="mb-10">Below are all grants read from the GrantRegistry contract</div>
+  <!-- General filters -->
+  <BaseFilterNav :items="grantRegistryListNav" />
+
   <GrantList v-if="grants && grantMetadata" :grants="grants" :grantMetadata="grantMetadata" />
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import useDataStore from 'src/store/data';
+import { computed, defineComponent } from 'vue';
+// --- App Imports ---
+import BaseHeader from 'src/components/BaseHeader.vue';
+import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantList from 'src/components/GrantList.vue';
-import { pushRoute } from 'src/utils/utils';
+// --- Store ---
+import useDataStore from 'src/store/data';
+// --- Types ---
+import { Breadcrumb, FilterNavItem } from '@dgrants/types';
+
+function useGrantRegistryList() {
+  // --- BaseHeader Navigation ---
+  const title = 'All Grants';
+  const breadcrumb = computed(
+    () =>
+      <Breadcrumb[]>[
+        {
+          displayName: 'dgrants',
+          routeTarget: { name: 'Home' },
+        },
+      ]
+  );
+
+  // --- Grants filters ---
+  // TODO add info to show the right filters
+  const grantRegistryListNav = <FilterNavItem[]>[
+    {
+      label: 'Sort',
+      menu: [
+        // TODO implement the behaviours here when grants have a date
+        {
+          label: 'newest',
+          action: () => {
+            console.log('newest');
+          },
+        },
+        {
+          label: 'oldest',
+          action: () => {
+            console.log('oldest');
+          },
+        },
+        {
+          label: 'shuffle',
+          action: () => {
+            console.log('shuffle');
+          },
+        },
+      ],
+    },
+  ];
+
+  return {
+    breadcrumb,
+    grantRegistryListNav,
+    title,
+  };
+}
 
 export default defineComponent({
   name: 'GrantRegistryList',
-  components: { GrantList },
+  components: { BaseHeader, BaseFilterNav, GrantList },
   setup() {
     const { grants, grantMetadata } = useDataStore();
-    return { grants, grantMetadata, pushRoute };
+
+    return {
+      grants,
+      grantMetadata,
+      ...useGrantRegistryList(),
+    };
   },
 });
 </script>
