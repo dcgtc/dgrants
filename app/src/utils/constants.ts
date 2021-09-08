@@ -2,7 +2,7 @@ import { TokenInfo } from '@uniswap/token-lists';
 import { getAddress } from 'src/utils/ethers';
 
 // Default RPC URL when user does not have a wallet connected
-export const RPC_URL = `https://mainnet.infura.io/v3/${import.meta.env.VITE_INFURA_ID}`;
+export const RPC_URL = `https://eth-mainnet.alchemyapi.io/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`;
 
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ADDRESS = '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696'; // applies to mainnet, rinkeby, goerli, ropsten, kovan

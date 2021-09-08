@@ -34,7 +34,7 @@ To ensure that everyone is using the same version of nodejs on this project, [vo
 
 ### Set your env files
 
-Copy `app/.env.template` to `app/.env` and edit, providing your own env vars. You will have to supply a [Blocknative](https://www.blocknative.com/) API key and an [Infura](https://infura.io/) Project ID. Both services have free tiers which are sufficient for development.
+Copy `app/.env.template` to `app/.env` and edit, providing your own env vars. You will have to supply a [Blocknative](https://www.blocknative.com/) API key and an [Alchemy](https://www.alchemy.com/) API key. Both services have free tiers which are sufficient for development.
 
 ```bash
 cp app/.env.template app/.env

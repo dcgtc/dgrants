@@ -53,11 +53,10 @@ function resetState() {
 }
 
 // Settings
-const infuraApiKey = import.meta.env.VITE_INFURA_ID;
 const walletChecks = [{ checkName: 'connect' }];
 const wallets = [
   { walletName: 'metamask', preferred: true },
-  { walletName: 'walletConnect', infuraKey: infuraApiKey, preferred: true },
+  { walletName: 'walletConnect', rpc: { '1': RPC_URL, '31337': RPC_URL }, preferred: true },
   { walletName: 'torus', preferred: true },
   { walletName: 'ledger', rpcUrl: RPC_URL, preferred: true },
   { walletName: 'lattice', rpcUrl: RPC_URL, appName: 'Umbra' },

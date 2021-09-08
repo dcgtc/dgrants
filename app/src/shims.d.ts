@@ -9,7 +9,7 @@ declare module '*.vue' {
 interface ImportMeta {
   env: {
     VITE_BLOCKNATIVE_API_KEY: string;
-    VITE_INFURA_ID: string;
+    VITE_ALCHEMY_API_KEY: string;
     VITE_FLEEK_STORAGE_API_KEY: string;
   };
 }
