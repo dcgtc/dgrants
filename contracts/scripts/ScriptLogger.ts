@@ -12,11 +12,11 @@ export class ScriptLogger {
   contracts: Record<string, string> = {};
   actions: Record<string, string> = {};
 
-  constructor(readonly network: string, readonly folder: string = './deploy-history') {
+  constructor(readonly deployName: string, readonly network: string, readonly folder: string = './deploy-history') {
     const now = new Date().toISOString();
     this.folderName = folder;
-    this.fileName = `${this.folderName}/${network}-${now}.json`;
-    this.latestFileName = `${this.folderName}/${network}-latest.json`;
+    this.fileName = `${this.folderName}/${deployName}-${network}-${now}.json`;
+    this.latestFileName = `${this.folderName}/${deployName}-${network}-latest.json`;
   }
 
   recordContract(name: string, address: string) {

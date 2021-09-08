@@ -17,7 +17,7 @@ const ipfs = create({
   const network = hre.network.name;
   console.log(`Deploying to ${network}`);
 
-  const logger = new ScriptLogger(network);
+  const logger = new ScriptLogger('poc', network);
 
   try {
     // Read configuration parameters for the current network
