@@ -17,20 +17,30 @@
         :lastPath="lastGrant"
       />
 
+      <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
         :logoURI="grantMetadata?.logoURI"
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
         :roundDetails="grantContributionsByRound"
-      >
-        <template v-slot:extraLinks>
-          <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
-            <EditIcon class="icon-primary stroke-2 w-9" />
-            <span class="text-grey-400 group-hover:text-grey-500">Edit Grant</span>
+      />
+
+      <!-- Interactions Bar for Share, Collection, Edit and so on  -->
+      <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+        <div class="flex flex-wrap gap-x-6 gap-y-4">
+          <!--share : todo on click what to do-->
+          <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
+            <ShareIcon class="icon icon-primary icon-small" />
+            <span class="text-grey-400 group-hover:text-grey-500">Share</span>
           </div>
-        </template>
-      </GrantDetailsRow>
+          <!--edit for owner-->
+          <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
+            <EditIcon class="icon icon-primary icon-small" />
+            <span class="text-grey-400 group-hover:text-grey-500">Edit</span>
+          </div>
+        </div>
+      </div>
 
       <SectionHeader title="Description" />
 
@@ -231,7 +241,8 @@ import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 // --- Icons ---
-import { Edit2Icon as EditIcon } from '@fusion-icons/vue/interface';
+import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 function useGrantDetail() {
   // --- get current state ---
@@ -607,6 +618,7 @@ export default defineComponent({
     BaseFilterNav,
     GrantDetailsRow,
     EditIcon,
+    ShareIcon,
     TransactionStatus,
   },
   setup() {
