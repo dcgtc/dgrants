@@ -124,7 +124,7 @@ In general, we follow the ["fork-and-pull" Git workflow](https://github.com/susa
 6. Push changes to your fork
 7. Open a PR in our repository and follow the PR template so that we can efficiently review the changes.
 
-NOTE: Before rasing a PR, ensure your branch is truly ahead of main branch. Avoid merge commits. Always rebase to ensure a clean commit history for your PR
+NOTE: Before opening a PR, ensure your branch is truly ahead of main branch. Avoid merge commits. Always rebase to ensure a clean commit history for your PR
 
 #### Git Rebase Workflow
 
@@ -148,6 +148,8 @@ If conflicts are found, you will have to resolve them now. See [here](https://do
 ```bash
 git push origin my-feature-branch --force
 ```
+
+In some circumstances, the process of rebasing and resolving merge conflicts may have broken the feature or functionality you were working on. This tends to occur when large changes were made on `main` to the same section of code being modified in a feature branch. In these cases, simply add additional commit(s) to the head of your feature branch correcting the problems.
 
 Every PR merged should merged with GitHub's "Rebase and Merge" button, or with a fast-forward merge on the command line, like:
 
