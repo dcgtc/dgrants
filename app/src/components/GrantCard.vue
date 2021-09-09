@@ -22,7 +22,7 @@
           >by
           <a
             class="text-grey-500 underline"
-            :href="`https://etherscan.io/address/${ownerAddress}`"
+            :href="getEtherscanUrl(ownerAddress, 1, 'address')"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -43,7 +43,7 @@ import { defineComponent } from 'vue';
 import useCartStore from 'src/store/cart';
 // --- Methods and Data ---
 import { BigNumber } from 'ethers';
-import { formatAddress, pushRoute } from 'src/utils/utils';
+import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
@@ -59,7 +59,7 @@ export default defineComponent({
   components: { CartIcon },
   setup() {
     const { addToCart, isInCart } = useCartStore();
-    return { addToCart, isInCart, formatAddress, pushRoute };
+    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute };
   },
 });
 </script>
