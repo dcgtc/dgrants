@@ -78,7 +78,6 @@ contract GrantRoundManager is SwapRouter {
    * @param _startTime Unix timestamp of the start of the round
    * @param _endTime Unix timestamp of the end of the round
    * @param _metaPtr URL pointing to the grant round metadata
-   * @param _minContribution Miniumum donation amount that can be made using the given donation token
    */
   function createGrantRound(
     address _owner,
@@ -86,8 +85,7 @@ contract GrantRoundManager is SwapRouter {
     IERC20 _matchingToken,
     uint256 _startTime,
     uint256 _endTime,
-    string memory _metaPtr,
-    uint256 _minContribution
+    string memory _metaPtr
   ) external {
     require(_matchingToken.totalSupply() > 0, "GrantRoundManager: Invalid matching token");
     GrantRound _grantRound = new GrantRound(
@@ -97,8 +95,7 @@ contract GrantRoundManager is SwapRouter {
       _matchingToken,
       _startTime,
       _endTime,
-      _metaPtr,
-      _minContribution
+      _metaPtr
     );
 
     emit GrantRoundCreated(address(_grantRound));

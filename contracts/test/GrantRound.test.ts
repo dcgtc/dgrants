@@ -29,7 +29,6 @@ describe('GrantRound', function () {
   let roundContractFactory: ContractFactory;
   let startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
   let endTime: number; // One day
-  const minContribution = 50;
 
   async function deployGrantRound(
     matchingTokenSupply: string,
@@ -66,8 +65,7 @@ describe('GrantRound', function () {
       mockMatchingERC20.address,
       startTime,
       endTime,
-      mockUrl,
-      minContribution
+      mockUrl
     );
 
     return { mockMatchingERC20, mockDonationERC20, roundContract };
@@ -139,8 +137,7 @@ describe('GrantRound', function () {
           mockERC20.address,
           startTime,
           endTime,
-          mockUrl,
-          minContribution
+          mockUrl
         )
       ).to.be.reverted;
     });

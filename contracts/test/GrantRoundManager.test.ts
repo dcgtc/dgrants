@@ -94,7 +94,6 @@ describe('GrantRoundManager', () => {
     const startTime = '50000000000000'; // random timestamp far in the future
     const endTime = '60000000000000'; // random timestamp far in the future
     const metaPtr = 'https://metadata-pointer.com';
-    const minContribution = '100';
 
     beforeEach(async () => {
       mockMatchingToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
@@ -109,8 +108,7 @@ describe('GrantRoundManager', () => {
         mockMatchingToken.address,
         startTime,
         endTime,
-        metaPtr,
-        minContribution
+        metaPtr
       );
 
       // Verify event log was emitted
@@ -130,21 +128,12 @@ describe('GrantRoundManager', () => {
       expect(await grantRound.startTime()).to.equal(startTime);
       expect(await grantRound.endTime()).to.equal(endTime);
       expect(await grantRound.metaPtr()).to.equal(metaPtr);
-      expect(await grantRound.minContribution()).to.equal(minContribution);
     });
 
     it('reverts when creating a round with an invalid matching token', async () => {
       await mockMatchingToken.mock.totalSupply.returns('0');
       await expect(
-        manager.createGrantRound(
-          metadataAdmin,
-          payoutAdmin,
-          mockMatchingToken.address,
-          startTime,
-          endTime,
-          metaPtr,
-          minContribution
-        )
+        manager.createGrantRound(metadataAdmin, payoutAdmin, mockMatchingToken.address, startTime, endTime, metaPtr)
       ).to.be.revertedWith('GrantRoundManager: Invalid matching token');
     });
   });

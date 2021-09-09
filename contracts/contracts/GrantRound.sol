@@ -30,9 +30,6 @@ contract GrantRound {
   /// @notice URL pointing to grant round metadata (for off-chain use)
   string public metaPtr;
 
-  /// @notice minimum contribution amount that can be made
-  uint256 public immutable minContribution;
-
   /// @notice Set to true if grant round has ended and payouts have been released
   bool public hasPaidOut;
 
@@ -55,7 +52,6 @@ contract GrantRound {
    * @param _startTime Unix timestamp of the start of the round
    * @param _endTime Unix timestamp of the end of the round
    * @param _metaPtr URL pointing to the grant round metadata
-   * @param _minContribution Miniumum donation amount that can be made using the given donation token
    */
   constructor(
     address _metadataAdmin,
@@ -64,8 +60,7 @@ contract GrantRound {
     IERC20 _matchingToken,
     uint256 _startTime,
     uint256 _endTime,
-    string memory _metaPtr,
-    uint256 _minContribution
+    string memory _metaPtr
   ) {
     require(_donationToken.totalSupply() > 0, "GrantRound: Invalid donation token");
     require(_matchingToken.totalSupply() > 0, "GrantRound: Invalid matching token");
@@ -80,7 +75,6 @@ contract GrantRound {
     startTime = _startTime;
     endTime = _endTime;
     metaPtr = _metaPtr;
-    minContribution = _minContribution;
   }
 
   /**

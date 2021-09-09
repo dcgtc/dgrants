@@ -29,7 +29,6 @@ describe('dGrants gas tests', () => {
   const startTime = Math.floor(new Date().getTime() / 1000) + 100;
   const endTime = startTime + 86400; // one day later
   const deadline = endTime;
-  const minContribution = '100';
 
   // --- Fixture ---
   async function setup() {
@@ -51,15 +50,7 @@ describe('dGrants gas tests', () => {
     );
 
     // Create Grant Round
-    const tx = await manager.createGrantRound(
-      addr1,
-      addr1,
-      tokens.dai.address,
-      startTime,
-      endTime,
-      metaPtr1,
-      minContribution
-    );
+    const tx = await manager.createGrantRound(addr1, addr1, tokens.dai.address, startTime, endTime, metaPtr1);
     const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
     const log = manager.interface.parseLog(receipt.logs[0]);
     const { grantRound: grantRoundAddress } = log.args;
@@ -114,9 +105,7 @@ describe('dGrants gas tests', () => {
   // --- GrantRoundManager snapshot tests ---
   describe('GrantRoundManager', () => {
     it('createGrantRound', async () => {
-      await snapshotGasCost(
-        manager.createGrantRound(addr1, addr1, tokens.dai.address, startTime, endTime, metaPtr1, minContribution)
-      );
+      await snapshotGasCost(manager.createGrantRound(addr1, addr1, tokens.dai.address, startTime, endTime, metaPtr1));
     });
 
     describe('one donation', () => {

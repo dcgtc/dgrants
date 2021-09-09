@@ -217,7 +217,7 @@ function useGrantRoundDetail() {
   const form = computed<{ token: string; amount: string }>(() => {
     return {
       token: grantRound.value.matchingToken.address,
-      amount: String(grantRound.value.minContribution),
+      amount: '0',
     };
   });
   const isAmountValid = (amount: BigNumberish) => {

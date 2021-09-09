@@ -68,7 +68,6 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
   const matchingToken = tokens.dai.address;
   const metaPtr = 'https://ipfs-dev.fleek.co/ipfs/bafybeib5r75zbrzavbskwywct42alawcwo7d4dlyipimvnjy23hfkqhham';
-  const minContribution = ethers.constants.One;
 
   const tx = await manager.createGrantRound(
     metadataAdmin,
@@ -76,8 +75,7 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
     matchingToken,
     Math.floor(startTime),
     Math.floor(endTime),
-    metaPtr,
-    minContribution
+    metaPtr
   );
   console.log(`Txn to create GrantRound: ${tx.hash}`);
 
