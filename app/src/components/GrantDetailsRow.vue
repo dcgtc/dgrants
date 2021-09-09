@@ -1,5 +1,5 @@
 <template>
-  <div class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2 gap-x-8">
+  <div class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2 gap-x-14">
     <!--grid:left (img)-->
     <div>
       <img class="shadow-light object-cover h-full" :src="logoURI || '/src/assets/placeholder_grant.svg'" />

@@ -1,147 +1,121 @@
 <template>
-  <!-- GrantRound details -->
-  <div v-if="!isContributing">
-    <div v-if="grantRound.address">
-      <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">
-        Details for Grant Round: <span :title="grantRound.address">{{ formatAddress(grantRound.address) }}</span>
-      </h1>
-      <p>Name: {{ grantRoundMetadata?.name }}</p>
-      <p>Description: {{ grantRoundMetadata?.description }}</p>
-      <p>Status: {{ grantRound.status }}</p>
-      <p>Matching: {{ grantRoundMetadata?.matchingAlgorithm }}</p>
-      <p>Website: {{ grantRoundMetadata?.properties?.websiteURI }}</p>
-      <p>Governance: {{ grantRoundMetadata?.properties?.governanceURI }}</p>
-      <p>Twitter: {{ grantRoundMetadata?.properties?.twitterURI }}</p>
-      <p>sponsors: {{ grantRoundMetadata?.properties?.sponsorsURI }}</p>
-      <p>Img: {{ grantRoundMetadata?.logoURI }}</p>
-
-      <p>
-        Funds:
-        <a
-          class="link"
-          :title="grantRound.matchingToken.name"
-          :href="`https://etherscan.io/token/${grantRound.matchingToken.address}?a=${grantRound.address}`"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          {{ grantRound.funds.toString() }} {{ grantRound.matchingToken.symbol }}
-        </a>
-      </p>
-      <p>
-        {{ hasStatus('Upcoming')(grantRound) ? 'Will begin' : 'Started' }}:
-        <span :title="new Date(BigNumber.from(grantRound.startTime).toNumber() * 1000).toLocaleString()">
-          {{ daysAgo(BigNumber.from(grantRound.startTime).toNumber()) }}
-        </span>
-      </p>
-      <p>
-        {{ hasStatus('Completed')(grantRound) ? 'Ended' : 'Will end' }}:
-        <span :title="new Date(BigNumber.from(grantRound.endTime).toNumber() * 1000).toLocaleString()">
-          {{ daysAgo(BigNumber.from(grantRound.endTime).toNumber()) }}
-        </span>
-      </p>
-      <p v-if="hasStatus('Completed')(grantRound)">
-        Has paid out:
-        <span>{{ grantRound.hasPaidOut ? 'Yes' : 'No' }}</span>
-      </p>
-      <p>
-        Metadata Admin:
-        <a
-          class="link"
-          :href="`https://etherscan.io/address/${grantRound.metadataAdmin}`"
-          target="_blank"
-          rel="noopener noreferrer"
-          >{{ grantRound.metadataAdmin }}</a
-        >
-      </p>
-      <p>
-        Payout Admin:
-        <a
-          class="link"
-          :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`"
-          target="_blank"
-          rel="noopener noreferrer"
-          >{{ grantRound.payoutAdmin }}</a
-        >
-      </p>
-      <p>
-        Address:
-        <a
-          class="link"
-          :href="`https://etherscan.io/address/${grantRound.address}`"
-          target="_blank"
-          rel="noopener noreferrer"
-          >{{ grantRound.address }}</a
-        >
-      </p>
-      <div class="flex justify-center">
-        <button
-          @click="pushRoute({ name: 'dgrants-round-details', params: { address: grantRound.address } })"
-          class="btn btn-primary mt-6"
-        >
-          See Grants
-        </button>
-        <button @click="startContributing" class="btn btn-primary mt-6">Contribute to the matching fund</button>
-      </div>
-    </div>
-    <div v-else-if="grantRound.error">
-      <span>{{ grantRound.error }}</span>
-    </div>
-    <div v-else>
-      <span>Loading details...</span>
-    </div>
-  </div>
-
   <!-- Contributing to GrantRound -->
-  <div v-else class="flex flex-col justify-center sm:px-6 lg:px-8">
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-      <img
-        class="mx-auto h-12 w-auto"
-        src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg"
-        alt="Workflow"
-      />
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
-        Contribute to GrantRound {{ formatAddress(grantRound.address.toString()) }}
-      </h2>
-    </div>
+  <div v-if="isAddingFunds" class="flex flex-col justify-center sm:px-6 lg:px-8">
+    <BaseHeader name="Contribute to GrantRound" :tagline="grantRoundMetadata?.name" />
 
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md text-left">
-      <div class="py-8 px-4 border border-gray-200 shadow sm:rounded-lg sm:px-6 bg-gray-50">
-        <form class="space-y-6" @submit.prevent="sendContribution">
-          <!-- token address -->
-          <BaseInput
-            v-model="form.token"
-            description="The token used to make the contribution"
-            id="contribution-token-address"
-            label="Contribution Token address"
-            :readonly="true"
-            :disabled="true"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+    <div class="text-left">
+      <form class="space-y-5" @submit.prevent="addFunds">
+        <!-- Token address -->
+        <BaseInput
+          v-model="form.token"
+          description="The token used to make the contribution"
+          id="contribution-token-address"
+          label="Contribution Token address"
+          :readonly="true"
+          :disabled="true"
+          :rules="isValidAddress"
+          errorMsg="Please enter a valid address"
+        />
 
-          <!-- contribution amount -->
-          <BaseInput
-            v-model="form.amount"
-            description="The number of tokens to contribute"
-            id="contribution-amount"
-            label="Contribution amount"
-            :rules="isAmountValid"
-            errorMsg="Please enter an amount greater than 0"
-          />
+        <!-- Contribution amount -->
+        <BaseInput
+          v-model="form.amount"
+          description="The number of tokens to contribute"
+          id="contribution-amount"
+          label="Contribution amount"
+          :required="true"
+          :rules="isAmountValid"
+          errorMsg="Please enter an amount greater than 0"
+        />
 
-          <!-- Submit and cancel buttons -->
+        <!-- Submit and cancel buttons -->
+        <div class="flex justify-end pt-6">
           <button
             type="submit"
-            class="btn btn-primary w-full"
+            class="btn btn-primary mr-5"
             :class="{ disabled: !isFormValid }"
             :disabled="!isFormValid"
           >
-            Send Contribution
+            Add Funds
           </button>
-          <button @click.prevent="cancelContribution" class="btn btn-outline w-full">Cancel</button>
-        </form>
+          <button @click.prevent="hideAddFunds" class="btn btn-outline">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Grant Round Details -->
+  <div v-else-if="grantRound.address && grantRoundMetadata">
+    <BaseHeader
+      :breadcrumbContent="breadcrumb"
+      :name="grantRoundMetadata?.name"
+      :owner="formatAddress(grantRound.address)"
+      :nextPath="nextGrantRound"
+      :lastPath="prevGrantRound"
+    />
+
+    <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
+    <GrantRoundDetailsRow :grantRound="grantRound" :grantRoundMetadata="grantRoundMetadata" />
+
+    <!-- Interactions Bar for Share, Add Funds  -->
+    <div class="px-4 md:px-12 py-8 border-b border-grey-100">
+      <div class="flex flex-wrap gap-x-6 gap-y-4">
+        <!-- TODO: Share-->
+        <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
+          <ShareIcon class="icon icon-primary icon-small" />
+          <span class="text-grey-400 group-hover:text-grey-500">Share</span>
+        </div>
+        <!-- Add funds to Grant Round -->
+        <div @click="showAddFunds()" class="flex items-center gap-x-2 cursor-pointer group">
+          <DonateIcon class="icon icon-primary icon-small icon-secondary" />
+          <span class="text-grey-400 group-hover:text-grey-500">Add funds</span>
+        </div>
       </div>
     </div>
+
+    <!-- Description -->
+    <SectionHeader title="Description" />
+    <div class="border-b border-grey-100">
+      <p style="white-space: pre-line" class="intent px-4 md:px-12 py-24 mx-auto max-w-6xl">
+        {{ grantRoundMetadata?.description }}
+      </p>
+    </div>
+
+    <!-- LINKS -->
+    <SectionHeader title="Links" />
+    <div class="px-4 md:px-12 py-12 border-grey-100 flex flex-col gap-y-4">
+      <div v-if="isDefined(grantRoundMetadata?.properties?.websiteURI)" class="flex gap-x-4">
+        <span class="text-grey-400">Website:</span>
+        <a :href="grantRoundMetadata?.properties?.websiteURI" target="_blank">{{
+          grantRoundMetadata?.properties?.websiteURI
+        }}</a>
+      </div>
+
+      <div v-if="isDefined(grantRoundMetadata?.properties?.governanceURI)" class="flex gap-x-4">
+        <span class="text-grey-400">Governance:</span>
+        <a :href="grantRoundMetadata?.properties?.governanceURI" target="_blank">{{
+          grantRoundMetadata?.properties?.governanceURI
+        }}</a>
+      </div>
+
+      <div v-if="isDefined(grantRoundMetadata?.properties?.twitterURI)" class="flex gap-x-4">
+        <span class="text-grey-400">Twitter:</span>
+        <a :href="grantRoundMetadata?.properties?.twitterURI" target="_blank">{{
+          grantRoundMetadata?.properties?.twitterURI
+        }}</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- No grant round selected -->
+  <div v-else-if="grantRound.error">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant round selected</h2>
+    <span>{{ grantRound.error }}</span>
+  </div>
+
+  <!-- Loading -->
+  <div v-else>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Loading...</h2>
   </div>
 </template>
 
@@ -149,9 +123,11 @@
 import { computed, defineComponent, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
-// --- App Imports ---
+// --- Components ---
+import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
-
+import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
+import SectionHeader from 'src/components/SectionHeader.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -175,16 +151,46 @@ import {
   getApproval,
   hasStatus,
   pushRoute,
+  isDefined,
 } from 'src/utils/utils';
+
 // --- Types ---
-import { GrantRound } from '@dgrants/types';
+import { GrantRound, Breadcrumb } from '@dgrants/types';
+
+// --- Icons ---
+import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { DonateIcon } from '@fusion-icons/vue/interface';
+
+// --- Contract ---
 import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 
+// --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
   const { grantRounds, grantRoundMetadata: _grantRoundMetadata, poll } = useDataStore();
 
   const { signer, userAddress } = useWalletStore();
   const route = useRoute();
+
+  const grantRoundAddress = computed(() => route.params.address);
+
+  // --- BaseHeader Navigation ---
+  const breadcrumb = computed(
+    () =>
+      <Breadcrumb[]>[
+        {
+          displayName: 'dgrants',
+          routeTarget: { name: 'Home' },
+        },
+        {
+          displayName: 'rounds',
+          routeTarget: { name: 'dgrants-rounds-list' },
+        },
+        {
+          displayName: `#${formatAddress(grantRoundAddress.value.toString())}`,
+          routeTarget: { name: 'dgrants-round', params: { address: grantRoundAddress.value } },
+        },
+      ]
+  );
 
   // get a single grantRound or an empty/error object (TODO: should the typings be modified to account for an empty object?)
   const grantRound = computed(() => {
@@ -198,12 +204,54 @@ function useGrantRoundDetail() {
     }
   });
 
+  /**
+   * @notice Link To Previous Grant Round
+   */
+  const prevGrantRound = computed(() => {
+    let prevRound = <GrantRound>{};
+
+    if (grantRounds.value) {
+      grantRounds.value.forEach((round, index) => {
+        if (round.address == getAddress(<string>route.params.address)) {
+          if (grantRounds.value?.length && index - 1 != 0) {
+            // check to see if there is previous round
+            prevRound = <GrantRound>grantRounds.value[index - 1];
+          }
+        }
+      });
+    }
+    return prevRound;
+  });
+
+  /**
+   * @notice Link To Next Grant Round
+   */
+  const nextGrantRound = computed(() => {
+    let nextRound = <GrantRound>{};
+
+    if (grantRounds.value) {
+      grantRounds.value.forEach((round, index) => {
+        if (round.address == getAddress(<string>route.params.address)) {
+          if (index + 1 == grantRounds.value?.length) {
+            // check to see if there is next round
+            nextRound = <GrantRound>grantRounds.value[index + 1];
+          }
+        }
+      });
+    }
+    return nextRound;
+  });
+
+  /**
+   * @notice Populate grant round metadata
+   */
   const grantRoundMetadata = computed(() =>
     grantRound.value ? _grantRoundMetadata.value[grantRound.value.metaPtr] : null
   );
 
   // --- Contribution capabilities ---
-  const isContributing = ref(false);
+
+  const isAddingFunds = ref(false);
   const form = computed<{ token: string; amount: string }>(() => {
     return {
       token: grantRound.value.matchingToken.address,
@@ -221,23 +269,23 @@ function useGrantRoundDetail() {
   });
 
   /**
-   * @notice Show the contribution window
+   * @notice Show the add funds window
    */
-  function startContributing() {
-    isContributing.value = true; // show contribution form
+  function showAddFunds() {
+    isAddingFunds.value = true;
   }
 
   /**
-   * @notice Hide the contribution window
+   * @notice Hide the add funds window
    */
-  function cancelContribution() {
-    isContributing.value = false; // hide contribution form
+  function hideAddFunds() {
+    isAddingFunds.value = false;
   }
 
   /**
-   * @notice Send contribution
+   * @notice Add Funds
    */
-  async function sendContribution() {
+  async function addFunds() {
     // Get contract instances
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -262,7 +310,7 @@ function useGrantRoundDetail() {
 
     // poll for the updated state and toggle page state back to display mode
     await poll();
-    cancelContribution();
+    hideAddFunds();
   }
 
   /**
@@ -281,23 +329,34 @@ function useGrantRoundDetail() {
     daysAgo,
     formatAddress,
     isAmountValid,
-    isContributing,
+    isAddingFunds,
     isValidAddress,
     isValidUrl,
     isFormValid,
     grantRound,
     grantRoundMetadata,
     form,
-    startContributing,
-    cancelContribution,
-    sendContribution,
+    showAddFunds,
+    hideAddFunds,
+    addFunds,
     pushRoute,
+    prevGrantRound,
+    nextGrantRound,
+    isDefined,
+    breadcrumb,
   };
 }
 
 export default defineComponent({
   name: 'GrantRoundDetails',
-  components: { BaseInput },
+  components: {
+    BaseHeader,
+    BaseInput,
+    GrantRoundDetailsRow,
+    SectionHeader,
+    DonateIcon,
+    ShareIcon,
+  },
   setup() {
     return { ...useGrantRoundDetail() };
   },
