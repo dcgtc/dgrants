@@ -63,7 +63,6 @@
         <template v-slot:input>
           <BaseTextarea
             v-model="form.description"
-            rows="10"
             width="w-full"
             placeholder="Description"
             id="grant-description"
