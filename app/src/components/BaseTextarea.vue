@@ -1,39 +1,31 @@
 <template>
-  <div class="grid grid-cols-12 py-5 items-center gap-m-8 border-b border-grey-100">
-    <div class="col-span-12 md:col-span-3 mb-3 md:mb-0 grid-rows-3">
-      <label :for="id" class="text-grey-400"> {{ label }}: </label>
-    </div>
+  <div :class="width">
+    <textarea
+      v-model="val"
+      @input="onInput"
+      :class="[!isValid ? '' : '', customcss ? customcss : '']"
+      :id="id"
+      :name="id"
+      :required="required"
+      :rows="rows"
+      :type="type"
+      :readonly="readonly"
+      :disabled="disabled"
+      :placeholder="placeholder"
+    />
+  </div>
 
-    <div class="col-span-10 md:col-span-6">
-      <textarea
-        v-model="val"
-        @input="onInput"
-        :class="{ 'border-red-300 text-red-900 placeholder-red-300 focus:ring-red-500 focus:border-red-500': !isValid }"
-        :id="id"
-        :name="id"
-        :required="required"
-        :rows="rows"
-        :type="type"
-        :readonly="readonly"
-        :disabled="disabled"
-        :placeholder="placeholder"
-      />
-      <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none h-12 w-12">
-        <WarningIcon class="icon stroke-pink" />
-      </div>
-      <p v-if="!isValid" class="text-xs text-red-600" :id="`${id}-error`">{{ errorMsg }}</p>
-      <p :for="id" class="text-grey-400 mt-2 text-sm">{{ description }}</p>
-    </div>
+  <div v-if="!isValid">
+    <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import { WarningIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'BaseTextarea',
-  components: { WarningIcon },
+  components: {},
   props: {
     // --- Required props ---
     modelValue: { type: [String, Number], required: true, default: undefined }, // from v-model, don't pass this directly
@@ -49,6 +41,7 @@ export default defineComponent({
     rows: { type: Number, required: false, default: 10 }, // rows in textarea
     required: { type: Boolean, required: false, default: false }, // is required field
     disabled: { type: Boolean, required: false, default: false }, // is disabled
+    width: { type: String, required: false, default: 'w-full' }, // input field width
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,

@@ -1,42 +1,34 @@
 <template>
   <div :class="width">
-    <label :for="id" class="block text-sm font-medium text-gray-700"> {{ label }} </label>
-    <p :for="id" class="text-gray-500 text-sm">{{ description }}</p>
-    <div>
-      <input
-        v-model="val"
-        @input="onInput"
-        :class="[!isValid ? 'border-pink text-pink' : '', customcss ? customcss : '']"
-        :id="id"
-        :name="id"
-        :required="required"
-        :type="type"
-        :readonly="readonly"
-        :disabled="disabled"
-        :placeholder="placeholder"
-      />
-      <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none h-12 w-12">
-        <WarningIcon class="icon stroke-pink" />
-      </div>
-      <p v-if="!isValid" class="text-xs text-red-600" :id="`${id}-error`">{{ errorMsg }}</p>
-      <p :for="id" class="text-grey-400 mt-2 text-sm">{{ description }}</p>
-    </div>
+    <input
+      v-model="val"
+      @input="onInput"
+      :class="[!isValid ? '' : '', customcss ? customcss : '']"
+      :id="id"
+      :name="id"
+      :required="required"
+      :type="type"
+      :readonly="readonly"
+      :disabled="disabled"
+      :placeholder="placeholder"
+    />
+  </div>
+
+  <div v-if="!isValid">
+    <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
   </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, ref } from 'vue';
-import { WarningIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'BaseInput',
-  components: { WarningIcon },
+  components: {},
   props: {
     // --- Required props ---
     modelValue: { type: [String, Number], required: true, default: undefined }, // from v-model, don't pass this directly
     // --- Optional props ---
-    label: { type: String, required: false, default: undefined }, // field label
-    description: { type: String, required: false, default: undefined }, // field description
     errorMsg: { type: String, required: false, default: undefined }, // message to show on error
     id: { type: String, required: false, default: undefined }, // id, for accessibility
     placeholder: { type: String, required: false, default: undefined }, // input placeholder text
