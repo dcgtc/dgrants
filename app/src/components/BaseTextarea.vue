@@ -24,7 +24,6 @@ import { computed, defineComponent, ref } from 'vue';
 
 export default defineComponent({
   name: 'BaseTextarea',
-  components: {},
   props: {
     // --- Required props ---
     modelValue: { type: [String, Number], required: true, default: undefined }, // from v-model, don't pass this directly
