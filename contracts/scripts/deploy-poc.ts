@@ -63,8 +63,7 @@ const ipfs = create({
       networkParams.matchingToken,
       networkParams.roundStartTime,
       networkParams.roundEndTime,
-      metadataPtr,
-      networkParams.minContribution
+      metadataPtr
     );
     await createGrantRoundTxReceipt.wait();
     logger.recordAction('CreateGrantGround', createGrantRoundTxReceipt.hash);

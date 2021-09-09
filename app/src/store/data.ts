@@ -86,7 +86,6 @@ export default function useDataStore() {
           roundContract.payoutAdmin(),
           roundContract.registry(),
           roundContract.metaPtr(),
-          roundContract.minContribution(),
           roundContract.hasPaidOut(),
           // get donation token details
           donationTokenContract.name(),
@@ -106,7 +105,6 @@ export default function useDataStore() {
             payoutAdmin,
             registry,
             metaPtr,
-            minContribution,
             hasPaidOut,
             // donation token details
             donationTokenName,
@@ -128,7 +126,6 @@ export default function useDataStore() {
               payoutAdmin,
               registry,
               metaPtr,
-              minContribution,
               hasPaidOut,
               donationToken: {
                 address: donationTokenAddress,

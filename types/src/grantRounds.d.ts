@@ -14,7 +14,6 @@ export type GrantRound = {
   startTime: BigNumberish;
   endTime: BigNumberish;
   metaPtr: string;
-  minContribution: BigNumberish;
   hasPaidOut: boolean;
   error: string | undefined;
 };
