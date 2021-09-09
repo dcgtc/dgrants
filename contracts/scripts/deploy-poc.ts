@@ -61,7 +61,6 @@ const ipfs = create({
       networkParams.metadataAdmin,
       networkParams.payoutAdmin,
       networkParams.matchingToken,
-      registry.address, // TODO: evaluate why we're passing this at all
       networkParams.roundStartTime,
       networkParams.roundEndTime,
       metadataPtr,
