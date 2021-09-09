@@ -3,7 +3,7 @@
     <input
       v-model="val"
       @input="onInput"
-      :class="[!isValid ? '' : '', customcss ? customcss : '']"
+      :class="[customcss ? customcss : '']"
       :id="id"
       :name="id"
       :required="required"
