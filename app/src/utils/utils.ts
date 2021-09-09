@@ -4,7 +4,7 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
-import { GrantRound } from '@dgrants/types';
+import { GrantRound, EtherscanGroup } from '@dgrants/types';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -108,12 +108,12 @@ export async function pushRoute(to: RouteLocationRaw) {
   await router.push(to);
 }
 
-// Generates the Etherscan URL based on the given `txHash` and `chainId`
-export function getEtherscanUrl(txHash: string, chainId: number) {
+// Generates the Etherscan URL based on the given `hash`, `chainId` and `group`
+export function getEtherscanUrl(hash: string, chainId: number, group: EtherscanGroup = 'tx') {
   // Only mainnet is supported, but we include chain ID 31337 for local testing against Hardhat
   let networkPrefix = '';
   if (chainId === 1) networkPrefix = 'etherscan.io';
   else if (chainId === 31337) networkPrefix = 'etherscan.io';
   // else throw new Error(`Could not generate Etherscan URL: Invalid chain ID ${chainId}`);
-  return `https://${networkPrefix}/tx/${txHash}`;
+  return `https://${networkPrefix}/${group}/${hash}`;
 }
