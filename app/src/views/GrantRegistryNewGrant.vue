@@ -123,10 +123,7 @@
       </InputRow>
 
       <!-- Submit button -->
-      <div class="px-4 md:px-12 py-8 flex items-center">
-        <!-- Error Message -->
-        <div v-if="!isFormValid">Please fill in all required fields</div>
-
+      <div class="px-4 md:px-12 py-12">
         <button
           type="submit"
           class="btn btn-primary ml-auto"
