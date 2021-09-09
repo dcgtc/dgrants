@@ -21,9 +21,6 @@ contract GrantRound {
   /// @notice Grant round metadata administrator
   address public immutable metadataAdmin;
 
-  /// @notice GrantsRegistry
-  GrantRegistry public immutable registry;
-
   /// @notice Token used for all contributions. Contributions in a different token are swapped to this token
   IERC20 public immutable donationToken;
 
@@ -53,7 +50,6 @@ contract GrantRound {
    * @notice Instantiates a new grant round
    * @param _metadataAdmin The address with the role that has permission to update the metadata pointer
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
-   * @param _registry Address that contains the grant metadata
    * @param _donationToken Address of the ERC20 token in which donations are made
    * @param _matchingToken Address of the ERC20 token for accepting matching pool contributions
    * @param _startTime Unix timestamp of the start of the round
@@ -64,7 +60,6 @@ contract GrantRound {
   constructor(
     address _metadataAdmin,
     address _payoutAdmin,
-    GrantRegistry _registry,
     IERC20 _donationToken,
     IERC20 _matchingToken,
     uint256 _startTime,
@@ -76,12 +71,10 @@ contract GrantRound {
     require(_matchingToken.totalSupply() > 0, "GrantRound: Invalid matching token");
     require(_startTime >= block.timestamp, "GrantRound: Start time has already passed");
     require(_endTime > _startTime, "GrantRound: End time must be after start time");
-    require(_registry.grantCount() >= 0, "GrantRound: Invalid registry"); // verify this call doesn't revert
 
     metadataAdmin = _metadataAdmin;
     payoutAdmin = _payoutAdmin;
     hasPaidOut = false;
-    registry = _registry;
     donationToken = _donationToken;
     matchingToken = _matchingToken;
     startTime = _startTime;

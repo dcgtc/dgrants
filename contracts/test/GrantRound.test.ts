@@ -62,7 +62,6 @@ describe('GrantRound', function () {
     const roundContract = await roundContractFactory.deploy(
       deployer.address,
       payoutAdmin.address,
-      registry.address,
       mockDonationERC20.address,
       mockMatchingERC20.address,
       startTime,

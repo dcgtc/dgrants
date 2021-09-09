@@ -75,7 +75,6 @@ contract GrantRoundManager is SwapRouter {
    * @param _owner Grant round owner that has permission to update the metadata pointer
    * @param _payoutAdmin Grant round administrator that has permission to payout the matching pool
    * @param _matchingToken Address for the token used to payout match amounts at the end of a round
-   * @param _registry Address that contains the grant metadata
    * @param _startTime Unix timestamp of the start of the round
    * @param _endTime Unix timestamp of the end of the round
    * @param _metaPtr URL pointing to the grant round metadata
@@ -85,7 +84,6 @@ contract GrantRoundManager is SwapRouter {
     address _owner,
     address _payoutAdmin,
     IERC20 _matchingToken,
-    GrantRegistry _registry,
     uint256 _startTime,
     uint256 _endTime,
     string memory _metaPtr,
@@ -95,7 +93,6 @@ contract GrantRoundManager is SwapRouter {
     GrantRound _grantRound = new GrantRound(
       _owner,
       _payoutAdmin,
-      _registry,
       donationToken,
       _matchingToken,
       _startTime,

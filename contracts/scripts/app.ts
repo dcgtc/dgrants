@@ -74,7 +74,6 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
     metadataAdmin,
     payoutAdmin,
     matchingToken,
-    registry.address,
     Math.floor(startTime),
     Math.floor(endTime),
     metaPtr,

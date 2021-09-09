@@ -87,9 +87,7 @@ describe('GrantRoundManager', () => {
   });
 
   describe('createGrantRound', () => {
-    let mockRegistry: MockContract;
     let mockMatchingToken: MockContract;
-    let registry: string;
     // Create round
     const metadataAdmin = randomAddress();
     const payoutAdmin = randomAddress();
@@ -99,11 +97,6 @@ describe('GrantRoundManager', () => {
     const minContribution = '100';
 
     beforeEach(async () => {
-      // Deploy and configure mocks (used to pass the validation in the GrantRound constructor)
-      mockRegistry = await deployMockContract(user, ['function grantCount() returns(uint96)']);
-      await mockRegistry.mock.grantCount.returns('0');
-      registry = mockRegistry.address;
-
       mockMatchingToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
     });
 
@@ -114,7 +107,6 @@ describe('GrantRoundManager', () => {
         metadataAdmin,
         payoutAdmin,
         mockMatchingToken.address,
-        registry,
         startTime,
         endTime,
         metaPtr,
@@ -133,7 +125,6 @@ describe('GrantRoundManager', () => {
       const grantRound = await ethers.getContractAt('GrantRound', grantRoundAddress);
       expect(await grantRound.metadataAdmin()).to.equal(metadataAdmin);
       expect(await grantRound.payoutAdmin()).to.equal(payoutAdmin);
-      expect(await grantRound.registry()).to.equal(registry);
       expect(await grantRound.donationToken()).to.equal(tokens.gtc.address);
       expect(await grantRound.matchingToken()).to.equal(mockMatchingToken.address);
       expect(await grantRound.startTime()).to.equal(startTime);
@@ -149,7 +140,6 @@ describe('GrantRoundManager', () => {
           metadataAdmin,
           payoutAdmin,
           mockMatchingToken.address,
-          registry,
           startTime,
           endTime,
           metaPtr,

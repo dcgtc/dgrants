@@ -55,7 +55,6 @@ describe('dGrants gas tests', () => {
       addr1,
       addr1,
       tokens.dai.address,
-      registry.address,
       startTime,
       endTime,
       metaPtr1,
@@ -116,16 +115,7 @@ describe('dGrants gas tests', () => {
   describe('GrantRoundManager', () => {
     it('createGrantRound', async () => {
       await snapshotGasCost(
-        manager.createGrantRound(
-          addr1,
-          addr1,
-          tokens.dai.address,
-          registry.address,
-          startTime,
-          endTime,
-          metaPtr1,
-          minContribution
-        )
+        manager.createGrantRound(addr1, addr1, tokens.dai.address, startTime, endTime, metaPtr1, minContribution)
       );
     });
 
