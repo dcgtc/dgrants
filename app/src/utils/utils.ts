@@ -10,7 +10,7 @@ import { GrantRound } from '@dgrants/types';
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
 export function formatAddress(address: string) {
-  if (!address || address.length !== 42) return null;
+  if (!address || address.length !== 42) return '';
   return `${address.slice(0, 6)}…${address.slice(38)}`;
 }
 

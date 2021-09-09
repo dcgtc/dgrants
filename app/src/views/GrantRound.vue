@@ -50,8 +50,8 @@
       :breadcrumbContent="breadcrumb"
       :name="grantRoundMetadata?.name"
       :owner="formatAddress(grantRound.address)"
-      :nextPath="nextGrantRound"
-      :lastPath="prevGrantRound"
+      :nextPath="!nextGrantRound ? undefined : { name: 'dgrants-round', params: { address: nextGrantRound?.address } }"
+      :lastPath="!prevGrantRound ? undefined : { name: 'dgrants-round', params: { address: prevGrantRound?.address } }"
     />
 
     <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
@@ -155,7 +155,7 @@ import {
 } from 'src/utils/utils';
 
 // --- Types ---
-import { GrantRound, Breadcrumb } from '@dgrants/types';
+import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
 
 // --- Icons ---
 import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
@@ -334,7 +334,7 @@ function useGrantRoundDetail() {
     isValidUrl,
     isFormValid,
     grantRound,
-    grantRoundMetadata,
+    grantRoundMetadata: grantRoundMetadata.value as GrantRoundMetadata, // without type casting you get `Types of property 'name' are incompatible. Type 'string | undefined' is not assignable to type 'string'.`
     form,
     showAddFunds,
     hideAddFunds,

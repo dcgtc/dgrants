@@ -1,7 +1,7 @@
 import fs from 'fs';
 import readline from 'readline';
 
-export const waitForInput = (query: string) => {
+export const waitForInput = (query: string): Promise<unknown> => {
   const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
   return new Promise((resolve) =>
     rl.question(query, (ans) => {
@@ -19,7 +19,7 @@ export class ScriptLogger {
 
   // output parameters
   deployer: string = '';
-  config: Record<string, any> = {};
+  config: Record<string, any> = {}; // eslint-disable-line @typescript-eslint/no-explicit-any
   contracts: Record<string, string> = {};
   actions: Record<string, string> = {};
 
@@ -30,7 +30,7 @@ export class ScriptLogger {
     this.latestFileName = `${this.folderName}/${deployName}-${network}-latest.json`;
   }
 
-  async confirmContinue() {
+  async confirmContinue(): Promise<void> {
     console.log(`Deploying to: ${this.network}`);
     console.log(`Deployer address: ${this.deployer}`);
     console.log('Deployment configuration');
@@ -47,17 +47,17 @@ export class ScriptLogger {
     }
   }
 
-  recordContract(name: string, address: string) {
+  recordContract(name: string, address: string): void {
     console.log(`Deployed ${name} to ${address}`);
     this.contracts[name] = address;
   }
 
-  recordAction(name: string, content: string) {
+  recordAction(name: string, content: string): void {
     console.log(`${name}: ${content}`);
     this.actions[name] = content;
   }
 
-  save() {
+  save(): void {
     // conditionally create the deploy history folder
     fs.mkdir(this.folderName, (err) => {
       if (err && err.code !== 'EEXIST') throw err;
