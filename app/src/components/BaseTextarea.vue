@@ -3,7 +3,6 @@
     <textarea
       v-model="val"
       @input="onInput"
-      :class="[!isValid ? '' : '']"
       :id="id"
       :name="id"
       :required="required"
