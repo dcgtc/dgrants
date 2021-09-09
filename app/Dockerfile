@@ -1,8 +1,5 @@
 FROM node:slim
 
-COPY . /app
-WORKDIR /app
-
 RUN apt update
 RUN apt install git -y
 
