@@ -5,7 +5,10 @@ import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
 import { EtherscanGroup } from 'src/types';
+import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
+import { formatUnits } from 'src/utils/ethers';
+import { ETH_ADDRESS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/constants';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -117,4 +120,30 @@ export function getEtherscanUrl(hash: string, chainId: number, group: EtherscanG
   else if (chainId === 31337) networkPrefix = 'etherscan.io';
   // else throw new Error(`Could not generate Etherscan URL: Invalid chain ID ${chainId}`);
   return `https://${networkPrefix}/${group}/${hash}`;
+}
+
+/**
+ * @notice Throws an error if the user does not have sufficient balance for the specified token
+ * @param tokenAddress Address of the token to check
+ * @param requiredAmount Amount required as a raw number, e.g. 5e18 if the user needs 5 DAI
+ * @returns True if the user has sufficient balance, or throws otherwise
+ */
+export async function assertSufficientBalance(tokenAddress: string, requiredAmount: BigNumberish): Promise<boolean> {
+  const { provider, userAddress } = useWalletStore();
+  if (!userAddress.value) return true; // exit early, don't want any errors thrown
+  const isEth = tokenAddress === WETH_ADDRESS;
+  tokenAddress = isEth ? ETH_ADDRESS : tokenAddress;
+  const abi = ['function balanceOf(address) view returns (uint256)'];
+  const token = new Contract(tokenAddress, abi, provider.value);
+  const balance = isEth ? await provider.value.getBalance(userAddress.value) : await token.balanceOf(userAddress.value);
+  if (balance.lt(requiredAmount)) {
+    const tokenInfo = SUPPORTED_TOKENS_MAPPING[tokenAddress];
+    const { symbol, decimals } = tokenInfo;
+    const balanceNeeds = formatNumber(formatUnits(requiredAmount, decimals), 4);
+    const balanceHas = formatNumber(formatUnits(balance, decimals), 4);
+    throw new Error(
+      `Insufficient ${symbol} balance: Current cart requires ${balanceNeeds} ${symbol}, but you only have ${balanceHas} ${symbol}`
+    );
+  }
+  return true;
 }

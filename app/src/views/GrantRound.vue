@@ -34,7 +34,7 @@
             <BaseInput
               v-model="form.amount"
               width="w-full"
-              placeholder="amount to contribute"
+              placeholder="0"
               id="contribution-amount"
               :required="true"
               :rules="isAmountValid"
@@ -159,7 +159,16 @@ import {
   MaxUint256,
   parseUnits,
 } from 'src/utils/ethers';
-import { daysAgo, formatAddress, isValidUrl, checkAllowance, getApproval, hasStatus, isDefined } from 'src/utils/utils';
+import {
+  daysAgo,
+  formatAddress,
+  isValidUrl,
+  checkAllowance,
+  getApproval,
+  hasStatus,
+  isDefined,
+  assertSufficientBalance,
+} from 'src/utils/utils';
 
 // --- Types ---
 import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
@@ -294,9 +303,10 @@ function useGrantRoundDetail() {
 
     // pull data from form
     const { amount } = form.value;
+    const tokenAddress = grantRound.value.matchingToken.address;
 
     // set up contracts
-    const token = new Contract(grantRound.value.matchingToken.address, ERC20_ABI, signer.value);
+    const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
     const round = <GrantRoundContract>new Contract(grantRound.value.address, GRANT_ROUND_ABI, signer.value);
 
     // contributionAmount must have the right number of decimals and be hexed
@@ -307,6 +317,8 @@ function useGrantRoundDetail() {
     if (allowance < contributionAmount) {
       await getApproval(token, grantRound.value.address, MaxUint256);
     }
+
+    assertSufficientBalance(tokenAddress, contributionAmount);
 
     // invoke addMatchingFunds on the round contract
     await addMatchingFunds(round, contributionAmount);
