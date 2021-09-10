@@ -10,7 +10,7 @@ exports[`dGrants gas tests GrantRegistry updateGrantOwner 1`] = `41527`;
 
 exports[`dGrants gas tests GrantRegistry updateGrantPayee 1`] = `41527`;
 
-exports[`dGrants gas tests GrantRoundManager createGrantRound 1`] = `1012939`;
+exports[`dGrants gas tests GrantRoundManager createGrantRound 1`] = `1024069`;
 
 exports[`dGrants gas tests GrantRoundManager five donations input token DAI, output token DAI 1`] = `229039`;
 
