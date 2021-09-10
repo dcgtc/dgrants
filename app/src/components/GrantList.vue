@@ -24,7 +24,7 @@ import GrantCard from 'src/components/GrantCard.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 // --- Types ---
-import { Grant, GrantMetadata } from '@dgrants/types';
+import { Grant, GrantMetadataResolution } from '@dgrants/types';
 
 export default defineComponent({
   name: 'GrantList',
@@ -32,7 +32,7 @@ export default defineComponent({
   props: {
     // --- Required props ---
     grants: { type: Array as PropType<Grant[]>, required: true },
-    grantMetadata: { type: Object as PropType<Record<string, GrantMetadata>>, required: true },
+    grantMetadata: { type: Object as PropType<Record<string, GrantMetadataResolution>>, required: true },
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
