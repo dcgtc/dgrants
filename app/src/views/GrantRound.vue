@@ -261,7 +261,7 @@ function useGrantRoundDetail() {
 
   const isAddingFunds = ref(false);
   const form = ref<{ amount: string }>({
-    amount: String(grantRound.value.minContribution),
+    amount: '',
   });
   const isAmountValid = (amount: BigNumberish) => {
     return (Number(amount) || 0) > 0;
