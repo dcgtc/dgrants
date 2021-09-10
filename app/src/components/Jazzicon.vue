@@ -1,5 +1,5 @@
 <template>
-  <div ref="icon" />
+  <div class="flex" ref="icon" />
 </template>
 
 <script lang="ts">
