@@ -260,19 +260,14 @@ function useGrantRoundDetail() {
   // --- Contribution capabilities ---
 
   const isAddingFunds = ref(false);
-  const form = computed<{ amount: string }>(() => {
-    return {
-      token: grantRound.value.matchingToken.address,
-      amount: String(grantRound.value.minContribution),
-    };
+  const form = ref<{ amount: string }>({
+    amount: String(grantRound.value.minContribution),
   });
   const isAmountValid = (amount: BigNumberish) => {
     return (Number(amount) || 0) > 0;
   };
   const isFormValid = computed(() => {
-    const { amount } = form.value;
-    const areFieldsValid = isAmountValid(amount);
-    return areFieldsValid;
+    return isAmountValid(form.value.amount);
   });
 
   /**
