@@ -5,6 +5,11 @@ const retrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
 
 export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
 
+export const uploadFile = async (file: File) => {
+  const res = await ipfs.add(file);
+  return res.cid;
+};
+
 /**
  * Adds grant metadata to IPFS
  * @param obj
@@ -12,8 +17,8 @@ export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
  * @param obj.description Description of grant
  * @returns CID
  */
-export const uploadGrantMetadata = async ({ name, description, properties }: GrantMetadata) => {
-  const res = await ipfs.add(JSON.stringify({ name, description, properties }));
+export const uploadGrantMetadata = async ({ name, description, logoURI, properties }: GrantMetadata) => {
+  const res = await ipfs.add(JSON.stringify({ name, description, logoURI, properties }));
   return res.cid;
 };
 
