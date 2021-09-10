@@ -8,12 +8,12 @@ module.exports = {
       sans: ['"Source Code Pro"', 'monospace'],
     },
     fontSize: {
-      sm: ['100%', '150%'],
-      md: ['100%', '150%'],
-      lg: ['100%', '150%'],
-      xl: ['110%', '150%'],
-      xxl: ['110%', '150%'],
-      headline: ['140%', '150%'],
+      sm: ['85%', '170%'],
+      md: ['90%', '170%'],
+      lg: ['100%', '170%'],
+      xl: ['110%', '170%'],
+      xxl: ['120%', '170%'],
+      headline: ['140%', '170%'],
     },
     colors: {
       transparent: 'transparent',

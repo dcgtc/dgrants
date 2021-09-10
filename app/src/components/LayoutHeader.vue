@@ -65,7 +65,7 @@
           </div>
           <div class="flex items-center">
             <figure>
-              <Jazzicon :address="userAddress" :key="userAddress" :width="40" />
+              <Jazzicon :address="userAddress" :key="userAddress" :width="38" />
             </figure>
             <ArrowBottomIcon class="icon-small icon-primary" />
           </div>
@@ -108,12 +108,13 @@
         </div>
       </div>
     </div>
-    <div v-else-if="!isSupportedNetwork" class="ml-auto flex items-center">
-      <div class="flex h-12 items-center pr-2 w-12">
-        <WarningIcon class="icon stroke-pink" />
-      </div>
-      <div class="text-gray-500">Unsupported network</div>
+
+    <!-- unsupported network -->
+    <div v-else-if="!isSupportedNetwork" class="ml-auto">
+      <div class="bg-pink px-4 py-2 text-white">Unsupported network</div>
     </div>
+
+    <!-- connect wallet -->
     <div v-else @click="connectWallet" class="flex items-center h-14 gap-x-2 group cursor-pointer ml-auto">
       <div class="hidden md:block group-hover:text-grey-500">Connect</div>
       <div>
@@ -126,7 +127,6 @@
 <script lang="ts">
 // --- External Imports ---
 import { defineComponent } from 'vue';
-import { WarningIcon } from '@fusion-icons/vue/interface';
 import { Wallet3Icon as ConnectWalletIcon } from '@fusion-icons/vue/web3';
 import { ArrowBottom2Icon as ArrowBottomIcon } from '@fusion-icons/vue/interface';
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
@@ -153,7 +153,7 @@ function useWalletConnection() {
 
 export default defineComponent({
   name: 'LayoutHeader',
-  components: { ConnectWalletIcon, ArrowBottomIcon, CartIcon, Jazzicon, WarningIcon },
+  components: { ConnectWalletIcon, ArrowBottomIcon, CartIcon, Jazzicon },
   setup(_props, context) {
     const { cartItemsCount } = useCartStore();
     const emitEvent = (eventName: string) => context.emit(eventName);

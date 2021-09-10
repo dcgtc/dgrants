@@ -19,11 +19,6 @@
     scroll-behavior: smooth;
   }
 
-  .text-red-600 {
-    --tw-text-opacity: 1;
-    color: rgba(220, 38, 38, var(--tw-text-opacity));
-  }
-
   .bn-notify-custom .bn-notify-notification {
     font-family: Source Code Pro, monospace;
   }
