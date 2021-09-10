@@ -101,7 +101,6 @@
     </div>
 
     <!-- Checkout -->
-
     <div class="px-4 md:px-12">
       <div class="py-8 border-b border-grey-100">
         <div class="flex gap-x-4 justify-end">
@@ -113,7 +112,7 @@
       <div class="py-8 border-b border-grey-100">
         <div class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
-          <span>TODO</span>
+          <span>{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
         </div>
       </div>
 
@@ -147,7 +146,7 @@
 
 <script lang="ts">
 // --- External Imports ---
-import { defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { ArrowToprightIcon, CloseIcon } from '@fusion-icons/vue/interface';
 // --- Component Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
@@ -159,14 +158,29 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { SUPPORTED_TOKENS } from 'src/utils/constants';
-import { pushRoute } from 'src/utils/utils';
+import { pushRoute, formatNumber } from 'src/utils/utils';
 
 function useCart() {
-  const { cart, cartSummaryString, removeFromCart, clearCart, initializeCart, updateCart, checkout } = useCartStore(); // prettier-ignore
+  const { cart, cartSummary, cartSummaryString, checkout, clearCart, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart } = useCartStore(); // prettier-ignore
 
-  onMounted(() => initializeCart()); // make sure cart store is initialized
+  onMounted(async () => {
+    await fetchQuotes(); // get latest quotes
+    initializeCart(); // make sure cart store is initialized
+  });
   const txHash = ref<string>();
   const status = ref<'not started' | 'pending' | 'success' | 'failure'>('pending');
+
+  const equivalentContributionAmount = computed(() => {
+    let sum = 0;
+    for (const [tokenAddress, amount] of Object.entries(cartSummary.value)) {
+      if (!amount) continue;
+      const exchangeRate = quotes.value[tokenAddress] ?? 0;
+      console.log('amount: ', amount);
+      console.log('exchangeRate: ', exchangeRate);
+      sum += amount * exchangeRate;
+    }
+    return sum;
+  });
 
   async function executeCheckout() {
     const tx = await checkout();
@@ -177,7 +191,7 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { txHash, status, cart, updateCart, clearCart, removeFromCart, cartSummaryString, executeCheckout, completeCheckout }; // prettier-ignore
+  return { cart, cartSummaryString, clearCart, completeCheckout, equivalentContributionAmount, executeCheckout, removeFromCart, status, txHash, updateCart }; // prettier-ignore
 }
 
 export default defineComponent({
@@ -186,7 +200,7 @@ export default defineComponent({
   setup() {
     const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, grantMetadata, SUPPORTED_TOKENS, NOT_IMPLEMENTED };
+    return { ...useCart(), pushRoute, grantMetadata, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber };
   },
 });
 </script>

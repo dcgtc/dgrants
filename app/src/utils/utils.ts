@@ -26,7 +26,8 @@ export function isDefined(val: unknown) {
 export function formatNumber(value: BigNumberish, decimals: number): string {
   // `BigNumber.from()` can't take decimal inputs
   value = typeof value === 'number' || typeof value === 'string' ? Number(value) : BigNumber.from(value);
-  return commify(parseFloat(String(value)).toFixed(decimals));
+  // Return value with minimum number of decimals shown, e.g. return '123' if input is 123.00
+  return commify(parseFloat(Number(value).toFixed(decimals)));
 }
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is

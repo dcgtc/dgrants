@@ -13,6 +13,7 @@ import {
   ETH_ADDRESS,
   GRANT_ROUND_MANAGER_ABI,
   GRANT_ROUND_MANAGER_ADDRESS,
+  SUPPORTED_TOKENS,
   SUPPORTED_TOKENS_MAPPING,
   WAD,
   WETH_ADDRESS,
@@ -59,7 +60,8 @@ const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
 // --- State ---
 const lsCart = ref<CartItemOptions[]>([]); // localStorage cart
-const cart = ref<CartItem[]>([]);
+const cart = ref<CartItem[]>([]); // source of truth for what's in the user's cart
+const quotes = ref<Record<string, number>>({}); // mapping from token address to DAI exchange rate, i.e. multiple token quantity by the exchange rate to get the value in DAI
 
 // --- Composition function for state management ---
 export default function useCartStore() {
@@ -264,6 +266,28 @@ export default function useCartStore() {
     return { swaps, donations: fixDonationRoundingErrors(donations), deadline: Math.floor(nowPlus20Minutes / 1000) };
   }
 
+  /**
+   * @notice Fetches quotes based on the users cart
+   * @dev For max accuracy, this should be run each time the user edits their cart with the actual cart amounts, but in
+   * reality this will be accurate enough if we just run it once with default amounts and save the results, because
+   * the Uniswap pools have sufficient liquid for all SUPPORTED_TOKENS
+   */
+  async function fetchQuotes() {
+    // TODO use multicall for better performance + fewer RPC requests
+    const _quotes = await Promise.all(
+      SUPPORTED_TOKENS.map(async (token) => {
+        if (token.symbol === 'DAI' || token.symbol === 'USDC') return { token, rate: 1 };
+        const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>token.address];
+        const amountIn = parseUnits('1', token.decimals); // for simplicity, use a value of 1 token for getting quotes
+        const amountOut = await quoteExactInput(path, amountIn); // as raw BigNumber
+        return { token, rate: Number(formatUnits(amountOut, token.decimals)) };
+      })
+    );
+    console.log('quotes.value: ', quotes.value);
+    _quotes.forEach((quote) => (quotes.value[quote.token.address] = quote.rate));
+    console.log('quotes.value: ', quotes.value);
+  }
+
   // --- Getters ---
   /**
    * @notice Returns true if the provided grantId is in the cart, false otherwise
@@ -305,13 +329,16 @@ export default function useCartStore() {
     // WARNING: Be careful -- the `cart` ref is directly exposed so it can be edited by v-model, so just make
     // sure to call `updateCart()` with the appropriate inputs whenever the `cart` ref is modified
     cart,
+    quotes: computed(() => quotes.value),
     // Getters
     cartItemsCount: computed(() => cart.value.length),
-    cartSummaryString,
-    // Mutations
+    cartSummary: computed(() => cartSummary.value),
+    cartSummaryString: computed(() => cartSummaryString.value),
+    // Actions / Mutations
     addToCart,
     checkout,
     clearCart,
+    fetchQuotes,
     initializeCart,
     isInCart,
     removeFromCart,
