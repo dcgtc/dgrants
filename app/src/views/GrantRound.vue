@@ -1,32 +1,47 @@
 <template>
+  <!-- Transaction Loading Page -->
+  <div v-if="txHash">
+    <BaseHeader name="Add Funds to Grant Round: Transaction Status" />
+    <TransactionStatus
+      :hash="txHash"
+      buttonLabel="CONTINUE"
+      :buttonAction="() => (grantRound ? hideAddFunds() : null)"
+    />
+  </div>
+
   <!-- Contributing to GrantRound -->
-  <div v-if="isAddingFunds" class="flex flex-col justify-center sm:px-6 lg:px-8">
+  <div v-else-if="isAddingFunds" class="flex flex-col justify-center sm:px-6 lg:px-8">
     <BaseHeader name="Contribute to GrantRound" :tagline="grantRoundMetadata?.name" />
 
     <div class="text-left">
       <form class="space-y-5" @submit.prevent="addFunds">
-        <!-- Token address -->
-        <BaseInput
-          v-model="form.token"
-          description="The token used to make the contribution"
-          id="contribution-token-address"
-          label="Contribution Token address"
-          :readonly="true"
-          :disabled="true"
-          :rules="isValidAddress"
-          errorMsg="Please enter a valid address"
-        />
+        <!-- Token Symbol -->
+        <InputRow :deleteable="false" :intended="false" text="">
+          <template v-slot:label>Token:</template>
+          <template v-slot:input>{{ grantRound.matchingToken.symbol }}</template>
+        </InputRow>
+
+        <!-- Token Address -->
+        <InputRow :deleteable="false" :intended="false" text="">
+          <template v-slot:label>Token Address:</template>
+          <template v-slot:input>{{ grantRound.matchingToken.address }}</template>
+        </InputRow>
 
         <!-- Contribution amount -->
-        <BaseInput
-          v-model="form.amount"
-          description="The number of tokens to contribute"
-          id="contribution-amount"
-          label="Contribution amount"
-          :required="true"
-          :rules="isAmountValid"
-          errorMsg="Please enter an amount greater than 0"
-        />
+        <InputRow :deleteable="false" :intended="false" text="">
+          <template v-slot:label>Contribution amount:</template>
+          <template v-slot:input>
+            <BaseInput
+              v-model="form.amount"
+              width="w-full"
+              placeholder="amount to contribute"
+              id="contribution-amount"
+              :required="true"
+              :rules="isAmountValid"
+              errorMsg="Please enter an amount greater than 0"
+            />
+          </template>
+        </InputRow>
 
         <!-- Submit and cancel buttons -->
         <div class="flex justify-end pt-6">
@@ -127,7 +142,9 @@ import { useRoute } from 'vue-router';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
+import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
+import TransactionStatus from 'src/components/TransactionStatus.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -142,17 +159,7 @@ import {
   MaxUint256,
   parseUnits,
 } from 'src/utils/ethers';
-import {
-  daysAgo,
-  formatAddress,
-  isValidAddress,
-  isValidUrl,
-  checkAllowance,
-  getApproval,
-  hasStatus,
-  pushRoute,
-  isDefined,
-} from 'src/utils/utils';
+import { daysAgo, formatAddress, isValidUrl, checkAllowance, getApproval, hasStatus, isDefined } from 'src/utils/utils';
 
 // --- Types ---
 import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
@@ -172,6 +179,7 @@ function useGrantRoundDetail() {
   const route = useRoute();
 
   const grantRoundAddress = computed(() => route.params.address);
+  const txHash = ref<string>();
 
   // --- BaseHeader Navigation ---
   const breadcrumb = computed(
@@ -252,7 +260,7 @@ function useGrantRoundDetail() {
   // --- Contribution capabilities ---
 
   const isAddingFunds = ref(false);
-  const form = computed<{ token: string; amount: string }>(() => {
+  const form = computed<{ amount: string }>(() => {
     return {
       token: grantRound.value.matchingToken.address,
       amount: String(grantRound.value.minContribution),
@@ -262,9 +270,8 @@ function useGrantRoundDetail() {
     return (Number(amount) || 0) > 0;
   };
   const isFormValid = computed(() => {
-    const { token, amount } = form.value;
-    const areFieldsValid =
-      isValidAddress(<string>token) && token === grantRound.value.matchingToken.address && isAmountValid(amount);
+    const { amount } = form.value;
+    const areFieldsValid = isAmountValid(amount);
     return areFieldsValid;
   });
 
@@ -280,6 +287,7 @@ function useGrantRoundDetail() {
    */
   function hideAddFunds() {
     isAddingFunds.value = false;
+    txHash.value = undefined;
   }
 
   /**
@@ -310,7 +318,6 @@ function useGrantRoundDetail() {
 
     // poll for the updated state and toggle page state back to display mode
     await poll();
-    hideAddFunds();
   }
 
   /**
@@ -319,6 +326,7 @@ function useGrantRoundDetail() {
   async function addMatchingFunds(round: GrantRoundContract, amount: BigNumber) {
     // send funds to the matching pool (*Note: Unable to test this until we get an ERC20 balance into the hardhat accounts)
     const tx: ContractTransaction = await round.addMatchingFunds(amount);
+    txHash.value = tx.hash;
     // After tx mines, poll so the store has the latest data
     await tx.wait();
   }
@@ -330,7 +338,6 @@ function useGrantRoundDetail() {
     formatAddress,
     isAmountValid,
     isAddingFunds,
-    isValidAddress,
     isValidUrl,
     isFormValid,
     grantRound,
@@ -339,11 +346,11 @@ function useGrantRoundDetail() {
     showAddFunds,
     hideAddFunds,
     addFunds,
-    pushRoute,
     prevGrantRound,
     nextGrantRound,
     isDefined,
     breadcrumb,
+    txHash,
   };
 }
 
@@ -353,9 +360,11 @@ export default defineComponent({
     BaseHeader,
     BaseInput,
     GrantRoundDetailsRow,
+    InputRow,
     SectionHeader,
     DonateIcon,
     ShareIcon,
+    TransactionStatus,
   },
   setup() {
     return { ...useGrantRoundDetail() };

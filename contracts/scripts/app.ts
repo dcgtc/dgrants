@@ -61,7 +61,7 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   let startTime = Math.floor(new Date().getTime() / 1000); // time in seconds
   startTime = await setNextBlockTimestamp(startTime + 200);
 
-  const endTime = startTime + 86400; // 1 day later
+  const endTime = startTime + (86400 * 5); // 5 days later
 
   // GrantRound Argument
   const metadataAdmin = '0x34f4E532a33EB545941e914B25Efe348Aea31f0A';
