@@ -36,12 +36,12 @@
     "types": "yarn workspace @dgrants/types",
     "dcurve": "yarn workspace @dgrants/dcurve",
     "utils": "yarn workspace @dgrants/utils",
-    "bump:patch": "lerna version prepatch --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
-    "bump:minor": "lerna version preminor --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
-    "bump:major": "lerna version premajor --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
-    "release:patch": "lerna version patch --force-publish --amend --force-publish --yes",
-    "release:minor": "lerna version minor --force-publish --amend --force-publish --yes",
-    "release:major": "lerna version major --force-publish --amend --force-publish --yes"
+    "bump:patch": "lerna version prepatch --preid $(git rev-parse --short HEAD) --yes --amend",
+    "bump:minor": "lerna version preminor --preid $(git rev-parse --short HEAD) --yes --amend",
+    "bump:major": "lerna version premajor --preid $(git rev-parse --short HEAD) --yes --amend",
+    "release:patch": "lerna version patch --amend --yes",
+    "release:minor": "lerna version minor --amend --yes",
+    "release:major": "lerna version major --amend --yes"
   },
   "husky": {
     "hooks": {
