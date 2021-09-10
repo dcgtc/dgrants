@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/dcurve",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "private": true,
   "description": "distribution generator for GrantCLR in dgrants",
   "keywords": [
