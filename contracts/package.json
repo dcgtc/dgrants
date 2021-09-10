@@ -2,7 +2,7 @@
   "name": "@dgrants/contracts",
   "version": "0.0.1",
   "devDependencies": {
-    "@dgrants/types": "^0.0.2",
+    "@dgrants/types": "^0.0.1",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "3.4.1-solc-0.7-2",
@@ -71,5 +71,14 @@
   },
   "volta": {
     "extends": "../package.json"
+  },
+  "changelog": {
+    "labels": {
+      "enhancement": "Enhancement",
+      "bug": "Bug Fix",
+      "breaking": "Breaking Change",
+      "documentation": "Documentation",
+      "internal": "Internal"
+    }
   }
 }

@@ -29,9 +29,18 @@
     "extends": "../package.json"
   },
   "dependencies": {
-    "@dgrants/contracts": "^0.0.2",
-    "@dgrants/utils": "^0.0.2",
+    "@dgrants/contracts": "^0.0.1",
+    "@dgrants/utils": "^0.0.1",
     "buffer": "^6.0.3",
     "ethers": "^5.4.6"
+  },
+  "changelog": {
+    "labels": {
+      "enhancement": "Enhancement",
+      "bug": "Bug Fix",
+      "breaking": "Breaking Change",
+      "documentation": "Documentation",
+      "internal": "Internal"
+    }
   }
 }
