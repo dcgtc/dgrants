@@ -50,5 +50,8 @@
   "volta": {
     "node": "14.17.4",
     "yarn": "1.22.10"
+  },
+  "resolutions": {
+    "brorand": "https://github.com/buu700/brorand#1b8c372b3c78bd5287728c1d5b4bf9cb8b708196"
   }
 }
