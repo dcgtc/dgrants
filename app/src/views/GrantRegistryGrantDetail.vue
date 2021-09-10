@@ -43,7 +43,6 @@
       </div>
 
       <SectionHeader title="Description" />
-
       <div class="border-b border-grey-100">
         <p style="white-space: pre-line" class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
           {{ grantMetadata?.description }}
@@ -59,7 +58,14 @@
         "
         title="Links"
       />
-      <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+      <div
+        v-if="
+          isDefined(grantMetadata?.properties?.websiteURI) ||
+          isDefined(grantMetadata?.properties?.githubURI) ||
+          isDefined(grantMetadata?.properties?.twitterURI)
+        "
+        class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4"
+      >
         <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
           <span class="text-grey-400">Website:</span>
           <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{
@@ -82,7 +88,7 @@
 
       <!-- CONTRIBUTIONS -->
       <SectionHeader v-if="grantContributions.length > 0" title="Contributions" />
-      <div>
+      <div v-if="grantContributions.length > 0">
         <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
         <div v-if="selectedRound == 0">
           <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
