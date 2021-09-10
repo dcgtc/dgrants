@@ -3,5 +3,6 @@
   "npmClient": "yarn",
   "version": "independent",
   "useWorkspaces": true,
-  "stream": true
+  "stream": true,
+  "changelogPreset": "angular"
 }
