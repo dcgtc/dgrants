@@ -91,6 +91,7 @@ contract GrantRoundManager is SwapRouter {
     GrantRound _grantRound = new GrantRound(
       _owner,
       _payoutAdmin,
+      registry,
       donationToken,
       _matchingToken,
       _startTime,
