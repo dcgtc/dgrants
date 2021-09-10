@@ -228,6 +228,22 @@
             </template>
           </InputRow>
 
+          <!-- Grant logo -->
+          <InputRow>
+            <template v-slot:label>Logo:</template>
+            <template v-slot:input>
+              <BaseImageUpload
+                v-model="form.logo"
+                width="w-full"
+                id="grant-logo"
+                :rules="isValidLogo"
+                errorMsg="Logo must be in png or svg format, under 200 kB, with dimensions of 1920x1080"
+                :required="false"
+                @update:modelValue="updateLogo"
+              />
+            </template>
+          </InputRow>
+
           <!-- Submit and cancel buttons -->
           <div class="flex justify-end">
             <button
@@ -263,7 +279,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
-import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
+import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
@@ -271,6 +287,7 @@ import { filterContributionsByGrantId } from 'src/utils/data/contributions';
 import { Breadcrumb, FilterNavItem, GrantsRoundDetails } from '@dgrants/types';
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
+import BaseImageUpload from 'src/components/BaseImageUpload.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import InputRow from 'src/components/InputRow.vue';
@@ -433,6 +450,7 @@ function useGrantDetail() {
     website: string;
     github: string;
     twitter: string;
+    logo: File | undefined;
   }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
@@ -441,8 +459,10 @@ function useGrantDetail() {
     website: grantMetadata.value?.properties?.websiteURI || '',
     github: grantMetadata.value?.properties?.githubURI || '',
     twitter: cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '',
+    logo: undefined,
   });
 
+  const isLogoValid = ref(true);
   const isFormValid = computed(() => {
     if (!grant.value) return false;
     const { owner, payee, name, description, website, github, twitter } = form.value;
@@ -453,7 +473,8 @@ function useGrantDetail() {
       isDefined(description) &&
       isValidWebsite(website) &&
       isValidGithub(github) &&
-      isValidTwitter(twitter);
+      isValidTwitter(twitter) &&
+      isLogoValid.value;
 
     const areFieldsUpdated =
       owner !== grant.value.owner ||
@@ -466,6 +487,11 @@ function useGrantDetail() {
 
     return areFieldsValid && areFieldsUpdated;
   });
+
+  async function updateLogo(logo: File | undefined) {
+    isLogoValid.value = await isValidLogo(logo);
+    form.value.logo = logo && isLogoValid.value ? logo : undefined;
+  }
 
   /**
    * @notice Resets the form values that user may have changed, and hides the edit window
@@ -483,7 +509,7 @@ function useGrantDetail() {
    */
   const saveEdits = async () => {
     // Validation
-    const { owner, payee, name, description, website, github, twitter } = form.value;
+    const { owner, payee, name, description, website, github, twitter, logo } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
 
@@ -503,10 +529,13 @@ function useGrantDetail() {
       github !== gMetadata?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(gMetadata?.properties?.twitterURI);
     if (isMetaPtrUpdated) {
+      const logoURI = logo
+        ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
+        : gMetadata?.logoURI;
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
       metaPtr = await ipfs
-        .uploadGrantMetadata({ name, description, properties })
+        .uploadGrantMetadata({ name, description, logoURI, properties })
         .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
     }
 
@@ -555,6 +584,7 @@ function useGrantDetail() {
   }
 
   return {
+    updateLogo,
     loading,
     grantId,
     rounds,
@@ -564,6 +594,7 @@ function useGrantDetail() {
     isValidWebsite,
     isValidGithub,
     isValidTwitter,
+    isValidLogo,
     isDefined,
     isFormValid,
     grant,
@@ -594,6 +625,7 @@ export default defineComponent({
     BaseFilterNav,
     BaseHeader,
     BaseInput,
+    BaseImageUpload,
     BaseTextarea,
     ContributionRow,
     EditIcon,

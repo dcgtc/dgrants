@@ -65,6 +65,11 @@ export function isValidUrl(val: string) {
   return (val.includes('http') || val.includes('https')) && val.includes('://') && val.includes('.');
 }
 
+// Returns true if the provided address is valid (TODO support ENS)
+export function isValidAddress(val: string | undefined) {
+  return val && isAddress(val);
+}
+
 // Returns true if the provided website is a valid option
 export function isValidWebsite(val: string | undefined) {
   return val ? isValidUrl(val) : true;
@@ -82,9 +87,21 @@ export function isValidTwitter(val: string | undefined) {
   return /^[a-zA-Z0-9_]{1,15}$/.test(handle);
 }
 
-// Returns true if the provided address is valid (TODO support ENS)
-export function isValidAddress(val: string | undefined) {
-  return val && isAddress(val);
+// Returns true if the provided logo is valid
+export async function isValidLogo(file: File | undefined) {
+  if (!file) return true;
+  if (file.size > 200000) return false;
+  if (!(file.type.includes('image/png') || file.type.includes('image/svg'))) return false;
+
+  const dimensions = await new Promise<{ width: number; height: number }>((resolve) => {
+    const img = new Image();
+    img.src = window.URL.createObjectURL(file);
+    img.onload = () => {
+      resolve({ width: img.width, height: img.height });
+    };
+  });
+
+  return dimensions.width === 1920 && dimensions.height === 1080;
 }
 
 // --- Tokens ---
