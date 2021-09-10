@@ -34,7 +34,13 @@
     "contracts": "yarn workspace @dgrants/contracts",
     "types": "yarn workspace @dgrants/types",
     "dcurve": "yarn workspace @dgrants/dcurve",
-    "utils": "yarn workspace @dgrants/utils"
+    "utils": "yarn workspace @dgrants/utils",
+    "bump:patch": "lerna version prepatch --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
+    "bump:minor": "lerna version preminor --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
+    "bump:major": "lerna version premajor --preid $(git rev-parse --short HEAD) --yes --amend --force-publish",
+    "release:patch": "lerna version patch --force-publish --amend --force-publish --yes",
+    "release:minor": "lerna version minor --force-publish --amend --force-publish --yes",
+    "release:major": "lerna version major --force-publish --amend --force-publish --yes"
   },
   "husky": {
     "hooks": {
@@ -44,8 +50,5 @@
   "volta": {
     "node": "14.17.4",
     "yarn": "1.22.10"
-  },
-  "resolutions": {
-    "brorand": "https://github.com/buu700/brorand"
   }
 }
