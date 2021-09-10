@@ -37,6 +37,3 @@ export type FilterNavButton = {
   label: string; // label to display in the button
   action?: (payload: MouseEvent) => void; // action to take when we click the button
 };
-
-// type of entities on Etherscan.
-export type EtherscanGroup = 'tx' | 'token' | 'address';

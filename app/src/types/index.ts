@@ -14,3 +14,6 @@ type ContributionToken = { contributionToken: TokenInfo };
 export type CartItem =
   | (Omit<CartItemOptions, 'contributionTokenAddress'> & Grant & ContributionToken & GrantMetadata)
   | (Omit<CartItemOptions, 'contributionTokenAddress'> & Grant & ContributionToken);
+
+// type of entities on Etherscan.
+export type EtherscanGroup = 'tx' | 'token' | 'address';

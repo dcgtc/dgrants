@@ -4,7 +4,8 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
-import { GrantRound, EtherscanGroup } from '@dgrants/types';
+import { EtherscanGroup } from 'src/types';
+import { GrantRound } from '@dgrants/types';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd

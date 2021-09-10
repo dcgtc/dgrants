@@ -2,7 +2,7 @@
   <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
 
   <!-- General filters -->
-  <BaseFilterNav :items="grantRegistryListNav" />
+  <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" />
 
   <GrantList v-if="grants && grantMetadata" :grants="grants" :grantMetadata="grantMetadata" />
 </template>
@@ -15,8 +15,10 @@ import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantList from 'src/components/GrantList.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
+// --- Methods and Data ---
+import { pushRoute } from 'src/utils/utils';
 // --- Types ---
-import { Breadcrumb, FilterNavItem } from '@dgrants/types';
+import { Breadcrumb, FilterNavButton, FilterNavItem } from '@dgrants/types';
 
 function useGrantRegistryList() {
   // --- BaseHeader Navigation ---
@@ -60,8 +62,14 @@ function useGrantRegistryList() {
     },
   ];
 
+  const filterNavButton = <FilterNavButton>{
+    label: 'create grant',
+    action: () => pushRoute({ name: 'dgrants-new' }),
+  };
+
   return {
     breadcrumb,
+    filterNavButton,
     grantRegistryListNav,
     title,
   };
