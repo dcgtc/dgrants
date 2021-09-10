@@ -23,10 +23,8 @@ import { defineComponent, PropType } from 'vue';
 import GrantCard from 'src/components/GrantCard.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
-// --- Methods and Data ---
-import { pushRoute } from 'src/utils/utils';
 // --- Types ---
-import { Grant, GrantRoundMetadataResolution } from '@dgrants/types';
+import { Grant, GrantMetadata } from '@dgrants/types';
 
 export default defineComponent({
   name: 'GrantList',
@@ -34,11 +32,11 @@ export default defineComponent({
   props: {
     // --- Required props ---
     grants: { type: Array as PropType<Grant[]>, required: true },
-    grantMetadata: { type: Object as PropType<Record<string, GrantRoundMetadataResolution>>, required: true },
+    grantMetadata: { type: Object as PropType<Record<string, GrantMetadata>>, required: true },
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    return { isInCart, addToCart, removeFromCart, pushRoute, console };
+    return { isInCart, addToCart, removeFromCart };
   },
 });
 </script>

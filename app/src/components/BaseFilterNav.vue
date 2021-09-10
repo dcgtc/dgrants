@@ -7,7 +7,7 @@
             <span :class="active == index ? 'underline' : ''">{{ item.label }}</span>
             <span v-if="item.counter" class="ml-2 text-grey-400">({{ item.counter }})</span>
             <span v-else-if="item.tag" class="text-grey-400 mr-2">{{ item.tag }}</span>
-            <div v-if="item.menu" class="absolute hidden group-hover:block text-left">
+            <div v-if="item.menu" class="absolute hidden group-hover:block text-left z-10">
               <div
                 class="
                   border border-grey-400

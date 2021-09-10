@@ -2,7 +2,10 @@
 
 <template>
   <figure class="group">
-    <div class="relative cursor-pointer" @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })">
+    <div
+      class="relative cursor-pointer"
+      @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
+    >
       <img class="shadow-light" :src="imgurl" />
       <div class="absolute bottom-0 right-0">
         <!-- when item in cart, add class "in-cart" to <button> -->
@@ -15,7 +18,7 @@
         </button>
       </div>
     </div>
-    <figcaption class="mt-4">
+    <figcaption class="mt-4 px-4 lg:px-0">
       <div class="text-grey-500 font-medium truncate">{{ name }}</div>
       <div class="flex justify-between">
         <span class="text-grey-400"
@@ -38,11 +41,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, PropType } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 // --- Methods and Data ---
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'src/utils/ethers';
 import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
@@ -50,7 +53,7 @@ import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 export default defineComponent({
   name: 'GrantCard',
   props: {
-    id: { type: BigNumber, required: true },
+    id: { type: Object as PropType<BigNumberish>, required: true },
     name: { type: String, required: true },
     imgurl: { type: String, required: true },
     ownerAddress: { type: String, required: true },
@@ -59,7 +62,7 @@ export default defineComponent({
   components: { CartIcon },
   setup() {
     const { addToCart, isInCart } = useCartStore();
-    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute };
+    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber };
   },
 });
 </script>
