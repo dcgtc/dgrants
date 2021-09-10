@@ -51,7 +51,14 @@
       </div>
 
       <!-- LINKS -->
-      <SectionHeader title="Links" />
+      <SectionHeader
+        v-if="
+          isDefined(grantMetadata?.properties?.websiteURI) ||
+          isDefined(grantMetadata?.properties?.githubURI) ||
+          isDefined(grantMetadata?.properties?.twitterURI)
+        "
+        title="Links"
+      />
       <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
         <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
           <span class="text-grey-400">Website:</span>
