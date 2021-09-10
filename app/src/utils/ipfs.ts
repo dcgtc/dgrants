@@ -14,6 +14,11 @@ export const ipfs = create({
   headers: config.storageHeaders,
 });
 
+export const uploadFile = async (file: File) => {
+  const res = await ipfs.add(file);
+  return res.cid;
+};
+
 /**
  * Adds grant metadata to IPFS
  * @param obj
@@ -21,8 +26,8 @@ export const ipfs = create({
  * @param obj.description Description of grant
  * @returns CID
  */
-export const uploadGrantMetadata = async ({ name, description, properties }: GrantMetadata) => {
-  const res = await ipfs.add(JSON.stringify({ name, description, properties }));
+export const uploadGrantMetadata = async ({ name, description, logoURI, properties }: GrantMetadata) => {
+  const res = await ipfs.add(JSON.stringify({ name, description, logoURI, properties }));
   return res.cid;
 };
 
