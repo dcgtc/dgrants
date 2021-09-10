@@ -73,6 +73,7 @@ yarn test
 yarn build
 ```
 
+
 #### Note: Subdirectory Development
 
 If you are working on one component or the other, you can use workspace aliases to run commands defined in the corresponding `package.json` independently.
@@ -88,6 +89,36 @@ or to start the frontend locally in development mode:
 ```bash
 yarn app dev
 ```
+
+### Version Management & Changelogs
+
+Versioning and Changelogs are managed by Lerna.
+
+#### Version Management
+Guidance around when to increase versions is coming soon.
+
+To increase the version number and include the short hash of the git commit ID, use the following commands.
+```
+$ yarn bump:patch
+$ yarn bump:minor
+$ yarn bump:major
+```
+
+To promote a pre-release version to release which removes the short hash from the version, use the following commands.
+```
+$ yarn release:patch
+$ yarn release:minor
+$ yarn release:major
+```
+
+#### Changelog Requirements
+In order for merged PRs to be added to the changelog, you must use one of the following tags in Github for each PR.
+
++ enhancement - A feature or addition to the codebase
++ bug - A fix for a bug
++ breaking - A change that breaks compatability or requires configuration changes
++ documentation - Changes or additions to documentation
++ internal - Changes or updates to build mechanisms
 
 # Help Build Decentralized Gitcoin
 

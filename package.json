@@ -11,6 +11,7 @@
   ],
   "devDependencies": {
     "concurrently": "^6.2.0",
+    "conventional-changelog-cli": "^2.1.1",
     "eslint": "^7.24.0",
     "eslint-config-prettier": "^8.2.0",
     "husky": "^7.0.0",
@@ -53,5 +54,14 @@
   },
   "resolutions": {
     "brorand": "https://github.com/buu700/brorand#1b8c372b3c78bd5287728c1d5b4bf9cb8b708196"
+  },
+  "changelog": {
+    "labels": {
+      "enhancement": "Enhancement",
+      "bug": "Bug Fix",
+      "breaking": "Breaking Change",
+      "documentation": "Documentation",
+      "internal": "Internal"
+    }
   }
 }
