@@ -81,11 +81,11 @@
       </div>
 
       <!-- CONTRIBUTIONS -->
-      <SectionHeader title="Contributions" />
+      <SectionHeader v-if="grantContributions.length > 0" title="Contributions" />
       <div>
         <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
         <div v-if="selectedRound == 0">
-          <div v-for="(contribution, index) in grantContibutions" :key="Number(index)">
+          <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
             <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
           </div>
         </div>
@@ -275,7 +275,7 @@ function useGrantDetail() {
   const loading = ref(true);
   const selectedRound = ref(0);
   const selectedEdit = ref(0);
-  const grantContibutions = ref();
+  const grantContributions = ref();
   const grantContributionsTotal = ref();
   const grantContributionsByRound = ref();
 
@@ -373,7 +373,7 @@ function useGrantDetail() {
           })
         );
         // save off data
-        grantContibutions.value = contributions;
+        grantContributions.value = contributions;
         grantContributionsTotal.value = contributionsTotal;
         grantContributionsByRound.value = contributionsByRound;
         // finished loading required state
@@ -418,7 +418,7 @@ function useGrantDetail() {
       <FilterNavItem[]>[
         {
           label: 'All Rounds',
-          counter: grantContibutions.value?.length,
+          counter: grantContributions.value?.length,
           action: () => {
             selectedRound.value = 0;
           },
@@ -606,7 +606,7 @@ function useGrantDetail() {
     lastGrant,
     selectedRound,
     selectedEdit,
-    grantContibutions,
+    grantContributions,
     grantContributionsTotal,
     grantContributionsByRound,
     LOREM_IPSOM_TEXT,
