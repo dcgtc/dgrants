@@ -4,7 +4,7 @@
  * generates a separate chunk (e.g. `about.[hash].js`) for this route which is lazy-loaded when the route is visited
  */
 
-import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
 import Home from '../views/Home.vue';
 
 // For info on using Vue Router with the Composition API, see https://next.router.vuejs.org/guide/advanced/composition-api.html
@@ -32,7 +32,7 @@ const routes: Array<RouteRecordRaw> = [
 
 const router = createRouter({
   // If app is not hosted at the domain root, make sure to pass the `base` input here: https://next.router.vuejs.org/api/#parameters
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
 });
 
