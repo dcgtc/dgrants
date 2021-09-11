@@ -75,15 +75,20 @@
     <!-- Interactions Bar for Share, Add Funds  -->
     <div class="px-4 md:px-12 py-8 border-b border-grey-100">
       <div class="flex flex-wrap gap-x-6 gap-y-4">
-        <!-- TODO: Tweet
-        Let's use this url and apply whatever string + url 
-        https://twitter.com/intent/tweet?text=testtesttesttest&url=https://test.com
-        please build something for this thats usable everywhere on @click.
-        -->
-        <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
+        <!-- Tweet -->
+        <a
+          target="_blank"
+          :href="
+            'https://twitter.com/intent/tweet?text=' +
+            grantRoundMetadata?.name +
+            '&url=https://grants.gtcdao.net' +
+            $route.path
+          "
+          class="flex items-center gap-x-2 cursor-pointer group ml-auto"
+        >
           <TweetIcon class="icon icon-primary icon-small" />
           <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
-        </div>
+        </a>
         <!-- Add funds to Grant Round -->
         <div @click="showAddFunds()" class="flex items-center gap-x-2 cursor-pointer group">
           <DonateIcon class="icon icon-primary icon-small" />
