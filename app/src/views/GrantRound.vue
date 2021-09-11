@@ -75,14 +75,18 @@
     <!-- Interactions Bar for Share, Add Funds  -->
     <div class="px-4 md:px-12 py-8 border-b border-grey-100">
       <div class="flex flex-wrap gap-x-6 gap-y-4">
-        <!-- TODO: Share-->
+        <!-- TODO: Tweet
+        Let's use this url and apply whatever string + url 
+        https://twitter.com/intent/tweet?text=testtesttesttest&url=https://test.com
+        please build something for this thats usable everywhere on @click.
+        -->
         <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
-          <ShareIcon class="icon icon-primary icon-small" />
-          <span class="text-grey-400 group-hover:text-grey-500">Share</span>
+          <TweetIcon class="icon icon-primary icon-small" />
+          <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
         </div>
         <!-- Add funds to Grant Round -->
         <div @click="showAddFunds()" class="flex items-center gap-x-2 cursor-pointer group">
-          <DonateIcon class="icon icon-primary icon-small icon-secondary" />
+          <DonateIcon class="icon icon-primary icon-small" />
           <span class="text-grey-400 group-hover:text-grey-500">Add funds</span>
         </div>
       </div>
@@ -90,10 +94,13 @@
 
     <!-- Description -->
     <SectionHeader title="Description" />
+
     <div class="border-b border-grey-100">
-      <p style="white-space: pre-line" class="intent px-4 md:px-12 py-24 mx-auto max-w-6xl">
-        {{ grantRoundMetadata?.description }}
-      </p>
+      <div class="px-4 md:px-12 py-12 mx-auto max-w-6xl">
+        <!-- the idea is to transform each CRLF / ENTER into a <p class="intent">text</p> 
+        the past approach ( style preline whitespace ) does not solve this -->
+        <p class="intent">{{ grantRoundMetadata?.description }}</p>
+      </div>
     </div>
 
     <!-- LINKS -->
@@ -174,7 +181,7 @@ import {
 import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
 
 // --- Icons ---
-import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon as TweetIcon } from '@fusion-icons/vue/interface';
 import { DonateIcon } from '@fusion-icons/vue/interface';
 
 // --- Contract ---
@@ -370,7 +377,7 @@ export default defineComponent({
     InputRow,
     SectionHeader,
     DonateIcon,
-    ShareIcon,
+    TweetIcon,
     TransactionStatus,
   },
   setup() {

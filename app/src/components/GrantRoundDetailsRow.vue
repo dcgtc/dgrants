@@ -8,9 +8,10 @@
       />
     </div>
 
-    <div class="mt-8 px-8 md:px-0">
+    <!--grid:right (txt)-->
+    <div class="my-6 px-8 md:px-0">
       <!-- Funds -->
-      <div class="mt-6 mb-1">
+      <div>
         <span class="text-grey-400 mr-4">Funds:</span>
         <span>
           {{ grantRound.funds.toString() }}
@@ -19,7 +20,7 @@
       </div>
 
       <!-- Contract -->
-      <div class="mb-1">
+      <div>
         <span class="text-grey-400 mr-4">Contract:</span>
         <a
           class="link"
@@ -30,7 +31,8 @@
         >
       </div>
 
-      <div class="mb-8">
+      <!-- Payout Admin -->
+      <div>
         <span class="text-grey-400 mr-4">Payout Admin:</span>
         <a
           class="link"
@@ -42,13 +44,13 @@
       </div>
 
       <!-- Grants count -->
-      <div class="mb-1">
+      <div>
         <span class="text-grey-400 mr-4">Grants In Round:</span>
         <span>{{ grantRoundMetadata?.grants?.length }}</span>
       </div>
 
       <!-- Period -->
-      <div class="mb-1">
+      <div>
         <span class="text-grey-400 mr-4">Period:</span>
         <span>
           {{ new Date(BigNumber.from(grantRound.startTime).toNumber() * 1000).toLocaleDateString() }}
@@ -58,7 +60,7 @@
       </div>
 
       <!-- Status -->
-      <div class="mb-1">
+      <div>
         <span class="text-grey-400 mr-4">Status:</span>
         <span>{{ grantRound.status }}</span>
 
@@ -72,9 +74,9 @@
       </div>
 
       <!-- See Grants -->
-      <div class="mt-2">
+      <div class="mt-8">
         <button
-          class="float-right btn btn-primary"
+          class="btn btn-primary"
           @click="pushRoute({ name: 'dgrants-round-details', params: { address: grantRound.address } })"
         >
           See Grants
