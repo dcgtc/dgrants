@@ -51,7 +51,7 @@
 
 /* Add styles to components */
 @layer components {
-  .indent {
+  .intent {
     text-indent: 1em;
   }
 
