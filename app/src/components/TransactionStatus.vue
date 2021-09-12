@@ -1,53 +1,50 @@
 <template>
   <!-- Transaction hash -->
-  <div :class="[...rowClasses, 'border-b', 'border-grey-100']">
-    <div class="col-span-12 md:col-span-3 grid-rows-3">Hash:</div>
-    <div class="col-span-10 md:col-span-6">
-      <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer" class="link text-grey-400">{{ hash }}</a>
+  <section>
+    <label>Hash:</label>
+    <div class="">
+      <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer " class="link break-all">{{ hash }}</a>
     </div>
-  </div>
+  </section>
+
   <!-- Status -->
-  <div :class="[...rowClasses, 'border-b', 'border-grey-100']">
-    <div class="col-span-12 md:col-span-3 grid-rows-3">Status:</div>
+  <section>
+    <label>Status:</label>
 
-    <div v-if="status === 'pending'" class="text-grey-500 col-span-10 md:col-span-6">
-      <span class="border-2 p-4 mr-8">Pending</span>
-      Pending for {{ timeString }}
-    </div>
+    <template v-if="status === 'pending'">
+      <div class="status pending">Pending</div>
+      <div>Pending for {{ timeString }}</div>
+    </template>
 
-    <div v-else-if="status === 'success'" class="text-grey-500 col-span-10 md:col-span-6">
-      <span class="text-teal border-teal border-2 p-4 mr-8">Success</span>
-      Confirmed in {{ timeString }}
-    </div>
+    <template v-else-if="status === 'success'">
+      <div class="status success">Success</div>
+      <div>Confirmed in {{ timeString }}</div>
+    </template>
 
-    <div v-else-if="status === 'failed'" class="text-grey-500 col-span-10 md:col-span-6">
-      <span class="text-pink border-pink border-2 p-4 mr-8 px-8">Fail</span>
-      Failed after {{ timeString }}
-    </div>
-  </div>
+    <template v-else-if="status === 'failed'">
+      <div class="status failed">Fail</div>
+      <div>Failed after {{ timeString }}</div>
+    </template>
+  </section>
 
   <!-- Copy + button -->
-  <div :class="[...rowClasses]">
-    <div class="text-grey-500 col-span-10 my-auto">
-      <template v-if="status === 'pending'"> Your transaction is pending. </template>
-      <template v-if="status === 'success'"> Transaction successful! </template>
-      <template v-if="status === 'failed'">
-        Something went wrong. Please check the transaction and try again.
-      </template>
+  <section>
+    <div>
+      <template v-if="status === 'pending'">Your transaction is pending. </template>
+      <template v-if="status === 'success'">Transaction successful! </template>
+      <template v-if="status === 'failed'">Something went wrong. Please check the transaction and try again.</template>
     </div>
 
-    <div class="col-span-2">
-      <button
-        v-if="label"
-        @click="action ? action() : () => ({})"
-        class="btn"
-        :class="{ disabled: status === 'pending' }"
-        :disabled="status === 'pending'"
-      >
-        {{ label }}
-      </button>
-    </div>
-  </div>
+    <button
+      v-if="label"
+      @click="action ? action() : () => ({})"
+      class="btn ml-auto"
+      :class="{ disabled: status === 'pending' }"
+      :disabled="status === 'pending'"
+    >
+      {{ label }}
+    </button>
+  </section>
 </template>
 
 <script lang="ts">
@@ -56,17 +53,6 @@ import { getEtherscanUrl } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 const emittedEventName = 'onReceipt'; // emitted once we receive the transaction receipt
-const rowClasses = [
-  // styles applied to all rows in the HTML template
-  'text-grey-400',
-  'text-left',
-  'py-10',
-  'px-4',
-  'sm:px-6',
-  'lg:px-8',
-  'grid',
-  'grid-cols-12',
-];
 
 function useTransactionStatus(hash: string, context: SetupContext<'onReceipt'[]>) {
   // Transaction status management
@@ -116,9 +102,32 @@ export default defineComponent({
     return {
       action: props.buttonAction,
       label: props.buttonLabel,
-      rowClasses,
       ...useTransactionStatus(props.hash, context),
     };
   },
 });
 </script>
+
+<style scoped>
+label {
+  @apply text-grey-400 w-1/5;
+}
+
+section {
+  @apply px-4 py-8 md:px-12 border-b border-grey-100 flex flex-wrap items-center gap-x-8 gap-y-4;
+}
+
+.status {
+  @apply px-6 py-4 border-2 border-grey-500;
+}
+
+.status.pending {
+  @apply border-grey-500 text-grey-500;
+}
+.status.success {
+  @apply border-teal text-teal;
+}
+.status.failed {
+  @apply border-pink text-pink;
+}
+</style>
