@@ -294,9 +294,7 @@ export default function useCartStore() {
         return { token, rate: Number(formatUnits(amountOut, token.decimals)) };
       })
     );
-    console.log('quotes.value: ', quotes.value);
     _quotes.forEach((quote) => (quotes.value[quote.token.address] = quote.rate));
-    console.log('quotes.value: ', quotes.value);
   }
 
   // --- Getters ---
