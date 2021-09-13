@@ -19,11 +19,11 @@ type NetworkParams = {
 type DeployParams = Record<string, NetworkParams>;
 
 const params: DeployParams = {
-  hardhat: {
+  localhost: {
     donationToken: '0x6B175474E89094C44Da98b954EedeAC495271d0F', // DAI
     uniswapFactory: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
-    metadataAdmin: '0x0000000000000000000000000000000000000000',
+    metadataAdmin: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
     payoutAdmin: '0x0000000000000000000000000000000000000000',
     matchingToken: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', // GTC
     roundStartTime: 1661990400, // Thursday, September 1, 2022 12:00:00 AM GMT
