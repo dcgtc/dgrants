@@ -1,14 +1,19 @@
 <template>
   <div class="px-4 md:px-12">
-    <div class="border-b border-grey-100 py-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-2">
-        <!--contributor-->
-        <div class="truncate">
-          <div class="flex items-center gap-4">
-            <figure>
-              <Jazzicon :address="contribution.from" :key="contribution.from" />
-            </figure>
+    <div class="py-6 md:py-8 border-b border-grey-100">
+      <!-- 3 row even grid that collapse to 1 row grid on mobile -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-x-4 gap-y-2">
+        <div>
+          <!-- identicon + address + blocknumber -->
+          <div class="flex items-center gap-x-4">
+            <!--identicon-->
             <div>
+              <Jazzicon :address="contribution.from" :key="contribution.from" width="48" />
+            </div>
+
+            <!--address-->
+            <div>
+              <!-- whats the else on this? can there be NO contribution.from at all? -->
               <div v-if="contribution.from">
                 <a
                   class="link"
@@ -18,27 +23,27 @@
                   >{{ formatAddress(contribution.from) }}</a
                 >
               </div>
+              <!--blocknumber-->
               <div class="text-grey-400">#{{ contribution.blockNumber }}</div>
             </div>
           </div>
         </div>
 
-        <!-- tx -->
+        <!--transaction hash & transaction status-->
+        <!--todo : display real transaction status-->
         <div class="truncate">
-          <div class="truncate">
-            <a
-              class="link"
-              :href="`https://etherscan.io/tx/${contribution.transactionHash}`"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ contribution.transactionHash }}</a
-            >
-          </div>
+          <a
+            class="link"
+            :href="`https://etherscan.io/tx/${contribution.transactionHash}`"
+            target="_blank"
+            rel="noopener noreferrer"
+            >{{ contribution.transactionHash }}</a
+          >
           <div class="text-grey-400">Success</div>
         </div>
 
-        <!-- donation-->
-        <div class="truncate text-left md:text-right">
+        <!-- donation -->
+        <div class="md:ml-auto">
           <div>
             {{ formatNumber(formatUnits(contribution.args?.donationAmount, contribution.donationToken?.decimals), 2) }}
             {{ contribution.donationToken?.symbol }}
