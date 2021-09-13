@@ -45,7 +45,7 @@ contract GrantRegistry {
   function createGrant(
     address _owner,
     address _payee,
-    string memory _metaPtr
+    string calldata _metaPtr
   ) external {
     uint96 _id = grantCount;
     grants[_id] = Grant(_id, _owner, _payee, _metaPtr);
@@ -60,7 +60,7 @@ contract GrantRegistry {
    */
   function updateGrantOwner(uint96 _id, address _owner) external {
     Grant storage grant = grants[_id];
-    require(msg.sender == grant.owner, "Not authorized");
+    require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.owner = _owner;
     emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
   }
@@ -72,7 +72,7 @@ contract GrantRegistry {
    */
   function updateGrantPayee(uint96 _id, address _payee) external {
     Grant storage grant = grants[_id];
-    require(msg.sender == grant.owner, "Not authorized");
+    require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.payee = _payee;
     emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
   }
@@ -84,7 +84,7 @@ contract GrantRegistry {
    */
   function updateGrantMetaPtr(uint96 _id, string calldata _metaPtr) external {
     Grant storage grant = grants[_id];
-    require(msg.sender == grant.owner, "Not authorized");
+    require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.metaPtr = _metaPtr;
     emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
   }
@@ -103,7 +103,7 @@ contract GrantRegistry {
     address _payee,
     string calldata _metaPtr
   ) external {
-    require(msg.sender == grants[_id].owner, "Not authorized");
+    require(msg.sender == grants[_id].owner, "GrantRegistry: Not authorized");
     grants[_id] = Grant({id: _id, owner: _owner, payee: _payee, metaPtr: _metaPtr});
     emit GrantUpdated(_id, _owner, _payee, _metaPtr);
   }
@@ -124,6 +124,8 @@ contract GrantRegistry {
    * @param _endId Grant ID of last grant to return, exclusive, i.e. this grant ID is NOT included in return data
    */
   function getGrants(uint96 _startId, uint96 _endId) public view returns (Grant[] memory) {
+    require(_endId <= grantCount, "GrantRegistry: _endId must be <= grantCount");
+    require(_startId <= _endId, "GrantRegistry: Invalid ID range");
     Grant[] memory grantList = new Grant[](_endId - _startId);
     for (uint96 i = _startId; i < _endId; i++) {
       grantList[i - _startId] = grants[i]; // use index of `i - _startId` so index starts at zero
@@ -137,6 +139,7 @@ contract GrantRegistry {
    * @param _id Grant ID used to retrieve the payee address in the registry
    */
   function getGrantPayee(uint96 _id) public view returns (address) {
+    require(_id < grantCount, "GrantRegistry: Grant does not exist");
     Grant storage grant = grants[_id];
     return grant.payee;
   }

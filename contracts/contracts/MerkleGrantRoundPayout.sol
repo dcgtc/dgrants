@@ -41,7 +41,7 @@ contract MerkleGrantRoundPayout {
 
   /// --- Types ---
   struct Claim {
-    uint256 index; // index in claimedBitmao
+    uint256 index; // index in claimedBitmap
     address payee; // address to which the funds are sent
     uint256 amount; // amount to be claimed
     bytes32[] merkleProof; // generated merkle proof
@@ -65,7 +65,7 @@ contract MerkleGrantRoundPayout {
   function _setClaimed(uint256 _index) private {
     uint256 claimedWordIndex = _index / 256;
     uint256 claimedBitIndex = _index % 256;
-    claimedBitMap[claimedWordIndex] = claimedBitMap[claimedWordIndex] | (1 << claimedBitIndex);
+    claimedBitMap[claimedWordIndex] |= (1 << claimedBitIndex);
   }
 
   /**
