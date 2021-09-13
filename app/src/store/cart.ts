@@ -17,7 +17,6 @@ import useWalletStore from 'src/store/wallet';
 
 // --- Constants and helpers ---
 const CART_KEY = 'cart';
-const DEFAULT_CONTRIBUTION_TOKEN_ADDRESS = '0x6B175474E89094C44Da98b954EedeAC495271d0F'; // DAI
 const DEFAULT_CONTRIBUTION_AMOUNT = 5; // this is converted to a parsed BigNumber at checkout
 const EMPTY_CART: CartItemOptions[] = []; // and empty cart is identified by an empty array
 // Hardcoded swap paths based on a input token and swapping to DAI, based on most liquid pairs: https://info.uniswap.org/#/
@@ -170,17 +169,19 @@ export default function useCartStore() {
    */
   function addToCart(grantId: BigNumberish | undefined) {
     if (!grantId) return;
+    const { supportedTokens } = useWalletStore();
 
     // Do nothing if this item is already in the cart
     const cartGrantIds = cart.value.map((grant) => grant.grantId);
     if (cartGrantIds.includes(toString(grantId))) return;
 
     // Otherwise, add it to the cart and update localStorage
+    const DEFAULT_CONTRIBUTION_TOKEN = supportedTokens.value.find((token) => token.symbol === 'DAI');
     const newCart = [
       ...lsCart.value,
       {
         grantId: toString(grantId),
-        contributionTokenAddress: DEFAULT_CONTRIBUTION_TOKEN_ADDRESS,
+        contributionTokenAddress: <string>DEFAULT_CONTRIBUTION_TOKEN?.address,
         contributionAmount: DEFAULT_CONTRIBUTION_AMOUNT,
       },
     ];
