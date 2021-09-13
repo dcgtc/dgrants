@@ -15,7 +15,7 @@
         <span class="text-grey-400 mr-4">Contract:</span>
         <a
           class="link"
-          :href="`https://etherscan.io/address/${payoutAddress}`"
+          :href="getEtherscanUrl(payoutAddress, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(payoutAddress) }}</a
@@ -78,7 +78,7 @@ import useCartStore from 'src/store/cart';
 // --- Types ---
 import { Grant, GrantsRoundDetails } from '@dgrants/types';
 // --- Utils/helper ---
-import { formatAddress } from 'src/utils/utils';
+import { formatAddress, getEtherscanUrl } from 'src/utils/utils';
 // --- Components/icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
@@ -95,7 +95,7 @@ export default defineComponent({
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
-    return { addToCart, isInCart, removeFromCart, formatAddress };
+    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl };
   },
 });
 </script>

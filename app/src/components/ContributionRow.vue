@@ -16,7 +16,7 @@
               <div v-if="contribution.from">
                 <a
                   class="link"
-                  :href="`https://etherscan.io/address/${contribution.from}`"
+                  :href="getEtherscanUrl(contribution.from, 1, 'address')"
                   target="_blank"
                   rel="noopener noreferrer"
                   >{{ formatAddress(contribution.from) }}</a
@@ -33,11 +33,11 @@
         <div class="truncate">
           <a
             class="link"
-            :href="`https://etherscan.io/tx/${contribution.transactionHash}`"
+            :href="getEtherscanUrl(contribution.transactionHash, 1, 'tx')"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ contribution.transactionHash }}</a
-          >
+            >{{ contribution.transactionHash }}
+          </a>
           <div class="text-grey-400">Success</div>
         </div>
 
@@ -57,7 +57,7 @@
 import { defineComponent, PropType } from 'vue';
 // --- Utils/helpers ---
 import { formatUnits } from 'src/utils/ethers';
-import { formatAddress, formatNumber } from 'src/utils/utils';
+import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
 // --- Types ---
 import { ContributionEvent } from '@dgrants/types';
 // --- Components ---
@@ -70,7 +70,7 @@ export default defineComponent({
   },
   components: { Jazzicon },
   setup() {
-    return { formatUnits, formatAddress, formatNumber };
+    return { formatUnits, formatAddress, formatNumber, getEtherscanUrl };
   },
 });
 </script>

@@ -24,7 +24,7 @@
         <span class="text-grey-400 mr-4">Contract:</span>
         <a
           class="link"
-          :href="`https://etherscan.io/address/${grantRound.address}`"
+          :href="getEtherscanUrl(grantRound.address, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(grantRound.address) }}</a
@@ -36,7 +36,7 @@
         <span class="text-grey-400 mr-4">Payout Admin:</span>
         <a
           class="link"
-          :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`"
+          :href="getEtherscanUrl(grantRound.payoutAdmin, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(grantRound.payoutAdmin) }}</a
@@ -91,7 +91,7 @@ import { defineComponent, PropType } from 'vue';
 // --- Types ---
 import { GrantRound, GrantRoundMetadata } from '@dgrants/types';
 // --- Utils/helper ---
-import { pushRoute, formatAddress } from 'src/utils/utils';
+import { pushRoute, formatAddress, getEtherscanUrl } from 'src/utils/utils';
 // --- Methods ---
 import { BigNumber } from 'src/utils/ethers';
 
@@ -106,6 +106,7 @@ export default defineComponent({
       BigNumber,
       pushRoute,
       formatAddress,
+      getEtherscanUrl,
     };
   },
 });

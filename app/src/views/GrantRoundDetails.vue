@@ -13,7 +13,7 @@
         <a
           class="link"
           :title="grantRound.matchingToken.name"
-          :href="`https://etherscan.io/token/${grantRound.matchingToken.address}?a=${grantRound.address}`"
+          :href="`${getEtherscanUrl(grantRound.matchingToken.address, 1, 'token')}?a=${grantRound.address}`"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -40,7 +40,7 @@
         Metadata Admin:
         <a
           class="link"
-          :href="`https://etherscan.io/address/${grantRound.metadataAdmin}`"
+          :href="getEtherscanUrl(grantRound.metadataAdmin, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.metadataAdmin }}</a
@@ -50,7 +50,7 @@
         Payout Admin:
         <a
           class="link"
-          :href="`https://etherscan.io/address/${grantRound.payoutAdmin}`"
+          :href="getEtherscanUrl(grantRound.payoutAdmin, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.payoutAdmin }}</a
@@ -60,7 +60,7 @@
         Address:
         <a
           class="link"
-          :href="`https://etherscan.io/address/${grantRound.address}`"
+          :href="getEtherscanUrl(grantRound.address, 1, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.address }}</a
@@ -166,6 +166,7 @@ import {
   checkAllowance,
   getApproval,
   hasStatus,
+  getEtherscanUrl,
 } from 'src/utils/utils';
 // --- Types ---
 import { Grant, GrantRound } from '@dgrants/types';
@@ -302,6 +303,7 @@ function useGrantRoundDetail() {
     startContributing,
     cancelContribution,
     sendContribution,
+    getEtherscanUrl,
   };
 }
 
