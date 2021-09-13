@@ -9,6 +9,7 @@ import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/constants';
+import { SupportedChainId, CHAIN_INFO } from 'src/utils/chains';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -114,13 +115,9 @@ export async function pushRoute(to: RouteLocationRaw) {
 }
 
 // Generates the Etherscan URL based on the given `hash`, `chainId` and `group`
-export function getEtherscanUrl(hash: string, chainId: number, group: EtherscanGroup = 'tx') {
-  // Only mainnet is supported, but we include chain ID 31337 for local testing against Hardhat
-  let networkPrefix = '';
-  if (chainId === 1) networkPrefix = 'etherscan.io';
-  else if (chainId === 31337) networkPrefix = 'etherscan.io';
-  // else throw new Error(`Could not generate Etherscan URL: Invalid chain ID ${chainId}`);
-  return `https://${networkPrefix}/${group}/${hash}`;
+export function getEtherscanUrl(hash: string, chainId: SupportedChainId, group: EtherscanGroup = 'tx') {
+  const explorerBaseUrl = CHAIN_INFO[chainId].explorer;
+  return `${explorerBaseUrl}/${group}/${hash}`;
 }
 
 /**

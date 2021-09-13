@@ -29,6 +29,7 @@ import Onboard from 'bnc-onboard';
 import { API as OnboardAPI } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from 'src/utils/ethers';
 import { RPC_URL } from 'src/utils/constants';
+import { ALL_SUPPORTED_CHAIN_IDS } from 'src/utils/chains';
 
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
@@ -36,10 +37,8 @@ const defaultProvider = new JsonRpcProvider(RPC_URL);
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
-const supportedChainIds = [1, 4, 31337]; // chain IDs supported by this app
-/* eslint-disable @typescript-eslint/no-explicit-any */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
-/* eslint-enable @typescript-eslint/no-explicit-any */
 const provider = ref<Web3Provider | JsonRpcProvider>(defaultProvider); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
@@ -171,7 +170,7 @@ export default function useWalletStore() {
 
     // Exit if not a valid network
     const chainId = _provider.network.chainId; // must be done after the .getNetwork() call
-    if (!supportedChainIds.includes(chainId)) {
+    if (!ALL_SUPPORTED_CHAIN_IDS.includes(chainId)) {
       network.value = markRaw(_network); // save network for checking if this is a supported network
       return;
     }
@@ -201,7 +200,9 @@ export default function useWalletStore() {
     changeWallet,
     setProvider,
     // Properties
-    isSupportedNetwork: computed(() => (network.value ? supportedChainIds.includes(network.value.chainId) : true)), // assume valid if we have no network information
+    isSupportedNetwork: computed(
+      () => (network.value ? ALL_SUPPORTED_CHAIN_IDS.includes(network.value.chainId) : true) // assume valid if we have no network information
+    ),
     network: computed(() => network.value),
     provider: computed(() => provider.value),
     signer: computed(() => signer.value),
