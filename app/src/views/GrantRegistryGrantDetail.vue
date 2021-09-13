@@ -198,9 +198,7 @@
     <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant selected</h2>
   </div>
 
-  <div v-else>
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Loading...</h2>
-  </div>
+  <LoadingScreen v-else />
 </template>
 
 <script lang="ts">
@@ -244,6 +242,7 @@ import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantDetailsRow from 'src/components/GrantDetailsRow.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
+import LoadingScreen from 'src/components/LoadingScreen.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 // --- Icons ---
 import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
@@ -633,6 +632,7 @@ export default defineComponent({
     EditIcon,
     ShareIcon,
     TransactionStatus,
+    LoadingScreen,
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();

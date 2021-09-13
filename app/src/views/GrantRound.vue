@@ -142,9 +142,7 @@
   </div>
 
   <!-- Loading -->
-  <div v-else>
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">Loading...</h2>
-  </div>
+  <LoadingScreen v-else />
 </template>
 
 <script lang="ts">
@@ -158,6 +156,7 @@ import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
+import LoadingScreen from 'src/components/LoadingScreen.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -385,6 +384,7 @@ export default defineComponent({
     DonateIcon,
     TwitterIcon,
     TransactionStatus,
+    LoadingScreen,
   },
   setup() {
     return { ...useGrantRoundDetail() };
