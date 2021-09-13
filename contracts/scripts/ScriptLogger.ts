@@ -37,7 +37,12 @@ export class ScriptLogger {
     console.log('------------------------');
 
     for (const param in this.config) {
-      const value = this.config[param];
+      let value = this.config[param];
+
+      if (typeof value === 'object') {
+        value = JSON.stringify(value);
+      }
+
       console.log(`  ${param}: ${value}`);
     }
 

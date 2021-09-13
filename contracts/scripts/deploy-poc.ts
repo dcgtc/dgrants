@@ -1,3 +1,4 @@
+import fs from 'fs';
 import hre from 'hardhat';
 import { create } from 'ipfs-http-client';
 import { ScriptLogger } from './ScriptLogger';
@@ -50,9 +51,21 @@ const ipfs = create({
     await roundManager.deployed();
     logger.recordContract('GrantRoundManager', roundManager.address);
 
-    // Upload the Round metadata to IPFS
-    const res = await ipfs.add(networkParams.metadataJson);
-    const metadataCid = res.cid.toString();
+    // Upload the Round metadata to IPFS (3 steps)
+    const metadata = networkParams.metadataJson;
+
+    // 1. Upload the round logo
+    const logoFile = await fs.readFileSync(networkParams.roundLogoPath);
+    const logoResult = await ipfs.add(logoFile);
+    const logoCid = logoResult.cid.toString();
+    logger.recordAction('PublishGrantRoundLogo', logoCid);
+
+    // 2. Update the metadata to include the logo metaPtr
+    metadata['logoURI'] = `${networkParams.ipfsRetrievalEndpoint}/${logoCid}`;
+
+    // 3. Upload the metadata
+    const metadataResult = await ipfs.add(JSON.stringify(metadata));
+    const metadataCid = metadataResult.cid.toString();
     logger.recordAction('PublishGrantRoundMetadata', metadataCid);
 
     // Create the GrantRound

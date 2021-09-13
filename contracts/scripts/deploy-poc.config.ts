@@ -1,5 +1,4 @@
-import metadataRaw from './grant-round-metadata.json';
-const metadataJson = JSON.stringify(metadataRaw);
+import metadataJson from './grant-round-metadata.json';
 
 type NetworkParams = {
   // GrantRoundManager parameters
@@ -13,7 +12,8 @@ type NetworkParams = {
   roundStartTime: number;
   roundEndTime: number;
   ipfsRetrievalEndpoint: string;
-  metadataJson: string;
+  roundLogoPath: string; // this path must be relative to the 'contracts' directory
+  metadataJson: Record<string, any>;
 };
 
 type DeployParams = Record<string, NetworkParams>;
@@ -29,6 +29,7 @@ const params: DeployParams = {
     roundStartTime: 1661990400, // Thursday, September 1, 2022 12:00:00 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/dgrants-placeholder.png',
     metadataJson,
   },
   mainnet: {
@@ -41,6 +42,7 @@ const params: DeployParams = {
     roundStartTime: 0,
     roundEndTime: 0,
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './dgrants-placeholder.png',
     metadataJson,
   },
 };
