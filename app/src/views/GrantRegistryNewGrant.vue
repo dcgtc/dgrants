@@ -13,7 +13,7 @@
 
     <form @submit.prevent="createGrant">
       <!-- Grant name -->
-      <InputRow :deleteable="false" :intended="false" text="">
+      <InputRow>
         <template v-slot:label>Title:</template>
         <template v-slot:input>
           <BaseInput
@@ -28,7 +28,7 @@
       </InputRow>
 
       <!-- Owner address -->
-      <InputRow :deleteable="false" :intended="false" text="has permission to edit the grant">
+      <InputRow text="has permission to edit the grant">
         <template v-slot:label>Owner address:</template>
         <template v-slot:input>
           <BaseInput
@@ -43,7 +43,7 @@
       </InputRow>
 
       <!-- Payee address -->
-      <InputRow :deleteable="false" :intended="false" text="contributions and matching funds are sent to">
+      <InputRow text="address all contributions and matching funds are sent to">
         <template v-slot:label>Payee address:</template>
         <template v-slot:input>
           <BaseInput
@@ -58,7 +58,7 @@
       </InputRow>
 
       <!-- Grant Description -->
-      <InputRow :deleteable="false" :intended="false" text="">
+      <InputRow>
         <template v-slot:label>Description:</template>
         <template v-slot:input>
           <BaseTextarea
@@ -74,7 +74,7 @@
       </InputRow>
 
       <!-- Grant website -->
-      <InputRow :deleteable="false" :intended="false" text="">
+      <InputRow>
         <template v-slot:label>Website:</template>
         <template v-slot:input>
           <BaseInput
@@ -90,7 +90,7 @@
       </InputRow>
 
       <!-- Grant github -->
-      <InputRow :deleteable="false" :intended="false" text="">
+      <InputRow>
         <template v-slot:label>Github:</template>
         <template v-slot:input>
           <BaseInput
@@ -106,7 +106,7 @@
       </InputRow>
 
       <!-- Grant twitter handle -->
-      <InputRow :deleteable="false" :intended="false" text="">
+      <InputRow>
         <template v-slot:label>Twitter:</template>
         <template v-slot:input>
           <BaseInput
