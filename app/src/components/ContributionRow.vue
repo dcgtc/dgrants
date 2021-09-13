@@ -16,7 +16,7 @@
               <div v-if="contribution.from">
                 <a
                   class="link"
-                  :href="getEtherscanUrl(contribution.from, 1, 'address')"
+                  :href="getEtherscanUrl(contribution.from, chainId, 'address')"
                   target="_blank"
                   rel="noopener noreferrer"
                   >{{ formatAddress(contribution.from) }}</a
@@ -31,12 +31,12 @@
         <!--transaction hash & transaction status-->
         <!--todo : display real transaction status-->
         <div class="truncate">
-          <a
-            class="link"
+          <a class="link"
             :href="getEtherscanUrl(contribution.transactionHash, 1, 'tx')"
             target="_blank"
             rel="noopener noreferrer"
-            >{{ contribution.transactionHash }}
+          >
+            {{ contribution.transactionHash }}
           </a>
           <div class="text-grey-400">Success</div>
         </div>
@@ -54,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 // --- Utils/helpers ---
 import { formatUnits } from 'src/utils/ethers';
 import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
@@ -62,6 +62,7 @@ import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
 import { ContributionEvent } from '@dgrants/types';
 // --- Components ---
 import Jazzicon from 'src/components/Jazzicon.vue';
+import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'ContributionRow',
@@ -70,7 +71,11 @@ export default defineComponent({
   },
   components: { Jazzicon },
   setup() {
-    return { formatUnits, formatAddress, formatNumber, getEtherscanUrl };
+    const chainId = computed(() => {
+      const { network } = useWalletStore();
+      return network.value?.chainId ? network.value.chainId : 1;
+    });
+    return { formatUnits, formatAddress, formatNumber, getEtherscanUrl, chainId };
   },
 });
 </script>

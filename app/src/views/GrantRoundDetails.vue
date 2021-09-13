@@ -13,7 +13,7 @@
         <a
           class="link"
           :title="grantRound.matchingToken.name"
-          :href="`${getEtherscanUrl(grantRound.matchingToken.address, 1, 'token')}?a=${grantRound.address}`"
+          :href="`${getEtherscanUrl(grantRound.matchingToken.address, chainId, 'token')}?a=${grantRound.address}`"
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -40,7 +40,7 @@
         Metadata Admin:
         <a
           class="link"
-          :href="getEtherscanUrl(grantRound.metadataAdmin, 1, 'address')"
+          :href="getEtherscanUrl(grantRound.metadataAdmin, chainId, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.metadataAdmin }}</a
@@ -50,7 +50,7 @@
         Payout Admin:
         <a
           class="link"
-          :href="getEtherscanUrl(grantRound.payoutAdmin, 1, 'address')"
+          :href="getEtherscanUrl(grantRound.payoutAdmin, chainId, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.payoutAdmin }}</a
@@ -60,7 +60,7 @@
         Address:
         <a
           class="link"
-          :href="getEtherscanUrl(grantRound.address, 1, 'address')"
+          :href="getEtherscanUrl(grantRound.address, chainId, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ grantRound.address }}</a
@@ -181,7 +181,9 @@ function useGrantRoundDetail() {
     poll,
   } = useDataStore();
 
-  const { signer, userAddress } = useWalletStore();
+  const { signer, userAddress, network } = useWalletStore();
+
+  const chainId = network.value?.chainId;
   const route = useRoute();
 
   // get a single grantRound or an empty/error object (TODO: should the typings be modified to account for an empty object?)
@@ -304,6 +306,7 @@ function useGrantRoundDetail() {
     cancelContribution,
     sendContribution,
     getEtherscanUrl,
+    chainId,
   };
 }
 

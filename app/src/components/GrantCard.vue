@@ -25,7 +25,7 @@
           >by
           <a
             class="text-grey-500 underline"
-            :href="getEtherscanUrl(ownerAddress, 1, 'address')"
+            :href="getEtherscanUrl(ownerAddress, chainId, 'address')"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -41,7 +41,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 // --- Methods and Data ---
@@ -49,6 +49,7 @@ import { BigNumber, BigNumberish } from 'src/utils/ethers';
 import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
+import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'GrantCard',
@@ -62,7 +63,11 @@ export default defineComponent({
   components: { CartIcon },
   setup() {
     const { addToCart, isInCart } = useCartStore();
-    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber };
+    const chainId = computed(() => {
+      const { network } = useWalletStore();
+      return network.value?.chainId ? network.value.chainId : 1;
+    });
+    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber, chainId };
   },
 });
 </script>

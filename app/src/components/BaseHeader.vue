@@ -14,7 +14,7 @@
       <a
         v-if="owner"
         class="link mr-4"
-        :href="getEtherscanUrl(owner, 1, 'address')"
+        :href="getEtherscanUrl(owner, chainId, 'address')"
         target="_blank"
         rel="noopener noreferrer"
         >{{ formattedOwner }}</a
@@ -59,6 +59,7 @@ import Breadcrumb from 'src/components/Breadcrumb.vue';
 import { ArrowLeft4Icon as ArrowLeftIcon } from '@fusion-icons/vue/interface';
 import { ArrowRight4Icon as ArrowRightIcon } from '@fusion-icons/vue/interface';
 import { daysAgo, formatAddress } from 'src/utils/utils';
+import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'BaseHeader',
@@ -78,8 +79,12 @@ export default defineComponent({
     const formattedLastUpdated = computed(() =>
       props.lastUpdated ? daysAgo(new Date(props.lastUpdated).getTime() / 1000) : false
     );
+    const chainId = computed(() => {
+      const { network } = useWalletStore();
+      return network.value?.chainId ? network.value.chainId : 1;
+    });
 
-    return { formattedOwner, formattedLastUpdated, getEtherscanUrl };
+    return { formattedOwner, formattedLastUpdated, getEtherscanUrl, chainId };
   },
 });
 </script>
