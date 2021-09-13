@@ -29,6 +29,7 @@ import {
   isAddress,
   parseUnits,
   getAddress,
+  formatUnits,
 } from 'src/utils/ethers';
 import { assertSufficientBalance } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
