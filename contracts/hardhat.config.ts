@@ -40,12 +40,7 @@ if (!alchemyApiKey) {
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
   return {
-    accounts: {
-      count: 10,
-      initialIndex: 0,
-      mnemonic,
-      path: "m/44'/60'/0'/0",
-    },
+    accounts: [process.env.DEPLOY_PRIVATE_KEY as string],
     chainId: chainIds[network],
     url,
   };
