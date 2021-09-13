@@ -193,7 +193,7 @@ export default function useWalletStore() {
   }
 
   // ---------------------------------------------------- Exports ----------------------------------------------------
-  const chainId = computed(() => network.value?.chainId);
+  const chainId = computed(() => network.value?.chainId as SupportedChainId);
 
   // Define parts of the store to expose. Only expose computed properties or methods to avoid direct mutation of state
   return {
@@ -204,6 +204,7 @@ export default function useWalletStore() {
     changeWallet,
     setProvider,
     // Properties
+    chainId: computed(() => chainId.value || mainnetChainId), // default to mainnet if wallet is not connected
     supportedTokens: computed(
       () => (chainId.value ? SUPPORTED_TOKENS[chainId.value] : SUPPORTED_TOKENS[mainnetChainId]) // default to mainnet if wallet is not connected
     ),

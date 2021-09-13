@@ -8,6 +8,7 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
+import { SupportedChainId } from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, WAD, WETH_ADDRESS } from 'src/utils/constants'; // prettier-ignore
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance } from 'src/utils/utils';
@@ -21,7 +22,7 @@ const DEFAULT_CONTRIBUTION_AMOUNT = 5; // this is converted to a parsed BigNumbe
 const EMPTY_CART: CartItemOptions[] = []; // and empty cart is identified by an empty array
 // Hardcoded swap paths based on a input token and swapping to DAI, based on most liquid pairs: https://info.uniswap.org/#/
 // TODO replace with more robust swap path logic
-const SWAP_PATHS = {
+const MAINNET_SWAP_PATHS = {
   // ETH to DAI through the 0.3% pool
   '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
   // USDC to DAI through the 0.05% pool
@@ -33,9 +34,38 @@ const SWAP_PATHS = {
   // DAI "swap path" is just its token address for our router
   '0x6B175474E89094C44Da98b954EedeAC495271d0F': '0x6b175474e89094c44da98b954eedeac495271d0f',
 };
+const SWAP_PATHS = {
+  [SupportedChainId.MAINNET]: MAINNET_SWAP_PATHS,
+  [SupportedChainId.HARDHAT]: MAINNET_SWAP_PATHS,
+  [SupportedChainId.RINKEBY]: {
+    // ETH to DAI through the 0.3% pool
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc778417e063141139fce010982780140aa0cd5ab000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  },
+  [SupportedChainId.OPTIMISM]: {
+    // ETH to DAI through the 0.3% pool
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+    // USDC to DAI through the 0.3% pool
+    '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+  },
+  [SupportedChainId.OPTIMISTIC_KOVAN]: {
+    // ETH to DAI through the 0.3% pool
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+    // USDC to DAI through the 0.3% pool
+    '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+  },
+  // *** Arbitrum paths are currently not handled as there is no bridged DAI ***
+  // We use the mainnet paths here just to avoid lint errors
+  [SupportedChainId.ARBITRUM_ONE]: {
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  },
+  [SupportedChainId.ARBITRUM_RINKEBY]: {
+    // Seems Uniswap V3 has no liquidity here
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+  },
+};
 
 const { grants, grantRounds } = useDataStore();
-const { supportedTokens, supportedTokensMapping } = useWalletStore();
+const { chainId, supportedTokens, supportedTokensMapping } = useWalletStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
@@ -215,7 +245,7 @@ export default function useCartStore() {
     const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
       const decimals = supportedTokensMapping.value[tokenAddress].decimals;
       const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
-      const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>tokenAddress];
+      const path = swapPaths.value[tokenAddress as keyof typeof swapPaths.value];
       // Use Uniswap's Quoter.sol to get amountOutMin, unless the path indicates so swap is required
       const amountOutMin = path.length === 42 ? amountIn : await quoteExactInput(path, amountIn);
       return { amountIn, amountOutMin, path };
@@ -258,7 +288,7 @@ export default function useCartStore() {
     const _quotes = await Promise.all(
       supportedTokens.value.map(async (token) => {
         if (token.symbol === 'DAI' || token.symbol === 'USDC') return { token, rate: 1 };
-        const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>token.address];
+        const path = swapPaths.value[token.address as keyof typeof swapPaths.value];
         const amountIn = parseUnits('1', token.decimals); // for simplicity, use a value of 1 token for getting quotes
         const amountOut = await quoteExactInput(path, amountIn); // as raw BigNumber
         return { token, rate: Number(formatUnits(amountOut, token.decimals)) };
@@ -303,6 +333,11 @@ export default function useCartStore() {
     }, '');
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });
+
+  /**
+   * @notice Returns list of valid swap paths for the specified chainId
+   */
+  const swapPaths = computed(() => SWAP_PATHS[chainId.value]);
 
   // Only export additional items as they are needed outside the store
   return {
