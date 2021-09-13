@@ -8,7 +8,6 @@ contract GrantRound {
   using SafeERC20 for IERC20;
 
   // --- Data ---
-
   /// @notice Unix timestamp of the start of the round
   uint256 public immutable startTime;
 
@@ -37,15 +36,10 @@ contract GrantRound {
   bool public hasPaidOut;
 
   // --- Events ---
-
-  /// @notice Emitted when a grant receives a donation
-  event DonationSent(uint96 indexed id, address indexed token, uint256 amount, address indexed donor);
-
   /// @notice Emitted when a grant round metadata pointer is updated
   event MetadataUpdated(string oldMetaPtr, string indexed newMetaPtr);
 
   // --- Core methods ---
-
   /**
    * @notice Instantiates a new grant round
    * @param _metadataAdmin The address with the role that has permission to update the metadata pointer
@@ -108,12 +102,10 @@ contract GrantRound {
    * @notice Updates the metadata pointer to a new location
    * @param _newMetaPtr A string where the updated metadata is stored
    */
-  function updateMetadataPtr(string memory _newMetaPtr) external {
+  function updateMetadataPtr(string calldata _newMetaPtr) external {
     require(msg.sender == metadataAdmin, "GrantRound: Action can be perfomed only by metadataAdmin");
-    string memory oldPtr = metaPtr;
+    emit MetadataUpdated(metaPtr, _newMetaPtr);
     metaPtr = _newMetaPtr;
-
-    emit MetadataUpdated(oldPtr, _newMetaPtr);
   }
 
   /**

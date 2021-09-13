@@ -13,6 +13,7 @@ contract GrantRoundManager is SwapRouter {
   using Address for address;
   using BytesLib for bytes;
   using SafeERC20 for IERC20;
+  using SafeMath for uint256;
 
   // --- Data ---
   /// @notice Address of the GrantRegistry
@@ -126,10 +127,13 @@ contract GrantRoundManager is SwapRouter {
       swapOutputs[_tokenIn] = 0;
       donationRatios[_tokenIn] = 0;
     }
+    for (uint256 i = 0; i < _donations.length; i++) {
+      donationRatios[_donations[i].token] = 0;
+    }
   }
 
   /**
-   * @dev Validates the the inputs to a donation call are valid, and reverts if any requirements are violated
+   * @dev Validates the inputs to a donation call are valid, and reverts if any requirements are violated
    * @param _donations Array of donations that will be executed
    */
   function _validateDonations(Donation[] calldata _donations) internal {
@@ -141,12 +145,13 @@ contract GrantRoundManager is SwapRouter {
       require(_donations[i].grantId < registry.grantCount(), "GrantRoundManager: Grant does not exist in registry");
 
       // Used later to validate ratios are correctly provided
-      donationRatios[_donations[i].token] += _donations[i].ratio;
+      donationRatios[_donations[i].token] = donationRatios[_donations[i].token].add(_donations[i].ratio);
 
       // Validate round parameters
       GrantRound[] calldata _rounds = _donations[i].rounds;
       for (uint256 j = 0; j < _rounds.length; j++) {
         require(_rounds[j].isActive(), "GrantRoundManager: GrantRound is not active");
+        require(_rounds[j].registry() == registry, "GrantRoundManager: Round-Registry mismatch");
         require(
           donationToken == _rounds[j].donationToken(),
           "GrantRoundManager: GrantRound's donation token does not match GrantRoundManager's donation token"
@@ -162,6 +167,10 @@ contract GrantRoundManager is SwapRouter {
    */
   function _executeDonationSwaps(SwapSummary[] calldata _swaps, uint256 _deadline) internal {
     for (uint256 i = 0; i < _swaps.length; i++) {
+      // Validate output token is donation token
+      IERC20 _outputToken = IERC20(_swaps[i].path.toAddress(_swaps[i].path.length - 20));
+      require(_outputToken == donationToken, "GrantRoundManager: Output token must match donation token");
+
       // Validate ratios sum to 100%
       IERC20 _tokenIn = IERC20(_swaps[i].path.toAddress(0));
       require(donationRatios[_tokenIn] == WAD, "GrantRoundManager: Ratios do not sum to 100%");
@@ -195,19 +204,17 @@ contract GrantRoundManager is SwapRouter {
       GrantRound[] calldata _rounds = _donations[i].rounds;
       uint96 _grantId = _donations[i].grantId;
       IERC20 _tokenIn = _donations[i].token;
-      uint256 _donationAmount = (swapOutputs[_tokenIn] * _donations[i].ratio) / WAD;
+      uint256 _donationAmount = (swapOutputs[_tokenIn].mul(_donations[i].ratio)) / WAD;
       require(_donationAmount > 0, "GrantRoundManager: Donation amount must be greater than zero"); // verifies that swap and donation inputs are consistent
 
       // Execute transfer
+      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
       address _payee = registry.getGrantPayee(_grantId);
       if (_tokenIn == donationToken) {
         _tokenIn.safeTransferFrom(msg.sender, _payee, _donationAmount); // transfer token directly from caller
       } else {
         donationToken.transfer(_payee, _donationAmount); // transfer swap output
       }
-
-      // Emit event
-      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
     }
   }
 }

@@ -92,10 +92,11 @@ describe('GrantRegistry', function () {
 
     it('reverts if unauthorized user tries to edit a grant', async () => {
       const registryUser2 = await registry.connect(user2); // instance of registry contract with `user1` as signer
-      await expect(registryUser2.updateGrantOwner(id, owner)).to.be.revertedWith('Not authorized');
-      await expect(registryUser2.updateGrantPayee(id, payee)).to.be.revertedWith('Not authorized');
-      await expect(registryUser2.updateGrantMetaPtr(id, metaPtr)).to.be.revertedWith('Not authorized');
-      await expect(registryUser2.updateGrant(id, owner, payee, metaPtr)).to.be.revertedWith('Not authorized');
+      const errMsg = 'GrantRegistry: Not authorized';
+      await expect(registryUser2.updateGrantOwner(id, owner)).to.be.revertedWith(errMsg);
+      await expect(registryUser2.updateGrantPayee(id, payee)).to.be.revertedWith(errMsg);
+      await expect(registryUser2.updateGrantMetaPtr(id, metaPtr)).to.be.revertedWith(errMsg);
+      await expect(registryUser2.updateGrant(id, owner, payee, metaPtr)).to.be.revertedWith(errMsg);
     });
 
     it('lets owner update owner', async () => {

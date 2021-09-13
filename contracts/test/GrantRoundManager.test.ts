@@ -150,6 +150,7 @@ describe('GrantRoundManager', () => {
       mockRound = await deployMockContract(user, artifacts.readArtifactSync('GrantRound').abi);
       await mockRound.mock.donationToken.returns(tokens.gtc.address);
       await mockRound.mock.isActive.returns(true);
+      await mockRound.mock.registry.returns(mockRegistry.address);
 
       // Set payee address to be a random address
       payee1 = randomAddress();
@@ -259,7 +260,7 @@ describe('GrantRoundManager', () => {
 
         // Get the donationAmount from the swap from the GrantDonation log
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 2]); // event we want is second to last event emitted
         const { donationAmount } = log.args;
         expect(await balanceOf('gtc', payee1)).to.equal(donationAmount);
       });
@@ -273,7 +274,7 @@ describe('GrantRoundManager', () => {
 
         // Get the donationAmount from the swap from the GrantDonation log
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 2]); // event we want is second to last event emitted
         const { donationAmount } = log.args;
         expect(await balanceOf('gtc', payee1)).to.equal(donationAmount);
       });
@@ -286,7 +287,7 @@ describe('GrantRoundManager', () => {
 
         // Get the donationAmount from the swap from the GrantDonation log
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
-        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 1]); // the event we want is the last one
+        const log = manager.interface.parseLog(receipt.logs[receipt.logs.length - 2]); // event we want is second to last event emitted
         const { donationAmount } = log.args;
         expect(await balanceOf('gtc', payee1)).to.equal(donationAmount);
       });
