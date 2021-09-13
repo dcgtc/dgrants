@@ -261,25 +261,9 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import {
-  GRANT_REGISTRY_ADDRESS,
-  GRANT_REGISTRY_ABI,
-  GRANT_ROUND_MANAGER_ABI,
-  GRANT_ROUND_MANAGER_ADDRESS,
-  SUPPORTED_TOKENS_MAPPING,
-  LOREM_IPSOM_TEXT,
-} from 'src/utils/constants';
+import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, LOREM_IPSOM_TEXT } from 'src/utils/constants'; // prettier-ignore
 import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
-import {
-  isValidAddress,
-  isValidWebsite,
-  isValidGithub,
-  isValidTwitter,
-  isDefined,
-  formatNumber,
-  urlFromTwitterHandle,
-  cleanTwitterUrl,
-} from 'src/utils/utils';
+import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
 import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
 import * as ipfs from 'src/utils/ipfs';
@@ -310,7 +294,7 @@ function useGrantDetail() {
     grantRounds: rounds,
     grantRoundMetadata: roundsMetadata,
   } = useDataStore();
-  const { signer, provider, userAddress } = useWalletStore();
+  const { signer, provider, userAddress, supportedTokensMapping } = useWalletStore();
   const route = useRoute();
 
   // --- expose grant data ---
@@ -346,7 +330,7 @@ function useGrantDetail() {
         grantRound: round.address,
         grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
         grantRegistry: GRANT_REGISTRY_ADDRESS,
-        supportedTokens: SUPPORTED_TOKENS_MAPPING,
+        supportedTokens: supportedTokensMapping.value,
         // should these be pulled from an endpoint?
         ignore: {
           grants: [],
