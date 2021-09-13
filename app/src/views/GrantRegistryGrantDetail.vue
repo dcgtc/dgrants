@@ -50,60 +50,52 @@
       </div>
 
       <!-- LINKS -->
-      <SectionHeader
-        v-if="
-          isDefined(grantMetadata?.properties?.websiteURI) ||
-          isDefined(grantMetadata?.properties?.githubURI) ||
-          isDefined(grantMetadata?.properties?.twitterURI)
-        "
-        title="Links"
-      />
-      <div
-        v-if="
-          isDefined(grantMetadata?.properties?.websiteURI) ||
-          isDefined(grantMetadata?.properties?.githubURI) ||
-          isDefined(grantMetadata?.properties?.twitterURI)
-        "
-        class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4"
-      >
-        <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
-          <span class="text-grey-400">Website:</span>
-          <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{
-            grantMetadata?.properties?.websiteURI
-          }}</a>
-        </div>
+      <template v-if="areLinksDefined">
+        <SectionHeader title="Links" />
+        <div class="px-4 md:px-12 py-8 border-b border-grey-100 flex flex-col gap-y-4">
+          <div v-if="isDefined(grantMetadata?.properties?.websiteURI)" class="flex gap-x-4">
+            <span class="text-grey-400">Website:</span>
+            <a :href="grantMetadata?.properties?.websiteURI" target="_blank">{{
+              grantMetadata?.properties?.websiteURI
+            }}</a>
+          </div>
 
-        <div v-if="isDefined(grantMetadata?.properties?.githubURI)" class="flex gap-x-4">
-          <span class="text-grey-400">Github:</span>
-          <a :href="grantMetadata?.properties?.githubURI" target="_blank">{{ grantMetadata?.properties?.githubURI }}</a>
-        </div>
+          <div v-if="isDefined(grantMetadata?.properties?.githubURI)" class="flex gap-x-4">
+            <span class="text-grey-400">Github:</span>
+            <a :href="grantMetadata?.properties?.githubURI" target="_blank">{{
+              grantMetadata?.properties?.githubURI
+            }}</a>
+          </div>
 
-        <div v-if="isDefined(grantMetadata?.properties?.twitterURI)" class="flex gap-x-4">
-          <span class="text-grey-400">Twitter:</span>
-          <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{
-            grantMetadata?.properties?.twitterURI
-          }}</a>
+          <div v-if="isDefined(grantMetadata?.properties?.twitterURI)" class="flex gap-x-4">
+            <span class="text-grey-400">Twitter:</span>
+            <a :href="grantMetadata?.properties?.twitterURI" target="_blank">{{
+              grantMetadata?.properties?.twitterURI
+            }}</a>
+          </div>
         </div>
-      </div>
+      </template>
 
       <!-- CONTRIBUTIONS -->
-      <SectionHeader v-if="grantContributions.length > 0" title="Contributions" />
-      <div v-if="grantContributions.length > 0">
-        <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
-        <div v-if="selectedRound == 0">
-          <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
-            <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+      <template v-if="grantContributions.length > 0">
+        <SectionHeader title="Contributions" />
+        <div>
+          <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
+          <div v-if="selectedRound == 0">
+            <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
+              <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+            </div>
+          </div>
+          <div v-else>
+            <div
+              v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
+              :key="Number(index)"
+            >
+              <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+            </div>
           </div>
         </div>
-        <div v-else>
-          <div
-            v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
-            :key="Number(index)"
-          >
-            <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
-          </div>
-        </div>
-      </div>
+      </template>
     </div>
 
     <!-- Editing grant -->
@@ -454,6 +446,13 @@ function useGrantDetail() {
       ]
   );
 
+  const areLinksDefined = computed(
+    () =>
+      isDefined(grantMetadata.value?.properties?.websiteURI) ||
+      isDefined(grantMetadata.value?.properties?.githubURI) ||
+      isDefined(grantMetadata.value?.properties?.twitterURI)
+  );
+
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
@@ -617,6 +616,7 @@ function useGrantDetail() {
     grantContributionsByRound,
     LOREM_IPSOM_TEXT,
     txHash,
+    areLinksDefined,
   };
 }
 
