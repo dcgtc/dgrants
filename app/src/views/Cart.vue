@@ -193,8 +193,6 @@ function useCart() {
     for (const [tokenAddress, amount] of Object.entries(cartSummary.value)) {
       if (!amount) continue;
       const exchangeRate = quotes.value[tokenAddress] ?? 0;
-      console.log('amount: ', amount);
-      console.log('exchangeRate: ', exchangeRate);
       sum += amount * exchangeRate;
     }
     return sum;
