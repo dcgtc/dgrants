@@ -105,82 +105,120 @@
 
       <div v-if="selectedEdit == 0" class="text-left">
         <form class="space-y-5" @submit.prevent="saveEdits">
+          <!-- Grant name -->
+          <InputRow :deleteable="false" :intended="false" text="">
+            <template v-slot:label>Title:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.name"
+                width="w-full"
+                placeholder="Grant name"
+                id="grant-name"
+                :rules="isDefined"
+                errorMsg="Please enter a name"
+              />
+            </template>
+          </InputRow>
+
           <!-- Owner address -->
-          <BaseInput
-            v-model="form.owner"
-            description="The owner has permission to edit the grant"
-            id="owner-address"
-            label="Owner address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
+          <InputRow :deleteable="false" :intended="false" text="has permission to edit the grant">
+            <template v-slot:label>Owner Adddress:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.owner"
+                width="w-full"
+                id="owner-address"
+                placeholder="owner ethereum address"
+                :rules="isValidAddress"
+                errorMsg="Please enter a valid address"
+              />
+            </template>
+          </InputRow>
 
           <!-- Payee address -->
-          <BaseInput
-            v-model="form.payee"
-            description="The address contributions and matching funds are sent to"
-            id="payee-address"
-            label="Payee address"
-            :rules="isValidAddress"
-            errorMsg="Please enter a valid address"
-          />
-
-          <!-- Grant name -->
-          <BaseInput
-            v-model="form.name"
-            description="Your grant's name"
-            id="grant-name"
-            label="Grant name"
-            :rules="isDefined"
-            errorMsg="Please enter a name"
-          />
+          <InputRow :deleteable="false" :intended="false" text="contributions and matching funds are sent to">
+            <template v-slot:label>Payee Adddress:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.payee"
+                width="w-full"
+                placeholder="payee ethereum address"
+                id="payee-address"
+                :rules="isValidAddress"
+                errorMsg="Please enter a valid address"
+              />
+            </template>
+          </InputRow>
 
           <!-- Grant Description -->
-          <BaseTextarea
-            v-model="form.description"
-            :placeholder="LOREM_IPSOM_TEXT"
-            id="grant-description"
-            label="Grant description"
-            :required="true"
-            :rules="isDefined"
-            errorMsg="Please enter a description"
-          />
+          <InputRow :deleteable="false" :intended="false" text="">
+            <template v-slot:label>Description:</template>
+            <template v-slot:input>
+              <BaseTextarea
+                v-model="form.description"
+                width="w-full"
+                :placeholder="LOREM_IPSOM_TEXT"
+                id="grant-description"
+                :required="true"
+                :rules="isDefined"
+                errorMsg="Please enter a description"
+              />
+            </template>
+          </InputRow>
 
           <!-- Grant website -->
-          <BaseInput
-            v-model="form.website"
-            id="grant-website"
-            label="Grant website"
-            :rules="isValidWebsite"
-            errorMsg="Please enter a valid URL"
-            :required="false"
-          />
+          <InputRow :deleteable="false" :intended="false" text="">
+            <template v-slot:label>Website:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.website"
+                width="w-full"
+                placeholder="https://"
+                id="grant-website"
+                :rules="isValidWebsite"
+                errorMsg="Please enter a valid URL"
+                :required="false"
+              />
+            </template>
+          </InputRow>
 
           <!-- Grant github -->
-          <BaseInput
-            v-model="form.github"
-            id="grant-github"
-            label="Grant github"
-            :rules="isValidGithub"
-            errorMsg="Please enter a valid Github URL"
-            :required="false"
-          />
+          <InputRow :deleteable="false" :intended="false" text="">
+            <template v-slot:label>Github:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.github"
+                width="w-full"
+                placeholder="https://"
+                id="grant-github"
+                :rules="isValidGithub"
+                errorMsg="Please enter a valid Github URL"
+                :required="false"
+              />
+            </template>
+          </InputRow>
 
           <!-- Grant twitter handle -->
-          <BaseInput
-            v-model="form.twitter"
-            id="grant-handle"
-            label="Grant twitter"
-            :rules="isValidTwitter"
-            errorMsg="Please enter a valid Twitter handle"
-            :required="false"
-          />
+          <InputRow :deleteable="false" :intended="false" text="">
+            <template v-slot:label>Twitter:</template>
+            <template v-slot:input>
+              <BaseInput
+                v-model="form.twitter"
+                width="w-full"
+                placeholder="@twitterhandle"
+                id="grant-handle"
+                :rules="isValidTwitter"
+                errorMsg="Please enter a valid Twitter handle"
+                :required="false"
+              />
+            </template>
+          </InputRow>
 
           <!-- Submit and cancel buttons -->
-          <div class="flex justify-end pt-6">
+          <div class="px-4 md:px-12 py-12">
             <button
               type="submit"
-              class="btn btn-primary mr-5"
+              class="btn btn-primary ml-auto"
               :class="{ disabled: !isFormValid }"
               :disabled="!isFormValid"
             >
@@ -239,6 +277,7 @@ import { Breadcrumb, FilterNavItem, GrantRound, GrantsRoundDetails } from '@dgra
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
+import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
@@ -623,14 +662,15 @@ function useGrantDetail() {
 export default defineComponent({
   name: 'GrantRegistryGrantDetail',
   components: {
+    BaseFilterNav,
+    BaseHeader,
     BaseInput,
     BaseTextarea,
-    SectionHeader,
     ContributionRow,
-    BaseHeader,
-    BaseFilterNav,
-    GrantDetailsRow,
     EditIcon,
+    GrantDetailsRow,
+    InputRow,
+    SectionHeader,
     ShareIcon,
     TransactionStatus,
   },
