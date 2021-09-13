@@ -16,19 +16,19 @@
     <div class="text-left">
       <form class="space-y-5" @submit.prevent="addFunds">
         <!-- Token Symbol -->
-        <InputRow :deleteable="false" :intended="false" text="">
+        <InputRow>
           <template v-slot:label>Token:</template>
           <template v-slot:input>{{ grantRound.matchingToken.symbol }}</template>
         </InputRow>
 
         <!-- Token Address -->
-        <InputRow :deleteable="false" :intended="false" text="">
+        <InputRow>
           <template v-slot:label>Token Address:</template>
           <template v-slot:input>{{ grantRound.matchingToken.address }}</template>
         </InputRow>
 
         <!-- Contribution amount -->
-        <InputRow :deleteable="false" :intended="false" text="">
+        <InputRow>
           <template v-slot:label>Contribution amount:</template>
           <template v-slot:input>
             <BaseInput

@@ -73,10 +73,10 @@ import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 export default defineComponent({
   name: 'InputRow',
   props: {
-    deleteable: Boolean,
-    toggleable: Boolean,
-    intended: Boolean,
-    text: String,
+    deleteable: { type: Boolean, required: false, default: false },
+    toggleable: { type: Boolean, required: false, default: false },
+    intended: { type: Boolean, required: false, default: false },
+    text: { type: String, required: false, default: '' },
   },
   components: { XIcon },
   data() {
