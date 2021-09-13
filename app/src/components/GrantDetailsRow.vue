@@ -15,7 +15,7 @@
         <span class="text-grey-400 mr-4">Contract:</span>
         <a
           class="link"
-          :href="getEtherscanUrl(payoutAddress, 1, 'address')"
+          :href="getEtherscanUrl(payoutAddress, chainId, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(payoutAddress) }}</a
@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { computed, defineComponent, PropType } from 'vue';
 // --- Data ---
 import useCartStore from 'src/store/cart';
 // --- Types ---
@@ -81,6 +81,7 @@ import { Grant, GrantsRoundDetails } from '@dgrants/types';
 import { formatAddress, getEtherscanUrl } from 'src/utils/utils';
 // --- Components/icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
+import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'GrantDetailsRow',
@@ -95,7 +96,12 @@ export default defineComponent({
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
-    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl };
+    const chainId = computed(() => {
+      const { network } = useWalletStore();
+      return network.value?.chainId ? network.value.chainId : 1;
+    });
+
+    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl, chainId };
   },
 });
 </script>
