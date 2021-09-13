@@ -9,7 +9,7 @@ import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
 import { SupportedChainId } from 'src/utils/chains';
-import { ERC20_ABI, ETH_ADDRESS, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, WAD, WETH_ADDRESS } from 'src/utils/constants'; // prettier-ignore
+import { ERC20_ABI, ETH_ADDRESS, WAD, WETH_ADDRESS } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
@@ -207,9 +207,9 @@ export default function useCartStore() {
    * @notice Executes donations
    */
   async function checkout(): Promise<ContractTransaction> {
-    const { signer, userAddress } = useWalletStore();
+    const { signer, userAddress, grantRoundManager } = useWalletStore();
+    const manager = grantRoundManager.value;
     const { swaps, donations, deadline } = await getCartDonationInputs();
-    const manager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, signer.value);
     const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
 
     // Check all balances

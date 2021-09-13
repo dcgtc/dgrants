@@ -23,19 +23,19 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
-import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
-import { JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
+import { SupportedChainId, ALL_SUPPORTED_CHAIN_IDS, CHAIN_INFO } from 'src/utils/chains';
+import { Contract, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
 import { API as OnboardAPI } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from 'src/utils/ethers';
-import { RPC_URL } from 'src/utils/constants';
-import { ALL_SUPPORTED_CHAIN_IDS } from 'src/utils/chains';
+import { GRANT_REGISTRY_ABI, GRANT_ROUND_MANAGER_ABI, MULTICALL_ABI } from 'src/utils/constants';
+import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
-const defaultProvider = new JsonRpcProvider(RPC_URL);
-const mainnetChainId = SupportedChainId.MAINNET;
+const defaultChainId = SupportedChainId.MAINNET;
+const defaultProvider = new JsonRpcProvider(CHAIN_INFO[defaultChainId].rpcUrl);
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
@@ -55,13 +55,7 @@ function resetState() {
 
 // Settings
 const walletChecks = [{ checkName: 'connect' }];
-const wallets = [
-  { walletName: 'metamask', preferred: true },
-  { walletName: 'walletConnect', rpc: { '1': RPC_URL, '31337': RPC_URL }, preferred: true },
-  { walletName: 'torus', preferred: true },
-  { walletName: 'ledger', rpcUrl: RPC_URL, preferred: true },
-  { walletName: 'lattice', rpcUrl: RPC_URL, appName: 'Umbra' },
-];
+const wallets = [{ walletName: 'metamask', preferred: true }]; // TODO determine set of wallets to support, and make sure rpcUrls are reactive based on network
 
 export default function useWalletStore() {
   // ------------------------------------------------ Wallet Connection ------------------------------------------------
@@ -192,8 +186,27 @@ export default function useWalletStore() {
     startPolling();
   }
 
-  // ---------------------------------------------------- Exports ----------------------------------------------------
-  const chainId = computed(() => network.value?.chainId as SupportedChainId);
+  // ----------------------------------------------------- Getters -----------------------------------------------------
+  // Default to mainnet for all network-based getters
+  const chainId = computed(() => (network.value?.chainId || defaultChainId) as SupportedChainId);
+  const chainInfo = computed(() => CHAIN_INFO[chainId.value]);
+  const supportedTokens = computed(() => chainInfo.value.tokens);
+  const supportedTokensMapping = computed(() => chainInfo.value.tokensMapping);
+  const contractProvider = computed(() => signer.value || defaultProvider);
+  const grantRegistry = computed(() => {
+    return <GrantRegistry>new Contract(chainInfo.value.grantRegistry, GRANT_REGISTRY_ABI, contractProvider.value);
+  });
+  const grantRoundManager = computed(() => {
+    return <GrantRoundManager>(
+      new Contract(chainInfo.value.grantRoundManager, GRANT_ROUND_MANAGER_ABI, contractProvider.value)
+    );
+  });
+  const multicall = computed(() => new Contract(chainInfo.value.multicall, MULTICALL_ABI, contractProvider.value));
+  const isSupportedNetwork = computed(
+    () => (network.value ? ALL_SUPPORTED_CHAIN_IDS.includes(network.value.chainId) : true) // assume valid if we have no network information
+  );
+
+  // ----------------------------------------------------- Exports -----------------------------------------------------
 
   // Define parts of the store to expose. Only expose computed properties or methods to avoid direct mutation of state
   return {
@@ -204,16 +217,13 @@ export default function useWalletStore() {
     changeWallet,
     setProvider,
     // Properties
-    chainId: computed(() => chainId.value || mainnetChainId), // default to mainnet if wallet is not connected
-    supportedTokens: computed(
-      () => (chainId.value ? SUPPORTED_TOKENS[chainId.value] : SUPPORTED_TOKENS[mainnetChainId]) // default to mainnet if wallet is not connected
-    ),
-    supportedTokensMapping: computed(
-      () => (chainId.value ? SUPPORTED_TOKENS_MAPPING[chainId.value] : SUPPORTED_TOKENS_MAPPING[mainnetChainId]) // default to mainnet if wallet is not connected
-    ),
-    isSupportedNetwork: computed(
-      () => (network.value ? ALL_SUPPORTED_CHAIN_IDS.includes(network.value.chainId) : true) // assume valid if we have no network information
-    ),
+    chainId,
+    supportedTokens,
+    supportedTokensMapping,
+    isSupportedNetwork,
+    grantRegistry,
+    grantRoundManager,
+    multicall,
     network: computed(() => network.value),
     provider: computed(() => provider.value),
     signer: computed(() => signer.value),

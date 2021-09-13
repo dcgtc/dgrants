@@ -4,10 +4,11 @@ import { getAddress } from 'src/utils/ethers';
 
 // --- Types and data ---
 export enum SupportedChainId {
+  // L1
   MAINNET = 1,
   RINKEBY = 4,
   HARDHAT = 31337,
-
+  // L2
   ARBITRUM_ONE = 42161,
   ARBITRUM_RINKEBY = 421611,
   OPTIMISM = 10,
@@ -44,7 +45,12 @@ interface L1ChainInfo {
   readonly label: string;
   readonly tokens: TokenInfo[];
   readonly tokensMapping: Record<string, TokenInfo>;
+  readonly rpcUrl: string;
+  // contract addresses
   readonly weth: string;
+  readonly grantRegistry: string;
+  readonly grantRoundManager: string;
+  readonly multicall: string;
 }
 
 export interface L2ChainInfo extends L1ChainInfo {
@@ -130,6 +136,7 @@ export const SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<stri
   return mapping;
 })();
 
+const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
 export const CHAIN_INFO: ChainInfo = {
   [SupportedChainId.ARBITRUM_ONE]: {
     bridge: 'https://bridge.arbitrum.io/',
@@ -139,6 +146,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_ONE],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_ONE],
     weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    grantRegistry: '',
+    grantRoundManager: '',
+    multicall: '',
+    rpcUrl: `https://arb-mainnet.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.ARBITRUM_RINKEBY]: {
     bridge: 'https://bridge.arbitrum.io/',
@@ -148,6 +159,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_RINKEBY],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_RINKEBY],
     weth: '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
+    grantRegistry: '',
+    grantRoundManager: '',
+    multicall: '',
+    rpcUrl: `https://arb-rinkeby.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.MAINNET]: {
     explorer: 'https://etherscan.io/',
@@ -155,6 +170,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.MAINNET],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.MAINNET],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    grantRegistry: '',
+    grantRoundManager: '',
+    multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+    rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.HARDHAT]: {
     explorer: 'https://etherscan.io/',
@@ -162,6 +181,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    grantRegistry: '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3',
+    grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
+    multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+    rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io/',
@@ -169,6 +192,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.RINKEBY],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.RINKEBY],
     weth: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+    grantRegistry: '0x0801975f24f23E0c902a0E4D565D383437d09458',
+    grantRoundManager: '0xfa1663757d603bA740e407F609acE2CdA3144386',
+    multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
+    rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.OPTIMISM]: {
     bridge: 'https://gateway.optimism.io/',
@@ -178,6 +205,10 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.OPTIMISM],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISM],
     weth: '0x4200000000000000000000000000000000000006',
+    grantRegistry: '',
+    grantRoundManager: '',
+    multicall: '0x90f872b3d8f33f305e0250db6A2761B354f7710A',
+    rpcUrl: `https://opt-mainnet.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.OPTIMISTIC_KOVAN]: {
     bridge: 'https://gateway.optimism.io/',
@@ -187,5 +218,9 @@ export const CHAIN_INFO: ChainInfo = {
     tokens: SUPPORTED_TOKENS[SupportedChainId.OPTIMISTIC_KOVAN],
     tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISTIC_KOVAN],
     weth: '0x4200000000000000000000000000000000000006',
+    grantRegistry: '',
+    grantRoundManager: '',
+    multicall: '0x1F98415757620B543A52E61c46B32eB19261F984',
+    rpcUrl: `https://opt-kovan.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
 };
