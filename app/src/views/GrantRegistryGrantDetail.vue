@@ -44,7 +44,7 @@
 
       <SectionHeader title="Description" />
       <div class="border-b border-grey-100">
-        <p style="white-space: pre-line" class="intent px-4 md:px-12 py-12 mx-auto max-w-6xl">
+        <p style="white-space: pre-line" class="text-indent px-4 md:px-12 py-12 mx-auto max-w-6xl">
           {{ grantMetadata?.description }}
         </p>
       </div>

@@ -18,7 +18,7 @@
     </div>
 
     <!-- optional quote -->
-    <p v-if="quote" class="intent italic mt-8 mx-auto max-w-6xl">“{{ quote }}”</p>
+    <p v-if="quote" class="text-indent italic mt-8 mx-auto max-w-6xl">“{{ quote }}”</p>
 
     <span>
       <!-- optional navigation to jump to next item in a list -->
