@@ -64,7 +64,7 @@
           <BaseTextarea
             v-model="form.description"
             width="w-full"
-            placeholder="Description"
+            :placeholder="LOREM_IPSOM_TEXT"
             id="grant-description"
             :required="true"
             :rules="isDefined"
