@@ -1,10 +1,12 @@
 <template>
-  <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
+  <template v-if="grants && grantMetadata">
+    <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
+    <!-- General filters -->
+    <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" />
+    <GrantList :grants="grants" :grantMetadata="grantMetadata" />
+  </template>
 
-  <!-- General filters -->
-  <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" />
-
-  <GrantList v-if="grants && grantMetadata" :grants="grants" :grantMetadata="grantMetadata" />
+  <LoadingScreen v-else />
 </template>
 
 <script lang="ts">
@@ -13,6 +15,7 @@ import { computed, defineComponent } from 'vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantList from 'src/components/GrantList.vue';
+import LoadingScreen from 'src/components/LoadingScreen.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
@@ -77,7 +80,7 @@ function useGrantRegistryList() {
 
 export default defineComponent({
   name: 'GrantRegistryList',
-  components: { BaseHeader, BaseFilterNav, GrantList },
+  components: { BaseHeader, BaseFilterNav, GrantList, LoadingScreen },
   setup() {
     const { grants, grantMetadata } = useDataStore();
 

@@ -1,6 +1,5 @@
 <template>
   <div class="max-w-screen-lg mx-auto">
-    <!-- ToDo. Loading... message-->
     <ul class="text-left grid grid-cols-1 gap-10 py-10 sm:grid-cols-2">
       <li v-for="grant in grants" :key="grant.id.toString()">
         <!-- ToDo: Raised data -->

@@ -142,6 +142,8 @@
       :buttonAction="() => pushRoute({ name: 'Home' })"
     />
   </div>
+
+  <LoadingScreen v-else />
 </template>
 
 <script lang="ts">
@@ -153,6 +155,7 @@ import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
+import LoadingScreen from 'src/components/LoadingScreen.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
@@ -196,7 +199,15 @@ function useCart() {
 
 export default defineComponent({
   name: 'Cart',
-  components: { BaseHeader, BaseInput, BaseSelect, TransactionStatus, ArrowToprightIcon, CloseIcon },
+  components: {
+    BaseHeader,
+    BaseInput,
+    BaseSelect,
+    TransactionStatus,
+    ArrowToprightIcon,
+    CloseIcon,
+    LoadingScreen,
+  },
   setup() {
     const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);

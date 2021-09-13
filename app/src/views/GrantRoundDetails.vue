@@ -78,9 +78,7 @@
     <div v-else-if="grantRound.error">
       <span>{{ grantRound.error }}</span>
     </div>
-    <div v-else>
-      <span>Loading details...</span>
-    </div>
+    <LoadingScreen v-else />
   </div>
 
   <!-- Contributing to GrantRound -->
@@ -144,6 +142,7 @@ import { useRoute } from 'vue-router';
 // --- App Imports ---
 import BaseInput from 'src/components/BaseInput.vue';
 import GrantList from 'src/components/GrantList.vue';
+import LoadingScreen from 'src/components/LoadingScreen.vue';
 
 // --- Store ---
 import useDataStore from 'src/store/data';
@@ -308,7 +307,7 @@ function useGrantRoundDetail() {
 
 export default defineComponent({
   name: 'GrantRoundDetails',
-  components: { BaseInput, GrantList },
+  components: { BaseInput, GrantList, LoadingScreen },
   setup() {
     return { ...useGrantRoundDetail() };
   },
