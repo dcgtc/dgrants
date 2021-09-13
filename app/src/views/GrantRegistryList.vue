@@ -6,7 +6,7 @@
     <GrantList :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
-  <LoadingScreen v-else />
+  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
@@ -15,7 +15,7 @@ import { computed, defineComponent } from 'vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantList from 'src/components/GrantList.vue';
-import LoadingScreen from 'src/components/LoadingScreen.vue';
+import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
@@ -80,7 +80,7 @@ function useGrantRegistryList() {
 
 export default defineComponent({
   name: 'GrantRegistryList',
-  components: { BaseHeader, BaseFilterNav, GrantList, LoadingScreen },
+  components: { BaseHeader, BaseFilterNav, GrantList, LoadingSpinner },
   setup() {
     const { grants, grantMetadata } = useDataStore();
 

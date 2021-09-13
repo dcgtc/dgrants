@@ -142,7 +142,7 @@
   </div>
 
   <!-- Loading -->
-  <LoadingScreen v-else />
+  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
@@ -156,7 +156,7 @@ import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
-import LoadingScreen from 'src/components/LoadingScreen.vue';
+import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -384,7 +384,7 @@ export default defineComponent({
     DonateIcon,
     TwitterIcon,
     TransactionStatus,
-    LoadingScreen,
+    LoadingSpinner,
   },
   setup() {
     return { ...useGrantRoundDetail() };
