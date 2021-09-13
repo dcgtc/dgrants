@@ -8,17 +8,7 @@ import { computed, markRaw, Ref, ref } from 'vue';
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
-import {
-  GRANT_ROUND_MANAGER_ADDRESS,
-  GRANT_ROUND_MANAGER_ABI,
-  GRANT_ROUND_ABI,
-  GRANT_REGISTRY_ADDRESS,
-  GRANT_REGISTRY_ABI,
-  MULTICALL_ADDRESS,
-  MULTICALL_ABI,
-  ERC20_ABI,
-  SUPPORTED_TOKENS_MAPPING,
-} from 'src/utils/constants';
+import { ERC20_ABI, GRANT_REGISTRY_ABI, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_ABI, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ABI, MULTICALL_ADDRESS } from 'src/utils/constants'; // prettier-ignore
 import { Grant, GrantRound, GrantRounds, GrantMetadataResolution, GrantRoundMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
 import { resolveMetaPtr } from 'src/utils/ipfs';
@@ -49,6 +39,7 @@ export default function useDataStore() {
    */
   async function poll() {
     if (!multicall.value || !registry.value || !roundManager.value) return;
+    const { supportedTokensMapping } = useWalletStore();
 
     // Define calls to be read using multicall
     const calls = [
@@ -170,7 +161,7 @@ export default function useDataStore() {
       grantRound: '0x8B4091997E3EbB87be90cEd3e50d8Bb27e1DC742',
       grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
       grantRegistry: GRANT_REGISTRY_ADDRESS,
-      supportedTokens: SUPPORTED_TOKENS_MAPPING,
+      supportedTokens: supportedTokensMapping.value,
       ignore: {
         grants: [],
         contributionAddress: [],

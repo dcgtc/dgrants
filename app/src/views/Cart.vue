@@ -76,7 +76,7 @@
                       item.contributionToken = $event;
                       updateCart(item.grantId, item.contributionToken.address);
                     "
-                    :options="SUPPORTED_TOKENS"
+                    :options="supportedTokens"
                     label="symbol"
                     width="w-1/2"
                   />
@@ -156,8 +156,8 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
+import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { SUPPORTED_TOKENS } from 'src/utils/constants';
 import { pushRoute, formatNumber } from 'src/utils/utils';
 
 function useCart() {
@@ -199,8 +199,9 @@ export default defineComponent({
   components: { BaseHeader, BaseInput, BaseSelect, TransactionStatus, ArrowToprightIcon, CloseIcon },
   setup() {
     const { grantMetadata } = useDataStore();
+    const { supportedTokens } = useWalletStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, grantMetadata, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber };
+    return { ...useCart(), pushRoute, grantMetadata, supportedTokens, NOT_IMPLEMENTED, formatNumber };
   },
 });
 </script>

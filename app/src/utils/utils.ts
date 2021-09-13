@@ -8,7 +8,7 @@ import { EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
-import { ETH_ADDRESS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/constants';
+import { ETH_ADDRESS, WETH_ADDRESS } from 'src/utils/constants';
 import { SupportedChainId, CHAIN_INFO } from 'src/utils/chains';
 
 // --- Formatters ---
@@ -127,7 +127,7 @@ export function getEtherscanUrl(hash: string, chainId: SupportedChainId, group: 
  * @returns True if the user has sufficient balance, or throws otherwise
  */
 export async function assertSufficientBalance(tokenAddress: string, requiredAmount: BigNumberish): Promise<boolean> {
-  const { provider, userAddress } = useWalletStore();
+  const { provider, userAddress, supportedTokensMapping } = useWalletStore();
   if (!userAddress.value) return true; // exit early, don't want any errors thrown
   const isEth = tokenAddress === WETH_ADDRESS;
   tokenAddress = isEth ? ETH_ADDRESS : tokenAddress;
@@ -135,7 +135,7 @@ export async function assertSufficientBalance(tokenAddress: string, requiredAmou
   const token = new Contract(tokenAddress, abi, provider.value);
   const balance = isEth ? await provider.value.getBalance(userAddress.value) : await token.balanceOf(userAddress.value);
   if (balance.lt(requiredAmount)) {
-    const tokenInfo = SUPPORTED_TOKENS_MAPPING[tokenAddress];
+    const tokenInfo = supportedTokensMapping.value[tokenAddress];
     const { symbol, decimals } = tokenInfo;
     const balanceNeeds = formatNumber(formatUnits(requiredAmount, decimals), 4);
     const balanceHas = formatNumber(formatUnits(balance, decimals), 4);

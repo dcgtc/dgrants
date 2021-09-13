@@ -23,6 +23,7 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
+import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
@@ -34,6 +35,7 @@ import { ALL_SUPPORTED_CHAIN_IDS } from 'src/utils/chains';
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
 const defaultProvider = new JsonRpcProvider(RPC_URL);
+const mainnetChainId = SupportedChainId.MAINNET;
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
@@ -191,6 +193,8 @@ export default function useWalletStore() {
   }
 
   // ---------------------------------------------------- Exports ----------------------------------------------------
+  const chainId = computed(() => network.value?.chainId);
+
   // Define parts of the store to expose. Only expose computed properties or methods to avoid direct mutation of state
   return {
     // Methods
@@ -200,6 +204,12 @@ export default function useWalletStore() {
     changeWallet,
     setProvider,
     // Properties
+    supportedTokens: computed(
+      () => (chainId.value ? SUPPORTED_TOKENS[chainId.value] : SUPPORTED_TOKENS[mainnetChainId]) // default to mainnet if wallet is not connected
+    ),
+    supportedTokensMapping: computed(
+      () => (chainId.value ? SUPPORTED_TOKENS_MAPPING[chainId.value] : SUPPORTED_TOKENS_MAPPING[mainnetChainId]) // default to mainnet if wallet is not connected
+    ),
     isSupportedNetwork: computed(
       () => (network.value ? ALL_SUPPORTED_CHAIN_IDS.includes(network.value.chainId) : true) // assume valid if we have no network information
     ),

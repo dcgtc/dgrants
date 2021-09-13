@@ -8,29 +8,8 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
-import {
-  ERC20_ABI,
-  ETH_ADDRESS,
-  GRANT_ROUND_MANAGER_ABI,
-  GRANT_ROUND_MANAGER_ADDRESS,
-  SUPPORTED_TOKENS,
-  SUPPORTED_TOKENS_MAPPING,
-  WAD,
-  WETH_ADDRESS,
-} from 'src/utils/constants';
-import {
-  BigNumber,
-  BigNumberish,
-  BytesLike,
-  Contract,
-  ContractTransaction,
-  hexDataSlice,
-  MaxUint256,
-  isAddress,
-  parseUnits,
-  getAddress,
-  formatUnits,
-} from 'src/utils/ethers';
+import { ERC20_ABI, ETH_ADDRESS, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, WAD, WETH_ADDRESS } from 'src/utils/constants'; // prettier-ignore
+import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -56,6 +35,7 @@ const SWAP_PATHS = {
 };
 
 const { grants, grantRounds } = useDataStore();
+const { supportedTokens, supportedTokensMapping } = useWalletStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
@@ -118,7 +98,7 @@ export default function useCartStore() {
       const { grantId, contributionAmount } = item;
       const grant = grants.value?.filter((grant) => grant.id.toString() === grantId)[0] as Grant; // TODO may be slow for large numbers of grants
       const tokenAddr = 'contributionToken' in item ? item.contributionToken.address : item.contributionTokenAddress;
-      const token = SUPPORTED_TOKENS_MAPPING[tokenAddr];
+      const token = supportedTokensMapping.value[tokenAddr];
       _lsCart.push({ grantId, contributionTokenAddress: token.address, contributionAmount });
       _cart.push({ ...grant, grantId, contributionAmount, contributionToken: token });
     });
@@ -233,7 +213,7 @@ export default function useCartStore() {
   async function getCartDonationInputs(): Promise<{ swaps: SwapSummary[]; donations: Donation[]; deadline: number }> {
     // Get the swaps array
     const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
-      const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const decimals = supportedTokensMapping.value[tokenAddress].decimals;
       const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
       const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>tokenAddress];
       // Use Uniswap's Quoter.sol to get amountOutMin, unless the path indicates so swap is required
@@ -249,7 +229,7 @@ export default function useCartStore() {
       const isEth = contributionToken.address === ETH_ADDRESS;
       const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
       const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
-      const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
+      const decimals = isEth ? 18 : supportedTokensMapping.value[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);
 
       // Compute ratio
@@ -271,12 +251,12 @@ export default function useCartStore() {
    * @notice Fetches quotes based on the users cart
    * @dev For max accuracy, this should be run each time the user edits their cart with the actual cart amounts, but in
    * reality this will be accurate enough if we just run it once with default amounts and save the results, because
-   * the Uniswap pools have sufficient liquid for all SUPPORTED_TOKENS
+   * the Uniswap pools have sufficient liquid for all supportedTokens.value
    */
   async function fetchQuotes() {
     // TODO use multicall for better performance + fewer RPC requests
     const _quotes = await Promise.all(
-      SUPPORTED_TOKENS.map(async (token) => {
+      supportedTokens.value.map(async (token) => {
         if (token.symbol === 'DAI' || token.symbol === 'USDC') return { token, rate: 1 };
         const path = SWAP_PATHS[<keyof typeof SWAP_PATHS>token.address];
         const amountIn = parseUnits('1', token.decimals); // for simplicity, use a value of 1 token for getting quotes
@@ -303,8 +283,8 @@ export default function useCartStore() {
    * @notice Convert a cart into an array of objects summarizing the cart info, with human-readable values
    * @returns Object where keys are token addresses, values are total amount of that token in cart
    */
-  const cartSummary = computed((): Record<keyof typeof SUPPORTED_TOKENS_MAPPING, number> => {
-    const output: Record<keyof typeof SUPPORTED_TOKENS_MAPPING, number> = {};
+  const cartSummary = computed((): Record<string, number> => {
+    const output: Record<string, number> = {};
     for (const item of cart.value) {
       const tokenAddress = item.contributionToken.address;
       if (tokenAddress in output) output[tokenAddress] += item.contributionAmount;
@@ -319,7 +299,7 @@ export default function useCartStore() {
   const cartSummaryString = computed(() => {
     // returns a string summarizing the `cartSummary`, such as `12 DAI + 4 GTC + 10 USDC`
     const summary = Object.keys(cartSummary.value).reduce((acc, tokenAddr) => {
-      return acc + `${cartSummary.value[tokenAddr]} ${SUPPORTED_TOKENS_MAPPING[tokenAddr].symbol} + `;
+      return acc + `${cartSummary.value[tokenAddr]} ${supportedTokensMapping.value[tokenAddr].symbol} + `;
     }, '');
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });
