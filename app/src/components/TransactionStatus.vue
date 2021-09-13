@@ -3,7 +3,7 @@
   <section>
     <label>Hash:</label>
     <div class="">
-      <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer " class="link break-all">{{ hash }}</a>
+      <a :href="etherscanUrl" target="_blank" rel="noopener noreferrer" class="link break-all">{{ hash }}</a>
     </div>
   </section>
 
