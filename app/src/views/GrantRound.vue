@@ -114,21 +114,21 @@
     <div class="px-4 md:px-12 py-12 border-grey-100 flex flex-col gap-y-4">
       <div v-if="isDefined(grantRoundMetadata?.properties?.websiteURI)" class="flex gap-x-4">
         <span class="text-grey-400">Website:</span>
-        <a :href="grantRoundMetadata?.properties?.websiteURI" target="_blank">{{
+        <a :href="grantRoundMetadata?.properties?.websiteURI" target="_blank" class="link">{{
           grantRoundMetadata?.properties?.websiteURI
         }}</a>
       </div>
 
       <div v-if="isDefined(grantRoundMetadata?.properties?.governanceURI)" class="flex gap-x-4">
         <span class="text-grey-400">Governance:</span>
-        <a :href="grantRoundMetadata?.properties?.governanceURI" target="_blank">{{
+        <a :href="grantRoundMetadata?.properties?.governanceURI" target="_blank" class="link">{{
           grantRoundMetadata?.properties?.governanceURI
         }}</a>
       </div>
 
       <div v-if="isDefined(grantRoundMetadata?.properties?.twitterURI)" class="flex gap-x-4">
         <span class="text-grey-400">Twitter:</span>
-        <a :href="grantRoundMetadata?.properties?.twitterURI" target="_blank">{{
+        <a :href="grantRoundMetadata?.properties?.twitterURI" target="_blank" class="link">{{
           grantRoundMetadata?.properties?.twitterURI
         }}</a>
       </div>
