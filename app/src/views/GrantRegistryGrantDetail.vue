@@ -211,10 +211,9 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, LOREM_IPSOM_TEXT } from 'src/utils/constants'; // prettier-ignore
-import { Contract, ContractTransaction, formatUnits } from 'src/utils/ethers';
+import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
+import { ContractTransaction, formatUnits } from 'src/utils/ethers';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
-import { GrantRegistry } from '@dgrants/contracts';
 import { hexlify } from 'ethers/lib/utils';
 import * as ipfs from 'src/utils/ipfs';
 // --- Types ---
@@ -242,7 +241,7 @@ function useGrantDetail() {
     grantRounds: rounds,
     grantRoundMetadata: roundsMetadata,
   } = useDataStore();
-  const { signer, provider, userAddress, supportedTokensMapping } = useWalletStore();
+  const { signer, provider, userAddress, supportedTokensMapping, grantRoundManager, grantRegistry } = useWalletStore();
   const route = useRoute();
 
   // --- expose grant data ---
@@ -276,8 +275,8 @@ function useGrantDetail() {
       grantRoundContributions: await fetch({
         provider: provider.value,
         grantRound: round.address,
-        grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
-        grantRegistry: GRANT_REGISTRY_ADDRESS,
+        grantRoundManager: grantRoundManager.value.address,
+        grantRegistry: grantRegistry.value.address,
         supportedTokens: supportedTokensMapping.value,
         // should these be pulled from an endpoint?
         ignore: {
@@ -291,9 +290,11 @@ function useGrantDetail() {
   // gets all contributions to this grant
   const getContributions = async () => {
     // all contributions will pass through the roundManager, and the roundManager will ensure theres only one donationToken currency shared between rounds
-    const roundManager = new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, provider.value);
+    const roundManager = grantRoundManager.value;
     // get every contribution for this grantId (ignoring the round for now)
-    const contributions = await roundManager.queryFilter(roundManager.filters.GrantDonation(hexlify(grantId.value)));
+    const contributions = await roundManager.queryFilter(
+      roundManager.filters.GrantDonation(hexlify(grantId.value), null, null, null)
+    );
 
     // attach the from address (the contributor) to the contribution object
     return await Promise.all(
@@ -504,7 +505,7 @@ function useGrantDetail() {
     if (!signer.value) throw new Error('Please connect a wallet');
 
     // Get registry instance
-    const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
+    const registry = grantRegistry.value;
 
     // Determine which update method to call
     let tx: ContractTransaction;
