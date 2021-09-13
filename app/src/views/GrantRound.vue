@@ -78,6 +78,7 @@
         <!-- Tweet -->
         <a
           target="_blank"
+          rel="noreferrer noopener"
           :href="
             'https://twitter.com/intent/tweet?text=' +
             grantRoundMetadata?.name +
@@ -86,7 +87,7 @@
           "
           class="flex items-center gap-x-2 cursor-pointer group ml-auto"
         >
-          <TweetIcon class="icon icon-primary icon-small" />
+          <TwitterIcon class="icon icon-primary icon-small" />
           <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
         </a>
         <!-- Add funds to Grant Round -->
@@ -102,9 +103,9 @@
 
     <div class="border-b border-grey-100">
       <div class="px-4 md:px-12 py-12 mx-auto max-w-6xl">
-        <!-- the idea is to transform each CRLF / ENTER into a <p class="intent">text</p> 
-        the past approach ( style preline whitespace ) does not solve this -->
-        <p class="intent">{{ grantRoundMetadata?.description }}</p>
+        <!-- the idea is to transform each CRLF / ENTER into a <p class="text-indent">text</p> 
+        ( whitespace-pre-line will be not needed then ) -->
+        <p class="text-indent whitespace-pre-line">{{ grantRoundMetadata?.description }}</p>
       </div>
     </div>
 
@@ -186,7 +187,7 @@ import {
 import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
 
 // --- Icons ---
-import { TwitterIcon as TweetIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
 import { DonateIcon } from '@fusion-icons/vue/interface';
 
 // --- Contract ---
@@ -382,7 +383,7 @@ export default defineComponent({
     InputRow,
     SectionHeader,
     DonateIcon,
-    TweetIcon,
+    TwitterIcon,
     TransactionStatus,
   },
   setup() {
