@@ -11,9 +11,14 @@
     <!--optional by address last seen / last  updated  -->
     <div v-if="formattedOwner">
       <span class="text-grey-400 mr-4">by</span>
-      <a class="link mr-4" :href="`https://etherscan.io/address/${owner}`" target="_blank" rel="noopener noreferrer">{{
-        formattedOwner
-      }}</a>
+      <a
+        v-if="owner"
+        class="link mr-4"
+        :href="getEtherscanUrl(owner, 1, 'address')"
+        target="_blank"
+        rel="noopener noreferrer"
+        >{{ formattedOwner }}</a
+      >
       <span v-if="formattedLastUpdated" class="italic text-grey-400">{{ formattedLastUpdated }}</span>
     </div>
 
@@ -44,6 +49,8 @@
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
+// --- Utils ---
+import { getEtherscanUrl } from 'src/utils/utils';
 // --- Types ---
 import { RouteTarget, Breadcrumb as BreadcrumbType } from '@dgrants/types';
 // --- Components ---
@@ -72,7 +79,7 @@ export default defineComponent({
       props.lastUpdated ? daysAgo(new Date(props.lastUpdated).getTime() / 1000) : false
     );
 
-    return { formattedOwner, formattedLastUpdated };
+    return { formattedOwner, formattedLastUpdated, getEtherscanUrl };
   },
 });
 </script>
