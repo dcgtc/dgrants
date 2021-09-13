@@ -13,7 +13,6 @@
 
             <!--address-->
             <div>
-              <!-- whats the else on this? can there be NO contribution.from at all? -->
               <div v-if="contribution.from">
                 <a
                   class="link"
