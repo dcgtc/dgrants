@@ -3,12 +3,12 @@
  */
 
 // --- External imports ---
-import { computed, markRaw, Ref, ref } from 'vue';
+import { computed, Ref, ref } from 'vue';
 
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
-import { ERC20_ABI, GRANT_REGISTRY_ABI, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_ABI, GRANT_ROUND_MANAGER_ABI, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ABI, MULTICALL_ADDRESS } from 'src/utils/constants'; // prettier-ignore
+import { ERC20_ABI, GRANT_ROUND_ABI } from 'src/utils/constants';
 import { Grant, GrantRound, GrantRounds, GrantMetadataResolution, GrantRoundMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
 import { resolveMetaPtr } from 'src/utils/ipfs';
@@ -16,9 +16,6 @@ import { CLR, fetch, linear, InitArgs, GrantsDistribution, GrantRoundFetchArgs }
 
 // --- Parameters required ---
 const { provider } = useWalletStore();
-const multicall = ref<Contract>();
-const registry = ref<Contract>();
-const roundManager = ref<Contract>();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -38,25 +35,32 @@ export default function useDataStore() {
    * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
    */
   async function poll() {
-    if (!multicall.value || !registry.value || !roundManager.value) return;
-    const { supportedTokensMapping } = useWalletStore();
+    const {
+      grantRoundManager: grantRoundManagerRef,
+      grantRegistry: grantRegistryRef,
+      multicall: multicallRef,
+      supportedTokensMapping,
+    } = useWalletStore();
+    const roundManager = grantRoundManagerRef.value;
+    const registry = grantRegistryRef.value;
+    const multicall = multicallRef.value;
 
     // Define calls to be read using multicall
     const calls = [
-      { target: MULTICALL_ADDRESS, callData: multicall.value.interface.encodeFunctionData('getCurrentBlockTimestamp') },
-      { target: GRANT_REGISTRY_ADDRESS, callData: registry.value.interface.encodeFunctionData('getAllGrants') },
+      { target: multicall.address, callData: multicall.interface.encodeFunctionData('getCurrentBlockTimestamp') },
+      { target: registry.address, callData: registry.interface.encodeFunctionData('getAllGrants') },
     ];
 
     // Execute calls
-    const { blockNumber, returnData } = await multicall.value.tryBlockAndAggregate(false, calls);
+    const { blockNumber, returnData } = await multicall.tryBlockAndAggregate(false, calls);
 
     // Parse return data
     const [timestampEncoded, grantsEncoded] = returnData;
-    const { timestamp } = multicall.value.interface.decodeFunctionResult('getCurrentBlockTimestamp', timestampEncoded.returnData); // prettier-ignore
-    const grantsList = registry.value.interface.decodeFunctionResult('getAllGrants', grantsEncoded.returnData)[0]; // prettier-ignore
+    const { timestamp } = multicall.interface.decodeFunctionResult('getCurrentBlockTimestamp', timestampEncoded.returnData); // prettier-ignore
+    const grantsList = registry.interface.decodeFunctionResult('getAllGrants', grantsEncoded.returnData)[0];
 
     // Get all rounds from GrantRoundCreated --- TODO: We need to cache these events somewhere (like the graph)
-    const roundList = await roundManager.value.queryFilter(roundManager.value.filters.GrantRoundCreated());
+    const roundList = await roundManager.queryFilter(roundManager.filters.GrantRoundCreated(null));
     const roundAddresses = [...roundList.map((e) => e.args?.grantRound)];
 
     // Pull state from each GrantRound
@@ -158,9 +162,9 @@ export default function useDataStore() {
     // get contributions and grantRound details
     const grantRoundArgs = await fetch({
       provider: provider.value,
-      grantRound: '0x8B4091997E3EbB87be90cEd3e50d8Bb27e1DC742',
-      grantRoundManager: GRANT_ROUND_MANAGER_ADDRESS,
-      grantRegistry: GRANT_REGISTRY_ADDRESS,
+      grantRound: roundAddresses[0],
+      grantRoundManager: roundManager.address,
+      grantRegistry: registry.address,
       supportedTokens: supportedTokensMapping.value,
       ignore: {
         grants: [],
@@ -221,13 +225,7 @@ export default function useDataStore() {
    * @notice Call this method to poll now, then poll on each new block
    */
   function startPolling() {
-    // Remove all existing listeners to avoid duplicate polling
-    provider.value.removeAllListeners();
-
-    // Start polling with the user's provider if available, or fallback to our default provider
-    multicall.value = markRaw(new Contract(MULTICALL_ADDRESS, MULTICALL_ABI, provider.value));
-    registry.value = markRaw(new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, provider.value));
-    roundManager.value = markRaw(new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, provider.value));
+    provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
     provider.value.on('block', (/* block: number */) => void poll());
   }
 

@@ -149,23 +149,12 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, LOREM_IPSOM_TEXT } from 'src/utils/constants';
-import { Contract } from 'src/utils/ethers';
-import {
-  isValidAddress,
-  isValidWebsite,
-  isValidGithub,
-  isValidTwitter,
-  isDefined,
-  pushRoute,
-  urlFromTwitterHandle,
-} from 'src/utils/utils';
+import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
+import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle } from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/ipfs';
-// --- Types ---
-import { GrantRegistry } from '@dgrants/contracts';
 
 function useNewGrant() {
-  const { signer } = useWalletStore();
+  const { signer, grantRegistry } = useWalletStore();
   const { poll } = useDataStore();
 
   const txHash = ref<string>();
@@ -212,16 +201,15 @@ function useNewGrant() {
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, properties })
       .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
-    const registry = <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, signer.value);
 
-    const tx = await registry.createGrant(owner, payee, metaPtr);
+    const tx = await grantRegistry.value.createGrant(owner, payee, metaPtr);
     txHash.value = tx.hash;
     // TODO: show waiting state screen
     await tx.wait();
 
     // Parse receipt to find the grant ID
     const receipt = await signer.value.provider.getTransactionReceipt(tx.hash);
-    const log = registry.interface.parseLog(receipt.logs[0]); // there is only one emitted event
+    const log = grantRegistry.value.interface.parseLog(receipt.logs[0]); // there is only one emitted event
 
     grantId.value = log.args.id;
     // Poll so the store has the latest data, then navigate to the grant page
