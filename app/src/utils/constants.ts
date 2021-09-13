@@ -1,6 +1,3 @@
-import { TokenInfo } from '@uniswap/token-lists';
-import { getAddress } from 'src/utils/ethers';
-
 // Default RPC URL when user does not have a wallet connected
 export const RPC_URL = `https://eth-mainnet.alchemyapi.io/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`;
 
@@ -40,56 +37,6 @@ export const ERC20_ABI = [
   'function transfer(address to, uint amount)',
   'event Transfer(address indexed from, address indexed to, uint amount)',
 ];
-
-export const SUPPORTED_TOKENS: TokenInfo[] = [
-  // TokenList format
-  {
-    chainId: 1,
-    address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
-    name: 'Ether',
-    symbol: 'ETH',
-    decimals: 18,
-    logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880',
-  },
-  {
-    chainId: 1,
-    address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
-    name: 'Dai Stablecoin',
-    symbol: 'DAI',
-    decimals: 18,
-    logoURI: 'https://assets.coingecko.com/coins/images/9956/thumb/dai-multi-collateral-mcd.png?1574218774',
-  },
-  {
-    chainId: 1,
-    address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48',
-    name: 'USD Coin USDC',
-    symbol: 'USDC',
-    decimals: 6,
-    logoURI: 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png?1547042389',
-  },
-  {
-    chainId: 1,
-    address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F',
-    name: 'Gitcoin',
-    symbol: 'GTC',
-    decimals: 18,
-    logoURI: 'https://assets.coingecko.com/coins/images/15810/thumb/gitcoin.png?1621992929',
-  },
-  {
-    chainId: 1,
-    address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984',
-    name: 'Uniswap',
-    symbol: 'UNI',
-    decimals: 18,
-    logoURI: 'https://assets.coingecko.com/coins/images/12504/thumb/uniswap-uni.png?1600306604',
-  },
-];
-
-export const SUPPORTED_TOKENS_MAPPING = (() => {
-  const tokenMappingByAddress: Record<string, TokenInfo> = {};
-  SUPPORTED_TOKENS.forEach((token) => (tokenMappingByAddress[getAddress(token.address)] = token));
-  return tokenMappingByAddress;
-})();
 
 export const LOREM_IPSOM_TEXT =
   'A brief description of your grant goes here.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.';
