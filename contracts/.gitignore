@@ -21,3 +21,4 @@ yarn-debug.log*
 yarn-error.log*
 .eslintcache
 /deploy-history/*hardhat-*.json
+/deploy-history/*localhost-*.json

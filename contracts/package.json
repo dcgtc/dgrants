@@ -57,6 +57,7 @@
     "clean": "hardhat clean",
     "build": "hardhat compile",
     "deploy:poc": "yarn build && yarn hardhat run scripts/deploy-poc.ts",
+    "update:round": "yarn build && yarn hardhat run scripts/update-round.ts",
     "coverage": "hardhat coverage --solcoverjs ./.solcover.js --temp artifacts --testfiles \"./test/**/*.ts\"",
     "lint": "yarn run prettier && yarn run lint:sol && yarn run lint:ts",
     "lint:sol": "solhint --config ./.solhint.json --max-warnings 0 \"contracts/**/*.sol\"",
