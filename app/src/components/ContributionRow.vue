@@ -8,7 +8,7 @@
           <div class="flex items-center gap-x-4">
             <!--identicon-->
             <div>
-              <Jazzicon :address="contribution.from" :key="contribution.from" width="48" />
+              <Jazzicon :address="contribution.from" :key="contribution.from" :width="48" />
             </div>
 
             <!--address-->
