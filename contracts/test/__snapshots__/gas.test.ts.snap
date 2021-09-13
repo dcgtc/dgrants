@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`dGrants gas tests GrantRegistry createGrant 1`] = `166526`;
+exports[`dGrants gas tests GrantRegistry createGrant 1`] = `166307`;
 
 exports[`dGrants gas tests GrantRegistry updateGrantMetaPtr 1`] = `46949`;
 
@@ -10,16 +10,16 @@ exports[`dGrants gas tests GrantRegistry updateGrantOwner 1`] = `41527`;
 
 exports[`dGrants gas tests GrantRegistry updateGrantPayee 1`] = `41527`;
 
-exports[`dGrants gas tests GrantRoundManager createGrantRound 1`] = `1024069`;
+exports[`dGrants gas tests GrantRoundManager createGrantRound 1`] = `968360`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token DAI, output token DAI 1`] = `229039`;
+exports[`dGrants gas tests GrantRoundManager five donations input token DAI, output token DAI 1`] = `241373`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token ETH, output token DAI 1`] = `324883`;
+exports[`dGrants gas tests GrantRoundManager five donations input token ETH, output token DAI 1`] = `337239`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token GTC, output token DAI 1`] = `391828`;
+exports[`dGrants gas tests GrantRoundManager five donations input token GTC, output token DAI 1`] = `404190`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token DAI, output token DAI 1`] = `101932`;
+exports[`dGrants gas tests GrantRoundManager one donation input token DAI, output token DAI 1`] = `104573`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token ETH, output token DAI 1`] = `194771`;
+exports[`dGrants gas tests GrantRoundManager one donation input token ETH, output token DAI 1`] = `197422`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token GTC, output token DAI 1`] = `248325`;
+exports[`dGrants gas tests GrantRoundManager one donation input token GTC, output token DAI 1`] = `250978`;
