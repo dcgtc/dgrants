@@ -143,7 +143,7 @@
     />
   </div>
 
-  <LoadingScreen v-else />
+  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
@@ -155,7 +155,7 @@ import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
-import LoadingScreen from 'src/components/LoadingScreen.vue';
+import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
@@ -206,7 +206,7 @@ export default defineComponent({
     TransactionStatus,
     ArrowToprightIcon,
     CloseIcon,
-    LoadingScreen,
+    LoadingSpinner,
   },
   setup() {
     const { grantMetadata } = useDataStore();
