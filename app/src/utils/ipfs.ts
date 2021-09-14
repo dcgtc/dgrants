@@ -1,7 +1,7 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { GrantMetadata } from '@dgrants/types';
 
-const RetrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
+const retrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
 
 export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
 
@@ -24,7 +24,7 @@ export const uploadGrantMetadata = async ({ name, description, properties }: Gra
  * @returns string
  */
 export const getMetaPtr = ({ cid }: { cid: string }) => {
-  return `${RetrievalEndpoint}/${cid}`;
+  return `${retrievalEndpoint}/${cid}`;
 };
 
 /**
