@@ -42,7 +42,7 @@ const params: DeployParams = {
     roundStartTime: 0,
     roundEndTime: 0,
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
-    roundLogoPath: './dgrants-placeholder.png',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
 };

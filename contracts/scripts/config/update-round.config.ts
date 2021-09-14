@@ -23,7 +23,7 @@ const params: DeployParams = {
   mainnet: {
     roundAddress: '0x0000000000000000000000000000000000000000',
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
-    roundLogoPath: './scripts/dgrants-placeholder.png',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
 };
