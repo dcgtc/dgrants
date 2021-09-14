@@ -1,6 +1,3 @@
-// Default RPC URL when user does not have a wallet connected
-export const RPC_URL = `https://eth-mainnet.alchemyapi.io/v2/${import.meta.env.VITE_ALCHEMY_API_KEY}`;
-
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ABI = [
   'function getCurrentBlockTimestamp() view returns (uint256 timestamp)',
