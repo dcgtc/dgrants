@@ -57,6 +57,18 @@ const params: DeployParams = {
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
     metadataJson,
   },
+  arbitrum: {
+    donationToken: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', // USDC
+    uniswapFactory: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
+    weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    metadataAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
+    payoutAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
+    matchingToken: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', // USDC
+    roundStartTime: 1631633030,
+    roundEndTime: 1731562000,
+    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    metadataJson,
+  },
 };
 
 export default params;

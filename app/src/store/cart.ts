@@ -61,12 +61,14 @@ const SWAP_PATHS = {
   // *** Arbitrum paths are currently not handled as there is no bridged DAI ***
   // We use the mainnet paths here just to avoid lint errors
   [SupportedChainId.ARBITRUM_ONE]: {
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
-    // TODO choose donation token since there's no DAI -- USDC?
+    // ETH to USDC through the 0.3% pool
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1000bb8ff970a61a04b1ca14834a43f5de4533ebddb5cc8', // prettier-ignore
+    // USDC "swap path" is just its token address for our router (no DAI on Arbitrum yet, so using USDC instead)
+    '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8': '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase(),
   },
   [SupportedChainId.ARBITRUM_RINKEBY]: {
-    // Seems Uniswap V3 has no liquidity here
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+    // Seems Uniswap V3 has no liquidity here (this swap path is not correct)
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
     // TODO choose donation token since there's no DAI -- USDC?
   },
 };
