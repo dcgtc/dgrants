@@ -115,7 +115,7 @@
   }
 
   .btn.in-cart {
-    @apply bg-teal hover:bg-grey-400 opacity-100;
+    @apply bg-teal hover:bg-teal opacity-100;
   }
 
   .base-grid {
