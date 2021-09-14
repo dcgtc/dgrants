@@ -1,4 +1,4 @@
-import metadataJson from './grant-round-metadata.json';
+import metadataJson from './assets/grant-round-metadata.json';
 
 type NetworkParams = {
   roundAddress: string;
@@ -17,7 +17,7 @@ const params: DeployParams = {
     // expected address using deploy-poc.ts w/ hardhat default account
     roundAddress: '0x851248dBF29D723f3A12EA9739A9D1c88d1c7faa',
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
-    roundLogoPath: './scripts/dgrants-placeholder.png',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   mainnet: {

@@ -2,7 +2,7 @@ import fs from 'fs';
 import hre from 'hardhat';
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { ScriptLogger } from './ScriptLogger';
-import params from './update-round.config';
+import params from './config/update-round.config';
 
 const { ethers } = hre;
 
