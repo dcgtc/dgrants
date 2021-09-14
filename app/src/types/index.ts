@@ -1,6 +1,7 @@
 // App-specific type definition go here
 import { Grant, GrantMetadata } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
+import { BigNumberish } from 'ethers';
 
 // Cart info saved in localStorage
 export type CartItemOptions = {
