@@ -66,51 +66,46 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, onMounted, ref } from 'vue';
 import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
 import { GithubIcon as GithubIcon } from '@fusion-icons/vue/interface';
 
 import packagejson from './../../package.json';
 
-type Contributor = {
-  login: string;
-  html_url: string;
-};
+function useContributors() {
+  type Contributor = {
+    login: string;
+    html_url: string;
+  };
 
-export default defineComponent({
-  name: 'About',
-  props: {
-    showAbout: Boolean,
-  },
-  components: {
-    XIcon,
-    TwitterIcon,
-    GithubIcon,
-  },
-  data() {
-    return {
-      contributors: [] as Contributor[],
-      packagejson: packagejson,
-    };
-  },
-  setup(_props, context) {
-    const emitEvent = (eventName: string) => context.emit(eventName);
-    return { emitEvent };
-  },
-  async created() {
+  const contributors: Contributor[] = ref([]);
+
+  onMounted(async () => {
     try {
       const url = 'https://api.github.com/repos/dcgtc/dgrants/contributors';
       const response = await fetch(url);
-      this.contributors = await response.json();
+      contributors.value = await response.json();
     } catch {
-      this.contributors = [
+      contributors.value = [
         {
           login: 'dGrants',
           html_url: 'https://github.com/dcgtc/dgrants/contributors',
         },
       ];
     }
+  });
+
+  return { contributors };
+}
+
+export default defineComponent({
+  name: 'About',
+  props: { showAbout: { type: Boolean, required: true, default: false } },
+  components: { XIcon, TwitterIcon, GithubIcon },
+  setup(_props, context) {
+    const emitEvent = (eventName: string) => context.emit(eventName);
+    return { emitEvent, packagejson, ...useContributors() };
   },
 });
 </script>
