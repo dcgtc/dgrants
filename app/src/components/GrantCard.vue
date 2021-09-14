@@ -8,33 +8,30 @@
     >
       <img class="shadow-light" :src="imgurl" />
       <div class="absolute bottom-0 right-0">
-        <!-- when item in cart, add class "in-cart" to <button> -->
         <button
           class="btn opacity-0 group-hover:opacity-100"
           :class="{ 'in-cart': isInCart(id) }"
-          @click.stop="addToCart(id)"
+          @click.stop="isInCart(id) ? removeFromCart(id) : addToCart(id)"
         >
           <CartIcon />
         </button>
       </div>
     </div>
-    <figcaption class="mt-4 px-4 lg:px-0">
+    <figcaption class="mt-4">
       <div class="text-grey-500 font-medium truncate">{{ name }}</div>
-      <div class="flex justify-between">
+      <div>
         <span class="text-grey-400"
-          >by
-          <a
-            class="text-grey-500 underline"
+          >by<a
+            class="text-grey-500 underline ml-1"
             :href="getEtherscanUrl(ownerAddress, chainId, 'address')"
             target="_blank"
             rel="noopener noreferrer"
-          >
-            {{ formatAddress(ownerAddress) }}
+            >{{ formatAddress(ownerAddress) }}
           </a>
         </span>
-        <span class="text-grey-400"
-          >Raised: <span class="text-grey-500">{{ raised }}</span></span
-        >
+      </div>
+      <div>
+        <span class="text-grey-400">Raised:</span><span class="ml-1">{{ raised }}</span>
       </div>
     </figcaption>
   </figure>
@@ -62,12 +59,12 @@ export default defineComponent({
   },
   components: { CartIcon },
   setup() {
-    const { addToCart, isInCart } = useCartStore();
+    const { addToCart, isInCart, removeFromCart } = useCartStore();
     const chainId = computed(() => {
       const { network } = useWalletStore();
       return network.value?.chainId ? network.value.chainId : 1;
     });
-    return { addToCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber, chainId };
+    return { addToCart, removeFromCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber, chainId };
   },
 });
 </script>
