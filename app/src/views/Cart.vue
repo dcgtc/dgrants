@@ -98,8 +98,15 @@
               <div class="col-span-4 lg:col-span-1">
                 <div class="text-grey-400 text-left lg:text-right">
                   <!-- TODO use real match estimates -->
-                  <p v-if="true">not in an active round</p>
-                  <p v-else>USD estimated matching</p>
+                  <p v-if="clrPredictions[item.grantId]">
+                    <span v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
+                      {{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}
+                      {{ index !== clrPredictions[item.grantId].length - 1 ? '+' : '' }}
+                      <br />
+                      estimated matching
+                    </span>
+                  </p>
+                  <p v-else>not in an active round</p>
                 </div>
               </div>
             </div>
@@ -131,7 +138,13 @@
       <div class="py-8 border-b border-grey-100">
         <div class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Estimated matching value:</span>
-          <span>TODO</span>
+          <span v-if="Object.keys(clrPredictionsByToken).length">
+            <span v-for="(symbol, index) in Object.keys(clrPredictionsByToken)" :key="index">
+              {{ formatNumber(clrPredictionsByToken[symbol], 2) }} {{ symbol }}
+              {{ index !== Object.keys(clrPredictionsByToken).length - 1 ? '+' : '' }}
+            </span>
+          </span>
+          <span v-else> 0.0 DAI </span>
         </div>
       </div>
 
@@ -176,7 +189,7 @@ import { SUPPORTED_TOKENS } from 'src/utils/chains';
 import { pushRoute, formatNumber } from 'src/utils/utils';
 
 function useCart() {
-  const { cart, cartSummary, cartSummaryString, checkout, clearCart, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart } = useCartStore(); // prettier-ignore
+  const { cart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart } = useCartStore(); // prettier-ignore
 
   onMounted(async () => {
     await fetchQuotes(); // get latest quotes
@@ -204,7 +217,7 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, cartSummaryString, clearCart, completeCheckout, equivalentContributionAmount, executeCheckout, removeFromCart, status, txHash, updateCart }; // prettier-ignore
+  return { cart, cartSummaryString, clearCart, completeCheckout, clrPredictions, clrPredictionsByToken, equivalentContributionAmount, executeCheckout, removeFromCart, status, txHash, updateCart }; // prettier-ignore
 }
 
 export default defineComponent({
