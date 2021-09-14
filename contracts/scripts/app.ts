@@ -24,7 +24,7 @@ const fixtureGrants = async (deployer: SignerWithAddress) => {
     {
       owner: '0x58E52440F56f2A5307772Ec881BCEf2c15e988Ab',
       payee: '0x6f02c37ea174DD05f20aC118da725ffa6A40B990',
-      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmeqiDZMA41ekPV9BJDx3VGtJbxU34YSS3oorLA8cPuib6',
+      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/Qma9gnPTmdZ65UVjJd9nkM6S8etti8qtNBD1ta6vVpSSVS',
     },
     {
       owner: '0x1fB6C46e6aDD95698352707D7f93a31030c80a0B',
