@@ -9,7 +9,7 @@ import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
 import { SupportedChainId } from 'src/utils/chains';
-import { ERC20_ABI, ETH_ADDRESS, WAD, WETH_ADDRESS } from 'src/utils/constants';
+import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
@@ -31,35 +31,43 @@ const MAINNET_SWAP_PATHS = {
   // UNI to ETH through 0.3% pool, ETH to DAI through 0.3% pool
   '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984': '0x1f9840a85d5af5bf1d1762f925bdaddc4201f984000bb8c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
   // DAI "swap path" is just its token address for our router
-  '0x6B175474E89094C44Da98b954EedeAC495271d0F': '0x6b175474e89094c44da98b954eedeac495271d0f',
+  '0x6B175474E89094C44Da98b954EedeAC495271d0F': '0x6B175474E89094C44Da98b954EedeAC495271d0F'.toLowerCase(),
 };
 const SWAP_PATHS = {
   [SupportedChainId.MAINNET]: MAINNET_SWAP_PATHS,
   [SupportedChainId.HARDHAT]: MAINNET_SWAP_PATHS,
   [SupportedChainId.RINKEBY]: {
     // ETH to DAI through the 0.3% pool
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc778417e063141139fce010982780140aa0cd5ab000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc778417e063141139fce010982780140aa0cd5ab000bb85592ec0cfb4dbc12d3ab100b257153436a1f0fea', // prettier-ignore
+    // DAI "swap path" is just its token address for our router
+    '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa': '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa'.toLowerCase(),
   },
   [SupportedChainId.OPTIMISM]: {
     // ETH to DAI through the 0.3% pool
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
     // USDC to DAI through the 0.3% pool
     '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+    // DAI "swap path" is just its token address for our router
+    '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(),
   },
   [SupportedChainId.OPTIMISTIC_KOVAN]: {
     // ETH to DAI through the 0.3% pool
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
     // USDC to DAI through the 0.3% pool
     '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
+    // DAI "swap path" is just its token address for our router
+    '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(),
   },
   // *** Arbitrum paths are currently not handled as there is no bridged DAI ***
   // We use the mainnet paths here just to avoid lint errors
   [SupportedChainId.ARBITRUM_ONE]: {
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+    // TODO choose donation token since there's no DAI -- USDC?
   },
   [SupportedChainId.ARBITRUM_RINKEBY]: {
     // Seems Uniswap V3 has no liquidity here
     '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
+    // TODO choose donation token since there's no DAI -- USDC?
   },
 };
 
@@ -208,7 +216,7 @@ export default function useCartStore() {
    * @notice Executes donations
    */
   async function checkout(): Promise<ContractTransaction> {
-    const { signer, userAddress, grantRoundManager } = useWalletStore();
+    const { signer, userAddress, grantRoundManager, WETH_ADDRESS } = useWalletStore();
     const manager = grantRoundManager.value;
     const { swaps, donations, deadline } = await getCartDonationInputs();
     const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
@@ -221,7 +229,7 @@ export default function useCartStore() {
     // Execute approvals if required
     for (const swap of swaps) {
       const tokenAddress = getInputToken(swap);
-      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
+      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS.value) continue; // no approvals for ETH, and explicit WETH donation not supported
       const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
       const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
       if (allowance.lt(swap.amountIn)) {
@@ -231,7 +239,7 @@ export default function useCartStore() {
     }
 
     // Determine if we need to send value with this transaction
-    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS);
+    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS.value);
     const value = ethSwap ? ethSwap.amountIn : 0;
 
     // Execute donation
@@ -242,6 +250,8 @@ export default function useCartStore() {
    * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
    */
   async function getCartDonationInputs(): Promise<{ swaps: SwapSummary[]; donations: Donation[]; deadline: number }> {
+    const { WETH_ADDRESS } = useWalletStore();
+
     // Get the swaps array
     const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
       const decimals = supportedTokensMapping.value[tokenAddress].decimals;
@@ -258,7 +268,7 @@ export default function useCartStore() {
       // Extract data we already have
       const { grantId, contributionAmount, contributionToken } = item;
       const isEth = contributionToken.address === ETH_ADDRESS;
-      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
+      const tokenAddress = isEth ? WETH_ADDRESS.value : contributionToken.address;
       const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
       const decimals = isEth ? 18 : supportedTokensMapping.value[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);

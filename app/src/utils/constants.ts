@@ -23,7 +23,6 @@ export { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/con
 
 // Tokens
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
-export const WETH_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 export const ERC20_ABI = [
   'function name() view returns (string)',
   'function symbol() view returns (string)',
