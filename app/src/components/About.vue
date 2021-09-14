@@ -17,7 +17,7 @@
         </div>
 
         <!-- ToDo. build version -->
-        <div class="mt-2">build 0.0.0.0</div>
+        <div class="mt-2">build {{ packagejson.version }}</div>
 
         <!-- Team -->
         <div class="mt-16">
@@ -71,6 +71,8 @@ import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
 import { GithubIcon as GithubIcon } from '@fusion-icons/vue/interface';
 
+import packagejson from './../../package.json';
+
 type Contributor = {
   login: string;
   html_url: string;
@@ -89,6 +91,7 @@ export default defineComponent({
   data() {
     return {
       contributors: [] as Contributor[],
+      packagejson: packagejson,
     };
   },
   setup(_props, context) {
