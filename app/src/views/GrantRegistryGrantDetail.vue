@@ -104,7 +104,7 @@
       <BaseFilterNav :active="selectedEdit" :items="editNav" />
 
       <div v-if="selectedEdit == 0" class="text-left">
-        <form class="space-y-5" @submit.prevent="saveEdits">
+        <form class="space-y-5 mb-20" @submit.prevent="saveEdits">
           <!-- Grant name -->
           <InputRow>
             <template v-slot:label>Title:</template>
