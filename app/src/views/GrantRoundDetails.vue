@@ -183,7 +183,7 @@ function useGrantRoundDetail() {
 
   const { signer, userAddress, network } = useWalletStore();
 
-  const chainId = network.value?.chainId;
+  const chainId = network.value?.chainId ? network.value.chainId : 1;
   const route = useRoute();
 
   // get a single grantRound or an empty/error object (TODO: should the typings be modified to account for an empty object?)

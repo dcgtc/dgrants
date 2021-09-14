@@ -31,7 +31,8 @@
         <!--transaction hash & transaction status-->
         <!--todo : display real transaction status-->
         <div class="truncate">
-          <a class="link"
+          <a
+            class="link"
             :href="getEtherscanUrl(contribution.transactionHash, 1, 'tx')"
             target="_blank"
             rel="noopener noreferrer"
