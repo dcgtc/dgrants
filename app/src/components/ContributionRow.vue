@@ -8,18 +8,18 @@
           <div class="flex items-center gap-x-4">
             <!--identicon-->
             <div>
-              <Jazzicon :address="contribution.from" :key="contribution.from" :width="48" />
+              <Jazzicon :address="contribution.address" :key="contribution.address" :width="48" />
             </div>
 
             <!--address-->
             <div>
-              <div v-if="contribution.from">
+              <div v-if="contribution.address">
                 <a
                   class="link"
-                  :href="getEtherscanUrl(contribution.from, 'address')"
+                  :href="getEtherscanUrl(contribution.address, 'address')"
                   target="_blank"
                   rel="noopener noreferrer"
-                  >{{ formatAddress(contribution.from) }}</a
+                  >{{ formatAddress(contribution.address) }}</a
                 >
               </div>
               <!--blocknumber-->
@@ -33,11 +33,11 @@
         <div class="truncate">
           <a
             class="link"
-            :href="getEtherscanUrl(contribution.transactionHash, 'tx')"
+            :href="getEtherscanUrl(contribution.txHash, 'tx')"
             target="_blank"
             rel="noopener noreferrer"
           >
-            {{ contribution.transactionHash }}
+            {{ contribution.txHash }}
           </a>
           <div class="text-grey-400">Success</div>
         </div>
@@ -45,7 +45,7 @@
         <!-- donation -->
         <div class="md:ml-auto">
           <div>
-            {{ formatNumber(formatUnits(contribution.args?.donationAmount, contribution.donationToken?.decimals), 2) }}
+            {{ contribution.amount }}
             {{ contribution.donationToken?.symbol }}
           </div>
         </div>
@@ -60,14 +60,14 @@ import { defineComponent, PropType } from 'vue';
 import { formatUnits } from 'src/utils/ethers';
 import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
 // --- Types ---
-import { ContributionEvent } from '@dgrants/types';
+import { Contribution } from '@dgrants/types';
 // --- Components ---
 import Jazzicon from 'src/components/Jazzicon.vue';
 
 export default defineComponent({
   name: 'ContributionRow',
   props: {
-    contribution: { type: Object as PropType<ContributionEvent>, required: true },
+    contribution: { type: Object as PropType<Contribution>, required: true },
   },
   components: { Jazzicon },
   setup() {
