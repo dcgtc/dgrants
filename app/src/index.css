@@ -117,4 +117,9 @@
   .btn.in-cart {
     @apply bg-teal hover:bg-grey-400 opacity-100;
   }
+
+  .base-grid {
+    @apply px-4 md:px-12 py-12 pb-24 grid gap-x-12 gap-y-12 border-b border-grey-100;
+    @apply grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4;
+  }
 }

@@ -4,9 +4,10 @@
       <div class="flex flex-wrap content-center gap-x-8">
         <div v-for="(item, index) in items" :key="item.label">
           <div class="cursor-pointer uppercase font-medium group" @click="item?.action">
-            <span :class="active == index ? 'underline' : ''">{{ item.label }}</span>
+            <span v-if="item.menu" class="text-grey-400">{{ item.label + ':' }}</span>
+            <span v-else :class="active == index ? 'underline' : ''">{{ item.label }}</span>
             <span v-if="item.counter" class="ml-2 text-grey-400">({{ item.counter }})</span>
-            <span v-else-if="item.tag" class="text-grey-400 mr-2">{{ item.tag }}</span>
+            <span v-else-if="item.tag" class="ml-2">{{ item.tag }}</span>
             <div v-if="item.menu" class="absolute hidden group-hover:block text-left z-10">
               <div
                 class="

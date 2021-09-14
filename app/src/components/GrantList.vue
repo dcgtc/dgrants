@@ -1,18 +1,16 @@
 <template>
-  <div class="max-w-screen-lg mx-auto">
-    <ul class="text-left grid grid-cols-1 gap-10 py-10 sm:grid-cols-2">
-      <li v-for="grant in grants" :key="grant.id.toString()">
-        <!-- ToDo: Raised data -->
-        <GrantCard
-          :id="grant.id"
-          :name="grantMetadata[grant.metaPtr].name ?? ''"
-          :ownerAddress="grant.owner"
-          :imgurl="grantMetadata[grant.metaPtr].logoURI ?? '/src/assets/placeholder_grant.svg'"
-          raised="100"
-        />
-      </li>
-    </ul>
-  </div>
+  <ul class="base-grid">
+    <li v-for="grant in grants" :key="grant.id.toString()">
+      <!-- ToDo: Raised data -->
+      <GrantCard
+        :id="grant.id"
+        :name="grantMetadata[grant.metaPtr].name ?? ''"
+        :ownerAddress="grant.owner"
+        :imgurl="grantMetadata[grant.metaPtr].logoURI ?? '/src/assets/placeholder_grant.svg'"
+        raised="100"
+      />
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">

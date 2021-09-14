@@ -41,6 +41,7 @@ function useGrantRegistryList() {
   const grantRegistryListNav = <FilterNavItem[]>[
     {
       label: 'Sort',
+      tag: 'newest',
       menu: [
         // TODO implement the behaviours here when grants have a date
         {
