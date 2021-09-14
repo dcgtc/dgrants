@@ -79,7 +79,7 @@ function useContributors() {
     html_url: string;
   };
 
-  const contributors: Contributor[] = ref([]);
+  const contributors = ref<Contributor[]>([]);
 
   onMounted(async () => {
     try {
