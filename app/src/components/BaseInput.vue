@@ -1,9 +1,9 @@
 <template>
-  <div :class="width">
+  <div :class="containerClass">
     <input
       v-model="val"
       @input="onInput"
-      :class="[customcss ? customcss : '']"
+      :class="[inputClass ? inputClass : '']"
       :id="id"
       :name="id"
       :required="required"
@@ -35,8 +35,8 @@ export default defineComponent({
     required: { type: Boolean, required: false, default: true }, // is required
     readonly: { type: Boolean, required: false, default: false }, // is readonly
     disabled: { type: Boolean, required: false, default: false }, // is disabled
-    width: { type: String, required: false, default: 'w-full' }, // input field width
-    customcss: { type: String, required: false, default: '' }, // add custom css stylings
+    inputClass: { type: String, required: false, default: '' }, // add custom css stylings to the input field
+    containerClass: { type: String, required: false, default: 'w-full' }, // input field container class
 
     rules: {
       // Validation rules, as a function that takes one input and returns a bool

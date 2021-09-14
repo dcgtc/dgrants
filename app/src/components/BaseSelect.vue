@@ -1,5 +1,10 @@
 <template>
-  <Listbox :class="width" as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
+  <Listbox
+    :class="containerClass"
+    as="div"
+    :modelValue="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
     <div class="relative">
       <!-- not realy happy with using the headless ui just for having a non-native input-select field ( <ListboxButton> and <ListboxOptions> ) 
       1. its impossible without hardcoding heights to mix native input fields and this fake
@@ -15,7 +20,7 @@
       </select>
       -->
 
-      <ListboxButton class="group w-full p-4 border border-grey-400 hover:border-grey-500">
+      <ListboxButton :class="`group w-full border border-grey-400 hover:border-grey-500 ${buttonClass}`">
         <span class="block truncate text-left">{{ modelValue[label] }}</span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none w-12">
           <ArrowBottom2Icon class="icon icon-primary" aria-hidden="true" />
@@ -35,7 +40,7 @@
             bg-white
             text-left
             overflow-auto
-            border border-grey-400
+            border border-grey-400 border-t-0
             p-5
             font-medium
             bg-white
@@ -84,7 +89,8 @@ export default defineComponent({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     options: { type: Array as PropType<Record<string, any>[]>, required: true }, // available options, must be array of objects with an `id` field
     label: { type: String, required: false, default: 'name' }, // option[label] is used as the string shown
-    width: { type: String, required: false, default: 'w-full' }, // input field width
+    buttonClass: { type: String, required: false, default: '' }, // button field class
+    containerClass: { type: String, required: false, default: 'w-full' }, // input field class
   },
 });
 </script>

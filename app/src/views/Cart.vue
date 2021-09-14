@@ -66,8 +66,8 @@
                       updateCart(item.grantId, item.contributionAmount);
                     "
                     type="number"
-                    width="w-1/2"
-                    customcss="border-r-0"
+                    inputClass="border-r-0 h-14"
+                    containerClass="w-1/2"
                   />
 
                   <BaseSelect
@@ -78,7 +78,8 @@
                     "
                     :options="SUPPORTED_TOKENS"
                     label="symbol"
-                    width="w-1/2"
+                    buttonClass="h-14 px-4"
+                    containerClass="w-1/2"
                   />
                 </div>
               </div>

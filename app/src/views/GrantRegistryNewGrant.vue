@@ -18,7 +18,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.name"
-            width="w-full"
+            containerClass="w-full"
             placeholder="Grant name"
             id="grant-name"
             :rules="isDefined"
@@ -33,7 +33,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.owner"
-            width="w-full"
+            containerClass="w-full"
             placeholder="owner ethereum address"
             id="owner-address"
             :rules="isValidAddress"
@@ -48,7 +48,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.payee"
-            width="w-full"
+            containerClass="w-full"
             placeholder="payee ethereum address"
             id="payee-address"
             :rules="isValidAddress"
@@ -63,7 +63,7 @@
         <template v-slot:input>
           <BaseTextarea
             v-model="form.description"
-            width="w-full"
+            containerClass="w-full"
             placeholder="Description"
             id="grant-description"
             :required="true"
@@ -79,7 +79,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.website"
-            width="w-full"
+            containerClass="w-full"
             placeholder="https://"
             id="grant-website"
             :rules="isValidWebsite"
@@ -95,7 +95,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.github"
-            width="w-full"
+            containerClass="w-full"
             placeholder="https://"
             id="grant-github"
             :rules="isValidGithub"
@@ -111,7 +111,7 @@
         <template v-slot:input>
           <BaseInput
             v-model="form.twitter"
-            width="w-full"
+            containerClass="w-full"
             placeholder="@twitterhandle"
             id="grant-handle"
             :rules="isValidTwitter"

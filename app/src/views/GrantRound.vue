@@ -33,7 +33,7 @@
           <template v-slot:input>
             <BaseInput
               v-model="form.amount"
-              width="w-full"
+              containerClass="w-full"
               placeholder="0"
               id="contribution-amount"
               :required="true"
