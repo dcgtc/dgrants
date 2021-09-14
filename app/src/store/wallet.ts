@@ -218,6 +218,7 @@ export default function useWalletStore() {
     setProvider,
     // Properties
     chainId,
+    WETH_ADDRESS: computed(() => chainInfo.value.weth),
     supportedTokens,
     supportedTokensMapping,
     isSupportedNetwork,
