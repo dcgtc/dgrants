@@ -1,4 +1,5 @@
-import { GrantRoundContributions, Contribution, GrantsDistribution, GrantMatch } from '../../src/types';
+import { GrantsDistribution, GrantMatch } from '../../src/types';
+import { GrantRoundContributions, Contribution } from '@dgrants/types';
 
 /**
  * util function which adds anonymous contribution of given value to the

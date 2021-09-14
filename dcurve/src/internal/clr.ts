@@ -1,13 +1,10 @@
 'use strict';
-
+import { CLRPrediction, GrantPrediction, GrantRoundContributions } from '@dgrants/types';
 import {
   CLRArgs,
   GrantMatch,
-  GrantPrediction,
-  GrantPredictionArgs,
-  GrantPredictions,
-  GrantRoundContributions,
   GrantsDistribution,
+  GrantPredictionArgs,
   InitArgs,
   PayoutMatch,
   PayoutMatches,
@@ -99,7 +96,7 @@ export class CLR {
    *
    * @returns GrantPredictions
    */
-  async predict(args: GrantPredictionArgs, _options?: Record<string, unknown>): Promise<GrantPredictions> {
+  async predict(args: GrantPredictionArgs, _options?: Record<string, unknown>): Promise<GrantPrediction> {
     // allow the options to be overridden
     const options = Object.assign(this._options, _options || {});
 
@@ -111,7 +108,7 @@ export class CLR {
     const predictionPoints: number[] = args.predictionPoints;
     const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
     const trustBonusScores = args.trustBonusScores;
-    const predictions: GrantPrediction[] = [];
+    const predictions: CLRPrediction[] = [];
 
     // calculate distribution based on current contribution
     const distribution: GrantsDistribution = await calcAlgo({
@@ -143,7 +140,7 @@ export class CLR {
           predictionPoint: predictionPoint,
           predictedGrantMatch: predictedGrantMatch,
           predictionDiff: predictedGrantMatch - currentGrantMatch,
-        } as GrantPrediction);
+        } as CLRPrediction);
       })
     ));
 
@@ -152,7 +149,7 @@ export class CLR {
       grantId: grantId,
       grantRound: grantRoundContributions.grantRound,
       predictions: predictions,
-    } as GrantPredictions;
+    } as GrantPrediction;
   }
 
   /**

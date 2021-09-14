@@ -1,11 +1,5 @@
-import {
-  CLRArgs,
-  ContributionsByGrantId,
-  GrantMatch,
-  GrantRoundContributions,
-  GrantsDistribution,
-  TrustBonusScore,
-} from '../../types';
+import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantsDistribution, TrustBonusScore } from '../../types';
+import { GrantRoundContributions } from '@dgrants/types';
 import { fetchTrustBonusScore, uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
 import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/ipfs';
 

@@ -1,7 +1,8 @@
 'use strict';
 
 import { Contract } from 'ethers';
-import { Contribution, GrantRoundContributions, GrantRoundFetchArgs } from '../../src/types';
+import { GrantRoundFetchArgs } from '../../src/types';
+import { GrantRoundContributions, Contribution } from '@dgrants/types';
 import { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
 import { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
 import { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
