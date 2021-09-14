@@ -17,3 +17,13 @@ export type CartItem =
 
 // type of entities on Etherscan.
 export type EtherscanGroup = 'tx' | 'token' | 'address';
+
+// Generic localStorage type to store key->any
+export type LocalStorageAnyObj = {
+  [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+};
+export type LocalStorageData = {
+  ts: BigNumberish;
+  blockNumber: number;
+  data: LocalStorageAnyObj;
+};
