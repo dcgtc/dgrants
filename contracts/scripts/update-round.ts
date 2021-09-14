@@ -1,17 +1,12 @@
 import fs from 'fs';
 import hre from 'hardhat';
-import { create } from 'ipfs-http-client';
+import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { ScriptLogger } from './ScriptLogger';
 import params from './update-round.config';
 
 const { ethers } = hre;
 
-const ipfs = create({
-  url: 'https://ipfs-api.dev.fleek.cool',
-  headers: {
-    Authorization: `v2 ${process.env.FLEEK_STORAGE_API_KEY}`,
-  },
-});
+const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
 
 // IIFE async function so "await"s can be performed for each operation
 (async function () {

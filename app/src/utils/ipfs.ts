@@ -1,18 +1,9 @@
-import { create } from 'ipfs-http-client';
+import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { GrantMetadata } from '@dgrants/types';
 
-const config = {
-  storageEndpoint: 'https://ipfs-api.dev.fleek.cool',
-  storageHeaders: {
-    Authorization: `v2 ${import.meta.env.VITE_FLEEK_STORAGE_API_KEY}`, // or Bearer <JWT> or public <AppKey>
-  },
-  retrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
-};
+const RetrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
 
-export const ipfs = create({
-  url: config.storageEndpoint,
-  headers: config.storageHeaders,
-});
+export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
 
 /**
  * Adds grant metadata to IPFS
@@ -33,7 +24,7 @@ export const uploadGrantMetadata = async ({ name, description, properties }: Gra
  * @returns string
  */
 export const getMetaPtr = ({ cid }: { cid: string }) => {
-  return `${config.retrievalEndpoint}/${cid}`;
+  return `${RetrievalEndpoint}/${cid}`;
 };
 
 /**
