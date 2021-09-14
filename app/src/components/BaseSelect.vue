@@ -1,6 +1,6 @@
 <template>
   <div :class="width">
-    <select name="token" class="">
+    <select v-model="val" @input="onInput" @update:model-value="$emit('update:modelValue', $event)">
       <option v-for="option in options" :key="option.id" :value="option">
         {{ option[label] }}
       </option>
@@ -9,19 +9,35 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, ref } from 'vue';
 
 export default defineComponent({
   name: 'BaseSelect',
-  components: {},
   props: {
     // --- Required props ---
-    modelValue: { type: Object, required: true }, // from v-model, don't pass this directly
+    options: { type: Array as PropType<Record<string, any>[]>, required: true }, // available
+    modelValue: { type: Object, required: true, default: undefined },
+
     // --- Optional props ---
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options: { type: Array as PropType<Record<string, any>[]>, required: true }, // available options, must be array of objects with an `id` field
+
     width: { type: String, required: false, default: 'w-full' }, // input field width
     label: { type: String, required: false, default: 'name' }, // option[label] is used as the string shown
+
+    rules: {
+      // Validation rules, as a function that takes one input and returns a bool
+      type: Function,
+      required: false,
+      default: () => true,
+    },
+  },
+
+  setup(props) {
+    const val = ref<any>(props.modelValue); // eslint-disable-line @typescript-eslint/no-explicit-any
+
+    function onInput() {
+      console.log(val);
+    }
+    return { onInput, val };
   },
 });
 </script>
