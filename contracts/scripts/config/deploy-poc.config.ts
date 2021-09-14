@@ -1,4 +1,4 @@
-import metadataJson from './grant-round-metadata.json';
+import metadataJson from './assets/grant-round-metadata.json';
 
 type NetworkParams = {
   // GrantRoundManager parameters
@@ -29,7 +29,7 @@ const params: DeployParams = {
     roundStartTime: 1661990400, // Thursday, September 1, 2022 12:00:00 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
-    roundLogoPath: './scripts/dgrants-placeholder.png',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   mainnet: {

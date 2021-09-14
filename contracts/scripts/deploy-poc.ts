@@ -2,7 +2,7 @@ import fs from 'fs';
 import hre from 'hardhat';
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { ScriptLogger } from './ScriptLogger';
-import params from './deploy-poc.config';
+import params from './config/deploy-poc.config';
 
 const { ethers } = hre;
 
