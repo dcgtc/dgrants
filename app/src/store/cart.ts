@@ -6,8 +6,9 @@
 
 // --- Imports ---
 import { computed, ref } from 'vue';
-import { Donation, Grant, SwapSummary } from '@dgrants/types';
-import { CartItem, CartItemOptions } from 'src/types';
+import { Donation, Grant, GrantRound, GrantRoundCLR, SwapSummary } from '@dgrants/types';
+import { CartItem, CartItemOptions, CartPrediction, CartPredictions } from 'src/types';
+import { TokenInfo } from '@uniswap/token-lists';
 import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
@@ -73,7 +74,7 @@ const SWAP_PATHS = {
   },
 };
 
-const { grants, grantRounds } = useDataStore();
+const { grants, grantRounds, grantRoundsCLRData } = useDataStore();
 const { chainId } = useWalletStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
@@ -112,6 +113,102 @@ export default function useCartStore() {
       console.warn('Could not read any existing cart data from localStorage. Defaulting to empty cart');
       setCart(EMPTY_CART);
     }
+  }
+
+  // convert the amount to a different token (direction allows for moving to/from the tokenAddress)
+  function getConvertedAmount(amount: number, tokenAddress: string, direction = 1) {
+    const exchangeRate = quotes.value[tokenAddress] ?? 0;
+
+    return amount * (direction == 1 ? exchangeRate : 1 / exchangeRate);
+  }
+
+  // Linear Interpolation function to find the point on the curve that amount corresponds to
+  function lerp(x_lower: number, x_upper: number, y_lower: number, y_upper: number, x: number) {
+    return y_lower + ((y_upper - y_lower) * (x - x_lower)) / (x_upper - x_lower);
+  }
+
+  // returns the prediction curve for this grant in the given round
+  function getPredictionsForGrantInRound(grantId: string, round: GrantRound) {
+    const data = ((grantRoundsCLRData && grantRoundsCLRData.value && grantRoundsCLRData.value) || {}) as {
+      [grantRound: string]: GrantRoundCLR;
+    };
+    const roundData = data[round.address] || {};
+
+    return roundData.predictions && roundData.predictions[Number(grantId)];
+  }
+
+  // given the grantId and the contribution amount find all matching in all rounds
+  function getPredictionForAmount(grantId: string, amount: number, token: TokenInfo) {
+    const rounds = grantRounds.value || [];
+
+    return rounds
+      .map((round) => {
+        const contributions_axis = [0, 1, 10, 100, 1000, 10000];
+        const clr_predictions = getPredictionsForGrantInRound(grantId, round);
+        const clr_prediction_curve = clr_predictions?.predictions?.map((prediction, key) => {
+          return key == 0 ? prediction.predictedGrantMatch : prediction.predictionDiff;
+        });
+
+        let predicted_clr = 0;
+
+        // convert amount to the matchingToken (double hop to get into dai then into the matchingToken)
+        amount =
+          token.symbol == 'dai' || token.address == round.matchingToken.address
+            ? amount
+            : getConvertedAmount(amount, token.address, 1);
+        amount =
+          round.matchingToken.symbol == 'dai' || token.address == round.matchingToken.address
+            ? amount
+            : getConvertedAmount(amount, round.matchingToken.address, -1);
+
+        if (!clr_prediction_curve || !amount || isNaN(amount)) {
+          predicted_clr = 0;
+        } else if (contributions_axis.indexOf(amount) > 0) {
+          predicted_clr = clr_prediction_curve[contributions_axis.indexOf(amount)];
+        } else {
+          let x_lower = 0;
+          let x_upper = 0;
+          let y_lower = 0;
+          let y_upper = 0;
+
+          if (0 < amount && amount < 1) {
+            x_lower = 0;
+            x_upper = 1;
+            y_lower = clr_prediction_curve[0];
+            y_upper = clr_prediction_curve[1];
+          } else if (1 < amount && amount < 10) {
+            x_lower = 1;
+            x_upper = 10;
+            y_lower = clr_prediction_curve[1];
+            y_upper = clr_prediction_curve[2];
+          } else if (10 < amount && amount < 100) {
+            x_lower = 10;
+            x_upper = 100;
+            y_lower = clr_prediction_curve[2];
+            y_upper = clr_prediction_curve[3];
+          } else if (100 < amount && amount < 1000) {
+            x_lower = 100;
+            x_upper = 1000;
+            y_lower = clr_prediction_curve[3];
+            y_upper = clr_prediction_curve[4];
+          } else {
+            x_lower = 1000;
+            x_upper = 10000;
+            y_lower = clr_prediction_curve[4];
+            y_upper = clr_prediction_curve[5];
+          }
+
+          predicted_clr = lerp(x_lower, x_upper, y_lower, y_upper, amount);
+        }
+
+        return clr_prediction_curve
+          ? {
+              matching: predicted_clr,
+              matchingToken: round.matchingToken,
+            }
+          : false;
+      })
+      .filter((clr) => clr);
   }
 
   /**
@@ -347,6 +444,39 @@ export default function useCartStore() {
    */
   const swapPaths = computed(() => SWAP_PATHS[chainId.value]);
 
+  /**
+   * @notice Returns all clr matching for each grant and each round
+   */
+  const clrPredictions = computed<CartPredictions>(() => {
+    const _predictions: CartPredictions = {};
+    cart.value.forEach((item) => {
+      _predictions[item.grantId] = getPredictionForAmount(
+        item.grantId,
+        item.contributionAmount,
+        item.contributionToken
+      ) as CartPrediction[];
+    });
+
+    return _predictions;
+  });
+
+  const clrPredictionsByToken = computed<{ [key: string]: number }>(() => {
+    const _predictions = clrPredictions.value;
+    const _predictionTotals: { [key: string]: number } = {};
+    cart.value.forEach((item) => {
+      if (_predictions[item.grantId]) {
+        _predictions[item.grantId].forEach((prediction: CartPrediction) => {
+          if (!_predictionTotals[prediction.matchingToken.symbol]) {
+            _predictionTotals[prediction.matchingToken.symbol] = 0;
+          }
+          _predictionTotals[prediction.matchingToken.symbol] += prediction.matching;
+        });
+      }
+    });
+
+    return _predictionTotals;
+  });
+
   // Only export additional items as they are needed outside the store
   return {
     // Store
@@ -354,6 +484,8 @@ export default function useCartStore() {
     // sure to call `updateCart()` with the appropriate inputs whenever the `cart` ref is modified
     cart,
     quotes: computed(() => quotes.value),
+    clrPredictions,
+    clrPredictionsByToken,
     // Getters
     cartItemsCount: computed(() => cart.value.length),
     cartSummary: computed(() => cartSummary.value),
