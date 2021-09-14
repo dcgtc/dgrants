@@ -1,6 +1,6 @@
 <template>
   <div :class="width">
-    <label>
+    <label :class="['flex', 'flex-col', 'bg-white', 'items-center', 'block', 'px-6', 'py-8', 'border border-grey-400']">
       <span>Choose image file to upload</span>
       <input type="file" @change="onFile" class="hidden" />
     </label>
