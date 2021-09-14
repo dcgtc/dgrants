@@ -139,7 +139,8 @@ import useCartStore from 'src/store/cart';
 // Header menu bar items
 const navigation = [
   { label: 'Home', name: 'Home' },
-  { label: 'Cart', name: 'Cart' },
+  { label: 'Rounds', name: 'dgrants-rounds-list' },
+  { label: 'Grants', name: 'dgrants' },
 ];
 
 // Composition function for wallet management in the header. All reading/writing related to the user's wallet
