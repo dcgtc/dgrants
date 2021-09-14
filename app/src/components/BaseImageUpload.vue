@@ -1,26 +1,28 @@
 <template>
   <div :class="width">
-    <label :class="['flex', 'flex-col', 'bg-white', 'items-center', 'block', 'px-6', 'py-8', 'border border-grey-400']">
+    <label class="flex flex-col bg-white items-center block px-6 py-8 border border-grey-400 cursor-pointer">
       <span>Choose image file to upload</span>
-      <input type="file" @change="onFile" class="hidden" />
+      <input type="file" @input="onInput" class="hidden" />
     </label>
-    <div v-if="!isValid" class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none h-12 w-12">
-      <WarningIcon class="icon stroke-pink" />
+
+    <div v-if="isValid && val">
+      <div :id="`${id}-success`">{{ val.name }}</div>
     </div>
-    <p v-if="!isValid" class="text-xs text-red-600" :id="`${id}-error`">{{ errorMsg }}</p>
+    <div v-else-if="!isValid">
+      <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import { WarningIcon } from '@fusion-icons/vue/interface';
+import { defineComponent, ref, watch } from 'vue';
 
 export default defineComponent({
   name: 'BaseImageUpload',
-  components: { WarningIcon },
   props: {
     // --- Required props ---
-    modelValue: { type: File, required: true, default: undefined }, // from v-model, don't pass this directly
+    // Getting the prop type right as File | undefined was a pain, so just leaving out the type definition here
+    modelValue: { required: true }, // from v-model, don't pass this directly
     // --- Optional props ---
     errorMsg: { type: String, required: false, default: undefined }, // message to show on error
     id: { type: String, required: false, default: undefined }, // id, for accessibility
@@ -36,14 +38,23 @@ export default defineComponent({
   },
 
   setup(props, context) {
-    const logo = ref<any>(props.modelValue); // eslint-disable-line @typescript-eslint/no-explicit-any
-    const isValid = true;
-    function onFile(e: Event) {
+    const val = ref<File | undefined>(props.modelValue as File);
+    const isValid = ref(true);
+
+    // Use watcher for rule validation since the rules are async (checking image dimensions is async)
+    watch(
+      () => val.value,
+      async () => (isValid.value = val.value ? await props.rules(val.value) : true),
+      { immediate: true }
+    );
+
+    function onInput(e: Event) {
       const target = e.target as HTMLInputElement;
       const file: File = (target.files as FileList)[0];
-      context.emit('updateLogo', file);
+      val.value = file;
+      context.emit('update:modelValue', file); // https://v3.vuejs.org/guide/migration/v-model.html#v-model
     }
-    return { onFile, isValid, logo };
+    return { onInput, isValid, val };
   },
 });
 </script>
