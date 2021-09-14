@@ -1,0 +1,30 @@
+{
+  "deployer": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+  "config": {
+    "donationToken": "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+    "uniswapFactory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+    "weth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    "metadataAdmin": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "payoutAdmin": "0x0000000000000000000000000000000000000000",
+    "matchingToken": "0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F",
+    "roundStartTime": 1661990400,
+    "roundEndTime": 1663200000,
+    "ipfsRetrievalEndpoint": "https://ipfs-dev.fleek.co/ipfs",
+    "roundLogoPath": "./scripts/dgrants-placeholder.png",
+    "metadataJson": {
+      "name": "dGrants Proof-of-Concept",
+      "description": "Gitcoin building Gitcoin using Gitcoin 🤯",
+      "grants": [],
+      "logoURI": "https://ipfs-dev.fleek.co/ipfs/QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F"
+    }
+  },
+  "contracts": {
+    "GrantRegistry": "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
+    "GrantRoundManager": "0xc351628EB244ec633d5f21fBD6621e1a683B1181"
+  },
+  "actions": {
+    "PublishGrantRoundLogo": "QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F",
+    "PublishGrantRoundMetadata": "QmSCFYQ3oYpzrrH8n7qJhUsGQBsp7mMRR7Q3uvE3yqVoYW",
+    "CreateGrantGround": "0x8dfcac14d610caa8310da829e2e39f2b2b9585e8dfe8b61f65d76dee1ba9d38b"
+  }
+}
