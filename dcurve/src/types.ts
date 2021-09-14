@@ -3,6 +3,7 @@
 import { MerkleDistributorInfo } from './internal/merkle';
 import { JsonRpcProvider, Web3Provider } from '@ethersproject/providers';
 import { TokenInfo } from '@uniswap/token-lists';
+import { Contribution, GrantRoundContributions } from '@dgrants/types';
 
 // ethers provider
 export type Provider = Web3Provider | JsonRpcProvider;
@@ -29,21 +30,6 @@ export type GrantRoundFetchArgs = {
 };
 
 /**
- * Object for an individual Contribution
- *
- * @type Contribution
- * @field {grantId} grant id in the registry to which the contribution was made
- * @field {address} address which made the contribution
- * @field {amount} contribution amount
- */
-export type Contribution = {
-  grantId: string;
-  grantAddress: string;
-  address: string;
-  amount: number;
-};
-
-/**
  * Contributions by grantId
  * @type ContributionsByGrantId
  * @key {key} grantId (number)
@@ -55,22 +41,6 @@ export type ContributionsByGrantId = {
     grantAddress: string;
     contributions: Contribution[];
   };
-};
-
-/**
- * Response object returned by fetch
- *
- * @type Contribution
- * @field {grantRound} grant round address
- * @field {totalPot} total pot amount in the round
- * @field {matchingTokenDecimals} the number of decimals used by the rounds matching currency
- * @field {[contributions]} contributions in that round
- */
-export type GrantRoundContributions = {
-  grantRound: string;
-  totalPot: number;
-  matchingTokenDecimals: number;
-  contributions: Contribution[];
 };
 
 // --------- PREDICTION
@@ -89,35 +59,6 @@ export type GrantPredictionArgs = {
   predictionPoints: number[];
   grantRoundContributions: GrantRoundContributions;
   trustBonusScores?: TrustBonusScore[];
-};
-
-/**
- * The new match amount for a grant if it were to recieve an anon contribution
- * of value predicted_amount
- *
- * @type GrantPrediction
- * @field {predictionPoint} if grant were to recieve an anon contribution
- * @field {predictedGrantMatch} new match after adding predicted_amount
- * @field {predictionDiff} difference between predicted_match and predicted_amount
- */
-export type GrantPrediction = {
-  predictionPoint: number;
-  predictedGrantMatch: number;
-  predictionDiff: number;
-};
-
-/**
- * Object containing an array of GrantPrediction
- *
- * @type GrantPredictions
- * @field {grantId} grant identifier
- * @field {grantRound} grant round address
- * @field {[GrantPrediction]} list of GrantPrediction
- */
-export type GrantPredictions = {
-  grantId: string;
-  grantRound: string;
-  predictions: GrantPrediction[];
 };
 
 // --------- CALCULATE
