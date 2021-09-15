@@ -39,8 +39,9 @@ if (!alchemyApiKey) {
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
+  const dummyPrivateKey = '0x0000000000000000000000000000000000000000000000000000000000000001';
   return {
-    accounts: [process.env.DEPLOY_PRIVATE_KEY as string],
+    accounts: [(process.env.DEPLOY_PRIVATE_KEY as string) || dummyPrivateKey],
     chainId: chainIds[network],
     url,
   };
@@ -67,10 +68,7 @@ const config: HardhatUserConfig = {
       },
       chainId: chainIds.hardhat,
     },
-    goerli: createTestnetConfig('goerli'),
-    kovan: createTestnetConfig('kovan'),
     rinkeby: createTestnetConfig('rinkeby'),
-    ropsten: createTestnetConfig('ropsten'),
   },
   paths: {
     artifacts: './artifacts',
