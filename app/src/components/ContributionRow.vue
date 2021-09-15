@@ -16,7 +16,7 @@
               <div v-if="contribution.from">
                 <a
                   class="link"
-                  :href="getEtherscanUrl(contribution.from, chainId, 'address')"
+                  :href="getEtherscanUrl(contribution.from, 'address')"
                   target="_blank"
                   rel="noopener noreferrer"
                   >{{ formatAddress(contribution.from) }}</a
@@ -33,7 +33,7 @@
         <div class="truncate">
           <a
             class="link"
-            :href="getEtherscanUrl(contribution.transactionHash, 1, 'tx')"
+            :href="getEtherscanUrl(contribution.transactionHash, 'tx')"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -55,7 +55,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 // --- Utils/helpers ---
 import { formatUnits } from 'src/utils/ethers';
 import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
@@ -63,7 +63,6 @@ import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
 import { ContributionEvent } from '@dgrants/types';
 // --- Components ---
 import Jazzicon from 'src/components/Jazzicon.vue';
-import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'ContributionRow',
@@ -72,11 +71,7 @@ export default defineComponent({
   },
   components: { Jazzicon },
   setup() {
-    const chainId = computed(() => {
-      const { network } = useWalletStore();
-      return network.value?.chainId ? network.value.chainId : 1;
-    });
-    return { formatUnits, formatAddress, formatNumber, getEtherscanUrl, chainId };
+    return { formatUnits, formatAddress, formatNumber, getEtherscanUrl };
   },
 });
 </script>

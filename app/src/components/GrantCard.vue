@@ -39,7 +39,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 // --- Methods and Data ---
@@ -47,7 +47,6 @@ import { BigNumber, BigNumberish } from 'src/utils/ethers';
 import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
-import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'GrantCard',
@@ -61,11 +60,7 @@ export default defineComponent({
   components: { CartIcon },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    const chainId = computed(() => {
-      const { network } = useWalletStore();
-      return network.value?.chainId ? network.value.chainId : 1;
-    });
-    return { addToCart, removeFromCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber, chainId };
+    return { addToCart, removeFromCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber };
   },
 });
 </script>
