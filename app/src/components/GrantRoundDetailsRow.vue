@@ -21,7 +21,7 @@
         <span class="text-grey-400 mr-4">Contract:</span>
         <a
           class="link"
-          :href="getEtherscanUrl(grantRound.address, chainId, 'address')"
+          :href="getEtherscanUrl(grantRound.address, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(grantRound.address) }}</a
@@ -33,7 +33,7 @@
         <span class="text-grey-400 mr-4">Payout Admin:</span>
         <a
           class="link"
-          :href="getEtherscanUrl(grantRound.payoutAdmin, chainId, 'address')"
+          :href="getEtherscanUrl(grantRound.payoutAdmin, 'address')"
           target="_blank"
           rel="noopener noreferrer"
           >{{ formatAddress(grantRound.payoutAdmin) }}</a
@@ -84,14 +84,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, PropType } from 'vue';
+import { defineComponent, PropType } from 'vue';
 // --- Types ---
 import { GrantRound, GrantRoundMetadata } from '@dgrants/types';
 // --- Utils/helper ---
 import { pushRoute, formatAddress, getEtherscanUrl } from 'src/utils/utils';
 // --- Methods ---
 import { BigNumber } from 'src/utils/ethers';
-import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'GrantRoundDetailsRow',
@@ -100,18 +99,7 @@ export default defineComponent({
     grantRoundMetadata: { type: Object as PropType<GrantRoundMetadata>, required: true },
   },
   setup() {
-    const chainId = computed(() => {
-      const { network } = useWalletStore();
-      return network.value?.chainId ? network.value.chainId : 1;
-    });
-
-    return {
-      BigNumber,
-      pushRoute,
-      formatAddress,
-      getEtherscanUrl,
-      chainId,
-    };
+    return { BigNumber, pushRoute, formatAddress, getEtherscanUrl };
   },
 });
 </script>
