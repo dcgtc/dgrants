@@ -2,15 +2,10 @@
   <div :class="width">
     <label class="flex flex-col bg-white items-center block px-6 py-8 border border-grey-400 cursor-pointer">
       <span>Choose image file to upload</span>
+      <div v-if="isValid && val" :id="`${id}-success`">Uploaded: {{ val.name }}</div>
       <input type="file" @input="onInput" class="hidden" />
     </label>
-
-    <div v-if="isValid && val">
-      <div :id="`${id}-success`">{{ val.name }}</div>
-    </div>
-    <div v-else-if="!isValid">
-      <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
-    </div>
+    <div v-if="!isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
   </div>
 </template>
 
