@@ -61,10 +61,7 @@
               <!-- image -->
               <div class="col-span-4 lg:col-span-1">
                 <figure class="max-w-lg">
-                  <img
-                    class="shadow-light"
-                    :src="grantMetadata[item.metaPtr]?.logoURI || 'src/assets/placeholder_grant.svg'"
-                  />
+                  <img class="shadow-light" :src="grantMetadata[item.metaPtr]?.logoURI || '/placeholder_grant.svg'" />
                 </figure>
               </div>
               <!-- text -->
