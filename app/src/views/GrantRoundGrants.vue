@@ -125,7 +125,7 @@ function useGrantRoundDetail() {
 }
 
 export default defineComponent({
-  name: 'GrantRoundDetails',
+  name: 'GrantRoundGrants',
   components: { BaseHeader, BaseFilterNav, GrantList, LoadingSpinner },
   setup() {
     return {

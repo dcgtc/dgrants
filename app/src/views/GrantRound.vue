@@ -374,7 +374,7 @@ function useGrantRoundDetail() {
 }
 
 export default defineComponent({
-  name: 'GrantRoundDetails',
+  name: 'GrantRoundGrants',
   components: {
     BaseHeader,
     BaseInput,

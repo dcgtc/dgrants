@@ -24,7 +24,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/dgrants/rounds/:address/grants',
     name: 'dgrants-round-details',
-    component: () => import('../views/GrantRoundDetails.vue'),
+    component: () => import('../views/GrantRoundGrants.vue'),
   },
   // Fallback route for handling 404s
   { path: '/:pathMatch(.*)*', name: '404', component: () => import('../views/Error404.vue') },
