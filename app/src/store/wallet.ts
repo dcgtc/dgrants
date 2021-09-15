@@ -34,7 +34,7 @@ import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
-const defaultChainId = SupportedChainId.MAINNET;
+const defaultChainId = process.env.DEFAULT_CHAINID | SupportedChainId.MAINNET;
 const defaultProvider = new JsonRpcProvider(CHAIN_INFO[defaultChainId].rpcUrl);
 
 // State variables
