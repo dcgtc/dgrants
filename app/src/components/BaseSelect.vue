@@ -1,5 +1,11 @@
 <template>
-  <Listbox :class="width" as="div" :modelValue="modelValue" @update:model-value="$emit('update:modelValue', $event)">
+  <Listbox
+    :class="width"
+    class="h-16"
+    as="div"
+    :modelValue="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
+  >
     <div class="relative">
       <!-- not realy happy with using the headless ui just for having a non-native input-select field ( <ListboxButton> and <ListboxOptions> ) 
       1. its impossible without hardcoding heights to mix native input fields and this fake
@@ -15,7 +21,7 @@
       </select>
       -->
 
-      <ListboxButton class="group w-full p-4 border border-grey-400 hover:border-grey-500">
+      <ListboxButton class="group w-full p-4 border border-grey-400 hover:border-grey-500 h-16">
         <span class="block truncate text-left">{{ modelValue[label] }}</span>
         <span class="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none w-12">
           <ArrowBottom2Icon class="icon icon-primary" aria-hidden="true" />

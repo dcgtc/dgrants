@@ -80,9 +80,11 @@
           target="_blank"
           rel="noreferrer noopener"
           :href="
-            'https://twitter.com/intent/tweet?text=' +
-            grantRoundMetadata?.name +
-            '&url=https://grants.gtcdao.net' +
+            'https://twitter.com/intent/tweet' +
+            '?text=' +
+            encodeURIComponent('Checkout ' + grantRoundMetadata?.name + ' at Gitcoins Decentral Grants App!') +
+            '&url=' +
+            encodeURIComponent('https://grants.gtcdao.net/#') +
             $route.path
           "
           class="flex items-center gap-x-2 cursor-pointer group ml-auto"
@@ -90,6 +92,7 @@
           <TwitterIcon class="icon icon-primary icon-small" />
           <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
         </a>
+
         <!-- Add funds to Grant Round -->
         <div @click="showAddFunds()" class="flex items-center gap-x-2 cursor-pointer group">
           <DonateIcon class="icon icon-primary icon-small" />

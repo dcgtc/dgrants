@@ -19,8 +19,44 @@
     scroll-behavior: smooth;
   }
 
+  .bn-notify-custom {
+    margin-left: 0px;
+  }
+
+  /*container holding all of the notifications*/
   .bn-notify-custom .bn-notify-notification {
     font-family: Source Code Pro, monospace;
+    border-radius: 0px !important;
+    padding-left: 0px;
+    padding-bottom: 10px;
+    font-size: 80%;
+    line-height: 130%;
+    @apply bg-grey-500 text-white;
+    display: block;
+  }
+
+  .bn-notify-custom .bn-notify-notification::after {
+    padding-left: 1em;
+    content: "_";
+    @apply text-white;
+    animation: blink-animation 700ms infinite;
+  }
+
+  @keyframes blink-animation {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* icons  */
+  .bn-notify-custom .bn-notify-notification-status-icon {
+    display: none;
   }
 
   h1 {

@@ -25,10 +25,25 @@
     <!-- Action Nav / Cart Toolbar ( Share & Clear Cart -->
     <div class="px-4 md:px-12 py-8 border-b border-grey-100">
       <div class="flex flex-wrap gap-x-6 gap-y-4">
-        <div @click="NOT_IMPLEMENTED('Share cart')" class="flex items-center gap-x-2 cursor-pointer group">
-          <ArrowToprightIcon class="icon icon-small icon-primary" />
-          <span class="text-grey-400 group-hover:text-grey-500">Share</span>
-        </div>
+        <!-- rudimentary tweet function -->
+        <!-- needs to get replaced with some real "share cart functionality" later on -->
+
+        <a
+          target="_blank"
+          rel="noreferrer noopener"
+          :href="
+            'https://twitter.com/intent/tweet' +
+            '?text=' +
+            encodeURIComponent('Checkout ' + grantMetadata?.name + ' at Gitcoins Decentral Grants App!') +
+            '&url=' +
+            encodeURIComponent('https://grants.gtcdao.net')
+          "
+        >
+          <div class="flex items-center gap-x-2 cursor-pointer group">
+            <TwitterIcon class="icon icon-small icon-primary" />
+            <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
+          </div>
+        </a>
 
         <div @click="clearCart" class="flex items-center gap-x-2 cursor-pointer group ml-auto">
           <CloseIcon class="icon icon-small icon-primary" />
@@ -149,7 +164,7 @@
 <script lang="ts">
 // --- External Imports ---
 import { computed, defineComponent, onMounted, ref } from 'vue';
-import { ArrowToprightIcon, CloseIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon, CloseIcon } from '@fusion-icons/vue/interface';
 // --- Component Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
@@ -204,7 +219,7 @@ export default defineComponent({
     BaseInput,
     BaseSelect,
     TransactionStatus,
-    ArrowToprightIcon,
+    TwitterIcon,
     CloseIcon,
     LoadingSpinner,
   },
