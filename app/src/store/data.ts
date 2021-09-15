@@ -45,11 +45,6 @@ export default function useDataStore() {
     const registry = grantRegistryRef.value;
     const multicall = multicallRef.value;
 
-    console.log('roundManager');
-    console.log('registry');
-    console.log('multicall');
-    console.log('provider: ', provider);
-
     // Define calls to be read using multicall
     const calls = [
       { target: multicall.address, callData: multicall.interface.encodeFunctionData('getCurrentBlockTimestamp') },
@@ -231,11 +226,7 @@ export default function useDataStore() {
    */
   function startPolling() {
     provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
-    void poll();
-    provider.value.on('block', (/* block: number */) => {
-      console.log(123123345345);
-      void poll();
-    });
+    provider.value.on('block', (/* block: number */) => void poll());
   }
 
   return {
