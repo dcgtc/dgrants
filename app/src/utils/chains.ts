@@ -40,6 +40,10 @@ export const L2_CHAIN_IDS = [
 
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number];
 
+// When building the app, only one Chain ID is supported per build to avoid mixing different GrantRegistry's, etc
+export const DGRANTS_CHAIN_ID = Number(import.meta.env.VITE_DGRANTS_CHAIN_ID) as SupportedChainId;
+const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
+
 interface L1ChainInfo {
   readonly explorer: string;
   readonly label: string;
@@ -116,7 +120,7 @@ const OPTIMISTIC_KOVAN_TOKENS = [
   { ...USDC_TOKEN, chainId: SupportedChainId.OPTIMISTIC_KOVAN, address: '0x4e62882864fB8CE54AFfcAf8D899A286762B011B' },
 ];
 
-export const SUPPORTED_TOKENS: { readonly [chainId: number]: TokenInfo[] } = {
+const ALL_SUPPORTED_TOKENS: { readonly [chainId: number]: TokenInfo[] } = {
   [SupportedChainId.ARBITRUM_ONE]: ARBITRUM_ONE_TOKENS,
   [SupportedChainId.ARBITRUM_RINKEBY]: ARBITRUM_RINKEBY_TOKENS,
   [SupportedChainId.MAINNET]: MAINNET_TOKENS,
@@ -127,24 +131,23 @@ export const SUPPORTED_TOKENS: { readonly [chainId: number]: TokenInfo[] } = {
 };
 
 // Mapping from chainId to token address to TokenInfo for that token
-export const SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<string, TokenInfo> } = (() => {
+const ALL_SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<string, TokenInfo> } = (() => {
   const mapping: { [chainId: number]: Record<string, TokenInfo> } = {};
-  for (const [chainId, tokens] of Object.entries(SUPPORTED_TOKENS)) {
+  for (const [chainId, tokens] of Object.entries(ALL_SUPPORTED_TOKENS)) {
     mapping[Number(chainId)] = {};
     tokens.forEach((token) => (mapping[Number(chainId)][getAddress(token.address)] = token));
   }
   return mapping;
 })();
 
-const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
-export const CHAIN_INFO: ChainInfo = {
+const ALL_CHAIN_INFO: ChainInfo = {
   [SupportedChainId.ARBITRUM_ONE]: {
     bridge: 'https://bridge.arbitrum.io/',
     explorer: 'https://arbiscan.io/',
     label: 'Arbitrum',
     logoUrl: 'src/assets/arbitrum_logo.svg',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_ONE],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_ONE],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_ONE],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_ONE],
     weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     grantRegistry: '',
     grantRoundManager: '',
@@ -156,8 +159,8 @@ export const CHAIN_INFO: ChainInfo = {
     explorer: 'https://rinkeby-explorer.arbitrum.io/',
     label: 'Arbitrum Rinkeby',
     logoUrl: 'src/assets/arbitrum_logo.svg',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_RINKEBY],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_RINKEBY],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_RINKEBY],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_RINKEBY],
     weth: '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
     grantRegistry: '',
     grantRoundManager: '',
@@ -167,8 +170,8 @@ export const CHAIN_INFO: ChainInfo = {
   [SupportedChainId.MAINNET]: {
     explorer: 'https://etherscan.io/',
     label: 'Mainnet',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.MAINNET],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.MAINNET],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.MAINNET],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.MAINNET],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     grantRegistry: '',
     grantRoundManager: '',
@@ -178,8 +181,8 @@ export const CHAIN_INFO: ChainInfo = {
   [SupportedChainId.HARDHAT]: {
     explorer: 'https://etherscan.io/',
     label: 'Hardhat',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
     grantRegistry: '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3',
     grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
@@ -189,8 +192,8 @@ export const CHAIN_INFO: ChainInfo = {
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io/',
     label: 'Rinkeby',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.RINKEBY],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.RINKEBY],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.RINKEBY],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.RINKEBY],
     weth: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
     grantRegistry: '0x0801975f24f23E0c902a0E4D565D383437d09458',
     grantRoundManager: '0xfa1663757d603bA740e407F609acE2CdA3144386',
@@ -202,8 +205,8 @@ export const CHAIN_INFO: ChainInfo = {
     explorer: 'https://optimistic.etherscan.io/',
     label: 'Optimism',
     logoUrl: 'src/assets/optimism_logo.svg',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.OPTIMISM],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISM],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISM],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISM],
     weth: '0x4200000000000000000000000000000000000006',
     grantRegistry: '',
     grantRoundManager: '',
@@ -215,8 +218,8 @@ export const CHAIN_INFO: ChainInfo = {
     explorer: 'https://optimistic.etherscan.io/',
     label: 'Optimistic Kovan',
     logoUrl: 'src/assets/optimism_logo.svg',
-    tokens: SUPPORTED_TOKENS[SupportedChainId.OPTIMISTIC_KOVAN],
-    tokensMapping: SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISTIC_KOVAN],
+    tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISTIC_KOVAN],
+    tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISTIC_KOVAN],
     weth: '0x4200000000000000000000000000000000000006',
     grantRegistry: '',
     grantRoundManager: '',
@@ -224,3 +227,13 @@ export const CHAIN_INFO: ChainInfo = {
     rpcUrl: `https://opt-kovan.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
 };
+
+export const CHAIN_INFO = ALL_CHAIN_INFO[DGRANTS_CHAIN_ID];
+export const ETHERSCAN_BASE_URL = CHAIN_INFO.explorer;
+export const SUPPORTED_TOKENS = CHAIN_INFO.tokens;
+export const SUPPORTED_TOKENS_MAPPING = CHAIN_INFO.tokensMapping;
+export const WETH_ADDRESS = CHAIN_INFO.weth;
+export const GRANT_REGISTRY_ADDRESS = CHAIN_INFO.grantRegistry;
+export const GRANT_ROUND_MANAGER_ADDRESS = CHAIN_INFO.grantRoundManager;
+export const MULTICALL_ADDRESS = CHAIN_INFO.multicall;
+export const RPC_URL = CHAIN_INFO.rpcUrl;

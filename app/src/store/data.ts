@@ -8,6 +8,7 @@ import { computed, Ref, ref } from 'vue';
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
+import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { ERC20_ABI, GRANT_ROUND_ABI } from 'src/utils/constants';
 import { Grant, GrantRound, GrantRounds, GrantMetadataResolution, GrantRoundMetadataResolution } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
@@ -39,11 +40,15 @@ export default function useDataStore() {
       grantRoundManager: grantRoundManagerRef,
       grantRegistry: grantRegistryRef,
       multicall: multicallRef,
-      supportedTokensMapping,
     } = useWalletStore();
     const roundManager = grantRoundManagerRef.value;
     const registry = grantRegistryRef.value;
     const multicall = multicallRef.value;
+
+    console.log('roundManager');
+    console.log('registry');
+    console.log('multicall');
+    console.log('provider: ', provider);
 
     // Define calls to be read using multicall
     const calls = [
@@ -165,7 +170,7 @@ export default function useDataStore() {
       grantRound: roundAddresses[0],
       grantRoundManager: roundManager.address,
       grantRegistry: registry.address,
-      supportedTokens: supportedTokensMapping.value,
+      supportedTokens: SUPPORTED_TOKENS_MAPPING,
       ignore: {
         grants: [],
         contributionAddress: [],
@@ -226,7 +231,11 @@ export default function useDataStore() {
    */
   function startPolling() {
     provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
-    provider.value.on('block', (/* block: number */) => void poll());
+    void poll();
+    provider.value.on('block', (/* block: number */) => {
+      console.log(123123345345);
+      void poll();
+    });
   }
 
   return {

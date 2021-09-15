@@ -50,8 +50,7 @@ export function handleError(err: Error, msg = 'An unknown error occurred') {
  */
 export async function txNotify(txHash: string, provider: JsonRpcProvider) {
   // Instantiate pending transaction notification
-  const { chainId } = await provider.getNetwork();
-  const onclick = () => window.open(getEtherscanUrl(txHash, chainId), '_blank');
+  const onclick = () => window.open(getEtherscanUrl(txHash), '_blank');
   const { update } = bNotify.notification({
     autoDismiss: 0,
     eventCode: 'txPending',

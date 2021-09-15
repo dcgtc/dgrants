@@ -24,6 +24,10 @@ This configuration is required to ensure your account is funded with tokens for 
 When you rebuild the app, you'll likely need to reset MetaMask so the nonces match what the local network expects.
 You can do this in MetaMask by clicking the circle in the top right > Settings > Advanced > Reset Account.
 
+Set `DGRANTS_CHAIN_ID` to the chain ID containing the set of dGrants contracts to use.
+This chain ID will be the only supported network after building the app.
+This architecture is used to ensure that regardless of the network a user's wallet is connected to when visiting the dGrants site, they are shown the correct set of grants and can populate their cart.
+
 You can now build the app with:
 
 ```sh

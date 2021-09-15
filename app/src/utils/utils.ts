@@ -9,7 +9,7 @@ import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
-import { SupportedChainId, CHAIN_INFO } from 'src/utils/chains';
+import { ETHERSCAN_BASE_URL, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -115,9 +115,8 @@ export async function pushRoute(to: RouteLocationRaw) {
 }
 
 // Generates the Etherscan URL based on the given `hash`, `chainId` and `group`
-export function getEtherscanUrl(hash: string, chainId: SupportedChainId, group: EtherscanGroup = 'tx') {
-  const explorerBaseUrl = CHAIN_INFO[chainId].explorer;
-  return `${explorerBaseUrl}/${group}/${hash}`;
+export function getEtherscanUrl(hash: string, group: EtherscanGroup = 'tx') {
+  return `${ETHERSCAN_BASE_URL}/${group}/${hash}`;
 }
 
 /**
@@ -127,15 +126,15 @@ export function getEtherscanUrl(hash: string, chainId: SupportedChainId, group: 
  * @returns True if the user has sufficient balance, or throws otherwise
  */
 export async function assertSufficientBalance(tokenAddress: string, requiredAmount: BigNumberish): Promise<boolean> {
-  const { provider, userAddress, supportedTokensMapping, WETH_ADDRESS } = useWalletStore();
+  const { provider, userAddress } = useWalletStore();
   if (!userAddress.value) return true; // exit early, don't want any errors thrown
-  const isEth = tokenAddress === WETH_ADDRESS.value;
+  const isEth = tokenAddress === WETH_ADDRESS;
   tokenAddress = isEth ? ETH_ADDRESS : tokenAddress;
   const abi = ['function balanceOf(address) view returns (uint256)'];
   const token = new Contract(tokenAddress, abi, provider.value);
   const balance = isEth ? await provider.value.getBalance(userAddress.value) : await token.balanceOf(userAddress.value);
   if (balance.lt(requiredAmount)) {
-    const tokenInfo = supportedTokensMapping.value[tokenAddress];
+    const tokenInfo = SUPPORTED_TOKENS_MAPPING[tokenAddress];
     const { symbol, decimals } = tokenInfo;
     const balanceNeeds = formatNumber(formatUnits(requiredAmount, decimals), 4);
     const balanceHas = formatNumber(formatUnits(balance, decimals), 4);

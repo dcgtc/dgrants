@@ -11,5 +11,6 @@ interface ImportMeta {
     VITE_BLOCKNATIVE_API_KEY: string;
     VITE_ALCHEMY_API_KEY: string;
     VITE_FLEEK_STORAGE_API_KEY: string;
+    VITE_DGRANTS_CHAIN_ID: string;
   };
 }

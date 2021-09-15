@@ -75,13 +75,11 @@ function useTransactionStatus(hash: string, context: SetupContext<'onReceipt'[]>
   );
 
   // Etherscan URL helpers
-  const chainId = ref(1); // default chainId is mainnet
-  const etherscanUrl = computed(() => getEtherscanUrl(hash, chainId.value));
+  const etherscanUrl = computed(() => getEtherscanUrl(hash));
 
   // On mount, fetch receipt and wait for it to be mined, and emit event with receipt status once mined
   onMounted(async () => {
     const { provider } = useWalletStore();
-    chainId.value = (await provider.value.getNetwork()).chainId;
     const receipt = await provider.value.waitForTransaction(hash);
     status.value = receipt.status === 1 ? 'success' : 'failed';
     emitTxReceipt(Boolean(receipt.status));

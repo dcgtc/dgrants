@@ -261,6 +261,7 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
+import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction, formatUnits } from 'src/utils/ethers';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
@@ -293,7 +294,7 @@ function useGrantDetail() {
     grantRounds: rounds,
     grantRoundMetadata: roundsMetadata,
   } = useDataStore();
-  const { signer, provider, userAddress, supportedTokensMapping, grantRoundManager, grantRegistry } = useWalletStore();
+  const { signer, provider, userAddress, grantRoundManager, grantRegistry } = useWalletStore();
   const route = useRoute();
 
   // --- expose grant data ---
@@ -329,7 +330,7 @@ function useGrantDetail() {
         grantRound: round.address,
         grantRoundManager: grantRoundManager.value.address,
         grantRegistry: grantRegistry.value.address,
-        supportedTokens: supportedTokensMapping.value,
+        supportedTokens: SUPPORTED_TOKENS_MAPPING,
         // should these be pulled from an endpoint?
         ignore: {
           grants: [],
