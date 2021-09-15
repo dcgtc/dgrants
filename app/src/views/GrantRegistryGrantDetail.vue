@@ -26,14 +26,28 @@
         :roundDetails="grantContributionsByRound"
       />
 
-      <!-- Interactions Bar for Share, Collection, Edit and so on  -->
+      <!-- Interactions Bar for Tweet, Collection, Edit and so on  -->
       <div class="px-4 md:px-12 py-8 border-b border-grey-100">
         <div class="flex flex-wrap gap-x-6 gap-y-4">
-          <!--share : todo on click what to do-->
-          <div class="flex items-center gap-x-2 cursor-pointer group ml-auto">
-            <ShareIcon class="icon icon-primary icon-small" />
-            <span class="text-grey-400 group-hover:text-grey-500">Share</span>
-          </div>
+          <!-- tweets the url of this grant -->
+
+          <a
+            target="_blank"
+            rel="noreferrer noopener"
+            :href="
+              'https://twitter.com/intent/tweet' +
+              '?text=' +
+              encodeURIComponent('Checkout ' + grantMetadata?.name + ' at Gitcoins Decentral Grants App!') +
+              '&url=' +
+              encodeURIComponent('https://grants.gtcdao.net/#') +
+              $route.path
+            "
+            class="flex items-center gap-x-2 cursor-pointer group ml-auto"
+          >
+            <TwitterIcon class="icon icon-primary icon-small" />
+            <span class="text-grey-400 group-hover:text-grey-500">Tweet</span>
+          </a>
+
           <!--edit for owner-->
           <div v-if="isOwner" @click="enableEdit()" class="flex items-center gap-x-2 cursor-pointer group">
             <EditIcon class="icon icon-primary icon-small" />
@@ -284,7 +298,7 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 // --- Icons ---
-import { ArrowToprightIcon as ShareIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
 import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 function useGrantDetail() {
@@ -670,7 +684,7 @@ export default defineComponent({
     GrantDetailsRow,
     InputRow,
     SectionHeader,
-    ShareIcon,
+    TwitterIcon,
     TransactionStatus,
     LoadingSpinner,
   },

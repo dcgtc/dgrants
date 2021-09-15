@@ -4,6 +4,7 @@
       v-model="val"
       @input="onInput"
       :class="[customcss ? customcss : '']"
+      class="h-16"
       :id="id"
       :name="id"
       :required="required"
