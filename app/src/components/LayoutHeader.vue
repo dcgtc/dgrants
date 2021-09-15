@@ -3,7 +3,7 @@
     <div class="relative group">
       <div class="font-medium flex items-center h-14 cursor-pointer">
         <router-link to="/">
-          <img class="icon" src="../assets/logo.svg" alt="dGrant logo" />
+          <img class="icon" src="/logo.svg" alt="dGrant logo" />
         </router-link>
         <div class="ml-4 hidden md:block">
           <span class="text-teal">d</span><span class="text-grey-500">GRANTS</span>
