@@ -298,7 +298,7 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { CLR, fetch, InitArgs, linear } from '@dgrants/dcurve';
 // --- Icons ---
-import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon } from '@fusion-icons/vue/interface';
 import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 function useGrantDetail() {
