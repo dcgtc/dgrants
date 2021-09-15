@@ -21,9 +21,10 @@
       <div class="text-grey-500 font-medium truncate">{{ name }}</div>
       <div>
         <span class="text-grey-400"
-          >by<a
+          >by
+          <a
             class="text-grey-500 underline ml-1"
-            :href="getEtherscanUrl(ownerAddress, chainId, 'address')"
+            :href="getEtherscanUrl(ownerAddress, 'address')"
             target="_blank"
             rel="noopener noreferrer"
             >{{ formatAddress(ownerAddress) }}

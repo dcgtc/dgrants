@@ -8,7 +8,7 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary } from '@dgrants/types';
 import { CartItem, CartItemOptions } from 'src/types';
-import { SupportedChainId } from 'src/utils/chains';
+import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance } from 'src/utils/utils';
@@ -74,7 +74,7 @@ const SWAP_PATHS = {
 };
 
 const { grants, grantRounds } = useDataStore();
-const { chainId, supportedTokens, supportedTokensMapping } = useWalletStore();
+const { chainId } = useWalletStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
@@ -137,7 +137,7 @@ export default function useCartStore() {
       const { grantId, contributionAmount } = item;
       const grant = grants.value?.filter((grant) => grant.id.toString() === grantId)[0] as Grant; // TODO may be slow for large numbers of grants
       const tokenAddr = 'contributionToken' in item ? item.contributionToken.address : item.contributionTokenAddress;
-      const token = supportedTokensMapping.value[tokenAddr];
+      const token = SUPPORTED_TOKENS_MAPPING[tokenAddr];
       _lsCart.push({ grantId, contributionTokenAddress: token.address, contributionAmount });
       _cart.push({ ...grant, grantId, contributionAmount, contributionToken: token });
     });
@@ -179,14 +179,13 @@ export default function useCartStore() {
    */
   function addToCart(grantId: BigNumberish | undefined) {
     if (!grantId) return;
-    const { supportedTokens } = useWalletStore();
 
     // Do nothing if this item is already in the cart
     const cartGrantIds = cart.value.map((grant) => grant.grantId);
     if (cartGrantIds.includes(toString(grantId))) return;
 
     // Otherwise, add it to the cart and update localStorage
-    const DEFAULT_CONTRIBUTION_TOKEN = supportedTokens.value.find((token) => token.symbol === 'DAI');
+    const DEFAULT_CONTRIBUTION_TOKEN = SUPPORTED_TOKENS.find((token) => token.symbol === 'DAI');
     const newCart = [
       ...lsCart.value,
       {
@@ -218,7 +217,7 @@ export default function useCartStore() {
    * @notice Executes donations
    */
   async function checkout(): Promise<ContractTransaction> {
-    const { signer, userAddress, grantRoundManager, WETH_ADDRESS } = useWalletStore();
+    const { signer, userAddress, grantRoundManager } = useWalletStore();
     const manager = grantRoundManager.value;
     const { swaps, donations, deadline } = await getCartDonationInputs();
     const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
@@ -231,7 +230,7 @@ export default function useCartStore() {
     // Execute approvals if required
     for (const swap of swaps) {
       const tokenAddress = getInputToken(swap);
-      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS.value) continue; // no approvals for ETH, and explicit WETH donation not supported
+      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
       const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
       const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
       if (allowance.lt(swap.amountIn)) {
@@ -241,7 +240,7 @@ export default function useCartStore() {
     }
 
     // Determine if we need to send value with this transaction
-    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS.value);
+    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS);
     const value = ethSwap ? ethSwap.amountIn : 0;
 
     // Execute donation
@@ -252,11 +251,9 @@ export default function useCartStore() {
    * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
    */
   async function getCartDonationInputs(): Promise<{ swaps: SwapSummary[]; donations: Donation[]; deadline: number }> {
-    const { WETH_ADDRESS } = useWalletStore();
-
     // Get the swaps array
     const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
-      const decimals = supportedTokensMapping.value[tokenAddress].decimals;
+      const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
       const path = swapPaths.value[tokenAddress as keyof typeof swapPaths.value];
       // Use Uniswap's Quoter.sol to get amountOutMin, unless the path indicates so swap is required
@@ -270,9 +267,9 @@ export default function useCartStore() {
       // Extract data we already have
       const { grantId, contributionAmount, contributionToken } = item;
       const isEth = contributionToken.address === ETH_ADDRESS;
-      const tokenAddress = isEth ? WETH_ADDRESS.value : contributionToken.address;
+      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
       const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
-      const decimals = isEth ? 18 : supportedTokensMapping.value[tokenAddress].decimals;
+      const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);
 
       // Compute ratio
@@ -294,12 +291,12 @@ export default function useCartStore() {
    * @notice Fetches quotes based on the users cart
    * @dev For max accuracy, this should be run each time the user edits their cart with the actual cart amounts, but in
    * reality this will be accurate enough if we just run it once with default amounts and save the results, because
-   * the Uniswap pools have sufficient liquid for all supportedTokens.value
+   * the Uniswap pools have sufficient liquid for all supported tokens
    */
   async function fetchQuotes() {
     // TODO use multicall for better performance + fewer RPC requests
     const _quotes = await Promise.all(
-      supportedTokens.value.map(async (token) => {
+      SUPPORTED_TOKENS.map(async (token) => {
         if (token.symbol === 'DAI' || token.symbol === 'USDC') return { token, rate: 1 };
         const path = swapPaths.value[token.address as keyof typeof swapPaths.value];
         const amountIn = parseUnits('1', token.decimals); // for simplicity, use a value of 1 token for getting quotes
@@ -340,7 +337,7 @@ export default function useCartStore() {
   const cartSummaryString = computed(() => {
     // returns a string summarizing the `cartSummary`, such as `12 DAI + 4 GTC + 10 USDC`
     const summary = Object.keys(cartSummary.value).reduce((acc, tokenAddr) => {
-      return acc + `${cartSummary.value[tokenAddr]} ${supportedTokensMapping.value[tokenAddr].symbol} + `;
+      return acc + `${cartSummary.value[tokenAddr]} ${SUPPORTED_TOKENS_MAPPING[tokenAddr].symbol} + `;
     }, '');
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });

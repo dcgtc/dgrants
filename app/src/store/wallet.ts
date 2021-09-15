@@ -23,7 +23,7 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
-import { SupportedChainId, ALL_SUPPORTED_CHAIN_IDS, CHAIN_INFO } from 'src/utils/chains';
+import { DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
 import { Contract, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
@@ -35,7 +35,7 @@ import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
 const defaultChainId = SupportedChainId.MAINNET;
-const defaultProvider = new JsonRpcProvider(CHAIN_INFO[defaultChainId].rpcUrl);
+const defaultProvider = new JsonRpcProvider(RPC_URL);
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
@@ -166,7 +166,7 @@ export default function useWalletStore() {
 
     // Exit if not a valid network
     const chainId = _provider.network.chainId; // must be done after the .getNetwork() call
-    if (!ALL_SUPPORTED_CHAIN_IDS.includes(chainId)) {
+    if (DGRANTS_CHAIN_ID !== chainId) {
       network.value = markRaw(_network); // save network for checking if this is a supported network
       return;
     }
@@ -176,7 +176,7 @@ export default function useWalletStore() {
 
     // Now we save the user's info to the store. We don't do this earlier because the UI is reactive based on these
     // parameters, and we want to ensure this method completed successfully before updating the UI
-    provider.value = markRaw(_provider);
+    if (chainId === DGRANTS_CHAIN_ID) provider.value = markRaw(_provider); // ensure we always read the correct data from DGRANTS_CHAIN_ID
     signer.value = _signer;
     userAddress.value = _userAddress;
     userEns.value = _userEns;
@@ -189,21 +189,18 @@ export default function useWalletStore() {
   // ----------------------------------------------------- Getters -----------------------------------------------------
   // Default to mainnet for all network-based getters
   const chainId = computed(() => (network.value?.chainId || defaultChainId) as SupportedChainId);
-  const chainInfo = computed(() => CHAIN_INFO[chainId.value]);
-  const supportedTokens = computed(() => chainInfo.value.tokens);
-  const supportedTokensMapping = computed(() => chainInfo.value.tokensMapping);
-  const contractProvider = computed(() => signer.value || defaultProvider);
+  const contractProvider = computed(() => (chainId.value === DGRANTS_CHAIN_ID ? signer.value : defaultProvider));
   const grantRegistry = computed(() => {
-    return <GrantRegistry>new Contract(chainInfo.value.grantRegistry, GRANT_REGISTRY_ABI, contractProvider.value);
+    return <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, contractProvider.value);
   });
   const grantRoundManager = computed(() => {
     return <GrantRoundManager>(
-      new Contract(chainInfo.value.grantRoundManager, GRANT_ROUND_MANAGER_ABI, contractProvider.value)
+      new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, contractProvider.value)
     );
   });
-  const multicall = computed(() => new Contract(chainInfo.value.multicall, MULTICALL_ABI, contractProvider.value));
+  const multicall = computed(() => new Contract(MULTICALL_ADDRESS, MULTICALL_ABI, contractProvider.value));
   const isSupportedNetwork = computed(
-    () => (network.value ? ALL_SUPPORTED_CHAIN_IDS.includes(network.value.chainId) : true) // assume valid if we have no network information
+    () => (network.value ? DGRANTS_CHAIN_ID === network.value.chainId : true) // assume valid if we have no network information
   );
 
   // ----------------------------------------------------- Exports -----------------------------------------------------
@@ -218,9 +215,6 @@ export default function useWalletStore() {
     setProvider,
     // Properties
     chainId,
-    WETH_ADDRESS: computed(() => chainInfo.value.weth),
-    supportedTokens,
-    supportedTokensMapping,
     isSupportedNetwork,
     grantRegistry,
     grantRoundManager,
