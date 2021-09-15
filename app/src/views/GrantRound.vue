@@ -189,7 +189,7 @@ import {
 import { GrantRound, GrantRoundMetadata, Breadcrumb } from '@dgrants/types';
 
 // --- Icons ---
-import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon } from '@fusion-icons/vue/interface';
 import { DonateIcon } from '@fusion-icons/vue/interface';
 
 // --- Contract ---
