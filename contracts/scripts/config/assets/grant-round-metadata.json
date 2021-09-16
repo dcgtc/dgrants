@@ -1,5 +1,5 @@
 {
   "name": "dGrants Proof-of-Concept",
   "description": "Gitcoin building Gitcoin using Gitcoin 🤯",
-  "grants": []
+  "grants": [0, 1, 2, 3, 4, 5]
 }

@@ -1,0 +1,30 @@
+{
+  "deployer": "0x99d717C9daED8211d1C6796697359973d7c4160B",
+  "config": {
+    "donationToken": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
+    "uniswapFactory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+    "weth": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    "metadataAdmin": "0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F",
+    "payoutAdmin": "0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F",
+    "matchingToken": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
+    "roundStartTime": 1631562000,
+    "roundEndTime": 1731562000,
+    "ipfsRetrievalEndpoint": "https://ipfs-dev.fleek.co/ipfs",
+    "roundLogoPath": "./scripts/config/assets/dgrants-placeholder.png",
+    "metadataJson": {
+      "name": "dGrants Proof-of-Concept",
+      "description": "Gitcoin building Gitcoin using Gitcoin 🤯",
+      "grants": [0, 1, 2, 3, 4, 5],
+      "logoURI": "https://ipfs-dev.fleek.co/ipfs/QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F"
+    }
+  },
+  "contracts": {
+    "GrantRegistry": "0xA32F3356b518ca56a559420f30BbEe8ba4fB4bFE",
+    "GrantRoundManager": "0xe55A9cEa9E57c45220dff5Eb0E3339D87e411aae"
+  },
+  "actions": {
+    "PublishGrantRoundLogo": "QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F",
+    "PublishGrantRoundMetadata": "QmPsAXpuwddVQ2w5jfGFZSSW1oTNQCoSJPhpAfhLXyZjUN",
+    "Error": "Error: transaction failed (transactionHash=\"0x947650ea1b0332a30ab8710e8d9f2abd6824128438197e2d709e3b1d4b54ddc4\", transaction={\"hash\":\"0x947650ea1b0332a30ab8710e8d9f2abd6824128438197e2d709e3b1d4b54ddc4\",\"type\":2,\"accessList\":[],\"blockHash\":null,\"blockNumber\":null,\"transactionIndex\":null,\"confirmations\":0,\"from\":\"0x99d717C9daED8211d1C6796697359973d7c4160B\",\"gasPrice\":{\"type\":\"BigNumber\",\"hex\":\"0x3b9aca03\"},\"maxPriorityFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x3b9ac9f1\"},\"maxFeePerGas\":{\"type\":\"BigNumber\",\"hex\":\"0x3b9aca03\"},\"gasLimit\":{\"type\":\"BigNumber\",\"hex\":\"0x0f4240\"},\"to\":\"0xe55A9cEa9E57c45220dff5Eb0E3339D87e411aae\",\"value\":{\"type\":\"BigNumber\",\"hex\":\"0x00\"},\"nonce\":6,\"data\":\"0xf208ce21000000000000000000000000d2553382a60f121d9b1e35cfc9ebf4870fbcc96f000000000000000000000000d2553382a60f121d9b1e35cfc9ebf4870fbcc96f0000000000000000000000005592ec0cfb4dbc12d3ab100b257153436a1f0fea00000000000000000000000000000000000000000000000000000000613fa9100000000000000000000000000000000000000000000000000000000067358a1000000000000000000000000000000000000000000000000000000000000000c0000000000000000000000000000000000000000000000000000000000000004d68747470733a2f2f697066732d6465762e666c65656b2e636f2f697066732f516d50734158707577646456513277356a6647465a535357316f544e51436f534a5068704166684c58795a6a554e00000000000000000000000000000000000000\",\"r\":\"0x80e3b3c78813440708d207fcfd97b87733cb8a62e60b0423f71e98ce2d421050\",\"s\":\"0x0801bb5fd9ad9591914c23e093086cf269376fc1cb7e258be248daeea25a0380\",\"v\":0,\"creates\":null,\"chainId\":4}, receipt={\"to\":\"0xe55A9cEa9E57c45220dff5Eb0E3339D87e411aae\",\"from\":\"0x99d717C9daED8211d1C6796697359973d7c4160B\",\"contractAddress\":null,\"transactionIndex\":17,\"gasUsed\":{\"type\":\"BigNumber\",\"hex\":\"0x0105e3\"},\"logsBloom\":\"0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000\",\"blockHash\":\"0xfb67cb9937fc7d21ff582b8ad98b4f7766c2f36adcc82eaa64eb4d33a2c282be\",\"transactionHash\":\"0x947650ea1b0332a30ab8710e8d9f2abd6824128438197e2d709e3b1d4b54ddc4\",\"logs\":[],\"blockNumber\":9304889,\"confirmations\":1,\"cumulativeGasUsed\":{\"type\":\"BigNumber\",\"hex\":\"0x6a9dce\"},\"effectiveGasPrice\":{\"type\":\"BigNumber\",\"hex\":\"0x3b9ac9fe\"},\"status\":0,\"type\":2,\"byzantium\":true}, code=CALL_EXCEPTION, version=providers/5.4.3)"
+  }
+}

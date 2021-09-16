@@ -26,6 +26,12 @@ const params: DeployParams = {
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
+  rinkeby: {
+    roundAddress: '0xa287E6E74F4bB2408C36cb0a062e72300cBEc2E9',
+    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
+    metadataJson,
+  },
 };
 
 export default params;

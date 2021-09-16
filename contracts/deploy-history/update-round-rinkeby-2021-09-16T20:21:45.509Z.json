@@ -1,0 +1,17 @@
+{
+  "deployer": "0x8A89da1cBD55E0019C6553a39C444FB8FD156fFD",
+  "config": {
+    "roundAddress": "0xa287E6E74F4bB2408C36cb0a062e72300cBEc2E9",
+    "ipfsRetrievalEndpoint": "https://ipfs-dev.fleek.co/ipfs",
+    "roundLogoPath": "./scripts/config/assets/dgrants-placeholder.png",
+    "metadataJson": {
+      "name": "dGrants Proof-of-Concept",
+      "description": "Gitcoin building Gitcoin using Gitcoin 🤯",
+      "grants": [0, 1, 2, 3, 4, 5]
+    }
+  },
+  "contracts": {},
+  "actions": {
+    "Error": "Error: Deployer (0x8A89da1cBD55E0019C6553a39C444FB8FD156fFD) is not metadataAdmin (0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F)"
+  }
+}

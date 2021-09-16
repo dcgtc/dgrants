@@ -55,6 +55,7 @@ const params: DeployParams = {
     roundStartTime: 1631562000,
     roundEndTime: 1731562000,
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   arbitrum: {
@@ -67,6 +68,7 @@ const params: DeployParams = {
     roundStartTime: 1631633030,
     roundEndTime: 1731562000,
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
 };
