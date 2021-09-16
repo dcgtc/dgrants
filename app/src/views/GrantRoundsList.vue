@@ -5,10 +5,10 @@
 
     <!-- Status filters -->
     <BaseFilterNav :active="selectedTab" :items="grantRoundsNav" />
-    <div>
+    <div class="max-w-screen-lg mx-auto">
       <!-- Status filtered Cards -->
       <template v-if="grantRoundLists[selectedTab] && grantRoundLists[selectedTab]?.rounds?.length">
-        <ul class="base-grid">
+        <ul class="text-left grid grid-cols-1 gap-10 py-12 px-4 md:px-12 md:grid-cols-2">
           <li v-for="(grantRound, index) in grantRoundLists[selectedTab].rounds" :key="grantRound.address">
             <GrantRoundCard
               :id="index"
@@ -24,7 +24,7 @@
       </template>
       <!-- Empty state -->
       <template v-else>
-        <div class="px-4 md:px-12 mt-8">
+        <div class="my-10 mx-4">
           <span>No {{ grantRoundLists[selectedTab].title }} Grant Rounds</span>
         </div>
       </template>
