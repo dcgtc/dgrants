@@ -3,7 +3,6 @@
 
   <div v-if="userDisplayName">
     <div>Block number: {{ blockNumber }}</div>
-    <div>Date: {{ date }}</div>
   </div>
 
   <div class="flex justify-center mt-6">
@@ -22,12 +21,12 @@ import { pushRoute } from 'src/utils/utils';
 export default defineComponent({
   name: 'Home',
   setup() {
-    const { lastBlockNumber, lastBlockTimestamp } = useDataStore();
+    const { lastBlockNumber } = useDataStore();
     const { userDisplayName, network } = useWalletStore();
 
     const blockNumber = computed(() => commify(lastBlockNumber.value));
-    const date = computed(() => new Date(lastBlockTimestamp.value * 1000).toLocaleString());
-    return { formatUnits, pushRoute, blockNumber, date, network, userDisplayName };
+
+    return { formatUnits, pushRoute, blockNumber, network, userDisplayName };
   },
 });
 </script>
