@@ -28,7 +28,6 @@ const { provider } = useWalletStore();
 // --- State ---
 // Most recent data read is saved as state
 const lastBlockNumber = ref<number>(0);
-const lastBlockTimestamp = ref<number>(0);
 
 const grants = ref<Grant[]>();
 const grantContributions = ref<Contribution[]>();
@@ -53,15 +52,8 @@ export default function useDataStore() {
     const registry = grantRegistryRef.value;
     const multicall = multicallRef.value;
 
-    // Parse return data
-    const [blockNumber, timestamp] = await Promise.all([
-      provider.value.getBlockNumber(),
-      multicall.getCurrentBlockTimestamp(),
-    ]);
-
-    // Save block data
-    lastBlockNumber.value = BigNumber.from(blockNumber).toNumber();
-    lastBlockTimestamp.value = BigNumber.from(timestamp).toNumber();
+    // Get blockdata
+    lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData] = await Promise.all([
@@ -205,7 +197,6 @@ export default function useDataStore() {
     poll,
     // Data
     lastBlockNumber: computed(() => lastBlockNumber.value || 0),
-    lastBlockTimestamp: computed(() => lastBlockTimestamp.value || 0),
     grants: computed(() => grants.value),
     grantRounds: computed(() => grantRounds.value),
     grantMetadata: computed(() => grantMetadata.value),
