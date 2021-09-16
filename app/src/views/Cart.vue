@@ -194,22 +194,29 @@ function useCart() {
   const { grantMetadata: meta } = useDataStore();
   const { cart, lsCart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart, setCart } = useCartStore(); // prettier-ignore
 
+  // fetchQuotes whenever network changes
+  const { provider } = useWalletStore();
+  // and on network change
+  watch(
+    () => [provider.value],
+    async () => {
+      try {
+        await fetchQuotes(); // get latest quotes
+      } catch (e) {
+        console.log('Quote update failed');
+      } finally {
+        initializeCart(); // make sure cart store is initialized
+      }
+    },
+    { immediate: true }
+  );
+
   // force cart update on metadata resolution
   const grantMetadata = computed(() => {
     setCart(lsCart.value);
 
     return meta.value;
   });
-
-  // fetchQuotes whenever network changes
-  const { provider } = useWalletStore();
-  watch(
-    () => [provider.value],
-    async () => {
-      await fetchQuotes(); // get latest quotes
-      initializeCart(); // make sure cart store is initialized
-    }
-  );
 
   const txHash = ref<string>();
   const status = ref<'not started' | 'pending' | 'success' | 'failure'>('pending');

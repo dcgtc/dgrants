@@ -30,10 +30,9 @@ import {
  * @notice Get/Refresh all GrantRound addresses
  *
  * @param {number} blockNumber The currenct block number
- * @param {Contract} roundManager The roundManager contract
  * @param {boolean} forceRefresh Force the cache to refresh
  */
-export async function getAllGrantRounds(blockNumber: number, roundManager: Contract, forceRefresh = false) {
+export async function getAllGrantRounds(blockNumber: number, forceRefresh = false) {
   return await syncStorage(
     allGrantRoundsKey,
     {
@@ -41,6 +40,7 @@ export async function getAllGrantRounds(blockNumber: number, roundManager: Contr
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
+      const { grantRoundManager } = useWalletStore();
       let roundAddresses = localStorageData?.data?.roundAddresses || [];
 
       // read from roundManager on first load and every 10 mins
@@ -49,7 +49,8 @@ export async function getAllGrantRounds(blockNumber: number, roundManager: Contr
         !localStorageData ||
         (localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
       ) {
-        const roundList = (await roundManager?.queryFilter(roundManager?.filters.GrantRoundCreated())) || [];
+        const roundList =
+          (await grantRoundManager.value?.queryFilter(grantRoundManager.value?.filters.GrantRoundCreated(null))) || [];
         roundAddresses = [...roundList.map((e: Event) => e.args?.grantRound)];
       }
 
@@ -72,16 +73,10 @@ export async function getAllGrantRounds(blockNumber: number, roundManager: Contr
  * @notice Get/Refresh the details of a single GrantRound
  *
  * @param {number} blockNumber The currenct block number
- * @param {Contract} multicall Multicall contract to combine calls to grantRoundAddress
  * @param {string} grantRoundAddress The grantRoundAddress to get the details for
  * @param {boolean} forceRefresh Force the cache to refresh
  */
-export async function getGrantRound(
-  blockNumber: number,
-  multicall: Contract | undefined,
-  grantRoundAddress: string,
-  forceRefresh?: boolean
-) {
+export async function getGrantRound(blockNumber: number, grantRoundAddress: string, forceRefresh?: boolean) {
   return await syncStorage(
     grantRoundKeyPrefix + grantRoundAddress,
     {
@@ -89,14 +84,14 @@ export async function getGrantRound(
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
-      const { provider } = useWalletStore();
+      const { provider, multicall } = useWalletStore();
       const data = localStorageData?.data || {};
 
       // read from registry on first load and every 10 mins
       if (
         forceRefresh ||
         !localStorageData ||
-        (multicall && localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
+        (multicall.value && localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
       ) {
         // open the rounds contract
         const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
@@ -128,7 +123,7 @@ export async function getGrantRound(
         ];
 
         // Execute calls
-        const { returnData } = (await multicall?.tryBlockAndAggregate(false, calls)) || {};
+        const { returnData } = (await multicall.value?.tryBlockAndAggregate(false, calls)) || {};
         const [
           startTimeEncoded,
           endTimeEncoded,

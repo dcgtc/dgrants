@@ -43,22 +43,13 @@ export default function useDataStore() {
    * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
    */
   async function rawPoll(forceRefresh = false) {
-    const {
-      grantRoundManager: grantRoundManagerRef,
-      grantRegistry: grantRegistryRef,
-      multicall: multicallRef,
-    } = useWalletStore();
-    const roundManager = grantRoundManagerRef.value;
-    const registry = grantRegistryRef.value;
-    const multicall = multicallRef.value;
-
     // Get blockdata
     lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData] = await Promise.all([
-      await getAllGrants(lastBlockNumber.value, registry, forceRefresh),
-      await getAllGrantRounds(lastBlockNumber.value, roundManager, forceRefresh),
+      await getAllGrants(lastBlockNumber.value, forceRefresh),
+      await getAllGrantRounds(lastBlockNumber.value, forceRefresh),
     ]);
 
     // collect the grants into a grantId->payoutAddress obj
@@ -73,7 +64,7 @@ export default function useDataStore() {
     // Pull state from each GrantRound
     const grantRoundsList = (await Promise.all(
       roundAddresses.map(async (grantRoundAddress: string) => {
-        const data = await getGrantRound(lastBlockNumber.value, multicall, grantRoundAddress, forceRefresh);
+        const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
 
         return data?.grantRound;
       })
@@ -82,7 +73,6 @@ export default function useDataStore() {
     // Get latest set of contributions
     const contributions = await getContributions(
       lastBlockNumber.value,
-      roundManager,
       grantsDict,
       grantRoundsList[0].donationToken,
       forceRefresh

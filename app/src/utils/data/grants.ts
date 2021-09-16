@@ -3,16 +3,22 @@ import { Grant } from '@dgrants/types';
 import { LocalStorageData } from 'src/types';
 // --- Utils ---
 import { syncStorage } from 'src/utils/data/utils';
-import { BigNumber, Contract } from 'ethers';
+import { BigNumber } from 'ethers';
 // --- Constants ---
 import { allGrantsKey } from 'src/utils/constants';
+// --- Data ---
+import useWalletStore from 'src/store/wallet';
+
+// --- pull in the registry contract
+const { grantRegistry } = useWalletStore();
 
 /**
  * @notice Get/Refresh all Grants
  *
+ * @param {number} blockNumber The currenct blockNumber
  * @param {boolean} forceRefresh Force the cache to refresh
  */
-export async function getAllGrants(blockNumber: number, registry: Contract, forceRefresh = false) {
+export async function getAllGrants(blockNumber: number, forceRefresh = false) {
   return await syncStorage(
     allGrantsKey,
     {
@@ -28,7 +34,7 @@ export async function getAllGrants(blockNumber: number, registry: Contract, forc
         !localStorageData ||
         (localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
       ) {
-        grants = (await registry.getAllGrants()) || [];
+        grants = (await grantRegistry.value?.getAllGrants()) || [];
       }
 
       // hydrate data from localStorage
