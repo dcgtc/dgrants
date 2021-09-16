@@ -151,7 +151,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle } from 'src/utils/utils'; // prettier-ignore
-import * as ipfs from 'src/utils/ipfs';
+import * as ipfs from 'src/utils/data/ipfs';
 
 function useNewGrant() {
   const { signer, grantRegistry } = useWalletStore();
