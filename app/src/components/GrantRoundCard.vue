@@ -1,37 +1,37 @@
-<!-- GrantCard -->
+<!-- RoundCard -->
 
 <template>
   <figure class="group">
-    <div class="relative cursor-pointer" @click="pushRoute({ name: 'dgrants-round', params: { address: address } })">
+    <div class="cursor-pointer" @click="pushRoute({ name: 'dgrants-round', params: { address: address } })">
       <img :src="imgurl" />
-      <div class="absolute bottom-0 right-0"></div>
     </div>
-    <figcaption class="grid grid-cols-2 mt-4">
-      <div>
-        <div class="text-grey-500 font-medium truncate">{{ name }}</div>
-        <div>
-          <span class="text-grey-400"
-            >by
-            <a
-              class="text-grey-500 underline ml-1"
-              :href="getEtherscanUrl(address, 'address')"
-              target="_blank"
-              rel="noopener noreferrer"
-              >{{ formatAddress(address) }}
-            </a>
-          </span>
-        </div>
+
+    <figcaption class="mt-4">
+      <!-- name -->
+      <div class="text-grey-500 font-medium truncate">
+        {{ name }}
       </div>
-      <div class="text-right">
-        <div>
-          <span class="text-grey-400">Grants:</span
-          ><a class="ml-1 link" @click="pushRoute({ name: 'dgrants-round-details', params: { address: address } })">{{
-            grantsTotal
-          }}</a>
-        </div>
-        <div>
-          <span class="text-grey-400">Funds:</span><span class="ml-1">{{ funds }}</span>
-        </div>
+
+      <!-- by -->
+      <div>
+        <span class="text-grey-400">by:</span>
+        <a class="link ml-1" :href="getEtherscanUrl(address, 'address')" target="_blank" rel="noopener noreferrer"
+          >{{ formatAddress(address) }}
+        </a>
+      </div>
+
+      <!-- grants -->
+      <div>
+        <span class="text-grey-400">Grants:</span>
+        <a class="link ml-1" @click="pushRoute({ name: 'dgrants-round-details', params: { address: address } })">{{
+          grantsTotal
+        }}</a>
+      </div>
+
+      <!-- funds -->
+      <div>
+        <span class="text-grey-400">Funds:</span>
+        <span class="ml-1">{{ funds }}</span>
       </div>
     </figcaption>
   </figure>
