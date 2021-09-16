@@ -1,97 +1,55 @@
 <template>
-  <div class="max-w-screen-lg mx-auto">
-    <!-- View Existing GrantRounds -->
-    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">Grant Round List</h1>
-    <div class="mb-10">Below is all grant rounds read from the GrantRoundManager contract</div>
+  <div v-if="Object.keys(grantRoundMetadata).length">
+    <!-- Simple breadcrumb pointing back to the landing -->
+    <BaseHeader :breadcrumbContent="breadcrumb" name="Matching Rounds" />
 
-    <div v-for="list in grantRoundLists" :key="list.title">
-      <h2 class="text-left my-5">{{ list.title }}</h2>
-      <ul v-if="list.rounds.length > 0" class="grid grid-cols-1 gap-6 sm:grid-cols-2 mb-10">
-        <li
-          v-for="(grantRound, index) in list.rounds"
-          :key="index"
-          @click="pushRoute({ name: 'dgrants-round', params: { address: grantRound.address } })"
-          class="
-            col-span-1
-            bg-white
-            rounded-lg
-            shadow
-            divide-y divide-gray-400 divide-opacity-30
-            cursor-pointer
-            border border-gray-200
-            hover:border-primary-500
-          "
-        >
-          <div class="w-full flex items-center justify-between p-6 space-x-6 hover:border">
-            <div class="flex-1 truncate text-left">
-              <div class="flex items-center space-x-3">
-                <h3 class="text-gray-900 text-sm font-medium truncate">
-                  Grant Round funds: {{ grantRound.funds.toString() }}
-                  <span :title="grantRound.matchingToken.name">{{ grantRound.matchingToken.symbol }}</span>
-                </h3>
-              </div>
-              <p class="mt-1 text-gray-500 text-sm truncate">{{ grantRound.metaPtr }}</p>
-            </div>
-          </div>
-          <div>
-            <div class="pl-6 p-2 -mt-px flex divide-x divide-gray-400 divide-opacity-30">
-              <div class="w-0 flex-1 flex">
-                <div class="flex-1 truncate text-left">
-                  <p class="mt-1 text-gray-500 text-sm truncate">Round Address</p>
-                  <div class="flex items-center space-x-3">
-                    <h3 class="text-gray-900 text-sm font-medium" :title="grantRound.address">
-                      {{ formatAddress(grantRound.address) }}
-                    </h3>
-                  </div>
-                </div>
-              </div>
-              <div class="pl-6 -ml-px w-0 flex-1 flex">
-                <div class="w-0 flex-1 flex">
-                  <div class="flex-1 truncate text-left">
-                    <p class="mt-1 text-gray-500 text-sm truncate">
-                      Round {{ hasStatus('Upcoming')(grantRound) ? 'will start' : 'started' }}
-                    </p>
-                    <div class="flex items-center space-x-3">
-                      <h3 class="text-gray-900 text-sm font-medium" :title="unixToLocaleString(grantRound.startTime)">
-                        {{ daysAgo(BigNumber.from(grantRound.startTime).toNumber()) }}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="pl-6 -ml-px w-0 flex-1 flex">
-                <div class="w-0 flex-1 flex">
-                  <div class="flex-1 truncate text-left">
-                    <p class="mt-1 text-gray-500 text-sm truncate">
-                      Round {{ hasStatus('Completed')(grantRound) ? 'ended' : 'will end' }}
-                    </p>
-                    <div class="flex items-center space-x-3">
-                      <h3 class="text-gray-900 text-sm font-medium" :title="unixToLocaleString(grantRound.endTime)">
-                        {{ daysAgo(BigNumber.from(grantRound.endTime).toNumber()) }}
-                      </h3>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </li>
-      </ul>
-      <div v-else>
-        <span>No {{ list.title }} Grant Rounds</span>
-      </div>
+    <!-- Status filters -->
+    <BaseFilterNav :active="selectedTab" :items="grantRoundsNav" />
+    <div class="max-w-screen-lg mx-auto">
+      <!-- Status filtered Cards -->
+      <template v-if="grantRoundLists[selectedTab] && grantRoundLists[selectedTab]?.rounds?.length">
+        <ul class="text-left grid grid-cols-1 gap-10 py-12 px-4 md:px-12 md:grid-cols-2">
+          <li v-for="(grantRound, index) in grantRoundLists[selectedTab].rounds" :key="grantRound.address">
+            <GrantRoundCard
+              :id="index"
+              :ptr="grantRound.metaPtr"
+              :address="grantRound.address"
+              :name="grantRoundMetadata[grantRound.metaPtr].name ?? ''"
+              :imgurl="grantRoundMetadata[grantRound.metaPtr].logoURI ?? '/placeholder_round.svg'"
+              :grantsTotal="grantRoundMetadata[grantRound.metaPtr].grants?.length ?? 0"
+              :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
+            />
+          </li>
+        </ul>
+      </template>
+      <!-- Empty state -->
+      <template v-else>
+        <div class="my-10 mx-4">
+          <span>No {{ grantRoundLists[selectedTab].title }} Grant Rounds</span>
+        </div>
+      </template>
     </div>
   </div>
+
+  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { daysAgo, formatAddress, pushRoute, unixToLocaleString, hasStatus } from 'src/utils/utils';
-import useDataStore from 'src/store/data';
-import { GrantRound } from '@dgrants/types';
+// --- Types ---
+import { Breadcrumb, FilterNavItem, GrantRound } from '@dgrants/types';
+// --- Utils ---
+import { computed, defineComponent, ref } from 'vue';
 import { BigNumber } from 'ethers';
+import { daysAgo, formatAddress, formatNumber, pushRoute, unixToLocaleString, hasStatus } from 'src/utils/utils';
+// --- Data and Methods ---
+import useDataStore from 'src/store/data';
+// --- Components ---
+import BaseHeader from 'src/components/BaseHeader.vue';
+import BaseFilterNav from 'src/components/BaseFilterNav.vue';
+import GrantRoundCard from 'src/components/GrantRoundCard.vue';
+import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 
-// sort by startDate
+// sort by startTime
 const sortByStartTime = (a: GrantRound, b: GrantRound) =>
   BigNumber.from(a.startTime).toNumber() < BigNumber.from(b.startTime).toNumber()
     ? -1
@@ -101,26 +59,80 @@ const sortByStartTime = (a: GrantRound, b: GrantRound) =>
 
 export default defineComponent({
   name: 'GrantRoundsList',
+  components: {
+    BaseHeader,
+    BaseFilterNav,
+    GrantRoundCard,
+    LoadingSpinner,
+  },
   setup() {
-    // Pull the grantRounds (to populate grantRoundLists)
-    const { grantRounds } = useDataStore();
-    // pivot the grandRounds data into separate lists
-    const grantRoundLists = computed(() => [
-      {
-        title: 'Active',
-        rounds: grantRounds.value ? grantRounds.value.filter(hasStatus('Active')).sort(sortByStartTime) : [],
-      },
-      {
-        title: 'Upcoming',
-        rounds: grantRounds.value ? grantRounds.value.filter(hasStatus('Upcoming')).sort(sortByStartTime) : [],
-      },
-      {
-        title: 'Completed',
-        rounds: grantRounds.value ? grantRounds.value.filter(hasStatus('Completed')).sort(sortByStartTime) : [],
-      },
-    ]);
+    const { grantRounds: _grantRounds, grantRoundMetadata: _grantRoundMetadata } = useDataStore();
 
-    return { BigNumber, daysAgo, formatAddress, grantRoundLists, hasStatus, pushRoute, unixToLocaleString };
+    // --- Data sources ---
+    const grantRounds = computed(() => _grantRounds.value);
+    const grantRoundMetadata = computed(() => _grantRoundMetadata.value);
+
+    // --- BaseHeader Navigation ---
+    const breadcrumb = computed(
+      () =>
+        <Breadcrumb[]>[
+          {
+            displayName: 'dgrants',
+            routeTarget: { name: 'Home' },
+          },
+          {
+            displayName: 'rounds',
+            routeTarget: { name: 'dgrants-rounds-list' },
+          },
+        ]
+    );
+
+    // --- GrantRound Filter nav ---
+    const selectedTab = ref<number>(0);
+    // status tabs
+    const statusTab = ['Active', 'Upcoming', 'Complete'];
+    // filter and sort each of the status tabs
+    const filteredLists = statusTab.map((status) =>
+      computed(() => {
+        return grantRounds.value ? grantRounds.value.filter(hasStatus(status)).sort(sortByStartTime) : [];
+      })
+    );
+    const grantRoundsNav = computed(
+      () => <FilterNavItem[]>statusTab.map((status, index) => {
+          return {
+            label: status,
+            counter: filteredLists[index].value.length,
+            action: () => {
+              selectedTab.value = index;
+            },
+          };
+        })
+    );
+
+    // --- GrantRoundCard data ---
+    const grantRoundLists = computed(() =>
+      statusTab.map((status, index) => {
+        return {
+          title: status,
+          rounds: filteredLists[index].value,
+        };
+      })
+    );
+
+    return {
+      BigNumber,
+      breadcrumb,
+      daysAgo,
+      formatAddress,
+      formatNumber,
+      grantRoundLists,
+      grantRoundMetadata,
+      grantRoundsNav,
+      hasStatus,
+      pushRoute,
+      selectedTab,
+      unixToLocaleString,
+    };
   },
 });
 </script>
