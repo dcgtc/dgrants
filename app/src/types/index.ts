@@ -30,7 +30,7 @@ export type LocalStorageAnyObj = {
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 export type LocalStorageData = {
-  ts: BigNumberish;
-  blockNumber: number;
+  ts?: BigNumberish;
+  blockNumber?: number;
   data: LocalStorageAnyObj;
 };
