@@ -246,7 +246,7 @@
   </template>
 
   <!-- No grant selected -->
-  <div v-else-if="!grant">
+  <div v-else-if="!loading">
     <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant selected</h2>
   </div>
 
@@ -264,9 +264,11 @@ import useWalletStore from 'src/store/wallet';
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
-import * as ipfs from 'src/utils/ipfs';
+import * as ipfs from 'src/utils/data/ipfs';
+import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
+import { filterContributionsByGrantId } from 'src/utils/data/contributions';
 // --- Types ---
-import { Breadcrumb, Contribution, FilterNavItem, GrantRound, GrantRoundCLR, GrantsRoundDetails } from '@dgrants/types';
+import { Breadcrumb, FilterNavItem, GrantsRoundDetails } from '@dgrants/types';
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
@@ -291,7 +293,7 @@ function useGrantDetail() {
     grantRounds: rounds,
     grantRoundMetadata: roundsMetadata,
     grantRoundsCLRData: roundsCLRData,
-    grantContributions: contributions,
+    grantContributions: allContributions,
   } = useDataStore();
   const { signer, provider, userAddress, grantRegistry } = useWalletStore();
   const route = useRoute();
@@ -313,71 +315,27 @@ function useGrantDetail() {
   const grantContributionsByRound = ref();
   const txHash = ref<string>();
 
-  // returns the predicition curve for this grant in the given round
-  const getPredictionForGrantInRound = async (round: GrantRound) => {
-    const data = ((roundsCLRData && roundsCLRData.value && roundsCLRData.value) || {}) as {
-      [grantRound: string]: GrantRoundCLR;
-    };
-    const roundData = data[round.address] || {};
-
-    return roundData.predictions && roundData.predictions[Number(grantId.value)];
-  };
-
-  // gets all contributions to this grant
-  const getContributions = async () => {
-    // fetch contributions
-    return Object.values(contributions?.value || {}).filter((contribution: Contribution) => {
-      // check that the contribution is valid
-      const forThisGrant = contribution.grantId == grantId.value.toString();
-
-      // only include contributions for this forThisGrant
-      return forThisGrant;
-    });
-  };
-
-  // Note: Should this state be cached between calls? How will we manage invalidations?
   watch(
-    () => [grantId.value, rounds.value, roundsMetadata.value, provider.value],
-    async () => {
+    () => [grant.value, grantId.value, rounds.value, roundsMetadata.value, provider.value],
+    () => {
+      // enter loading state between loads
+      loading.value = true;
       // ensure the computed props are ready before fetching data
       if (rounds.value && roundsMetadata.value && provider.value) {
-        // enter loading state between loads
-        loading.value = true;
         // get all contributions for this grant
-        const contributions = await getContributions();
+        const contributions = filterContributionsByGrantId(grantId.value.toString(), allContributions?.value || []);
         // sum all contributions made against this grant
         const contributionsTotal = `${formatNumber(
-          contributions.reduce((carr, contrib) => contrib?.amount + carr, 0),
+          contributions.reduce((total, contribution) => contribution?.amount + total, 0),
           2
         )} ${rounds.value && rounds.value[0].donationToken.symbol}`;
         // collect this grants details from every round that it is a member of (should we use the metadata here?)
-        const contributionsByRound = await Promise.all(
-          (rounds.value || []).map(async (round) => {
-            // this prediciton will refetch all contributions made in this round - should we cache the result of dcurve/fetch?
-            const prediction = await getPredictionForGrantInRound(round);
-            // filter only contributions which should be considered for this round (should we also/only check metadata here?)
-            const roundContributions = contributions
-              .map((contrib) => (contrib?.inRounds?.includes(round.address) ? contrib : false))
-              .filter((c) => c);
-            // sum the contributions which were made against this round
-            const roundsContributionTotal = roundContributions
-              .reduce((carr, contrib) => (contrib ? contrib.amount + carr : carr), 0)
-              .toString();
-
-            return {
-              address: round.address,
-              metaPtr: round.metaPtr,
-              name: roundsMetadata.value[round.metaPtr].name,
-              matchingToken: round.matchingToken,
-              donationToken: round.donationToken,
-              contributions: roundContributions,
-              balance: formatNumber(roundsContributionTotal, 2),
-              matching: prediction && formatNumber(prediction.predictions[0].predictedGrantMatch, 2),
-              prediction1: prediction && formatNumber(prediction.predictions[1].predictionDiff, 2),
-              prediction10: prediction && formatNumber(prediction.predictions[2].predictionDiff, 2),
-              prediction100: prediction && formatNumber(prediction.predictions[3].predictionDiff, 2),
-            } as GrantsRoundDetails;
-          })
+        const contributionsByRound = getGrantsGrantRoundDetails(
+          grantId.value.toString(),
+          rounds.value,
+          roundsMetadata.value,
+          roundsCLRData.value,
+          contributions
         );
         // save off data
         grantContributions.value = contributions;
