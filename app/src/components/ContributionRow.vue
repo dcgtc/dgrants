@@ -33,7 +33,7 @@
         <div class="truncate">
           <a
             class="link"
-            :href="getEtherscanUrl(contribution.txHash, 'tx')"
+            :href="getEtherscanUrl(contribution.txHash || '', 'tx')"
             target="_blank"
             rel="noopener noreferrer"
           >
