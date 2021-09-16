@@ -5,24 +5,27 @@ import { TokenInfo } from '@uniswap/token-lists';
 // --- Utils ---
 import { fetchTrustBonusScore } from '@dgrants/utils/src/trustBonus';
 import { formatUnits } from 'ethers/lib/utils';
-import { Contract, Event } from 'ethers';
+import { Event } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
 import { contributionsKey, trustBonusKey } from 'src/utils/constants';
 import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+// --- Data ---
+import useWalletStore from 'src/store/wallet';
+
+// --- pull in the registry contract
+const { grantRoundManager } = useWalletStore();
 
 /**
  * @notice Get/Refresh all contributions
  *
  * @param {number} blockNumber The current blockNumber
- * @param {Contract} roundManager The roundManagers
  * @param {Object} grantsDict A dict of grant addresses (grant.id->grant.payee)
  * @param {TokenInfo} donationToken The roundManagers donation token
  * @param {boolean} forceRefresh Force the cache to refresh
  */
 export async function getContributions(
   blockNumber: number,
-  roundManager: Contract,
   grantsDict: Record<string, string>,
   donationToken: TokenInfo,
   forceRefresh?: boolean
@@ -43,7 +46,11 @@ export async function getContributions(
         const fromBlock = localStorageData?.blockNumber + 1 || 0;
         // get any new donations to the grantRound
         const grantDonations =
-          (await roundManager?.queryFilter(roundManager?.filters.GrantDonation(), fromBlock, blockNumber)) || [];
+          (await grantRoundManager.value?.queryFilter(
+            grantRoundManager?.value?.filters?.GrantDonation(null, null, null, null),
+            fromBlock,
+            blockNumber
+          )) || [];
 
         // resolve contributions
         void (await Promise.all(
