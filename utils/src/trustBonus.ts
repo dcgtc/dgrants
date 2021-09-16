@@ -1,4 +1,4 @@
-import { ipfs } from '@dgrants/app/src/utils/ipfs';
+import { ipfs } from '@dgrants/app/src/utils/data/ipfs';
 import { TrustBonusScore } from '@dgrants/dcurve/src/types';
 import { Status } from '../types';
 

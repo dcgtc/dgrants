@@ -1,7 +1,7 @@
 import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantsDistribution, TrustBonusScore } from '../../types';
 import { GrantRoundContributions } from '@dgrants/types';
 import { fetchTrustBonusScore, uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
-import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/ipfs';
+import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/data/ipfs';
 
 /**
  * @notice Contains the logic to determine the distribution using linear QF formula.
