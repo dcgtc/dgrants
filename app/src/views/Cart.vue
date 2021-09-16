@@ -77,6 +77,7 @@
                       item.contributionAmount = Number($event);
                       updateCart(item.grantId, item.contributionAmount);
                     "
+                    :min="0"
                     type="number"
                     width="w-1/2"
                     customcss="border-r-0"
@@ -128,7 +129,7 @@
         </div>
       </div>
 
-      <div class="py-8 border-b border-grey-100">
+      <div class="py-8 border-b border-grey-100" :class="{ hidden: !showEquivalentContributionAmount }">
         <div class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
@@ -173,7 +174,7 @@
 
 <script lang="ts">
 // --- External Imports ---
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { TwitterIcon, CloseIcon } from '@fusion-icons/vue/interface';
 // --- Component Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
@@ -187,23 +188,48 @@ import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
 import { pushRoute, formatNumber } from 'src/utils/utils';
+import useWalletStore from 'src/store/wallet';
 
 function useCart() {
-  const { cart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart } = useCartStore(); // prettier-ignore
+  const { grantMetadata: meta } = useDataStore();
+  const { cart, lsCart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart, setCart } = useCartStore(); // prettier-ignore
 
-  onMounted(async () => {
-    await fetchQuotes(); // get latest quotes
-    initializeCart(); // make sure cart store is initialized
+  // force cart update on metadata resolution
+  const grantMetadata = computed(() => {
+    setCart(lsCart.value);
+
+    return meta.value;
   });
+
+  // fetchQuotes whenever network changes
+  const { provider } = useWalletStore();
+  watch(
+    () => [provider.value],
+    async () => {
+      await fetchQuotes(); // get latest quotes
+      initializeCart(); // make sure cart store is initialized
+    }
+  );
+
   const txHash = ref<string>();
   const status = ref<'not started' | 'pending' | 'success' | 'failure'>('pending');
 
+  const showEquivalentContributionAmount = ref<boolean>(false);
+
   const equivalentContributionAmount = computed(() => {
     let sum = 0;
+    let isStableCoin = 0;
     for (const [tokenAddress, amount] of Object.entries(cartSummary.value)) {
       if (!amount) continue;
       const exchangeRate = quotes.value[tokenAddress] ?? 0;
       sum += amount * exchangeRate;
+      isStableCoin += exchangeRate == 1 ? 1 : 0;
+    }
+    // hide when cart is all denominated in a single stablecoin
+    if (sum == 0 || (isStableCoin == 1 && isStableCoin === Object.keys(cartSummary.value).length)) {
+      showEquivalentContributionAmount.value = false;
+    } else {
+      showEquivalentContributionAmount.value = true;
     }
     return sum;
   });
@@ -217,7 +243,7 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, cartSummaryString, clearCart, completeCheckout, clrPredictions, clrPredictionsByToken, equivalentContributionAmount, executeCheckout, removeFromCart, status, txHash, updateCart }; // prettier-ignore
+  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, showEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart }; // prettier-ignore
 }
 
 export default defineComponent({
@@ -232,9 +258,8 @@ export default defineComponent({
     LoadingSpinner,
   },
   setup() {
-    const { grantMetadata } = useDataStore();
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, grantMetadata, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber };
+    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber };
   },
 });
 </script>
