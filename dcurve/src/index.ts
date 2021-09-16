@@ -7,6 +7,9 @@ export { fetch } from './internal/fetch';
 // Calculation commands
 export { handle as linear } from './internal/calc/linear';
 
+// Prediction helpers
+export { getPredictedMatchingForAmount } from './internal/utils';
+
 // Hashing commands
 export { getMerkleRoot, getMerkleProof } from './internal/merkle';
 
