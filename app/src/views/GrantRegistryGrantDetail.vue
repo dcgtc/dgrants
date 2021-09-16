@@ -113,12 +113,12 @@
     </div>
 
     <!-- Editing grant -->
-    <div v-else class="flex flex-col justify-center sm:px-6 lg:px-8">
+    <div v-else>
       <BaseHeader name="Edit Grant" :tagline="grantMetadata?.name" />
       <BaseFilterNav :active="selectedEdit" :items="editNav" />
 
-      <div v-if="selectedEdit == 0" class="text-left">
-        <form class="space-y-5 mb-20" @submit.prevent="saveEdits">
+      <div v-if="selectedEdit == 0">
+        <form @submit.prevent="saveEdits">
           <!-- Grant name -->
           <InputRow>
             <template v-slot:label>Title:</template>
@@ -131,6 +131,21 @@
                 :rules="isDefined"
                 errorMsg="Please enter a name"
               />
+            </template>
+          </InputRow>
+
+          <!-- if there is an image uploaded show it -->
+          <ImageRow
+            label="Image 1:"
+            imgsrc="http://placekitten.com/1920/1200?image=1"
+            filename="0x32bc27d24ec86a23e8a52208935e7fa.png"
+          />
+
+          <!-- image upload -->
+          <InputRow text="">
+            <template v-slot:label>Upload Thumbnail:</template>
+            <template v-slot:input>
+              <BaseUpload />
             </template>
           </InputRow>
 
@@ -272,8 +287,10 @@ import { Breadcrumb, FilterNavItem, GrantRound, GrantsRoundDetails } from '@dgra
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
+import BaseUpload from 'src/components/BaseUpload.vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import InputRow from 'src/components/InputRow.vue';
+import ImageRow from 'src/components/ImageRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import ContributionRow from 'src/components/ContributionRow.vue';
@@ -673,6 +690,8 @@ export default defineComponent({
     TwitterIcon,
     TransactionStatus,
     LoadingSpinner,
+    ImageRow,
+    BaseUpload,
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
