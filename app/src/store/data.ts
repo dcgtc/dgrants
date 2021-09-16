@@ -43,7 +43,7 @@ export default function useDataStore() {
   /**
    * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
    */
-  async function rawPoll(forceRefresh = false) {    
+  async function rawPoll(forceRefresh = false) {
     const {
       grantRoundManager: grantRoundManagerRef,
       grantRegistry: grantRegistryRef,
@@ -56,7 +56,7 @@ export default function useDataStore() {
     // Parse return data
     const [blockNumber, timestamp] = await Promise.all([
       provider.value.getBlockNumber(),
-      multicall.value.getCurrentBlockTimestamp(),
+      multicall.getCurrentBlockTimestamp(),
     ]);
 
     // Save block data
@@ -65,8 +65,8 @@ export default function useDataStore() {
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData] = await Promise.all([
-      await getAllGrants(lastBlockNumber.value, registry.value, forceRefresh),
-      await getAllGrantRounds(lastBlockNumber.value, roundManager.value, forceRefresh),
+      await getAllGrants(lastBlockNumber.value, registry, forceRefresh),
+      await getAllGrantRounds(lastBlockNumber.value, roundManager, forceRefresh),
     ]);
 
     // collect the grants into a grantId->payoutAddress obj
@@ -81,7 +81,7 @@ export default function useDataStore() {
     // Pull state from each GrantRound
     const grantRoundsList = (await Promise.all(
       roundAddresses.map(async (grantRoundAddress: string) => {
-        const data = await getGrantRound(lastBlockNumber.value, multicall.value, grantRoundAddress, forceRefresh);
+        const data = await getGrantRound(lastBlockNumber.value, multicall, grantRoundAddress, forceRefresh);
 
         return data?.grantRound;
       })
@@ -90,7 +90,7 @@ export default function useDataStore() {
     // Get latest set of contributions
     const contributions = await getContributions(
       lastBlockNumber.value,
-      roundManager.value,
+      roundManager,
       grantsDict,
       grantRoundsList[0].donationToken,
       forceRefresh

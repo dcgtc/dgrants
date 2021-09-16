@@ -17,11 +17,10 @@ import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
 // --- Constants ---
+import { SUPPORTED_TOKENS_MAPPING, GRANT_REGISTRY_ADDRESS } from 'src/utils/chains';
 import {
   GRANT_ROUND_ABI,
   ERC20_ABI,
-  GRANT_REGISTRY_ADDRESS,
-  SUPPORTED_TOKENS_MAPPING,
   allGrantRoundsKey,
   grantRoundKeyPrefix,
   grantRoundsCLRDataKeyPrefix,

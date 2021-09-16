@@ -8,7 +8,8 @@ import { formatUnits } from 'ethers/lib/utils';
 import { Contract, Event } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
-import { contributionsKey, SUPPORTED_TOKENS_MAPPING, trustBonusKey } from 'src/utils/constants';
+import { contributionsKey, trustBonusKey } from 'src/utils/constants';
+import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 
 /**
  * @notice Get/Refresh all contributions
