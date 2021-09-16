@@ -33,6 +33,10 @@ function useGrantRegistryList() {
           displayName: 'dgrants',
           routeTarget: { name: 'Home' },
         },
+        {
+          displayName: 'registry',
+          routeTarget: { name: 'dgrants' },
+        },
       ]
   );
 
