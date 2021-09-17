@@ -59,7 +59,6 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: {
       hardfork: 'london',
-      allowUnlimitedContractSize: true,
       initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`,
