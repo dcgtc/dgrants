@@ -61,6 +61,7 @@ export default function useDataStore() {
     }, {});
     const roundAddresses = grantRoundData.roundAddresses || [];
 
+    debugger;
     // Pull state from each GrantRound
     const grantRoundsList = (await Promise.all(
       roundAddresses.map(async (grantRoundAddress: string) => {
@@ -70,6 +71,7 @@ export default function useDataStore() {
       })
     )) as GrantRound[];
 
+    debugger;
     // Get latest set of contributions
     const contributions = await getContributions(
       lastBlockNumber.value,
