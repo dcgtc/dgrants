@@ -3,7 +3,7 @@ import { Grant } from '@dgrants/types';
 import { LocalStorageData } from 'src/types';
 // --- Utils ---
 import { syncStorage } from 'src/utils/data/utils';
-import { BigNumber } from 'ethers';
+import { BigNumber, Event } from 'ethers';
 // --- Constants ---
 import { allGrantsKey } from 'src/utils/constants';
 // --- Data ---
@@ -23,7 +23,7 @@ const mapArgs = (tx: Event) => {
     owner: tx.args?.owner,
     payee: tx.args?.payee,
     metaPtr: tx.args?.metaPtr,
-  };
+  } as Grant;
 };
 
 /**
@@ -45,7 +45,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       // only update grants if new ones are added...
       let grants = localStorageData?.data?.grants || [];
       // each update should be pulled in when we hydrate localStorage state
-      let grantUpdates = [];
+      let grantUpdates: Grant[] = [];
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
