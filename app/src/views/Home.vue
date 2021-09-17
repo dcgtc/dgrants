@@ -39,7 +39,6 @@
     <GrantList :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
-  <LoadingSpinner v-else />
 </template>
 
 <script lang="ts">
