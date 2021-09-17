@@ -26,15 +26,32 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       ts: Date.now() / 1000,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
+      // use the ls_blockNumber to decide if we need to update the grants
+      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      // only update grants if new ones are added...
       let grants = localStorageData?.data?.grants || [];
-
-      // read from the registry contract on first load and every 10 mins
-      if (
-        forceRefresh ||
-        !localStorageData ||
-        (localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
-      ) {
-        grants = (await grantRegistry.value?.getAllGrants()) || [];
+      // every block
+      if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
+        // get the most recent block we collected
+        const fromBlock = ls_blockNumber + 1 || 0;
+        // get any new donations to the grantRound
+        grants = [
+          ...grants,
+          ...(
+            (await grantRegistry.value?.queryFilter(
+              grantRegistry?.value?.filters?.GrantCreated(null, null, null, null),
+              fromBlock,
+              blockNumber
+            )) || []
+          ).map((tx) => {
+            return {
+              id: tx.args?.id,
+              owner: tx.args?.owner,
+              payee: tx.args?.payee,
+              metaPtr: tx.args?.metaPtr,
+            };
+          }),
+        ];
       }
 
       // hydrate data from localStorage
