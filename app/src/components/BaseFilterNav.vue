@@ -2,10 +2,11 @@
   <div class="px-4 md:px-12 py-8 border-b border-grey-100">
     <div class="block md:flex gap-x-8">
       <div class="flex flex-wrap content-center gap-x-8">
+        <div v-if="title" class="uppercase font-medium text-grey-500">{{ title }}</div>
         <div v-for="(item, index) in items" :key="item.label">
           <div class="cursor-pointer uppercase font-medium group" @click="item?.action">
             <span v-if="item.menu" class="text-grey-400">{{ item.label + ':' }}</span>
-            <span v-else :class="active == index ? 'underline' : ''">{{ item.label }}</span>
+            <span v-else :class="active == index ? 'border-b pb-1' : 'text-grey-400'">{{ item.label }}</span>
             <span v-if="item.counter" class="ml-2 text-grey-400">({{ item.counter }})</span>
             <span v-else-if="item.tag" class="ml-2">{{ item.tag }}</span>
             <div v-if="item.menu" class="absolute hidden group-hover:block text-left z-10">
@@ -58,6 +59,7 @@ export default defineComponent({
   name: 'BaseFilterNav',
   components: {},
   props: {
+    title: { type: String, required: false, default: '' },
     items: { type: Array as PropType<FilterNavItem[]>, required: true },
     active: { type: Number, required: false, default: 0 },
     button: { type: Object as PropType<undefined | FilterNavButton>, required: false, default: undefined },

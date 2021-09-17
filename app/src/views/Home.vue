@@ -4,7 +4,7 @@
     <BaseHeader :breadcrumbContent="breadcrumb" name="Decentralized Grants Explorer" />
 
     <!-- Status filters -->
-    <BaseFilterNav :active="selectedTab" :items="grantRoundsNav" />
+    <BaseFilterNav :active="selectedTab" :items="grantRoundsNav" title="rounds:" />
     <div>
       <!-- Status filtered Cards -->
       <template v-if="grantRoundLists[selectedTab] && grantRoundLists[selectedTab]?.rounds?.length">
@@ -24,8 +24,10 @@
       </template>
       <!-- Empty state -->
       <template v-else>
-        <div class="px-4 md:px-12 mt-8">
-          <span>No {{ grantRoundLists[selectedTab].title }} Grant Rounds</span>
+        <div class="px-4 md:px-12 py-4 md:py-12 border-b border-grey-100 text-grey-400">
+          <div class="mb-8">
+            <span>No {{ grantRoundLists[selectedTab].title }} Grant Rounds</span>
+          </div>
         </div>
       </template>
     </div>
@@ -35,7 +37,7 @@
 
   <template v-if="grants && grantMetadata">
     <!-- General filters -->
-    <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" />
+    <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" title="grants:" />
     <GrantList :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
