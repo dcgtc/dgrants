@@ -72,8 +72,8 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       // hydrate data from localStorage
       const ls_grants = {
         grants: grants.map((grant: Grant) => {
-          const updatedGrant = grantUpdates.find((grant) => {
-            return BigNumber.from(grant.id).toString() === BigNumber.from(grant.id).toString();
+          const updatedGrant = grantUpdates.find((foundGrant) => {
+            return BigNumber.from(grant.id).toString() === BigNumber.from(foundGrant.id).toString();
           });
 
           return {
