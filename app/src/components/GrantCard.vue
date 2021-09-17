@@ -39,14 +39,26 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { ref, defineComponent, PropType } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
+import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { BigNumber, BigNumberish } from 'src/utils/ethers';
-import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
+import { filterContributionsByGrantId } from 'src/utils/data/contributions';
+import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
+
+function getTotalRaised(grantId: any) {
+  const { grantRounds, grantContributions } = useDataStore();
+  const contributions = filterContributionsByGrantId(grantId.toString(), grantContributions?.value || []);
+  const raised = `${formatNumber(
+    contributions.reduce((total, contribution) => contribution?.amount + total, 0),
+    2
+  )} ${grantRounds.value && grantRounds.value[0].donationToken.symbol}`;
+  return { raised };
+}
 
 export default defineComponent({
   name: 'GrantCard',
@@ -55,12 +67,21 @@ export default defineComponent({
     name: { type: String, required: true },
     imgurl: { type: String, required: true },
     ownerAddress: { type: String, required: true },
-    raised: { type: String, required: true },
   },
   components: { CartIcon },
-  setup() {
+  setup(props) {
+    const grantId = ref<any>(props.id);
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    return { addToCart, removeFromCart, isInCart, formatAddress, getEtherscanUrl, pushRoute, BigNumber };
+    return {
+      addToCart,
+      removeFromCart,
+      isInCart,
+      formatAddress,
+      getEtherscanUrl,
+      pushRoute,
+      BigNumber,
+      ...getTotalRaised(grantId),
+    };
   },
 });
 </script>
