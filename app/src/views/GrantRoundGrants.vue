@@ -46,7 +46,6 @@ function useGrantRoundDetail() {
    * @notice returns grants present in grantRound
    */
   const grants = computed(() => {
-    debugger;
     if (allGrants.value && grantRoundMetadata?.value?.grants) {
       const grantIdsInRound = Object.keys(grantRoundMetadata?.value['grants']);
       return allGrants.value.filter((grant) => grantIdsInRound.includes(grant.id.toString()));
