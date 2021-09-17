@@ -1,7 +1,7 @@
 <template>
   <div v-if="Object.keys(grantRoundMetadata).length">
     <!-- Simple breadcrumb pointing back to the landing -->
-    <BaseHeader :breadcrumbContent="breadcrumb" name="Decentral Grants Explorer" />
+    <BaseHeader :breadcrumbContent="breadcrumb" name="Decentralized Grants Explorer" />
 
     <!-- Status filters -->
     <BaseFilterNav :active="selectedTab" :items="grantRoundsNav" />
