@@ -40,7 +40,6 @@
     <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" title="grants:" />
     <GrantList :grants="grants" :grantMetadata="grantMetadata" />
   </template>
-
 </template>
 
 <script lang="ts">
