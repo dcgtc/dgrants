@@ -6,8 +6,7 @@
         :id="grant.id"
         :name="grantMetadata[grant.metaPtr].name ?? ''"
         :ownerAddress="grant.owner"
-        :imgurl="grantMetadata[grant.metaPtr].logoURI ?? '/placeholder_grant.svg'"
-        raised="100"
+        :imgurl="grantMetadata[grant.metaPtr].logoURI || '/placeholder_grant.svg'"
       />
     </li>
   </ul>

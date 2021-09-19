@@ -1,9 +1,7 @@
 <template>
-  <div class="text-center my-16">
-    <img style="width: 64px; height: 64px" class="mx-auto" src="/src/assets/spinner.svg" />
-    <h2 class="mt-6 text-3xl text-gray-500">
-      {{ text }}
-    </h2>
+  <div>
+    <img src="/src/assets/spinner.svg" />
+    <span>{{ text }}</span>
   </div>
 </template>
 
@@ -17,3 +15,18 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+div {
+  @apply text-center mx-auto py-12;
+}
+
+img {
+  @apply mx-auto;
+  @apply h-8 w-8 md:h-12 md:w-12;
+}
+
+span {
+  @apply inline-block mt-4 text-grey-500;
+}
+</style>

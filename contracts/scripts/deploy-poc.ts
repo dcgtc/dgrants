@@ -71,7 +71,8 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
       networkParams.matchingToken,
       networkParams.roundStartTime,
       networkParams.roundEndTime,
-      metadataPtr
+      metadataPtr,
+      { gasLimit: 1000000 }
     );
     await createGrantRoundTxReceipt.wait();
     logger.recordAction('CreateGrantGround', createGrantRoundTxReceipt.hash);

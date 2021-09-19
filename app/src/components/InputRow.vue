@@ -9,12 +9,12 @@
 
         <!-- input + optional description -->
         <div class="col-span-4 md:col-span-3">
-          <div class="flex items-center gap-x-8">
+          <div class="flex items-center">
             <slot name="input"></slot>
 
             <!-- deletable -->
             <div v-if="deleteable" class="col-span-3 justify-self-end">
-              <XIcon class="icon icon-primary icon-small cursor-pointer" />
+              <XIcon class="icon icon-primary icon-small cursor-pointer ml-4" />
             </div>
           </div>
           <div v-if="text" class="mt-2">{{ text }}</div>

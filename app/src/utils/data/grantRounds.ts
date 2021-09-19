@@ -41,17 +41,24 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
       const { grantRoundManager } = useWalletStore();
+      // use the ls_blockNumber to decide if we need to update the roundAddresses
+      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      // only update roundAddress if new ones are added...
       let roundAddresses = localStorageData?.data?.roundAddresses || [];
-
-      // read from roundManager on first load and every 10 mins
-      if (
-        forceRefresh ||
-        !localStorageData ||
-        (localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
-      ) {
+      // every block
+      if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
+        // get the most recent block we collected
+        const fromBlock = ls_blockNumber + 1 || 0;
         const roundList =
-          (await grantRoundManager.value?.queryFilter(grantRoundManager.value?.filters.GrantRoundCreated(null))) || [];
-        roundAddresses = [...roundList.map((e: Event) => e.args?.grantRound)];
+          (
+            await grantRoundManager.value?.queryFilter(
+              grantRoundManager.value?.filters.GrantRoundCreated(null),
+              fromBlock,
+              blockNumber
+            )
+          ).map((e: Event) => e.args?.grantRound) || [];
+        // add new rounds
+        roundAddresses = [...roundAddresses, ...roundList];
       }
 
       // hydrate/format roundAddresses for use
@@ -70,7 +77,7 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
 }
 
 /**
- * @notice Get/Refresh the details of a single GrantRound
+ * @notice Get/Refresh the details of a single GrantRound - we need to run this frequently to get any changes in balance
  *
  * @param {number} blockNumber The currenct block number
  * @param {string} grantRoundAddress The grantRoundAddress to get the details for
@@ -87,18 +94,18 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
       const { provider, multicall } = useWalletStore();
       const data = localStorageData?.data || {};
 
-      // read from registry on first load and every 10 mins
+      // read from registry on first load and every 30 secs after (we need to pick up any changes)
       if (
         forceRefresh ||
         !localStorageData ||
-        (multicall.value && localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 60 * 10)
+        (multicall.value && localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 30)
       ) {
         // open the rounds contract
         const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
         // collect the donationToken before promise.all'ing everything
         const donationTokenAddress = data?.donationToken?.address || (await roundContract.donationToken());
-        const donationTokenContract = new Contract(donationTokenAddress, ERC20_ABI, provider.value);
         const matchingTokenAddress = data?.matchingToken?.address || (await roundContract.matchingToken());
+        // use matchingTokenContract to get balance
         const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
 
         // Define calls to be read using multicall
@@ -110,12 +117,6 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
           { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('registry') },
           { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('metaPtr') },
           { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('hasPaidOut') },
-          { target: donationTokenAddress, callData: donationTokenContract.interface.encodeFunctionData('name') },
-          { target: donationTokenAddress, callData: donationTokenContract.interface.encodeFunctionData('symbol') },
-          { target: donationTokenAddress, callData: donationTokenContract.interface.encodeFunctionData('decimals') },
-          { target: matchingTokenAddress, callData: matchingTokenContract.interface.encodeFunctionData('name') },
-          { target: matchingTokenAddress, callData: matchingTokenContract.interface.encodeFunctionData('symbol') },
-          { target: matchingTokenAddress, callData: matchingTokenContract.interface.encodeFunctionData('decimals') },
           {
             target: matchingTokenAddress,
             callData: matchingTokenContract.interface.encodeFunctionData('balanceOf', [grantRoundAddress]),
@@ -132,12 +133,6 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
           registryAddressEncoded,
           metaPtrEncoded,
           hasPaidOutEncoded,
-          donationTokenNameEncoded,
-          donationTokenSymbolEncoded,
-          donationTokenDecimalsEncoded,
-          matchingTokenNameEncoded,
-          matchingTokenSymbolEncoded,
-          matchingTokenDecimalsEncoded,
           matchingTokenBalanceEncoded,
         ] = returnData;
 
@@ -149,12 +144,6 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         const registryAddress = roundContract.interface.decodeFunctionResult('registry', registryAddressEncoded.returnData)[0]; // prettier-ignore
         const metaPtr = roundContract.interface.decodeFunctionResult('metaPtr', metaPtrEncoded.returnData)[0]; // prettier-ignore
         const hasPaidOut = roundContract.interface.decodeFunctionResult('hasPaidOut', hasPaidOutEncoded.returnData)[0]; // prettier-ignore
-        const donationTokenName = donationTokenContract.interface.decodeFunctionResult('name', donationTokenNameEncoded.returnData)[0]; // prettier-ignore
-        const donationTokenSymbol = donationTokenContract.interface.decodeFunctionResult('symbol', donationTokenSymbolEncoded.returnData)[0]; // prettier-ignore
-        const donationTokenDecimals = donationTokenContract.interface.decodeFunctionResult('decimals', donationTokenDecimalsEncoded.returnData)[0]; // prettier-ignore
-        const matchingTokenName = matchingTokenContract.interface.decodeFunctionResult('name', matchingTokenNameEncoded.returnData)[0]; // prettier-ignore
-        const matchingTokenSymbol = matchingTokenContract.interface.decodeFunctionResult('symbol', matchingTokenSymbolEncoded.returnData)[0]; // prettier-ignore
-        const matchingTokenDecimals = matchingTokenContract.interface.decodeFunctionResult('decimals', matchingTokenDecimalsEncoded.returnData)[0]; // prettier-ignore
         const matchingTokenBalance = matchingTokenContract.interface.decodeFunctionResult('balanceOf', matchingTokenBalanceEncoded.returnData)[0]; // prettier-ignore
 
         // build status against now (unix)
@@ -172,24 +161,24 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
             hasPaidOut,
             donationToken: {
               address: donationTokenAddress,
-              name: donationTokenName,
-              symbol: donationTokenSymbol,
-              decimals: donationTokenDecimals,
+              name: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].name,
+              symbol: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].symbol,
+              decimals: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].decimals,
               chainId: provider.value.network.chainId || 1,
               // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
               logoURI: undefined, // we can leave this out for now
             } as TokenInfo,
             matchingToken: {
               address: matchingTokenAddress,
-              name: matchingTokenName,
-              symbol: matchingTokenSymbol,
-              decimals: matchingTokenDecimals,
+              name: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].name,
+              symbol: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].symbol,
+              decimals: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals,
               chainId: provider.value.network.chainId || 1,
               // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
               logoURI: undefined, // we can leave this out for now
             } as TokenInfo,
             address: grantRoundAddress,
-            funds: matchingTokenBalance / 10 ** matchingTokenDecimals,
+            funds: matchingTokenBalance / 10 ** SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals,
             status:
               now >= startTime.toNumber() && now < endTime.toNumber()
                 ? 'Active'

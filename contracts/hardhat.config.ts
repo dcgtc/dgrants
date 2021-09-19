@@ -43,6 +43,7 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
   return {
     accounts: [(process.env.DEPLOY_PRIVATE_KEY as string) || dummyPrivateKey],
     chainId: chainIds[network],
+    allowUnlimitedContractSize: true,
     url,
   };
 }

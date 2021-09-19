@@ -12,10 +12,10 @@
       :disabled="disabled"
       :placeholder="placeholder"
     />
-  </div>
 
-  <div v-if="!isValid">
-    <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
+    <div v-if="!isValid">
+      <div class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
+    </div>
   </div>
 </template>
 
