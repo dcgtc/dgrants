@@ -8,15 +8,15 @@ title: How to Create & Edit Grants
 
 1. Click "Create Grant" on the dgrants home page
 
-![](https://i.imgur.com/EKgB8Ly.png)
+![](/img/create-grants-1.png)
 
 2. Fill in the Grant Title, Owner Address & Payee Address and click "Deploy Contract"
 
-![](https://i.imgur.com/PvsvEN8.png)
+![](/img/create-grants-2.png)
 
 3. Once contract is succesfully deployed, click "Continue" and your Grant is set up! 
 
-![](https://i.imgur.com/RLapEfb.png)
+![](/img/create-grants-2.png)
 
 ## How to Edit Grants 
 
@@ -24,10 +24,10 @@ title: How to Create & Edit Grants
 
 2. TODO: Step here to edit grant is unclear 
 
-![](https://i.imgur.com/pi0GxOu.png)
+![](/img/edit-grants-1.png)
 
 3. Edit your Media, Details and Settings
 
-![](https://i.imgur.com/yzLDDMm.png)
+![](/img/edit-grants-2.png)
 
 4. Click "Update" to save your changes to your Grant! 
