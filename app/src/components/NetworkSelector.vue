@@ -8,7 +8,7 @@
       </div>
 
       <div class="ml-auto mt-4 md:mt-0">
-        <button class="btn text-left">
+        <button @click="switchNetwork" class="btn text-left">
           <NetworkIcon />
           <div>Switch network</div>
         </button>
@@ -27,8 +27,8 @@ export default defineComponent({
   name: 'NetworkSelector',
   components: { NetworkIcon },
   setup() {
-    const { isSupportedNetwork } = useWalletStore();
-    return { isSupportedNetwork, supportedNetworkName: CHAIN_INFO.label };
+    const { isSupportedNetwork, switchNetwork } = useWalletStore();
+    return { isSupportedNetwork, switchNetwork, supportedNetworkName: CHAIN_INFO.label };
   },
 });
 </script>

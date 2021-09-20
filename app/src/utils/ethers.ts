@@ -24,7 +24,7 @@ export type { Network } from '@ethersproject/networks';
 // --- Methods and classes ---
 export { getAddress, isAddress } from '@ethersproject/address';
 export { BigNumber } from '@ethersproject/bignumber';
-export { hexDataSlice } from '@ethersproject/bytes';
+export { hexDataSlice, hexStripZeros } from '@ethersproject/bytes';
 export { Contract } from '@ethersproject/contracts';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 export { commify, formatUnits, parseUnits } from '@ethersproject/units';
