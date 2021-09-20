@@ -50,6 +50,11 @@ interface L1ChainInfo {
   readonly tokens: TokenInfo[];
   readonly tokensMapping: Record<string, TokenInfo>;
   readonly rpcUrl: string;
+  readonly nativeCurrency: {
+    name: string;
+    symbol: string;
+    decimals: number;
+  };
   // contract addresses
   readonly weth: string;
   readonly grantRegistry: string;
@@ -149,6 +154,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_ONE],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_ONE],
     weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '',
@@ -162,6 +172,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_RINKEBY],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.ARBITRUM_RINKEBY],
     weth: '0xB47e6A5f8b33b3F17603C83a0535A9dcD7E32681',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '',
@@ -173,6 +188,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.MAINNET],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.MAINNET],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
@@ -184,6 +204,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
     weth: '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3',
     grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
@@ -195,6 +220,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.RINKEBY],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.RINKEBY],
     weth: '0xc778417E063141139Fce010982780140Aa0cD5Ab',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '0x7e13B0251f0F92C98bB5E9cAeABb9A91ccf13655',
     grantRoundManager: '0xa1f0230045eAb2D2F2c4ef1B7bD53330Bd41f862',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
@@ -208,6 +238,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISM],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISM],
     weth: '0x4200000000000000000000000000000000000006',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '0x90f872b3d8f33f305e0250db6A2761B354f7710A',
@@ -221,6 +256,11 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISTIC_KOVAN],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.OPTIMISTIC_KOVAN],
     weth: '0x4200000000000000000000000000000000000006',
+    nativeCurrency: {
+      name: 'Ethereum',
+      symbol: 'ETH',
+      decimals: 18,
+    },
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '0x1F98415757620B543A52E61c46B32eB19261F984',

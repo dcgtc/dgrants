@@ -23,8 +23,8 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
-import { DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
-import { Contract, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers';
+import { CHAIN_INFO, DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
+import { BigNumber, Contract, hexStripZeros, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers'; // prettier-ignore
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
 import { API as OnboardAPI } from 'bnc-onboard/dist/src/interfaces';
@@ -180,6 +180,37 @@ export default function useWalletStore() {
     startPolling();
   }
 
+  /**
+   * @notice Prompts user to switch networks to this applications required network
+   */
+  async function switchNetwork() {
+    // Chain ID must be a 0x-prefixed hex string without paddingL https://eth.wiki/json-rpc/API
+    const chainId = hexStripZeros(BigNumber.from(DGRANTS_CHAIN_ID).toHexString());
+
+    // First try switching chains
+    try {
+      await rawProvider.value?.send('wallet_switchEthereumChain', [{ chainId }]);
+    } catch (err) {
+      const { code } = err as { code: number };
+
+      // This error code indicates that the chain has not been added to MetaMask: https://docs.metamask.io/guide/rpc-api.html#other-rpc-methods
+      // In this case, add the chain for the user
+      if (code === 4902) {
+        await rawProvider.value?.send('wallet_addEthereumChain', [
+          {
+            chainId,
+            chainName: CHAIN_INFO.label,
+            nativeCurrency: CHAIN_INFO.nativeCurrency,
+            rpcUrls: [CHAIN_INFO.rpcUrl],
+            blockExplorerUrls: [CHAIN_INFO.explorer],
+          },
+        ]);
+      } else {
+        throw err;
+      }
+    }
+  }
+
   // ----------------------------------------------------- Getters -----------------------------------------------------
   // Default to mainnet for all network-based getters
   const chainId = computed(() => (network.value?.chainId || defaultChainId) as SupportedChainId);
@@ -202,16 +233,17 @@ export default function useWalletStore() {
   // Define parts of the store to expose. Only expose computed properties or methods to avoid direct mutation of state
   return {
     // Methods
+    changeWallet,
     configureProvider,
     connectWallet,
     disconnectWallet,
-    changeWallet,
     setProvider,
+    switchNetwork,
     // Properties
     chainId,
-    isSupportedNetwork,
     grantRegistry,
     grantRoundManager,
+    isSupportedNetwork,
     multicall,
     network: computed(() => network.value),
     provider: computed(() => provider.value),
