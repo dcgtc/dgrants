@@ -109,11 +109,6 @@
       </div>
     </div>
 
-    <!-- unsupported network -->
-    <div v-else-if="!isSupportedNetwork" class="ml-auto">
-      <div class="bg-pink px-4 py-2 text-white">Unsupported network</div>
-    </div>
-
     <!-- connect wallet -->
     <div v-else @click="connectWallet" class="flex items-center h-14 gap-x-2 group cursor-pointer ml-auto">
       <div class="hidden md:block group-hover:text-grey-500">Connect</div>
