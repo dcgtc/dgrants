@@ -41,7 +41,7 @@ const defaultProvider = new JsonRpcProvider(RPC_URL);
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
-const provider = ref<Web3Provider | JsonRpcProvider>(defaultProvider); // ethers provider
+const provider = ref<Web3Provider | JsonRpcProvider>(markRaw(defaultProvider)); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
 const userEns = ref<string | null>(); // user's ENS name
@@ -164,15 +164,9 @@ export default function useWalletStore() {
     // Clear state
     resetState();
 
-    // Exit if not a valid network
+    // Get ENS name if user is connected to mainnet
     const chainId = _provider.network.chainId; // must be done after the .getNetwork() call
-    if (DGRANTS_CHAIN_ID !== chainId) {
-      network.value = markRaw(_network); // save network for checking if this is a supported network
-      return;
-    }
-
-    // Get ENS name if we're on mainnet
-    const _userEns = _network.chainId === 1 ? await _provider.lookupAddress(_userAddress) : null;
+    const _userEns = chainId === 1 ? await _provider.lookupAddress(_userAddress) : null;
 
     // Now we save the user's info to the store. We don't do this earlier because the UI is reactive based on these
     // parameters, and we want to ensure this method completed successfully before updating the UI
