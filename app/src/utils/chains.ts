@@ -41,7 +41,7 @@ export const L2_CHAIN_IDS = [
 export type SupportedL2ChainId = typeof L2_CHAIN_IDS[number];
 
 // When building the app, only one Chain ID is supported per build to avoid mixing different GrantRegistry's, etc
-export const DGRANTS_CHAIN_ID = Number(import.meta.env.VITE_DGRANTS_CHAIN_ID) as SupportedChainId;
+export const DGRANTS_CHAIN_ID = (Number(import.meta.env.VITE_DGRANTS_CHAIN_ID) as SupportedChainId) || 4; // default to Rinkeby
 const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
 
 interface L1ChainInfo {
