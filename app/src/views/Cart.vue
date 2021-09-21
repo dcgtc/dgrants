@@ -66,7 +66,12 @@
               </div>
               <!-- text -->
               <div class="col-span-4 lg:col-span-1">
-                <div>{{ grantMetadata[item.metaPtr]?.name }}</div>
+                <div
+                  class="link"
+                  @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(item.grantId).toString() } })"
+                >
+                  {{ grantMetadata[item.metaPtr]?.name }}
+                </div>
               </div>
               <!-- input -->
               <div class="col-span-4 lg:col-span-1">
@@ -186,6 +191,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
+import { BigNumber } from 'src/utils/ethers';
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
 import { pushRoute, formatNumber } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
@@ -250,7 +256,27 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, showEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart }; // prettier-ignore
+  return {
+    cart,
+    lsCart,
+    cartSummaryString,
+    grantMetadata,
+    clearCart,
+    completeCheckout,
+    fetchQuotes,
+    initializeCart,
+    clrPredictions,
+    clrPredictionsByToken,
+    showEquivalentContributionAmount,
+    equivalentContributionAmount,
+    executeCheckout,
+    removeFromCart,
+    setCart,
+    status,
+    txHash,
+    updateCart,
+    BigNumber,
+  };
 }
 
 export default defineComponent({
