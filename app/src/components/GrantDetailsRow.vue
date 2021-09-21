@@ -35,35 +35,21 @@
 
       <!-- rounds a grant is in -->
       <article class="mt-8">
-        <div v-for="(round, index) in roundDetails" :key="index" class="mt-4">
+        <div v-for="(round, index) in roundDetails" :key="index" class="mt-2">
           <!--round-->
           <div>
-            <span class="text-grey-400 mr-4">Round:</span>
-            <span class="mr-2">{{ round.name }}</span>
+            <span class="text-grey-400 mr-4">Matching:</span>
+            <span>{{ round.matching }} {{ round.matchingToken.symbol }}</span>
+            <span>, {{ round.name }}</span>
           </div>
 
           <!--matching-->
           <div>
-            <span class="text-grey-400 mr-4">Matching:</span>
-            <span>{{ round.matching }} {{ round.matchingToken.symbol }}</span>
-          </div>
-
-          <!--prediction 10 -->
-          <div>
-            <span class="text-grey-400 mr-4"
-              >10 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} Contribution</span
-            >
-            <span class="mr-4">≈</span>
-            <span>{{ round.prediction10 }} {{ round.matchingToken.symbol }}</span>
-          </div>
-
-          <!--prediction 100 -->
-          <div>
-            <span class="text-grey-400 mr-4"
-              >100 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} Contribution</span
-            >
-            <span class="mr-4">≈</span>
-            <span>{{ round.prediction100 }} {{ round.matchingToken.symbol }}</span>
+            <span class="text-grey-300 italic">
+              10 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈ {{ round.prediction10 }}
+              {{ round.matchingToken.symbol }}, 100 {{ roundDetails[0] ? roundDetails[0].donationToken.symbol : '' }} ≈
+              {{ round.prediction100 }} {{ round.matchingToken.symbol }}
+            </span>
           </div>
         </div>
       </article>
