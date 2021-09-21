@@ -16,19 +16,13 @@ The current version only allows the dGrants (decentralized grants) core team to 
 
 ## Grant Owners, Funders and Contributors 
 
-Grant owners can be one or multiple people, but generally is the team building and coordinating a specific project that the web3.0 community finds meaningful.
-
-> If you're a grant owner, head to our [Grant Owner's Guide](/docs/grant-owners-guide/create-edit-grants) for tutorials and more. 
+Grant owners can be one or multiple people, but generally is the team building and coordinating a specific project that the web3.0 community finds meaningful. If you're a grant owner, head to our [Grant Owner's Guide](/docs/grant-owners-guide/create-edit-grants) for tutorials and more. 
 
 Funding for a grant, and respectively, for grant owners, can come from two sources: contributors and matching pool funders. 
 
-Contributors are community patrons who want to support and fund a particular project submitted by a owner. It usually means they have used the project in their own work, were an open source contributor to it, or simply are interested in the mission and premise of a project and wish to see it succeed.
+Contributors are community patrons who want to support and fund a particular project submitted by a owner. It usually means they have used the project in their own work, were an open source contributor to it, or simply are interested in the mission and premise of a project and wish to see it succeed. If you're a contributor, head to our [Contributor's Guide]((/docs/contributors-guide/add-to-cart-checkout)) for tutorials and more. 
 
-> If you're a contributor, head to our [Contributor's Guide]((/docs/contributors-guide/add-to-cart-checkout)) for tutorials and more. 
-
-Matching pool funders are donors who provide funds to a grant round. These funds are distributed to grants within a grant round based on the quadratic matching formula.
-
-> If you're a matching pool funder, head to our [Funder's Guide](/docs/funders-guide/fund-grant-round) for tutorials and more. 
+Matching pool funders are donors who provide funds to a grant round. These funds are distributed to grants within a grant round based on the quadratic matching formula. If you're a matching pool funder, head to our [Funder's Guide](/docs/funders-guide/fund-grant-round) for tutorials and more. 
 
 ## Cart 
 
