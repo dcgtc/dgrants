@@ -86,6 +86,8 @@
                     type="number"
                     width="w-1/2"
                     customcss="border-r-0"
+                    :rules="isValidAmount"
+                    errorMsg="Invalid amount"
                   />
 
                   <BaseSelect
@@ -162,8 +164,8 @@
           <button
             @click="executeCheckout"
             class="btn"
-            :class="{ disabled: !isCorrectNetwork }"
-            :disabled="!isCorrectNetwork"
+            :class="{ disabled: !isCorrectNetwork || !isCheckoutValid }"
+            :disabled="!isCorrectNetwork || !isCheckoutValid"
           >
             checkout
           </button>
@@ -203,7 +205,7 @@ import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { BigNumber } from 'src/utils/ethers';
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
-import { pushRoute, formatNumber } from 'src/utils/utils';
+import { pushRoute, formatNumber, isValidAmount } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 function useCart() {
@@ -241,6 +243,11 @@ function useCart() {
     },
     { immediate: true }
   );
+
+  // ensures that checkout amounts are valid
+  const isCheckoutValid = computed(() => {
+    return lsCart.value.filter((cartItem) => !isValidAmount(cartItem.contributionAmount)).length == 0;
+  });
 
   // force cart update on metadata resolution
   const grantMetadata = computed(() => {
@@ -300,6 +307,8 @@ function useCart() {
     status,
     txHash,
     updateCart,
+    isValidAmount,
+    isCheckoutValid,
   };
 }
 
