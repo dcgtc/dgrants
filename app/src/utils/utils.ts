@@ -104,6 +104,11 @@ export async function isValidLogo(file: File | undefined) {
   return dimensions.width === 1920 && dimensions.height === 1080;
 }
 
+// Returns true if the provided amount is valid
+export function isValidAmount(val: number | undefined) {
+  return val && Number(val) && Number(val) > 0;
+}
+
 // --- Tokens ---
 // Check for approved allowance
 export async function checkAllowance(token: Contract, ownerAddress: string | undefined, spenderAddress: string) {
