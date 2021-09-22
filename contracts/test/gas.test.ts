@@ -26,9 +26,9 @@ describe('dGrants gas tests', () => {
   let round: GrantRound;
   let manager: GrantRoundManager;
 
-  const startTime = Math.floor(new Date().getTime() / 1000) + 100;
-  const endTime = startTime + 86400; // one day later
-  const deadline = endTime;
+  let startTime: number;
+  let endTime: number;
+  let deadline: number;
 
   // --- Fixture ---
   async function setup() {
@@ -50,6 +50,9 @@ describe('dGrants gas tests', () => {
     );
 
     // Create Grant Round
+    startTime = (await ethers.provider.getBlock('latest')).timestamp + 100; // use block timestamp over `new Date()` because prior tests may have fast-forwarded time
+    endTime = startTime + 86400; // one day later
+    deadline = endTime;
     const tx = await manager.createGrantRound(addr1, addr1, tokens.dai.address, startTime, endTime, metaPtr1);
     const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
     const log = manager.interface.parseLog(receipt.logs[0]);

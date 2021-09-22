@@ -62,7 +62,7 @@ const config: HardhatUserConfig = {
       initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
       forking: {
         url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`,
-        blockNumber: 13186295,
+        blockNumber: 13186295, // mainnet block, but works fine for Polygon too
       },
       accounts: {
         mnemonic,

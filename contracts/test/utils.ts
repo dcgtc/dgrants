@@ -1,18 +1,16 @@
 /**
  * @notice This file contains test utilities and helper methods
  */
-// --- Internal imports ---
-import { Grant } from '@dgrants/types';
-import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
-
-// --- External imports ---
 import { ethers, network } from 'hardhat';
+import hardhatConfig from '../hardhat.config';
+import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/dist/src/signer-with-address';
 import { expect } from 'chai';
 import { BigNumber, BigNumberish, utils } from 'ethers';
 import { Log } from '@ethersproject/providers';
 import { abi as UNISWAP_POOL_ABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
 import { FeeAmount, Pool, Route, computePoolAddress, encodeRouteToPath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
+import { Grant } from '@dgrants/types';
 
 const { defaultAbiCoder, hexStripZeros, hexZeroPad, keccak256 } = utils;
 
@@ -29,6 +27,14 @@ export const tokens = {
   gtc: { address: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', name: "Gitcoin", symbol: "GTC", decimals: 18, mappingSlot: '0x5' }, // prettier-ignore
   usdc: { address: '0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48', name: "USD Coin", symbol: "USDC", decimals: 6, mappingSlot: '0x9' }, // prettier-ignore
   uni: { address: '0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984', name: "Uniswap", symbol: "UNI", decimals: 18, mappingSlot: '0x4' }, // prettier-ignore
+};
+
+export const tokensPolygon = {
+  dai: { address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', decimals: 18, mappingSlot: '0x0' },
+  usdc: { address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', decimals: 6, mappingSlot: '0x0' },
+  usdt: { address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F', decimals: 6, mappingSlot: '0x0' },
+  wbtc: { address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6', decimals: 8, mappingSlot: '0x0' },
+  weth: { address: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', decimals: 18, mappingSlot: '0x0' },
 };
 
 // This type is our list of tokens supported in the "Token Helpers" section
@@ -60,14 +66,37 @@ export async function setNextBlockTimestamp(timestamp: BigNumberish): Promise<nu
 // --- Uniswap Helpers ---
 // Loops through an array of logs to find a Uniswap V3 `Swap` log, and returns the swap's amountOut
 export function getSwapAmountOut(logs: Log[]): BigNumber {
-  const swapTopic = '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'; // topic for Swap event
+  const swapTopic = isPolygon()
+    ? '0xd78ad95fa46c994b6551d0da85fc275fe613ce37657fb8d5e3d130840159d822'
+    : '0xc42079f94a6350d7e6235f29174924f928cc2ac818eb64fed8004e115fbcca67'; // topic for Swap event
+
   const swapLogs = logs.filter((log) => log.topics[0] === swapTopic);
   const swapLog = swapLogs[swapLogs.length - 1]; // always use the last Swap log to get final output amount
-  const swapEvent = 'event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)'; // prettier-ignore
+
+  const swapEvent = isPolygon()
+    ? 'event Swap(address indexed sender, uint amount0In, uint amount1In, uint amount0Out, uint amount1Out, address indexed to)'
+    : 'event Swap(address indexed sender, address indexed recipient, int256 amount0, int256 amount1, uint160 sqrtPriceX96, uint128 liquidity, int24 tick)';
+
   const iface = new ethers.utils.Interface([swapEvent]);
   const event = iface.parseLog(swapLog);
-  const amountOut = event.args.amount1 as BigNumber; // this is often negative
+  const amountOut = isPolygon()
+    ? event.args.amount0Out.gt(event.args.amount1Out)
+      ? event.args.amount0Out
+      : event.args.amount1Out
+    : (event.args.amount1 as BigNumber); // this is often negative
+
   return amountOut.abs();
+}
+
+export async function encodeRoutePolygon(tokens: SupportedToken[]): Promise<string[]> {
+  // This method returns a swap route for SushiSwap on polygon
+  if (tokens[tokens.length - 1] !== 'dai') throw new Error('Currently DAI must be the last token of the swap');
+
+  const path = tokens.map((token) => {
+    const symbol = token === 'eth' ? 'weth' : token;
+    return tokensPolygon[symbol as keyof typeof tokensPolygon].address;
+  });
+  return path;
 }
 
 export async function encodeRoute(tokens: SupportedToken[]): Promise<string> {
@@ -119,7 +148,8 @@ async function getPoolInstance(token0: SupportedToken, token1: SupportedToken): 
 // Gets token balance
 export async function balanceOf(tokenSymbol: SupportedToken, address: string): Promise<BigNumber> {
   if (tokenSymbol === 'eth') return ethers.provider.getBalance(address);
-  const tokenAddress = tokens[tokenSymbol].address;
+  const tokenMapping = getTokensMapping();
+  const tokenAddress = tokenMapping[tokenSymbol as keyof typeof tokenMapping].address;
   const abi = ['function balanceOf(address) external view returns (uint256)'];
   const contract = new ethers.Contract(tokenAddress, abi, ethers.provider);
   return contract.balanceOf(address);
@@ -128,7 +158,8 @@ export async function balanceOf(tokenSymbol: SupportedToken, address: string): P
 // Sets token allowance
 export async function approve(tokenSymbol: SupportedToken, holder: SignerWithAddress, spender: string): Promise<void> {
   if (tokenSymbol === 'eth') return;
-  const tokenAddress = tokens[tokenSymbol].address;
+  const tokenMapping = getTokensMapping();
+  const tokenAddress = tokenMapping[tokenSymbol as keyof typeof tokenMapping].address;
   const abi = ['function approve(address,uint256) external returns (bool)'];
   const contract = new ethers.Contract(tokenAddress, abi, holder);
   await contract.approve(spender, ethers.constants.MaxUint256);
@@ -143,8 +174,13 @@ export async function setBalance(tokenSymbol: SupportedToken, to: string, amount
   }
 
   // Otherwise, compute the storage slot containing this users balance and use it to set the balance
-  const slot = getBalanceOfSlotSolidity(tokens[tokenSymbol].mappingSlot, to);
-  await network.provider.send('hardhat_setStorageAt', [tokens[tokenSymbol].address, slot, to32ByteHex(amount)]);
+  const tokenMapping = getTokensMapping();
+  const slot = getBalanceOfSlotSolidity(tokenMapping[tokenSymbol as keyof typeof tokenMapping].mappingSlot, to);
+  await network.provider.send('hardhat_setStorageAt', [
+    tokenMapping[tokenSymbol as keyof typeof tokenMapping].address,
+    slot,
+    to32ByteHex(amount),
+  ]);
 }
 
 // --- Private (not exported) helpers ---
@@ -160,4 +196,14 @@ function getBalanceOfSlotSolidity(mappingSlot: string, address: string) {
 // Converts a number to a 32 byte hex string
 function to32ByteHex(x: BigNumberish) {
   return hexZeroPad(BigNumber.from(x).toHexString(), 32);
+}
+
+// Returns true if we're testing against a forked Polygon, false otherwise
+function isPolygon() {
+  return hardhatConfig.networks?.hardhat?.forking?.url.includes('polygon');
+}
+
+// Returns the tokens mapping that should be used based on the network we're testing against
+function getTokensMapping() {
+  return isPolygon() ? tokensPolygon : tokens;
 }
