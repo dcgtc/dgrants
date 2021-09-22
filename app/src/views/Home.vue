@@ -35,11 +35,12 @@
 
   <LoadingSpinner v-else />
 
-  <template v-if="grants && grantMetadata">
-    <!-- General filters -->
-    <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" title="grants:" />
-    <GrantList :grants="grants" :grantMetadata="grantMetadata" />
-  </template>
+  <GrantListWithFilter
+    v-if="grants && grantMetadata"
+    :button="filterNavButton"
+    :grants="grants"
+    :grantMetadata="grantMetadata"
+  />
 </template>
 
 <script lang="ts">
@@ -55,7 +56,7 @@ import useDataStore from 'src/store/data';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
-import GrantList from 'src/components/GrantList.vue';
+import GrantListWithFilter from 'src/components/GrantListWithFilter.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 
 // sort by startTime
@@ -67,36 +68,6 @@ const sortByStartTime = (a: GrantRound, b: GrantRound) =>
     : 1;
 
 function useGrantRegistryList() {
-  // --- Grants filters ---
-  // TODO add info to show the right filters
-  const grantRegistryListNav = <FilterNavItem[]>[
-    {
-      label: 'Sort',
-      tag: 'newest',
-      menu: [
-        // TODO implement the behaviours here when grants have a date
-        {
-          label: 'newest',
-          action: () => {
-            console.log('newest');
-          },
-        },
-        {
-          label: 'oldest',
-          action: () => {
-            console.log('oldest');
-          },
-        },
-        {
-          label: 'shuffle',
-          action: () => {
-            console.log('shuffle');
-          },
-        },
-      ],
-    },
-  ];
-
   const filterNavButton = <FilterNavButton>{
     label: 'create grant',
     action: () => pushRoute({ name: 'dgrants-new' }),
@@ -104,7 +75,6 @@ function useGrantRegistryList() {
 
   return {
     filterNavButton,
-    grantRegistryListNav,
   };
 }
 
@@ -114,7 +84,7 @@ export default defineComponent({
     BaseHeader,
     BaseFilterNav,
     GrantRoundCard,
-    GrantList,
+    GrantListWithFilter,
     LoadingSpinner,
   },
   setup() {
