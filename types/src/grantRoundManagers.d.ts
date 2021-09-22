@@ -14,3 +14,10 @@ export interface Donation {
   ratio: BigNumberish;
   rounds: string[];
 }
+
+// SwapSummary struct from GrantRoundManagerUniV2
+export interface SwapSummaryUniV2 {
+  amountIn: BigNumberish;
+  amountOutMin: BigNumberish;
+  path: string[]; // swap path as array of token addresses to pass through
+}
