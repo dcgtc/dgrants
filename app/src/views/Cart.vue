@@ -130,10 +130,12 @@
       </div>
 
       <div class="py-8 border-b border-grey-100" :class="{ hidden: !showEquivalentContributionAmount }">
-        <div class="flex gap-x-4 justify-end">
+        <div v-if="equivalentContributionAmount" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
         </div>
+
+        <LoadingSpinner v-else />
       </div>
 
       <div class="py-8 border-b border-grey-100">
