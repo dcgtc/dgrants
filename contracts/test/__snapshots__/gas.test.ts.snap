@@ -12,14 +12,14 @@ exports[`dGrants gas tests GrantRegistry updateGrantPayee 1`] = `41527`;
 
 exports[`dGrants gas tests GrantRoundManager createGrantRound 1`] = `968360`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token DAI, output token DAI 1`] = `241373`;
+exports[`dGrants gas tests GrantRoundManager five donations input token DAI, output token DAI 1`] = `224273`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token ETH, output token DAI 1`] = `337239`;
+exports[`dGrants gas tests GrantRoundManager five donations input token ETH, output token DAI 1`] = `321121`;
 
-exports[`dGrants gas tests GrantRoundManager five donations input token GTC, output token DAI 1`] = `404190`;
+exports[`dGrants gas tests GrantRoundManager five donations input token GTC, output token DAI 1`] = `387120`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token DAI, output token DAI 1`] = `104573`;
+exports[`dGrants gas tests GrantRoundManager one donation input token DAI, output token DAI 1`] = `90893`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token ETH, output token DAI 1`] = `197422`;
+exports[`dGrants gas tests GrantRoundManager one donation input token ETH, output token DAI 1`] = `184528`;
 
-exports[`dGrants gas tests GrantRoundManager one donation input token GTC, output token DAI 1`] = `250978`;
+exports[`dGrants gas tests GrantRoundManager one donation input token GTC, output token DAI 1`] = `237322`;
