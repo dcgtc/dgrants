@@ -19,6 +19,7 @@ import { bigNumberComparator } from 'src/utils/sorting';
 
 const defaultSortingMode = 'descending';
 const grantsSortingMode = ref<SortingMode>(defaultSortingMode);
+const shuffleNonce = ref(1);
 
 const filterNavTag = computed(() => {
   switch (grantsSortingMode.value) {
@@ -59,6 +60,7 @@ const grantRegistryListNav = computed(
           {
             label: 'shuffle',
             action: () => {
+              shuffleNonce.value++;
               grantsSortingMode.value = 'random';
             },
           },
@@ -78,9 +80,11 @@ export default defineComponent({
   },
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    const sortedGrants = computed(() =>
-      [...props.grants].sort((a, b) => bigNumberComparator(a.id, b.id, grantsSortingMode.value))
-    );
+    const sortedGrants = computed(() => {
+      // Force to recalculate when clicking "Shuffle" consecutively.
+      shuffleNonce.value;
+      return [...props.grants].sort((a, b) => bigNumberComparator(a.id, b.id, grantsSortingMode.value));
+    });
 
     onUnmounted(() => {
       grantsSortingMode.value = defaultSortingMode;
