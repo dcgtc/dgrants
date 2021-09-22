@@ -44,34 +44,18 @@ const SWAP_PATHS = {
     // DAI "swap path" is just its token address for our router
     '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa': '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa'.toLowerCase(),
   },
-  [SupportedChainId.OPTIMISM]: {
-    // ETH to DAI through the 0.3% pool
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
-    // USDC to DAI through the 0.3% pool
-    '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
-    // DAI "swap path" is just its token address for our router
-    '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(),
-  },
-  [SupportedChainId.OPTIMISTIC_KOVAN]: {
-    // ETH to DAI through the 0.3% pool
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x4200000000000000000000000000000000000006000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
-    // USDC to DAI through the 0.3% pool
-    '0x7F5c764cBc14f9669B88837ca1490cCa17c31607': '0x7f5c764cbc14f9669b88837ca1490cca17c31607000bb8da10009cbd5d07dd0cecc66161fc93d7c9000da1', // prettier-ignore
-    // DAI "swap path" is just its token address for our router
-    '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1': '0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'.toLowerCase(),
-  },
-  // *** Arbitrum paths are currently not handled as there is no bridged DAI ***
-  // We use the mainnet paths here just to avoid lint errors
-  [SupportedChainId.ARBITRUM_ONE]: {
-    // ETH to USDC through the 0.3% pool
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1000bb8ff970a61a04b1ca14834a43f5de4533ebddb5cc8', // prettier-ignore
-    // USDC "swap path" is just its token address for our router (no DAI on Arbitrum yet, so using USDC instead)
-    '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8': '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8'.toLowerCase(),
-  },
-  [SupportedChainId.ARBITRUM_RINKEBY]: {
-    // Seems Uniswap V3 has no liquidity here (this swap path is not correct)
-    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1000bb86b175474e89094c44da98b954eedeac495271d0f', // prettier-ignore
-    // TODO choose donation token since there's no DAI -- USDC?
+  [SupportedChainId.POLYGON]: {
+    // Unlike the Uniswap V3 swap paths, these Uniswap V2 (SushiSwap) paths are just arrays of token addresses
+    // ETH to DAI through the ETH/DAI pool
+    '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': ['0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'], // prettier-ignore
+    // USDC to DAI through the USDC/DAI pool
+    '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174': ['0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174', '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'], // prettier-ignore
+    // USDT to DAI through the USDT/ETH and ETH/DAI pools
+    '0xc2132D05D31c914a87C6611C10748AEb04B58e8F': ['0xc2132D05D31c914a87C6611C10748AEb04B58e8F','0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'], // prettier-ignore
+    // WBTC to DAI through the WBTC/ETH and ETH/DAI pools
+    '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6': ['0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6','0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270', '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'], // prettier-ignore
+    // DAI "swap path" is just its token address based on GrantRoundManager contract config
+    '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063': ['0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063'],
   },
 };
 
