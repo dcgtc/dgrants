@@ -65,10 +65,14 @@
     "postinstall": "yarn typechain",
     "precommit": "lint-staged",
     "prettier": "prettier --write \"**/*.{js,json,md,sol,ts}\"",
-    "test": "hardhat test",
+    "test:mainnet": "yarn set-fork:mainnet && hardhat test test/*.test.ts",
+    "test:polygon": "yarn set-fork:polygon && hardhat test test/polygon/*.test.ts; yarn set-fork:mainnet",
+    "test": "yarn test:polygon && yarn test:mainnet",
     "typechain": "hardhat typechain",
     "app:node": "ALCHEMY_API_KEY=$(grep ALCHEMY_API_KEY .env | cut -d '=' -f2) && yarn hardhat node --fork \"https://eth-mainnet.alchemyapi.io/v2/$ALCHEMY_API_KEY\"",
-    "app:setup": "hardhat run scripts/app.ts --network localhost"
+    "app:setup": "hardhat run scripts/app.ts --network localhost",
+    "set-fork:polygon": "sed -i -e 's/eth-mainnet.alchemyapi.io/polygon-mainnet.g.alchemy.com/g' ./hardhat.config.ts && rm -f ./hardhat.config.ts-e",
+    "set-fork:mainnet": "sed -i -e 's/polygon-mainnet.g.alchemy.com/eth-mainnet.alchemyapi.io/g' ./hardhat.config.ts && rm -f ./hardhat.config.ts-e"
   },
   "volta": {
     "extends": "../package.json"
