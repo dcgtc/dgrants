@@ -1,9 +1,8 @@
 <template>
-  <template v-if="hasLoadedHeader">
+  <template v-if="hasLoadedHeader && hasLoadedGrants">
     <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
     <!-- General filters -->
-    <BaseFilterNav :items="grantRegistryListNav" :button="filterNavButton" />
-    <GrantList v-if="hasLoadedGrants" :grants="grants" :grantMetadata="grantMetadata" />
+    <GrantListWithFilter :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
   <LoadingSpinner v-else />
@@ -14,8 +13,7 @@ import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 // --- App Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
-import BaseFilterNav from 'src/components/BaseFilterNav.vue';
-import GrantList from 'src/components/GrantList.vue';
+import GrantListWithFilter from 'src/components/GrantListWithFilter.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 
 // --- Store ---
@@ -24,7 +22,7 @@ import useDataStore from 'src/store/data';
 import { getAddress } from 'src/utils/ethers';
 import { pushRoute } from 'src/utils/utils';
 // --- Types ---
-import { Breadcrumb, FilterNavButton, FilterNavItem, Grant, GrantRound } from '@dgrants/types';
+import { Breadcrumb, FilterNavButton, Grant, GrantRound } from '@dgrants/types';
 
 function useGrantRoundDetail() {
   const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grants: allGrants, grantMetadata } = useDataStore();
@@ -76,36 +74,6 @@ function useGrantRoundDetail() {
   const hasLoadedHeader = computed(() => grantRound.value?.address && grantRoundMetadata.value?.name);
   const hasLoadedGrants = computed(() => grants.value && grantMetadata);
 
-  // --- Grants filters ---
-  // TODO add info to show the right filters
-  const grantRegistryListNav = <FilterNavItem[]>[
-    {
-      label: 'Sort',
-      tag: 'newest',
-      menu: [
-        // TODO implement the behaviours here when grants have a date
-        {
-          label: 'newest',
-          action: () => {
-            console.log('newest');
-          },
-        },
-        {
-          label: 'oldest',
-          action: () => {
-            console.log('oldest');
-          },
-        },
-        {
-          label: 'shuffle',
-          action: () => {
-            console.log('shuffle');
-          },
-        },
-      ],
-    },
-  ];
-
   const filterNavButton = <FilterNavButton>{
     label: 'create grant',
     action: () => pushRoute({ name: 'dgrants-new' }),
@@ -114,7 +82,6 @@ function useGrantRoundDetail() {
   return {
     breadcrumb,
     filterNavButton,
-    grantRegistryListNav,
     title,
     grants,
     grantMetadata,
@@ -126,7 +93,7 @@ function useGrantRoundDetail() {
 
 export default defineComponent({
   name: 'GrantRoundGrants',
-  components: { BaseHeader, BaseFilterNav, GrantList, LoadingSpinner },
+  components: { BaseHeader, GrantListWithFilter, LoadingSpinner },
   setup() {
     return {
       ...useGrantRoundDetail(),
