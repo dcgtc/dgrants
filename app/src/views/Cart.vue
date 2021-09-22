@@ -133,7 +133,7 @@
         </div>
       </div>
 
-      <div class="py-8 border-b border-grey-100" :class="{ hidden: !showEquivalentContributionAmount }">
+      <div class="py-8 border-b border-grey-100" :class="{ hidden: hideEquivalentContributionAmount }">
         <div v-if="equivalentContributionAmount" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
@@ -227,7 +227,7 @@ function useCart() {
   const txHash = ref<string>();
   const status = ref<'not started' | 'pending' | 'success' | 'failure'>('pending');
 
-  const showEquivalentContributionAmount = ref<boolean>(false);
+  const hideEquivalentContributionAmount = ref<boolean>(true);
 
   const equivalentContributionAmount = computed(() => {
     let sum = 0;
@@ -239,11 +239,8 @@ function useCart() {
       isStableCoin += exchangeRate == 1 ? 1 : 0;
     }
     // hide when cart is all denominated in a single stablecoin
-    if (sum == 0 || (isStableCoin == 1 && isStableCoin === Object.keys(cartSummary.value).length)) {
-      showEquivalentContributionAmount.value = false;
-    } else {
-      showEquivalentContributionAmount.value = true;
-    }
+    hideEquivalentContributionAmount.value =
+      sum == 0 || (isStableCoin == 1 && isStableCoin === Object.keys(cartSummary.value).length);
     return sum;
   });
 
@@ -256,7 +253,7 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, showEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart }; // prettier-ignore
+  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, hideEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart }; // prettier-ignore
 }
 
 export default defineComponent({
