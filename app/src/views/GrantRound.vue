@@ -140,7 +140,7 @@
 
   <!-- No grant round selected -->
   <div v-else-if="grantRound.error">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant round selected</h2>
+    <h2 class="mt-6">No grant round selected</h2>
     <span>{{ grantRound.error }}</span>
   </div>
 

@@ -36,16 +36,18 @@
           v-for="link in navigation"
           :key="link.name"
           :to="{ name: link.name }"
-          active-class="font-bold"
+          active-class="font-medium text-grey-500"
           exact
-          class="font-medium text-gray-500 hover:text-gray-900"
+          class="hover:text-grey-500"
         >
           {{ link.label }}
         </router-link>
-        <div class="border-b border-grey-400 my-4"></div>
-        <button @click="emitEvent('toggleAbout')" class="font-medium text-gray-500 hover:text-gray-900 uppercase">
+
+        <div class="border-b border-grey-400"></div>
+
+        <div @click="emitEvent('toggleAbout')" class="text-grey-400 hover:text-grey-500 uppercase cursor-pointer">
           About
-        </button>
+        </div>
       </div>
     </div>
 

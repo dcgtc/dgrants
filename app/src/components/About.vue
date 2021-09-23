@@ -52,12 +52,18 @@
         <!-- license & support link -->
         <div class="mt-8 mb-8 block md:flex items-center gap-x-8 space-y-2 md:space-y-0">
           <div>
-            <a href="https://github.com/dcgtc/dgrants/blob/main/LICENSE" target="_blank" rel="noreferrer noopener"
+            <a
+              class="link"
+              href="https://github.com/dcgtc/dgrants/blob/main/LICENSE"
+              target="_blank"
+              rel="noreferrer noopener"
               >Licensed under AGPL-3.0 License</a
             >
           </div>
           <div class="ml-auto">
-            <a href="https://support.gitcoin.co" target="_blank" rel="noreferrer noopener">Help & Support</a>
+            <a class="link" href="https://support.gitcoin.co" target="_blank" rel="noreferrer noopener"
+              >Help & Support</a
+            >
           </div>
         </div>
       </div>
