@@ -159,7 +159,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRegistry: '',
     grantRoundManager: '',
     multicall: '',
-    rpcUrl: `https://arb-mainnet.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io',
