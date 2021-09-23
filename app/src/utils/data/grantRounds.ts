@@ -255,7 +255,6 @@ export async function getGrantRoundGrantData(
       // unpack current ls state
       let ls_grantDonations: Contribution[] = roundGrantData?.contributions || [];
       let ls_grantPredictions = roundGrantData?.predictions || {};
-
       // every block
       if (
         forceRefresh ||
@@ -272,7 +271,6 @@ export async function getGrantRoundGrantData(
           // only include transactions from this grantRound which havent been ignored
           return inRound;
         });
-
         // re-run predict if there are any new contributions/grants
         if (ls_grantDonations.length > oldDonationCount || grantIds.length > Object.keys(ls_grantPredictions).length) {
           // scores are to be presented in an array
@@ -282,12 +280,13 @@ export async function getGrantRoundGrantData(
               score: trustBonus[address],
             };
           });
+
           // get all predictions for each grant in this round
           ls_grantPredictions = (
             await Promise.all(
               grantIds.map((grantId: string) =>
                 clr.predict({
-                  grantId: grantId,
+                  grantId: BigNumber.from(grantId).toString(),
                   predictionPoints: [0, 1, 10, 100, 1000, 10000],
                   trustBonusScores: trustBonusScores,
                   grantRoundContributions: {
