@@ -1,8 +1,13 @@
 <template>
-  <template v-if="hasLoadedHeader && hasLoadedGrants">
+  <template v-if="hasLoadedHeader">
     <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
     <!-- General filters -->
-    <GrantListWithFilter :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
+    <GrantListWithFilter
+      v-if="hasLoadedGrants"
+      :button="filterNavButton"
+      :grants="grants"
+      :grantMetadata="grantMetadata"
+    />
   </template>
 
   <LoadingSpinner v-else />
