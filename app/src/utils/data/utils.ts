@@ -25,7 +25,7 @@ export async function syncStorage(
   // - `callback` is passed a `localStorageData` object (the current state) and a `save` fn
   // - `callback` should return an Object which syncStorage will return as response
   // - `callback` may call `save` and pass in an alternative object to save into localStorage
-  const data = await callback(localStorageData, (saveData?) => ((shouldSave = !getStorage(key)), (altSave = saveData)));
+  const data = await callback(localStorageData, (saveData?) => ((shouldSave = true), (altSave = saveData)));
   // save new state
   if (shouldSave) {
     // merge data with meta and store into storage mechanism (localStorage)
