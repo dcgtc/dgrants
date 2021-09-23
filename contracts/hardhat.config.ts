@@ -20,6 +20,7 @@ const chainIds = {
   hardhat: 31337,
   kovan: 42,
   mainnet: 1,
+  polygon: 137,
   rinkeby: 4,
   ropsten: 3,
 };
@@ -82,6 +83,11 @@ const config: HardhatUserConfig = {
       chainId: chainIds.hardhat,
     },
     rinkeby: createTestnetConfig('rinkeby'),
+    polygon: {
+      accounts: [process.env.DEPLOY_PRIVATE_KEY as string],
+      chainId: chainIds.polygon,
+      url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+    },
   },
   paths: {
     artifacts: './artifacts',
