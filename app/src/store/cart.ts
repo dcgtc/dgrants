@@ -340,7 +340,8 @@ export default function useCartStore() {
   const cartSummaryString = computed(() => {
     // returns a string summarizing the `cartSummary`, such as `12 DAI + 4 GTC + 10 USDC`
     const summary = Object.keys(cartSummary.value).reduce((acc, tokenAddr) => {
-      return acc + `${cartSummary.value[tokenAddr]} ${SUPPORTED_TOKENS_MAPPING[tokenAddr].symbol} + `;
+      const amount = cartSummary.value[tokenAddr] > 0 ? cartSummary.value[tokenAddr] : 0;
+      return acc + `${amount} ${SUPPORTED_TOKENS_MAPPING[tokenAddr].symbol} + `;
     }, '');
     return summary.slice(0, -3); // trim the trailing ` + ` from the string
   });

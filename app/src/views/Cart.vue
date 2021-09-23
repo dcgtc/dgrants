@@ -109,8 +109,10 @@
                   <!-- match estimates -->
                   <div v-if="clrPredictions[item.grantId]">
                     <span v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
-                      <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
+                      <template v-if="clr.matching >= 0">
+                        <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
+                        <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
+                      </template>
                     </span>
                     <span class="inline-block">estimated matching</span>
                   </div>
@@ -141,14 +143,14 @@
       </div>
 
       <div class="py-8 border-b border-grey-100" :class="{ hidden: hideEquivalentContributionAmount }">
-        <div v-if="equivalentContributionAmount" class="flex gap-x-4 justify-end">
+        <div v-if="equivalentContributionAmount && equivalentContributionAmount >= 0" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
         </div>
         <LoadingSpinner v-else />
       </div>
 
-      <div class="py-8 border-b border-grey-100">
+      <div class="py-8 border-b border-grey-100" v-if="equivalentContributionAmount && equivalentContributionAmount >= 0" >
         <div v-if="Object.keys(clrPredictionsByToken).length" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Estimated matching value:</span>
           <span v-for="(symbol, index) in Object.keys(clrPredictionsByToken)" :key="index">
@@ -264,6 +266,7 @@ function useCart() {
   const equivalentContributionAmount = computed(() => {
     let sum = 0;
     let isStableCoin = 0;
+
     for (const [tokenAddress, amount] of Object.entries(cartSummary.value)) {
       if (!amount) continue;
       const exchangeRate = quotes.value[tokenAddress] ?? 0;
