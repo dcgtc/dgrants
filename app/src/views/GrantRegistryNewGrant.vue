@@ -121,9 +121,17 @@
         </template>
       </InputRow>
 
+      <!-- Uploaded Image logo -->
+      <InputRow v-if="form.logoURI">
+        <template v-slot:label>Logo:</template>
+        <template v-slot:input>
+          <BaseImageRow v-model="form.logoURI" id="grant-logo-uri" :URI="form.logoURI" />
+        </template>
+      </InputRow>
+
       <!-- Grant logo -->
       <InputRow>
-        <template v-slot:label>Logo:</template>
+        <template v-slot:label>Upload Logo:</template>
         <template v-slot:input>
           <BaseImageUpload
             v-model="form.logo"
@@ -159,6 +167,7 @@ import { computed, defineComponent, ref } from 'vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import InputRow from 'src/components/InputRow.vue';
 import BaseInput from 'src/components/BaseInput.vue';
+import BaseImageRow from 'src/components/BaseImageRow.vue';
 import BaseImageUpload from 'src/components/BaseImageUpload.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
@@ -187,6 +196,7 @@ function useNewGrant() {
     github: string;
     twitter: string;
     logo: File | undefined;
+    logoURI: string;
   }>({
     owner: '',
     payee: '',
@@ -196,6 +206,7 @@ function useNewGrant() {
     github: '',
     twitter: '',
     logo: undefined,
+    logoURI: '',
   });
 
   const isLogoValid = ref(true);
@@ -215,6 +226,9 @@ function useNewGrant() {
   async function updateLogo(logo: File | undefined) {
     isLogoValid.value = await isValidLogo(logo);
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
+    form.value.logoURI = logo
+      ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
+      : '';
   }
 
   /**
@@ -222,8 +236,7 @@ function useNewGrant() {
    */
   async function createGrant() {
     // Send transaction
-    const { owner, payee, name, description, website, github, twitter, logo } = form.value;
-    const logoURI = logo ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() })) : '';
+    const { owner, payee, name, description, website, github, twitter, logoURI } = form.value;
     const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
     const properties = { websiteURI: website, githubURI: github, twitterURI };
     if (!signer.value) throw new Error('Please connect a wallet');
@@ -271,6 +284,7 @@ export default defineComponent({
   components: {
     BaseHeader,
     BaseInput,
+    BaseImageRow,
     BaseImageUpload,
     BaseTextarea,
     InputRow,
