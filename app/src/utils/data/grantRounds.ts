@@ -5,14 +5,14 @@ import {
   GrantRoundCLR,
   GrantsRoundDetails,
   GrantRoundMetadataResolution,
+  GrantPrediction,
 } from '@dgrants/types';
 import { LocalStorageData } from 'src/types';
-import { TokenInfo } from '@uniswap/token-lists';
 // --- Methods and Data ---
 import useWalletStore from 'src/store/wallet';
-import { Contract, Event } from 'ethers';
+import { BigNumber, Contract, Event } from 'ethers';
 import { formatUnits } from 'ethers/lib/utils';
-import { formatNumber } from '../utils';
+import { formatNumber, callMulticallContract } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
@@ -36,7 +36,6 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
   return await syncStorage(
     allGrantRoundsKey,
     {
-      ts: Date.now() / 1000,
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
@@ -44,12 +43,12 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
       // use the ls_blockNumber to decide if we need to update the roundAddresses
       const ls_blockNumber = localStorageData?.blockNumber || START_BLOCK;
       // only update roundAddress if new ones are added...
-      let roundAddresses = localStorageData?.data?.roundAddresses || [];
+      const ls_roundAddresses = localStorageData?.data?.roundAddresses || [];
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
         const fromBlock = ls_blockNumber + 1 || START_BLOCK;
-        const roundList =
+        const newRounds =
           (
             await grantRoundManager.value?.queryFilter(
               grantRoundManager.value?.filters.GrantRoundCreated(null),
@@ -57,21 +56,22 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
               blockNumber
             )
           ).map((e: Event) => e.args?.grantRound) || [];
+
         // add new rounds
-        roundAddresses = [...roundAddresses, ...roundList];
+        ls_roundAddresses.push(...newRounds);
       }
 
       // hydrate/format roundAddresses for use
-      const ls_roundAddresses = {
-        roundAddresses: roundAddresses,
+      const roundAddresses = {
+        roundAddresses: ls_roundAddresses,
       };
 
       // conditionally save the new roundAddresses
-      if (roundAddresses.length && save) {
+      if (ls_roundAddresses.length && save) {
         save();
       }
 
-      return ls_roundAddresses;
+      return roundAddresses;
     }
   );
 }
@@ -87,120 +87,136 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
   return await syncStorage(
     grantRoundKeyPrefix + grantRoundAddress,
     {
-      ts: Date.now() / 1000,
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
-      const { provider, multicall } = useWalletStore();
-      const data = localStorageData?.data || {};
-
-      // read from registry on first load and every 30 secs after (we need to pick up any changes)
-      if (
-        forceRefresh ||
-        !localStorageData ||
-        (multicall.value && localStorageData && (localStorageData.ts || 0) < Date.now() / 1000 - 30)
-      ) {
-        // open the rounds contract
-        const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
-        // collect the donationToken before promise.all'ing everything
-        const donationTokenAddress = data?.donationToken?.address || (await roundContract.donationToken());
-        const matchingTokenAddress = data?.matchingToken?.address || (await roundContract.matchingToken());
-        // use matchingTokenContract to get balance
-        const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
-
+      const { provider } = useWalletStore();
+      // use the ls_blockNumber to decide if we need to update the rounds data
+      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      // current state
+      let {
+        startTime,
+        endTime,
+        metadataAdmin,
+        payoutAdmin,
+        registryAddress,
+        metaPtr,
+        hasPaidOut,
+        donationToken,
+        matchingToken,
+        funds,
+        donationTokenAddress,
+      } = localStorageData?.data?.grantRound || {};
+      // open the rounds contract
+      const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
+      // collect the donationToken & matchingToken before promise.all'ing everything
+      const matchingTokenAddress = matchingToken?.address || (await roundContract.matchingToken());
+      // use matchingTokenContract to get balance
+      const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
+      // full update of stored data
+      if (forceRefresh || !localStorageData) {
         // Define calls to be read using multicall
-        const calls = [
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('startTime') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('endTime') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('metadataAdmin') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('payoutAdmin') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('registry') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('metaPtr') },
-          { target: grantRoundAddress, callData: roundContract.interface.encodeFunctionData('hasPaidOut') },
+        [
+          donationTokenAddress,
+          startTime,
+          endTime,
+          metadataAdmin,
+          payoutAdmin,
+          registryAddress,
+          metaPtr,
+          hasPaidOut,
+          funds,
+        ] = await callMulticallContract([
+          // pull the grantRound data from its contract
+          {
+            target: grantRoundAddress,
+            contract: roundContract,
+            fns: [
+              'donationToken',
+              'startTime',
+              'endTime',
+              'metadataAdmin',
+              'payoutAdmin',
+              'registry',
+              'metaPtr',
+              'hasPaidOut',
+            ],
+          },
+          // get the balance from the matchinTokenContract
           {
             target: matchingTokenAddress,
-            callData: matchingTokenContract.interface.encodeFunctionData('balanceOf', [grantRoundAddress]),
+            contract: matchingTokenContract,
+            fns: [
+              {
+                fn: 'balanceOf',
+                args: [grantRoundAddress],
+              },
+            ],
           },
-        ];
-
-        // Execute calls
-        const { returnData } = (await multicall.value?.tryBlockAndAggregate(false, calls)) || {};
-        const [
-          startTimeEncoded,
-          endTimeEncoded,
-          metadataAdminEncoded,
-          payoutAdminEncoded,
-          registryAddressEncoded,
-          metaPtrEncoded,
-          hasPaidOutEncoded,
-          matchingTokenBalanceEncoded,
-        ] = returnData;
-
-        // Unpack result
-        const startTime = roundContract.interface.decodeFunctionResult('startTime', startTimeEncoded.returnData)[0]; // prettier-ignore
-        const endTime = roundContract.interface.decodeFunctionResult('endTime', endTimeEncoded.returnData)[0] // prettier-ignore
-        const metadataAdmin = roundContract.interface.decodeFunctionResult('metadataAdmin', metadataAdminEncoded.returnData)[0]; // prettier-ignore
-        const payoutAdmin = roundContract.interface.decodeFunctionResult('payoutAdmin', payoutAdminEncoded.returnData)[0]; // prettier-ignore
-        const registryAddress = roundContract.interface.decodeFunctionResult('registry', registryAddressEncoded.returnData)[0]; // prettier-ignore
-        const metaPtr = roundContract.interface.decodeFunctionResult('metaPtr', metaPtrEncoded.returnData)[0]; // prettier-ignore
-        const hasPaidOut = roundContract.interface.decodeFunctionResult('hasPaidOut', hasPaidOutEncoded.returnData)[0]; // prettier-ignore
-        const matchingTokenBalance = matchingTokenContract.interface.decodeFunctionResult('balanceOf', matchingTokenBalanceEncoded.returnData)[0]; // prettier-ignore
-
-        // build status against now (unix)
-        const now = Date.now() / 1000;
-
-        // place the GrantRound details into a GrantRound object
-        const ls_grantRound = {
-          grantRound: {
-            startTime,
-            endTime,
-            metadataAdmin,
-            payoutAdmin,
-            registryAddress,
-            metaPtr,
-            hasPaidOut,
-            donationToken: {
-              address: donationTokenAddress,
-              name: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].name,
-              symbol: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].symbol,
-              decimals: SUPPORTED_TOKENS_MAPPING[donationTokenAddress].decimals,
-              chainId: provider.value.network.chainId || 1,
-              // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
-              logoURI: undefined, // we can leave this out for now
-            } as TokenInfo,
-            matchingToken: {
-              address: matchingTokenAddress,
-              name: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].name,
-              symbol: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].symbol,
-              decimals: SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals,
-              chainId: provider.value.network.chainId || 1,
-              // TODO: fetch logo from CoinGecko's huge token list (as well as use that to avoid a network request for token info each poll): https://tokenlists.org/token-list?url=https://tokens.coingecko.com/uniswap/all.json
-              logoURI: undefined, // we can leave this out for now
-            } as TokenInfo,
-            address: grantRoundAddress,
-            funds: matchingTokenBalance / 10 ** SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals,
-            status:
-              now >= startTime.toNumber() && now < endTime.toNumber()
-                ? 'Active'
-                : now < startTime.toNumber()
-                ? 'Upcoming'
-                : 'Completed',
-            registry: GRANT_REGISTRY_ADDRESS,
-            error: undefined,
-          } as GrantRound,
-        };
-
-        // mark this for renewal
-        if (data.startTime && data.endTime && save) {
-          save();
-        }
-
-        // return the GrantRound data
-        return ls_grantRound;
-      } else {
-        // return data unchanged
-        return data;
+        ]);
+        // get the donation/matching token
+        matchingToken = SUPPORTED_TOKENS_MAPPING[matchingTokenAddress];
+        donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
+        // record the funds as a human readable number
+        funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
+      } else if (localStorageData && ls_blockNumber < blockNumber) {
+        // get the most recent block we collected
+        const fromBlock = ls_blockNumber + 1 || 0;
+        // get updated metadata
+        const [updatedMetadata, newTransfers] = await Promise.all([
+          roundContract.queryFilter(roundContract.filters.MetadataUpdated(), fromBlock, blockNumber),
+          matchingTokenContract.queryFilter(
+            matchingTokenContract.filters.Transfer(null, grantRoundAddress),
+            fromBlock,
+            blockNumber
+          ),
+        ]);
+        // get any new funding transfers
+        updatedMetadata.forEach((metaUpdate: Event) => {
+          metaPtr = metaUpdate?.args?.newMetaPtr;
+        });
+        newTransfers.forEach((transfer: Event) => {
+          funds = BigNumber.from(funds)
+            .add(
+              parseFloat(formatUnits(transfer?.args?.amount, SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals))
+            )
+            .toString();
+        });
       }
+      // build status against now (unix)
+      const now = Date.now() / 1000;
+      // place the GrantRound details into a GrantRound object
+      const grantRound = {
+        grantRound: {
+          startTime,
+          endTime,
+          metadataAdmin,
+          payoutAdmin,
+          registryAddress,
+          metaPtr,
+          hasPaidOut,
+          donationToken: donationToken,
+          matchingToken: matchingToken,
+          address: grantRoundAddress,
+          funds: funds,
+          status:
+            now >= BigNumber.from(startTime).toNumber() && now < BigNumber.from(endTime).toNumber()
+              ? 'Active'
+              : now < BigNumber.from(startTime).toNumber()
+              ? 'Upcoming'
+              : 'Completed',
+          registry: GRANT_REGISTRY_ADDRESS,
+          error: undefined,
+        } as GrantRound,
+      };
+
+      // mark this for renewal
+      if (grantRound.grantRound.startTime && save) {
+        save();
+      }
+
+      // return the GrantRound data
+      return grantRound;
     }
   );
 }
@@ -212,7 +228,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
  * @param {Object} contributions A dict of all contributions (contribution.txHash->contribution)
  * @param {Object} trustBonus A dict of all trustBonus scores (contribution.payee->trustBonusScore)
  * @param {String} grantRoundAddress The grantRound address we want details for
- * @param {Object} grantsDict A dict of grant addresses (grant.id->grant.payee)
+ * @param {Array} grantIds An array of grantIds
  * @param {TokenInfo} matchingToken The matchingToken used by the grantRound
  * @param {boolean} forceRefresh Force the cache to refresh
  */
@@ -220,9 +236,8 @@ export async function getGrantRoundGrantData(
   blockNumber: number,
   contributions: Contribution[],
   trustBonus: { [address: string]: number },
-  grantRoundAddress: string,
-  grantsDict: { [key: string]: string },
-  matchingToken: TokenInfo,
+  grantRound: GrantRound,
+  grantIds: string[],
   forceRefresh = false
 ) {
   const clr = new CLR({
@@ -231,95 +246,88 @@ export async function getGrantRoundGrantData(
   } as InitArgs);
 
   return await syncStorage(
-    grantRoundsCLRDataKeyPrefix + grantRoundAddress,
+    grantRoundsCLRDataKeyPrefix + grantRound.address,
     {
-      ts: Date.now() / 1000,
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
-      const { provider } = useWalletStore();
       const roundGrantData = localStorageData?.data?.grantRoundCLR || {};
-
       // unpack current ls state
-      let grantDonations: Contribution[] = roundGrantData?.contributions || [];
-      let matchingTokenDecimals: number = roundGrantData?.matchingTokenDecimals || 0;
-      const totalPot: number = roundGrantData?.totalPot || 0;
-      const predictions = roundGrantData?.predictions || {};
-      const donationCount = grantDonations.length;
-
-      // get token info
-      const matchingTokenContract = new Contract(matchingToken.address, ERC20_ABI, provider.value);
-      // used to bigNumberify the distribution data
-      matchingTokenDecimals = SUPPORTED_TOKENS_MAPPING[matchingToken.address].decimals;
-      // total pot is balance of matchingToken held by grantRoundAddress
-      const newTotalPot = parseFloat(
-        formatUnits(await matchingTokenContract.balanceOf(grantRoundAddress), matchingTokenDecimals)
-      );
+      let ls_grantDonations: Contribution[] = roundGrantData?.contributions || [];
+      let ls_grantPredictions = roundGrantData?.predictions || {};
 
       // every block
       if (
         forceRefresh ||
         !localStorageData ||
-        totalPot !== newTotalPot ||
         (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
+        // total the number of contributions being considered in the current prediction
+        const oldDonationCount = ls_grantDonations.length;
         // fetch contributions
-        grantDonations = Object.values(contributions).filter((contribution: Contribution) => {
+        ls_grantDonations = Object.values(contributions).filter((contribution: Contribution) => {
           // check that the contribution is valid
-          const inRound = contribution.inRounds?.includes(grantRoundAddress);
+          const inRound = contribution.inRounds?.includes(grantRound.address);
 
           // only include transactions from this grantRound which havent been ignored
           return inRound;
         });
 
-        // re-run predict if there are any new contributions
-        if (totalPot !== newTotalPot || grantDonations.length > donationCount) {
-          // get all predictions for the grants in this round
-          void (await Promise.all(
-            Object.keys(grantsDict).map(async (grantId: string) => {
-              // predict for each grant in the round
-              predictions[grantId] = await clr.predict({
-                grantId: grantId,
-                predictionPoints: [0, 1, 10, 100, 1000, 10000],
-                trustBonusScores: Object.keys(trustBonus).map((address) => {
-                  return {
-                    address: address,
-                    score: trustBonus[address],
-                  };
-                }),
-                grantRoundContributions: {
-                  grantRound: grantRoundAddress,
-                  totalPot: newTotalPot,
-                  matchingTokenDecimals: matchingTokenDecimals,
-                  contributions: grantDonations,
-                },
-              });
-            })
-          ));
+        // re-run predict if there are any new contributions/grants
+        if (ls_grantDonations.length > oldDonationCount || grantIds.length > Object.keys(ls_grantPredictions).length) {
+          // scores are to be presented in an array
+          const trustBonusScores = Object.keys(trustBonus).map((address) => {
+            return {
+              address: address,
+              score: trustBonus[address],
+            };
+          });
+          // get all predictions for each grant in this round
+          ls_grantPredictions = (
+            await Promise.all(
+              grantIds.map((grantId: string) =>
+                clr.predict({
+                  grantId: grantId,
+                  predictionPoints: [0, 1, 10, 100, 1000, 10000],
+                  trustBonusScores: trustBonusScores,
+                  grantRoundContributions: {
+                    grantRound: grantRound.address,
+                    totalPot: BigNumber.from(grantRound.funds).toNumber(),
+                    matchingTokenDecimals: grantRound.matchingToken.decimals,
+                    contributions: ls_grantDonations,
+                  },
+                })
+              )
+            )
+          ).reduce((predictions, prediction) => {
+            // record as a dict (grantId -> GrantPrediction)
+            predictions[prediction.grantId] = prediction;
+            return predictions;
+          }, {} as Record<string, GrantPrediction>);
         }
       }
 
-      const ls_grantRoundCLR = {
+      const grantRoundCLR = {
         grantRoundCLR: {
-          grantRound: grantRoundAddress,
-          totalPot: newTotalPot,
-          matchingTokenDecimals: matchingTokenDecimals,
-          contributions: grantDonations,
-          predictions: predictions,
+          grantRound: grantRound.address,
+          totalPot: BigNumber.from(grantRound.funds).toNumber(),
+          matchingTokenDecimals: grantRound.matchingToken.decimals,
+          contributions: ls_grantDonations,
+          predictions: ls_grantPredictions,
         } as GrantRoundCLR,
       };
 
-      if (grantDonations.length && save) {
+      if (ls_grantDonations.length && save) {
         save();
       }
 
-      return ls_grantRoundCLR;
+      return grantRoundCLR;
     }
   );
 }
 
 /**
- * @notice returns the prediction curve for this grant in the given round
+ * @notice returns the predictions for this grant in the given round
  */
 export function getPredictionsForGrantInRound(grantId: string, roundData: GrantRoundCLR) {
   return roundData.predictions && roundData.predictions[Number(grantId)];

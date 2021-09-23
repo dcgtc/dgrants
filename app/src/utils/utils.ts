@@ -177,3 +177,77 @@ export async function assertSufficientBalance(tokenAddress: string, requiredAmou
   }
   return true;
 }
+
+/**
+ * @notice Get the multicall data for the fns on a contract @ address
+ * @param calls {target, contract, fns} The address, contract and fns we want to call via multicall
+ * @returns A list of calls we can make to multicall.tryBlockAndAggregate()
+ */
+export const getMulticallData = (
+  calls: {
+    target: string;
+    contract: Contract;
+    fns: (string | { fn: string; args: (string | BigNumberish | boolean)[] })[];
+  }[]
+) => {
+  const flatMap: {
+    target: string;
+    callData: string;
+  }[] = [];
+  calls.forEach((call) =>
+    flatMap.push(
+      ...call.fns.map((fn) => {
+        const args = typeof fn === 'string' ? [fn] : [fn.fn, fn.args];
+        return {
+          target: call.target,
+          callData: call.contract.interface.encodeFunctionData(
+            args[0] as string,
+            args[1] as (string | BigNumberish | boolean)[]
+          ),
+        };
+      })
+    )
+  );
+
+  return flatMap;
+};
+
+/**
+ * @notice Decode the returnData we get by calling multicall.tryBlockAndAggregate
+ * @param returnData An array of multicall.tryBlockAndAggregate results
+ * @param calls {contract, fns} The contract and fns we want to decode the result for
+ * @returns all results returned in an array
+ */
+export const decodeMulticallReturnData = (
+  returnData: { success: boolean; returnData: string }[],
+  calls: { contract: Contract; fns: (string | { fn: string; args: (string | BigNumberish | boolean)[] })[] }[]
+) => {
+  let flatPtr = 0;
+  const flatMap: (string | BigNumberish | boolean)[] = [];
+  calls.forEach((call) =>
+    flatMap.push(
+      ...call.fns.map((fn) => {
+        return call.contract.interface.decodeFunctionResult(
+          typeof fn === 'string' ? fn : fn.fn,
+          returnData[flatPtr++].returnData
+        )[0];
+      })
+    )
+  );
+
+  return flatMap;
+};
+
+/**
+ * @notice Get the response from a call to multicall for the given fns on a contract @ address
+ * @param calls {target, contract, fns} The address, contract and fns we want to call via multicall
+ * @returns all results returned in an array
+ */
+export async function callMulticallContract(
+  calls: { target: string; contract: Contract; fns: (string | { fn: string; args: (string | BigNumberish)[] })[] }[]
+) {
+  const { multicall } = useWalletStore();
+  const { returnData } = (await multicall.value?.tryBlockAndAggregate(false, getMulticallData(calls))) || {};
+
+  return decodeMulticallReturnData(returnData, calls);
+}
