@@ -2,11 +2,12 @@
 
 <template>
   <figure class="group">
+    <!--img-->
     <div
       class="relative cursor-pointer"
       @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
     >
-      <img class="shadow-light" :src="imgurl" />
+      <img class="shadow-light group-hover:opacity-90" :src="imgurl" />
       <div class="absolute bottom-0 right-0">
         <button
           class="btn opacity-0 group-hover:opacity-100"
@@ -23,7 +24,7 @@
         <span class="text-grey-400"
           >by
           <a
-            class="text-grey-500 underline ml-1"
+            class="link ml-1"
             :href="getEtherscanUrl(ownerAddress, 'address')"
             target="_blank"
             rel="noopener noreferrer"

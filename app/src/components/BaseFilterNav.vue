@@ -8,15 +8,17 @@
         <!-- nav item loop -->
         <ul v-for="(item, index) in items" :key="item.label">
           <!-- nav item -->
-          <li @click="item?.action">
+          <li @click="item?.action" class="group">
             <!-- if item have a menu show label in grey with a : at end -->
-            <span v-if="item.menu" class="text-grey-400">{{ item.label + ':' }}</span>
+            <span v-if="item.menu" class="text-grey-400 group-hover:text-grey-500">{{ item.label + ':' }}</span>
 
             <!-- else just show the label-->
-            <span v-else :class="active == index ? 'border-b pb-1' : 'text-grey-400'">{{ item.label }}</span>
+            <span v-else :class="active == index ? 'border-b pb-1' : 'text-grey-400 group-hover:text-grey-500'">{{
+              item.label
+            }}</span>
 
             <!-- if item have a counter -->
-            <span v-if="item.counter" class="ml-2 text-grey-400">({{ item.counter }})</span>
+            <span v-if="item.counter" class="ml-2 text-grey-300">({{ item.counter }})</span>
 
             <!-- if item have a item tag -->
             <span v-if="item.tag" class="ml-2">{{ item.tag }}</span>

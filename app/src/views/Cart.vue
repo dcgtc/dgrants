@@ -95,19 +95,23 @@
                   />
                 </div>
               </div>
+
               <!-- matching -->
               <div class="col-span-4 lg:col-span-1">
                 <div class="text-grey-400 text-left lg:text-right">
-                  <!-- TODO use real match estimates -->
-                  <p v-if="clrPredictions[item.grantId]">
+                  <!-- match estimates -->
+                  <div v-if="clrPredictions[item.grantId]">
                     <span v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      {{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}
-                      {{ index !== clrPredictions[item.grantId].length - 1 ? '+' : '' }}
-                      <br />
-                      estimated matching
+                      <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
+                      <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                     </span>
-                  </p>
-                  <p v-else>not in an active round</p>
+                    <span class="inline-block">estimated matching</span>
+                  </div>
+
+                  <!-- no matching -->
+                  <div v-else>
+                    <span>not in an active round</span>
+                  </div>
                 </div>
               </div>
             </div>

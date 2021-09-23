@@ -1,12 +1,15 @@
 <template>
-  <div class="">
-    <h1 class="my-6 text-center text-3xl font-extrabold text-gray-900">404</h1>
-    <div class="text-2xl text-gray-500 my-5">Oops. Page not found...</div>
-    <div class="flex flex-row justify-center space-x-4">
-      <button @click="routerGo(-1)" class="btn btn-primary my-5">Back</button>
-      <button @click="routerPush('/')" class="btn btn-secondary my-5">Home</button>
+  <section class="px-4 md:px-12 py-4 md:py-12">
+    <div class="grid justify-center text-center">
+      <h1 class="text-grey-500">404</h1>
+      <p>Page not found!</p>
+
+      <div class="mt-8 flex gap-4 justify-center">
+        <button @click="routerGo(-1)" class="btn">Back</button>
+        <button @click="routerPush('/')" class="btn">Home</button>
+      </div>
     </div>
-  </div>
+  </section>
 </template>
 
 <script lang="ts">
