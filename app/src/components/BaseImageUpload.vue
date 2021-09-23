@@ -1,16 +1,38 @@
 <template>
-  <div :class="width">
-    <label class="flex flex-col bg-white items-center block px-6 py-8 border border-grey-400 cursor-pointer">
-      <span>Choose image file to upload</span>
-      <div v-if="isValid && val" :id="`${id}-success`">Uploaded: {{ val.name }}</div>
+  <div class="block">
+    <label class="w-100 flex flex-col bg-white items-center px-6 py-8 border border-grey-400 cursor-pointer">
       <input type="file" @input="onInput" class="hidden" />
+      <div class="flex p-12 gap-x-12">
+        <div
+          class="
+            group
+            flex
+            items-center
+            justify-center
+            h-24
+            border border-grey-400
+            p-12
+            cursor-pointer
+            hover:border-grey-500
+          "
+        >
+          <ImportIcon class="icon icon-small icon-primary" />
+        </div>
+        <div class="text-grey-400 flex items-center">
+          1920x1080px<br />
+          *.png
+        </div>
+      </div>
     </label>
-    <div v-if="!isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
+  </div>
+  <div v-if="!isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">
+    {{ errorMsg }}
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, watch } from 'vue';
+import { ImportIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'BaseImageUpload',
@@ -32,6 +54,8 @@ export default defineComponent({
     },
   },
 
+  components: { ImportIcon },
+
   setup(props, context) {
     const val = ref<File | undefined>(props.modelValue as File);
     const isValid = ref(true);
@@ -49,6 +73,7 @@ export default defineComponent({
       val.value = file;
       context.emit('update:modelValue', file); // https://v3.vuejs.org/guide/migration/v-model.html#v-model
     }
+
     return { onInput, isValid, val };
   },
 });
