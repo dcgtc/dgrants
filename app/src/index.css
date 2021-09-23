@@ -92,7 +92,7 @@
   }
 
   .link {
-    @apply text-grey-500 underline cursor-pointer;
+    @apply border-b border-grey-500 text-grey-500 hover:text-grey-400 hover:border-grey-400 cursor-pointer;
   }
 
   .btn {

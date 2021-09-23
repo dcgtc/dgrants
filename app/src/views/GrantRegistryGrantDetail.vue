@@ -263,7 +263,7 @@
 
   <!-- No grant selected -->
   <div v-else-if="!loading">
-    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">No grant selected</h2>
+    <h2 class="mt-6">No grant selected</h2>
   </div>
 
   <LoadingSpinner v-else />

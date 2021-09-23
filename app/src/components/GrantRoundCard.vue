@@ -1,8 +1,9 @@
 <!-- RoundCard -->
 <template>
   <figure class="group">
+    <!--img-->
     <div class="cursor-pointer" @click="pushRoute({ name: 'dgrants-round', params: { address: address } })">
-      <img :src="imgurl" />
+      <img class="shadow-light group-hover:opacity-90" :src="imgurl" />
     </div>
 
     <figcaption class="mt-4">

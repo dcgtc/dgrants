@@ -5,7 +5,7 @@
       v-for="link in path"
       :key="link.displayName"
       :to="link.routeTarget"
-      active-class="font-bold"
+      active-class="font-medium"
       exact
       class="group no-underline flex items-center"
     >
