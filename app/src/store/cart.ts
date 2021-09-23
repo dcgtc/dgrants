@@ -463,10 +463,20 @@ function fixDonationRoundingErrors(donations: Donation[]) {
  * @param path Swap path
  * @param amountIn Swap input amount, as a full integer
  */
-async function quoteExactInput(path: BytesLike, amountIn: BigNumberish): Promise<BigNumber> {
+async function quoteExactInput(path: BytesLike | string[], amountIn: BigNumberish): Promise<BigNumber> {
   const { provider } = useWalletStore();
-  const abi = ['function quoteExactInput(bytes memory path, uint256 amountIn) external view returns (uint256 amountOut)']; // prettier-ignore
-  const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, provider.value);
-  const amountOut = await quoter.quoteExactInput(path, amountIn);
+  let amountOut: BigNumber;
+  if (Array.isArray(path)) {
+    // Polygon mainnet, Uniswap V2 format
+    const abi = ['function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)']; // prettier-ignore
+    const router = new Contract('0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', abi, provider.value); // TODO hardcoded Polygon mainnet SushiSwap address
+    const amountsOut = await router.getAmountsOut(amountIn, path);
+    amountOut = amountsOut[amountsOut.length - 1];
+  } else {
+    // L1 mainnet, Uniswap V3 format
+    const abi = ['function quoteExactInput(bytes memory path, uint256 amountIn) external view returns (uint256 amountOut)']; // prettier-ignore
+    const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, provider.value); // TODO hardcoded L1 mainnet Uniswap V3 address
+    amountOut = await quoter.quoteExactInput(path, amountIn);
+  }
   return amountOut.mul(995).div(1000); // multiplying by 995/1000 is equivalent to 0.5% slippage
 }
