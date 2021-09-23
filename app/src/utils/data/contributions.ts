@@ -9,7 +9,7 @@ import { Event } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
 import { contributionsKey, trustBonusKey } from 'src/utils/constants';
-import { START_BLOCK, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+import { START_BLOCK } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 
@@ -20,13 +20,13 @@ const { grantRoundManager } = useWalletStore();
  * @notice Get/Refresh all contributions
  *
  * @param {number} blockNumber The current blockNumber
- * @param {Object} grantsDict A dict of grant addresses (grant.id->grant.payee)
+ * @param {Object} grantPayees A dict of grant addresses (grant.id->grant.payee)
  * @param {TokenInfo} donationToken The roundManagers donation token
  * @param {boolean} forceRefresh Force the cache to refresh
  */
 export async function getContributions(
   blockNumber: number,
-  grantsDict: Record<string, string>,
+  grantPayees: Record<string, string>,
   donationToken: TokenInfo,
   forceRefresh?: boolean
 ) {
@@ -34,11 +34,10 @@ export async function getContributions(
     contributionsKey,
     {
       blockNumber: blockNumber,
-      timeStamp: Date.now() / 1000,
     },
     async (localStorageData?: LocalStorageAnyObj | undefined, save?: (saveData?: LocalStorageAnyObj) => void) => {
-      const rawData = localStorageData?.data || {};
-      const contributions: Record<string, Contribution> = rawData?.contributions || {};
+      // pick up contributions from the localStorage obj
+      const ls_contributions: Record<string, Contribution> = localStorageData?.data?.contributions || {};
 
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && localStorageData.blockNumber < blockNumber)) {
@@ -62,16 +61,11 @@ export async function getContributions(
             const grantId = contribution?.args?.grantId.toString();
             const inRounds = contribution?.args?.rounds;
             // record the new transaction
-            contributions[`${tx.hash}-${grantId}`] = {
+            ls_contributions[`${tx.hash}-${grantId}`] = {
               grantId: grantId,
-              amount: parseFloat(
-                formatUnits(
-                  contribution?.args?.donationAmount,
-                  SUPPORTED_TOKENS_MAPPING[donationToken.address].decimals
-                )
-              ),
+              amount: parseFloat(formatUnits(contribution?.args?.donationAmount, donationToken.decimals)),
               inRounds: inRounds,
-              grantAddress: grantsDict[grantId],
+              grantAddress: grantPayees[grantId],
               address: tx.from,
               donationToken: donationToken,
               txHash: tx.hash,
@@ -82,25 +76,21 @@ export async function getContributions(
       }
 
       // convert back to Contribitions[] and sort
-      const ls_contributions = {
-        contributions: Object.values(contributions).sort((a: Contribution, b: Contribution) =>
-          (a?.blockNumber || START_BLOCK) > (b?.blockNumber || START_BLOCK)
-            ? -1
-            : a?.blockNumber == b?.blockNumber
-            ? 0
-            : 1
+      const contributions = {
+        contributions: Object.values(ls_contributions).sort((a: Contribution, b: Contribution) =>
+          (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
         ) as Contribution[],
       };
 
       // mark for renewal and save off the { txHash: Contribution } version to avoid duplicates
-      if ((ls_contributions.contributions || []).length > 0 && save) {
+      if ((contributions.contributions || []).length > 0 && save) {
         save({
-          contributions: contributions,
+          contributions: ls_contributions,
         });
       }
 
       // return sorted Contributions[]
-      return ls_contributions;
+      return contributions;
     }
   );
 }
@@ -120,13 +110,13 @@ export async function getTrustBonusScores(
   return await syncStorage(
     trustBonusKey,
     {
-      ts: Date.now() / 1000,
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageAnyObj | undefined, save?: () => void) => {
-      const trustBonusData = localStorageData?.data?.trustBonus || {};
-      const contributorsData = localStorageData?.data?.contributors || [];
-      const newContributionAddresses: Set<string> = new Set();
+      const ls_trustBonus = localStorageData?.data?.trustBonus || {};
+      const ls_contributors = localStorageData?.data?.contributors || [];
+      // collect any new contributor
+      const newContributorAddresses: Set<string> = new Set();
       // every block
       if (
         forceRefresh ||
@@ -134,7 +124,7 @@ export async function getTrustBonusScores(
         (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // set score for null user to prevent linear from fetching (if there are no other scores matched)
-        trustBonusData['0x0'] = 0.5;
+        ls_trustBonus['0x0'] = 0.5;
         // collect any new contributors
         Object.values(contributions).forEach((contribution) => {
           if (
@@ -142,33 +132,34 @@ export async function getTrustBonusScores(
             !contribution?.blockNumber ||
             contribution.blockNumber > (localStorageData.blockNumber || START_BLOCK)
           ) {
-            newContributionAddresses.add(contribution.address);
+            newContributorAddresses.add(contribution.address);
           }
         });
         // get the trust scores for any new contributors
-        if ([...newContributionAddresses].length) {
+        if ([...newContributorAddresses].length) {
           // fetch trust bonus scores from gitcoin API
-          const { data, status } = await fetchTrustBonusScore([...newContributionAddresses]);
+          const { data, status } = await fetchTrustBonusScore([...newContributorAddresses]);
           if (!status.ok) console.error(status.message);
           if (data) {
             data.forEach((trustBonus) => {
-              trustBonusData[trustBonus.address] = trustBonus.score;
+              ls_trustBonus[trustBonus.address] = trustBonus.score;
             });
           }
         }
       }
 
-      const ls_trustBonus = {
-        trustBonus: trustBonusData,
-        contributors: [...new Set([...contributorsData, ...newContributionAddresses])],
+      // compile response data
+      const trustBonus = {
+        trustBonus: ls_trustBonus,
+        contributors: [...new Set([...ls_contributors, ...newContributorAddresses])],
       };
 
       // mark this for renewal
-      if (Object.keys(ls_trustBonus.trustBonus || {}).length > 0 && save) {
+      if (Object.keys(ls_trustBonus || {}).length > 0 && save) {
         save();
       }
 
-      return ls_trustBonus;
+      return trustBonus;
     }
   );
 }
