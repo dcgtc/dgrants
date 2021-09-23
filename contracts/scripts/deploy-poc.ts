@@ -11,6 +11,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
 // IIFE async function so "await"s can be performed for each operation
 (async function () {
   const network = hre.network.name;
+  const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('2', 'gwei') } : {};
 
   const logger = new ScriptLogger('poc', network);
 
@@ -31,7 +32,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
 
     // Deploy the GrantRegistry
     const GrantRegistry = await ethers.getContractFactory('GrantRegistry', deployer);
-    const registry = await GrantRegistry.deploy();
+    const registry = await GrantRegistry.deploy(overrides);
     await registry.deployed();
     logger.recordContract('GrantRegistry', registry.address);
 
@@ -41,7 +42,8 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
       registry.address,
       networkParams.donationToken,
       networkParams.uniswapFactory,
-      networkParams.weth
+      networkParams.weth,
+      overrides
     );
     await roundManager.deployed();
     logger.recordContract('GrantRoundManager', roundManager.address);

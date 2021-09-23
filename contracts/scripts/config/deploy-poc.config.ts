@@ -45,6 +45,19 @@ const params: DeployParams = {
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
+  polygon: {
+    donationToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
+    uniswapFactory: '0xc35DADB65012eC5796536bD9864eD8773aBc74C4',
+    weth: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
+    metadataAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
+    payoutAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
+    matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
+    roundStartTime: 1632442000, // Friday, September 24, 2021 12:06:40 AM GMT
+    roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
+    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
+    metadataJson,
+  },
   rinkeby: {
     donationToken: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa', // DAI
     uniswapFactory: '0x1F98431c8aD98523631AE4a59f267346ea31F984',
