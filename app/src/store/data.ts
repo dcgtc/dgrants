@@ -21,9 +21,11 @@ import {
   GrantRoundMetadataResolution,
 } from '@dgrants/types';
 import { resolveMetaPtr } from 'src/utils/data/ipfs';
+import { TokenInfo } from '@uniswap/token-lists';
+import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 
 // --- Parameters required ---
-const { provider } = useWalletStore();
+const { provider, grantRoundManager } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -36,6 +38,7 @@ const grantMetadata = ref<Record<string, GrantMetadataResolution>>({});
 const grantRounds = ref<GrantRound[]>();
 const grantRoundMetadata = ref<Record<string, GrantRoundMetadataResolution>>({});
 const grantRoundsCLRData = ref<Record<string, GrantRoundCLR>>({});
+const grantRoundsDonationToken = ref<TokenInfo>();
 
 // --- Store methods and exports ---
 export default function useDataStore() {
@@ -47,21 +50,23 @@ export default function useDataStore() {
     lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
 
     // Get all grants and round data held in the registry/roundManager
-    const [grantsData, grantRoundData] = await Promise.all([
-      await getAllGrants(lastBlockNumber.value, forceRefresh),
-      await getAllGrantRounds(lastBlockNumber.value, forceRefresh),
+    const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
+      getAllGrants(lastBlockNumber.value, forceRefresh),
+      getAllGrantRounds(lastBlockNumber.value, forceRefresh),
+      grantRoundManager.value.donationToken(),
     ]);
 
     // collect the grants into a grantId->payoutAddress obj
     const grantsList = grantsData.grants || [];
-    const grantsDict = grantsList.reduce((grants: Record<string, string>, grant: Grant, key: number) => {
+    const grantIds = grantsList.map((grant: Grant) => grant.id);
+    const grantPayees = grantsList.reduce((grants: Record<string, string>, grant: Grant, key: number) => {
       grants[key.toString()] = grant.payee;
 
       return grants;
     }, {});
-    const roundAddresses = grantRoundData.roundAddresses || [];
 
     // Pull state from each GrantRound
+    const roundAddresses = grantRoundData.roundAddresses || [];
     const grantRoundsList = (await Promise.all(
       roundAddresses.map(async (grantRoundAddress: string) => {
         const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
@@ -73,8 +78,8 @@ export default function useDataStore() {
     // Get latest set of contributions
     const contributions = await getContributions(
       lastBlockNumber.value,
-      grantsDict,
-      grantRoundsList[0].donationToken,
+      grantPayees,
+      SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
       forceRefresh
     );
 
@@ -87,21 +92,20 @@ export default function useDataStore() {
 
     // Pull all contributions for the current GrantRounds
     const grantDataByRound: Record<string, GrantRoundCLR> = (
-      await Promise.all(
-        roundAddresses.map(async (grantRoundAddress: string, key: number) => {
+      (await Promise.all(
+        grantRoundsList.map(async (grantRound: GrantRound) => {
           const data = await getGrantRoundGrantData(
             lastBlockNumber.value,
             contributions.contributions,
             trustBonusScores.trustBonus,
-            grantRoundAddress,
-            grantsDict,
-            grantRoundsList[key].matchingToken,
+            grantRound,
+            grantIds,
             forceRefresh
           );
 
           return data.grantRoundCLR;
-        }) as GrantRoundCLR[]
-      )
+        })
+      )) as GrantRoundCLR[]
     ).reduce((byRound, data) => {
       byRound[data.grantRound] = data;
 
@@ -113,11 +117,13 @@ export default function useDataStore() {
     const grantRoundMetaPtrs = grantRoundsList.map((grantRound: GrantRound) => grantRound.metaPtr);
     void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
     void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
+
     // Save off data
     grants.value = grantsList as Grant[];
     grantContributions.value = contributions.contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsCLRData.value = grantDataByRound as Record<string, GrantRoundCLR>;
+    grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
   }
 
   /**
@@ -193,5 +199,6 @@ export default function useDataStore() {
     grantContributions: computed(() => grantContributions.value),
     grantRoundsCLRData: computed(() => grantRoundsCLRData.value),
     grantRoundMetadata: computed(() => grantRoundMetadata.value),
+    grantRoundsDonationToken: computed(() => grantRoundsDonationToken.value),
   };
 }
