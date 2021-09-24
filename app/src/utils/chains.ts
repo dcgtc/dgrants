@@ -125,7 +125,7 @@ const ALL_SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<string,
 // --- Data for all supported chains ---
 const ALL_CHAIN_INFO: ChainInfo = {
   [SupportedChainId.HARDHAT]: {
-    explorer: 'https://etherscan.io/',
+    explorer: 'https://etherscan.io',
     label: 'Hardhat',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
@@ -151,13 +151,13 @@ const ALL_CHAIN_INFO: ChainInfo = {
     startBlock: 13285176,
   },
   [SupportedChainId.POLYGON]: {
-    bridge: 'https://bridge.arbitrum.io/',
-    explorer: 'https://arbiscan.io/',
-    label: 'Arbitrum',
-    logoUrl: '/arbitrum_logo.svg',
+    bridge: 'https://wallet.polygon.technology/bridge/',
+    explorer: 'https://polygonscan.com',
+    label: 'Polygon',
+    logoUrl: '/polygon_logo.svg',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.POLYGON],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.POLYGON],
-    weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
+    weth: '0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270',
     nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
     grantRegistry: '0x3C66293942C39084e5Da5c9Ec04580717B27EFd8',
     grantRoundManager: '0x3692d6dE91E7Efd98d761fffe4d1541dAEF6030c',
