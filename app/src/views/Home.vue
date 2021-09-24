@@ -35,12 +35,7 @@
 
   <LoadingSpinner v-else />
 
-  <GrantListWithFilter
-    v-if="grants && grantMetadata"
-    :button="filterNavButton"
-    :grants="grants"
-    :grantMetadata="grantMetadata"
-  />
+  <GrantList v-if="grants && grantMetadata" :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
 </template>
 
 <script lang="ts">
@@ -56,7 +51,7 @@ import useDataStore from 'src/store/data';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
-import GrantListWithFilter from 'src/components/GrantListWithFilter.vue';
+import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 
 // sort by startTime
@@ -84,7 +79,7 @@ export default defineComponent({
     BaseHeader,
     BaseFilterNav,
     GrantRoundCard,
-    GrantListWithFilter,
+    GrantList,
     LoadingSpinner,
   },
   setup() {

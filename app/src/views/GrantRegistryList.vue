@@ -1,7 +1,7 @@
 <template>
   <template v-if="grants && grantMetadata">
     <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
-    <GrantListWithFilter :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
+    <GrantList :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
   <LoadingSpinner v-else />
@@ -11,7 +11,7 @@
 import { computed, defineComponent } from 'vue';
 // --- App Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
-import GrantListWithFilter from 'src/components/GrantListWithFilter.vue';
+import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
@@ -51,7 +51,7 @@ function useGrantRegistryList() {
 
 export default defineComponent({
   name: 'GrantRegistryList',
-  components: { BaseHeader, GrantListWithFilter, LoadingSpinner },
+  components: { BaseHeader, GrantList, LoadingSpinner },
   setup() {
     const { grants, grantMetadata } = useDataStore();
 

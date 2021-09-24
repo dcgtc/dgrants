@@ -2,12 +2,7 @@
   <template v-if="hasLoadedHeader">
     <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
     <!-- General filters -->
-    <GrantListWithFilter
-      v-if="hasLoadedGrants"
-      :button="filterNavButton"
-      :grants="grants"
-      :grantMetadata="grantMetadata"
-    />
+    <GrantList v-if="hasLoadedGrants" :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
   </template>
 
   <LoadingSpinner v-else />
@@ -18,7 +13,7 @@ import { computed, defineComponent } from 'vue';
 import { useRoute } from 'vue-router';
 // --- App Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
-import GrantListWithFilter from 'src/components/GrantListWithFilter.vue';
+import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 
 // --- Store ---
@@ -98,7 +93,7 @@ function useGrantRoundDetail() {
 
 export default defineComponent({
   name: 'GrantRoundGrants',
-  components: { BaseHeader, GrantListWithFilter, LoadingSpinner },
+  components: { BaseHeader, GrantList, LoadingSpinner },
   setup() {
     return {
       ...useGrantRoundDetail(),
