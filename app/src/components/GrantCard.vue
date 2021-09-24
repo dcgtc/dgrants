@@ -1,12 +1,12 @@
 <!-- GrantCard -->
 
 <template>
-  <figure class="group">
+  <figure
+    class="group cursor-pointer"
+    @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
+  >
     <!--img-->
-    <div
-      class="relative cursor-pointer"
-      @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
-    >
+    <div class="relative">
       <img class="shadow-light group-hover:opacity-90" :src="imgurl" />
       <div class="absolute bottom-0 right-0">
         <button
@@ -19,7 +19,7 @@
       </div>
     </div>
     <figcaption class="mt-4">
-      <div class="text-grey-500 font-medium truncate">{{ name }}</div>
+      <div class="truncate">{{ name }}</div>
       <div>
         <span class="text-grey-400"
           >by
