@@ -17,7 +17,7 @@
 
 // --- Types ---
 export type { BigNumberish } from '@ethersproject/bignumber';
-export type { ContractTransaction } from '@ethersproject/contracts';
+export type { ContractInterface, ContractTransaction } from '@ethersproject/contracts';
 export type { BytesLike } from '@ethersproject/bytes';
 export type { Network } from '@ethersproject/networks';
 

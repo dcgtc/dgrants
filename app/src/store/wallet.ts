@@ -29,7 +29,7 @@ import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
 import { API as OnboardAPI } from 'bnc-onboard/dist/src/interfaces';
 import { getAddress } from 'src/utils/ethers';
-import { GRANT_REGISTRY_ABI, GRANT_ROUND_MANAGER_ABI, MULTICALL_ABI } from 'src/utils/constants';
+import { GRANT_REGISTRY_ABI, MULTICALL_ABI } from 'src/utils/constants';
 import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 
 const { startPolling } = useDataStore();
@@ -220,7 +220,7 @@ export default function useWalletStore() {
   });
   const grantRoundManager = computed(() => {
     return <GrantRoundManager>(
-      new Contract(GRANT_ROUND_MANAGER_ADDRESS, GRANT_ROUND_MANAGER_ABI, contractProvider.value)
+      new Contract(GRANT_ROUND_MANAGER_ADDRESS, CHAIN_INFO.grantRoundManagerAbi, contractProvider.value)
     );
   });
   const multicall = computed(() => new Contract(MULTICALL_ADDRESS, MULTICALL_ABI, contractProvider.value));

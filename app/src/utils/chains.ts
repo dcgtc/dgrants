@@ -1,6 +1,7 @@
 // based off of: https://github.com/Uniswap/uniswap-interface/blob/81b13469371b3371a55b4b29c7365b1610a8d865/src/constants/chains.ts
 import { TokenInfo } from '@uniswap/token-lists';
-import { getAddress } from 'src/utils/ethers';
+import {GRANT_ROUND_MANAGER_ABI as GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI, GRANT_ROUND_MANAGER_UNI_V2_ABI} from 'src/utils/constants'; // prettier-ignore
+import { ContractInterface, getAddress } from 'src/utils/ethers';
 
 // --- Types and data ---
 export enum SupportedChainId {
@@ -46,6 +47,7 @@ interface L1ChainInfo {
   readonly weth: string;
   readonly grantRegistry: string;
   readonly grantRoundManager: string;
+  readonly grantRoundManagerAbi: ContractInterface;
   readonly multicall: string;
   readonly startBlock: number; // block to start scanning from when looking for events, if none is cached, recommend GrantRegistry deploy block
 }
@@ -133,6 +135,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
     grantRegistry: '0xd0F350b13465B5251bb03E4bbf9Fa1DbC4a378F3',
     grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
+    grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 13285176,
@@ -146,6 +149,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
     grantRegistry: '',
     grantRoundManager: '',
+    grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 13285176,
@@ -161,6 +165,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
     grantRegistry: '0x3C66293942C39084e5Da5c9Ec04580717B27EFd8',
     grantRoundManager: '0x3692d6dE91E7Efd98d761fffe4d1541dAEF6030c',
+    grantRoundManagerAbi: GRANT_ROUND_MANAGER_UNI_V2_ABI,
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
     startBlock: 19437770,
@@ -174,6 +179,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     nativeCurrency: { name: 'Ethereum', symbol: 'ETH', decimals: 18 },
     grantRegistry: '0x7e13B0251f0F92C98bB5E9cAeABb9A91ccf13655',
     grantRoundManager: '0xa1f0230045eAb2D2F2c4ef1B7bD53330Bd41f862',
+    grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 9306030,
@@ -188,6 +194,7 @@ export const SUPPORTED_TOKENS_MAPPING = CHAIN_INFO.tokensMapping;
 export const WETH_ADDRESS = CHAIN_INFO.weth;
 export const GRANT_REGISTRY_ADDRESS = CHAIN_INFO.grantRegistry;
 export const GRANT_ROUND_MANAGER_ADDRESS = CHAIN_INFO.grantRoundManager;
+export const GRANT_ROUND_MANAGER_ABI = CHAIN_INFO.grantRoundManagerAbi;
 export const MULTICALL_ADDRESS = CHAIN_INFO.multicall;
 export const RPC_URL = CHAIN_INFO.rpcUrl;
 export const START_BLOCK = CHAIN_INFO.startBlock;
