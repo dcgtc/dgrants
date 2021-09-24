@@ -6,6 +6,7 @@ import { syncStorage } from 'src/utils/data/utils';
 import { BigNumber, Event } from 'ethers';
 // --- Constants ---
 import { allGrantsKey } from 'src/utils/constants';
+import { START_BLOCK } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 
@@ -41,7 +42,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
       // use the ls_blockNumber to decide if we need to update the grants
-      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      const ls_blockNumber = localStorageData?.blockNumber || START_BLOCK;
       // only update grants if new ones are added...
       let grants = localStorageData?.data?.grants || [];
       // each update should be pulled in when we hydrate localStorage state
@@ -49,7 +50,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1 || 0;
+        const fromBlock = ls_blockNumber + 1 || START_BLOCK;
         // get new state
         const [newGrants, updatedGrants] = await Promise.all([
           grantRegistry.value?.queryFilter(

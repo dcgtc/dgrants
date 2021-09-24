@@ -17,7 +17,7 @@ import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
 // --- Constants ---
-import { SUPPORTED_TOKENS_MAPPING, GRANT_REGISTRY_ADDRESS } from 'src/utils/chains';
+import { START_BLOCK, SUPPORTED_TOKENS_MAPPING, GRANT_REGISTRY_ADDRESS } from 'src/utils/chains';
 import {
   GRANT_ROUND_ABI,
   ERC20_ABI,
@@ -42,13 +42,13 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
       const { grantRoundManager } = useWalletStore();
       // use the ls_blockNumber to decide if we need to update the roundAddresses
-      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      const ls_blockNumber = localStorageData?.blockNumber || START_BLOCK;
       // only update roundAddress if new ones are added...
       let roundAddresses = localStorageData?.data?.roundAddresses || [];
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1 || 0;
+        const fromBlock = ls_blockNumber + 1 || START_BLOCK;
         const roundList =
           (
             await grantRoundManager.value?.queryFilter(
@@ -261,7 +261,7 @@ export async function getGrantRoundGrantData(
         forceRefresh ||
         !localStorageData ||
         totalPot !== newTotalPot ||
-        (localStorageData && (localStorageData.blockNumber || 0) < blockNumber)
+        (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // fetch contributions
         grantDonations = Object.values(contributions).filter((contribution: Contribution) => {

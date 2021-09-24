@@ -9,7 +9,7 @@ import { Event } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
 import { contributionsKey, trustBonusKey } from 'src/utils/constants';
-import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+import { START_BLOCK, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 
@@ -43,7 +43,7 @@ export async function getContributions(
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && localStorageData.blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = localStorageData?.blockNumber + 1 || 0;
+        const fromBlock = localStorageData?.blockNumber + 1 || START_BLOCK;
         // get any new donations to the grantRound
         const grantDonations =
           (await grantRoundManager.value?.queryFilter(
@@ -84,7 +84,11 @@ export async function getContributions(
       // convert back to Contribitions[] and sort
       const ls_contributions = {
         contributions: Object.values(contributions).sort((a: Contribution, b: Contribution) =>
-          (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
+          (a?.blockNumber || START_BLOCK) > (b?.blockNumber || START_BLOCK)
+            ? -1
+            : a?.blockNumber == b?.blockNumber
+            ? 0
+            : 1
         ) as Contribution[],
       };
 
@@ -127,7 +131,7 @@ export async function getTrustBonusScores(
       if (
         forceRefresh ||
         !localStorageData ||
-        (localStorageData && (localStorageData.blockNumber || 0) < blockNumber)
+        (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // set score for null user to prevent linear from fetching (if there are no other scores matched)
         trustBonusData['0x0'] = 0.5;
@@ -136,7 +140,7 @@ export async function getTrustBonusScores(
           if (
             !localStorageData ||
             !contribution?.blockNumber ||
-            contribution.blockNumber > (localStorageData.blockNumber || 0)
+            contribution.blockNumber > (localStorageData.blockNumber || START_BLOCK)
           ) {
             newContributionAddresses.add(contribution.address);
           }
