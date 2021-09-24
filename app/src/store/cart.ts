@@ -6,7 +6,7 @@
 
 // --- Imports ---
 import { computed, ref } from 'vue';
-import { Donation, Grant, SwapSummary } from '@dgrants/types';
+import { Donation, Grant, SwapSummary, SwapSummaryUniV2 } from '@dgrants/types';
 import { CartItem, CartItemOptions, CartPrediction, CartPredictions } from 'src/types';
 import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
@@ -213,7 +213,6 @@ export default function useCartStore() {
     const { signer, userAddress, grantRoundManager } = useWalletStore();
     const manager = grantRoundManager.value;
     const { swaps, donations, deadline } = await getCartDonationInputs();
-    const getInputToken = (swap: SwapSummary) => getAddress(hexDataSlice(swap.path, 0, 20));
 
     // Check all balances
     for (const swap of swaps) {
@@ -232,8 +231,9 @@ export default function useCartStore() {
       }
     }
 
-    // Determine if we need to send value with this transaction
-    const ethSwap = swaps.find((swap) => getInputToken(swap) === WETH_ADDRESS);
+    // Determine if we need to send value with this transaction. We cast swaps to `any` or TS complains that
+    // we can't use `find` since `swaps` has two potential types that are incompatible with each other
+    const ethSwap = (<any>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
     const value = ethSwap ? ethSwap.amountIn : 0;
 
     // Execute donation
@@ -243,30 +243,36 @@ export default function useCartStore() {
   /**
    * @notice Takes an array of cart items and returns inputs needed for the GrantRoundManager.donate() method
    */
-  async function getCartDonationInputs(): Promise<{ swaps: SwapSummary[]; donations: Donation[]; deadline: number }> {
+  async function getCartDonationInputs(): Promise<{
+    swaps: SwapSummary[] | SwapSummaryUniV2[];
+    donations: Donation[];
+    deadline: number;
+  }> {
     // Get the swaps array
     const swapPromises = Object.keys(cartSummary.value).map(async (tokenAddress) => {
       const decimals = SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const amountIn = parseUnits(String(cartSummary.value[tokenAddress]), decimals);
       const path = swapPaths.value[tokenAddress as keyof typeof swapPaths.value];
       // Use Uniswap's Quoter.sol to get amountOutMin, unless the path indicates so swap is required
-      const amountOutMin = path.length === 42 ? amountIn : await quoteExactInput(path, amountIn);
+      const isSwapRequired = Array.isArray(path) ? path.length === 1 : path.length === 42;
+      const amountOutMin = isSwapRequired ? amountIn : await quoteExactInput(path, amountIn);
       return { amountIn, amountOutMin, path };
     });
-    const swaps = <SwapSummary[]>await Promise.all(swapPromises);
+    const swaps = <SwapSummary[] | SwapSummaryUniV2[]>await Promise.all(swapPromises);
 
     // Get the donations array
     const donations: Donation[] = cart.value.map((item) => {
       // Extract data we already have
       const { grantId, contributionAmount, contributionToken } = item;
       const isEth = contributionToken.address === ETH_ADDRESS;
-      const tokenAddress = isEth ? WETH_ADDRESS : contributionToken.address;
+      const tokenAddress = getAddress(isEth ? WETH_ADDRESS : contributionToken.address);
       const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
       const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);
 
-      // Compute ratio
-      const swap = swaps.find((swap) => hexDataSlice(swap.path, 0, 20) === tokenAddress.toLowerCase());
+      // Compute ratio. We cast swaps to `any` or TS complains that we can't use `find` since `swaps` has
+      // two potential types that are incompatible with each other
+      const swap = (<any[]>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === tokenAddress);
       if (!swap) throw new Error('Could not find matching swap for donation');
       const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
 
@@ -430,6 +436,15 @@ export default function useCartStore() {
 }
 
 // --- Pure functions (not reliant on state) ---
+
+/**
+ * @notice Decodes the swap path for Uniswap V3 and Uniswap V2 style swaps to return the input token
+ * @param swap Swap details
+ * @returns Checksummed input token address
+ */
+function getInputToken(swap: SwapSummary | SwapSummaryUniV2) {
+  return getAddress(Array.isArray(swap.path) ? swap.path[0] : hexDataSlice(swap.path, 0, 20));
+}
 
 /**
  * @notice Takes an array of donation data, and adjusts the ratios so they sum to 1e18 for each set of tokens

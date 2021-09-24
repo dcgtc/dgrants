@@ -17,6 +17,7 @@ export const WAD = '1000000000000000000'; // 1e18
 export { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
 export { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
 export { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
+export { abi as GRANT_ROUND_MANAGER_UNI_V2_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManagerUniV2.sol/GrantRoundManagerUniV2.json';
 
 // Tokens
 export const ETH_ADDRESS = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
