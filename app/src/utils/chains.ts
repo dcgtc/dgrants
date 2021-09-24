@@ -156,9 +156,9 @@ const ALL_CHAIN_INFO: ChainInfo = {
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.POLYGON],
     weth: '0x82aF49447D8a07e3bd95BD0d56f35241523fBab1',
     nativeCurrency: { name: 'Matic', symbol: 'MATIC', decimals: 18 },
-    grantRegistry: '',
-    grantRoundManager: '',
-    multicall: '',
+    grantRegistry: '0x0D39B9BB82d41F33F894FCeb85FbE4777377A092',
+    grantRoundManager: '0x6C9C48aE6A74DA5A98CFAD6617cF0B860E112071',
+    multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.RINKEBY]: {
