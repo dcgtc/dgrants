@@ -134,21 +134,18 @@
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
         </div>
-
         <LoadingSpinner v-else />
       </div>
 
       <div class="py-8 border-b border-grey-100">
-        <div class="flex gap-x-4 justify-end">
+        <div v-if="Object.keys(clrPredictionsByToken).length" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Estimated matching value:</span>
-          <span v-if="Object.keys(clrPredictionsByToken).length">
-            <span v-for="(symbol, index) in Object.keys(clrPredictionsByToken)" :key="index">
-              {{ formatNumber(clrPredictionsByToken[symbol], 2) }} {{ symbol }}
-              {{ index !== Object.keys(clrPredictionsByToken).length - 1 ? '+' : '' }}
-            </span>
+          <span v-for="(symbol, index) in Object.keys(clrPredictionsByToken)" :key="index">
+            {{ formatNumber(clrPredictionsByToken[symbol], 2) }} {{ symbol }}
+            {{ index !== Object.keys(clrPredictionsByToken).length - 1 ? '+' : '' }}
           </span>
-          <span v-else> 0.0 DAI </span>
         </div>
+        <LoadingSpinner v-else />
       </div>
 
       <div class="mt-12 mb-12">
@@ -236,7 +233,7 @@ function useCart() {
     }
     // hide when cart is all denominated in a single stablecoin
     hideEquivalentContributionAmount.value =
-      sum == 0 || (isStableCoin == 1 && isStableCoin === Object.keys(cartSummary.value).length);
+      isStableCoin == 1 && isStableCoin === Object.keys(cartSummary.value).length;
     return sum;
   });
 

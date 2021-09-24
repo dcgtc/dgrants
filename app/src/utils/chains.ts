@@ -64,8 +64,7 @@ export interface L2ChainInfo extends L1ChainInfo {
 
 type ChainInfo = { readonly [chainId: number]: L1ChainInfo | L2ChainInfo } & {
   readonly [chainId in SupportedL2ChainId]: L2ChainInfo;
-} &
-  { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
+} & { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
 
 const ETH_TOKEN = { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', name: 'Ether', symbol: 'ETH', decimals: 18, logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880' }; // prettier-ignore
 const DAI_TOKEN = { name: 'Dai Stablecoin', symbol: 'DAI', decimals: 18, logoURI: 'https://assets.coingecko.com/coins/images/9956/thumb/dai-multi-collateral-mcd.png?1574218774' }; // prettier-ignore
