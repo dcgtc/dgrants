@@ -66,7 +66,7 @@ const DAI_TOKEN = { name: 'Dai Stablecoin', symbol: 'DAI', decimals: 18, logoURI
 const ETH_TOKEN = { address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE', name: 'Ether', symbol: 'ETH', decimals: 18, logoURI: 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880' }; // prettier-ignore
 const USDC_TOKEN = { name: 'USD Coin', symbol: 'USDC', decimals: 6, logoURI: 'https://assets.coingecko.com/coins/images/6319/thumb/USD_Coin_icon.png?1547042389' }; // prettier-ignore
 const USDT_TOKEN = { name: 'Tether USD', symbol: 'USDT', decimals: 6, logoURI: 'https://assets.coingecko.com/coins/images/325/thumb/Tether-logo.png?1598003707' }; // prettier-ignore
-const WBTC_TOKEN = { name: 'Wrapped BTC', symbol: 'WBTC', decimals: 8, logoURI: 'https://assets.coingecko.com/coins/images/7598/thumb/wrapped_bitcoin_wbtc.png?1548822744' }; // prettier-ignore
+// const WBTC_TOKEN = { name: 'Wrapped BTC', symbol: 'WBTC', decimals: 8, logoURI: 'https://assets.coingecko.com/coins/images/7598/thumb/wrapped_bitcoin_wbtc.png?1548822744' }; // prettier-ignore
 
 // --- Tokens by network ---
 const MAINNET_TOKENS = [
@@ -102,7 +102,7 @@ const POLYGON_TOKENS = [
   { ...DAI_TOKEN, chainId: SupportedChainId.POLYGON, address: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063' },
   { ...USDC_TOKEN, chainId: SupportedChainId.POLYGON, address: '0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174' },
   { ...USDT_TOKEN, chainId: SupportedChainId.POLYGON, address: '0xc2132D05D31c914a87C6611C10748AEb04B58e8F' },
-  { ...WBTC_TOKEN, chainId: SupportedChainId.POLYGON, address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6' },
+  // { ...WBTC_TOKEN, chainId: SupportedChainId.POLYGON, address: '0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6' },
 ];
 
 const ALL_SUPPORTED_TOKENS: { readonly [chainId: number]: TokenInfo[] } = {
