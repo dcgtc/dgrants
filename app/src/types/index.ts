@@ -34,6 +34,3 @@ export type LocalStorageData = {
   blockNumber?: number;
   data: LocalStorageAnyObj;
 };
-
-// type of sorting modes
-export type SortingMode = 'ascending' | 'descending' | 'random';

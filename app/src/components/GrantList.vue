@@ -23,60 +23,59 @@ import GrantCard from 'src/components/GrantCard.vue';
 import useCartStore from 'src/store/cart';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
-import { SortingMode } from 'src/types';
-import { bigNumberComparator } from 'src/utils/sorting';
 
-const defaultSortingMode = 'descending';
+type SortingMode = 'newest' | 'oldest' | 'shuffle';
+
+const defaultSortingMode = 'newest';
 const grantsSortingMode = ref<SortingMode>(defaultSortingMode);
-const shuffleNonce = ref(1);
 
-const filterNavTag = computed(() => {
-  switch (grantsSortingMode.value) {
-    case 'descending': {
-      return 'newest';
-    }
-    case 'ascending': {
-      return 'oldest';
-    }
-    case 'random': {
-      return 'shuffle';
-    }
-    default: {
-      return 'newest';
-    }
+function useSortedGrants(grants: Grant[]) {
+  const sortedGrants = ref(grants);
+
+  function sortGrants(order: SortingMode) {
+    grantsSortingMode.value = order;
+    if (order === 'newest') sortedGrants.value = sortedGrants.value.sort((a, b) => (a.id < b.id ? 1 : -1));
+    else if (order === 'oldest') sortedGrants.value = sortedGrants.value.sort((a, b) => (a.id > b.id ? 1 : -1));
+    else sortedGrants.value = sortedGrants.value.sort(() => (Math.random() < 0.5 ? 1 : -1));
   }
-});
 
-const grantRegistryListNav = computed(
-  () =>
-    <FilterNavItem[]>[
-      {
-        label: 'Sort',
-        tag: filterNavTag.value,
-        menu: [
-          {
-            label: 'newest',
-            action: () => {
-              grantsSortingMode.value = 'descending';
+  sortGrants(grantsSortingMode.value);
+
+  const grantRegistryListNav = computed(
+    () =>
+      <FilterNavItem[]>[
+        {
+          label: 'Sort',
+          tag: grantsSortingMode.value,
+          menu: [
+            {
+              label: 'newest',
+              action: () => {
+                sortGrants('newest');
+              },
             },
-          },
-          {
-            label: 'oldest',
-            action: () => {
-              grantsSortingMode.value = 'ascending';
+            {
+              label: 'oldest',
+              action: () => {
+                sortGrants('oldest');
+              },
             },
-          },
-          {
-            label: 'shuffle',
-            action: () => {
-              shuffleNonce.value++;
-              grantsSortingMode.value = 'random';
+            {
+              label: 'shuffle',
+              action: () => {
+                sortGrants('shuffle');
+              },
             },
-          },
-        ],
-      },
-    ]
-);
+          ],
+        },
+      ]
+  );
+
+  return {
+    sortedGrants,
+    grantRegistryListNav,
+  };
+}
 
 export default defineComponent({
   name: 'GrantList',
@@ -90,22 +89,15 @@ export default defineComponent({
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
-    const sortedGrants = computed(() => {
-      // Force to recalculate when clicking "Shuffle" consecutively.
-      shuffleNonce.value;
-      return [...props.grants].sort((a, b) => bigNumberComparator(a.id, b.id, grantsSortingMode.value));
-    });
-
     onUnmounted(() => {
       grantsSortingMode.value = defaultSortingMode;
     });
 
     return {
-      sortedGrants,
+      ...useSortedGrants(props.grants),
       isInCart,
       addToCart,
       removeFromCart,
-      grantRegistryListNav,
     };
   },
 });
