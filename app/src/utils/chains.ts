@@ -42,11 +42,12 @@ interface L1ChainInfo {
     symbol: string;
     decimals: number;
   };
-  // contract addresses
+  // contract addresses and related info
   readonly weth: string;
   readonly grantRegistry: string;
   readonly grantRoundManager: string;
   readonly multicall: string;
+  readonly startBlock: number; // block to start scanning from when looking for events, if none is cached, recommend GrantRegistry deploy block
 }
 
 export interface L2ChainInfo extends L1ChainInfo {
@@ -134,6 +135,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    startBlock: 13285176,
   },
   [SupportedChainId.MAINNET]: {
     explorer: 'https://etherscan.io',
@@ -146,6 +148,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    startBlock: 13285176,
   },
   [SupportedChainId.POLYGON]: {
     bridge: 'https://bridge.arbitrum.io/',
@@ -160,6 +163,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '0x6C9C48aE6A74DA5A98CFAD6617cF0B860E112071',
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    startBlock: 19437770,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io',
@@ -172,6 +176,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '0xa1f0230045eAb2D2F2c4ef1B7bD53330Bd41f862',
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    startBlock: 9306030,
   },
 };
 
@@ -185,3 +190,4 @@ export const GRANT_REGISTRY_ADDRESS = CHAIN_INFO.grantRegistry;
 export const GRANT_ROUND_MANAGER_ADDRESS = CHAIN_INFO.grantRoundManager;
 export const MULTICALL_ADDRESS = CHAIN_INFO.multicall;
 export const RPC_URL = CHAIN_INFO.rpcUrl;
+export const START_BLOCK = CHAIN_INFO.startBlock;
