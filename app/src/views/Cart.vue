@@ -112,12 +112,16 @@
                   <!-- match estimates -->
                   <div v-if="clrPredictions[item.grantId]">
                     <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      <template v-if="clr.matching >= 0">
+                      <template v-if="clr.matching !== false">
                         <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                       </template>
                     </span>
-                    <span class="inline-block">&nbsp;estimated matching</span>
+                    <span
+                      v-if="clrPredictions[item.grantId].reduce((carr, clr) => carr || clr.matching !== false, false)"
+                      class="inline-block"
+                      >&nbsp;estimated matching</span
+                    >
                   </div>
 
                   <!-- no matching -->
@@ -166,6 +170,10 @@
             {{ formatNumber(clrPredictionsByToken[symbol], 2) }} {{ symbol }}
             {{ index !== Object.keys(clrPredictionsByToken).length - 1 ? '+' : '' }}
           </span>
+<<<<<<< HEAD
+=======
+          <span v-else> 0 DAI </span>
+>>>>>>> Ensures we only calculate matching for the grants in a round
         </div>
         <LoadingSpinner v-else />
       </div>
