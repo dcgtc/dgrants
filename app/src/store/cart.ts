@@ -237,6 +237,10 @@ export default function useCartStore() {
     const value = ethSwap ? ethSwap.amountIn : 0;
 
     // Execute donation
+    // The donate function has two different signatures depending on chainId (e.g. GrantRoundManager
+    // vs GrantRoundManagerUniV2 contracts), and the static TS type inference can't tell the difference, so we
+    // ignore the TS error
+    // @ts-ignore
     return <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
   }
 

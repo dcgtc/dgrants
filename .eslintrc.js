@@ -24,6 +24,7 @@ module.exports = {
     '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/unbound-method': ['error', { ignoreStatic: true }],
     '@typescript-eslint/no-unused-vars': ['error', { ignoreRestSiblings: true }],
+    '@typescript-eslint/ban-ts-comment': ['warn'],
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
   },
 };
