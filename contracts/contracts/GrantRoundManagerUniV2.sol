@@ -77,13 +77,6 @@ contract GrantRoundManagerUniV2 {
     // Set state
     registry = _registry;
     donationToken = _donationToken;
-
-    // Token approvals of common tokens
-    IERC20(0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063).safeApprove(address(router), type(uint256).max); // DAI
-    IERC20(0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174).safeApprove(address(router), type(uint256).max); // USDC
-    IERC20(0xc2132D05D31c914a87C6611C10748AEb04B58e8F).safeApprove(address(router), type(uint256).max); // USDT
-    IERC20(0x1BFD67037B42Cf73acF2047067bd4F2C47D9BfD6).safeApprove(address(router), type(uint256).max); // WBTC
-    WETH.safeApprove(address(router), type(uint256).max); // WETH
   }
 
   // --- Core methods ---
@@ -213,6 +206,10 @@ contract GrantRoundManagerUniV2 {
       if (_tokenIn != WETH) {
         // Swapping a token
         _tokenIn.safeTransferFrom(msg.sender, address(this), _swaps[i].amountIn);
+        if (_tokenIn.allowance(address(this), address(router)) == 0) {
+          _tokenIn.safeApprove(address(router), type(uint256).max);
+        }
+
         router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
           _swaps[i].amountIn,
           _swaps[i].amountOutMin,
