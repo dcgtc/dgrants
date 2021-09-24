@@ -45,7 +45,7 @@ export const DGRANTS_CHAIN_ID = (Number(import.meta.env.VITE_DGRANTS_CHAIN_ID) a
 const ALCHEMY_API_KEY = import.meta.env.VITE_ALCHEMY_API_KEY;
 
 interface L1ChainInfo {
-  readonly explorer: string;
+  readonly explorer: string; // Explorer URLs should have no trailing slash
   readonly label: string;
   readonly tokens: TokenInfo[];
   readonly tokensMapping: Record<string, TokenInfo>;
@@ -148,7 +148,7 @@ const ALL_SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<string,
 const ALL_CHAIN_INFO: ChainInfo = {
   [SupportedChainId.ARBITRUM_ONE]: {
     bridge: 'https://bridge.arbitrum.io/',
-    explorer: 'https://arbiscan.io/',
+    explorer: 'https://arbiscan.io',
     label: 'Arbitrum',
     logoUrl: '/arbitrum_logo.svg',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_ONE],
@@ -166,7 +166,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
   },
   [SupportedChainId.ARBITRUM_RINKEBY]: {
     bridge: 'https://bridge.arbitrum.io/',
-    explorer: 'https://rinkeby-explorer.arbitrum.io/',
+    explorer: 'https://rinkeby-explorer.arbitrum.io',
     label: 'Arbitrum Rinkeby',
     logoUrl: '/arbitrum_logo.svg',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.ARBITRUM_RINKEBY],
@@ -183,7 +183,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     rpcUrl: `https://arb-rinkeby.g.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.MAINNET]: {
-    explorer: 'https://etherscan.io/',
+    explorer: 'https://etherscan.io',
     label: 'Mainnet',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.MAINNET],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.MAINNET],
@@ -199,7 +199,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.HARDHAT]: {
-    explorer: 'https://etherscan.io/',
+    explorer: 'https://etherscan.io',
     label: 'Hardhat',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.HARDHAT],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.HARDHAT],
@@ -215,7 +215,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
   },
   [SupportedChainId.RINKEBY]: {
-    explorer: 'https://rinkeby.etherscan.io/',
+    explorer: 'https://rinkeby.etherscan.io',
     label: 'Rinkeby',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.RINKEBY],
     tokensMapping: ALL_SUPPORTED_TOKENS_MAPPING[SupportedChainId.RINKEBY],
@@ -232,7 +232,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
   },
   [SupportedChainId.OPTIMISM]: {
     bridge: 'https://gateway.optimism.io/',
-    explorer: 'https://optimistic.etherscan.io/',
+    explorer: 'https://optimistic.etherscan.io',
     label: 'Optimism',
     logoUrl: '/optimism_logo.svg',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISM],
@@ -250,7 +250,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
   },
   [SupportedChainId.OPTIMISTIC_KOVAN]: {
     bridge: 'https://gateway.optimism.io/',
-    explorer: 'https://optimistic.etherscan.io/',
+    explorer: 'https://optimistic.etherscan.io',
     label: 'Optimistic Kovan',
     logoUrl: '/optimism_logo.svg',
     tokens: ALL_SUPPORTED_TOKENS[SupportedChainId.OPTIMISTIC_KOVAN],
