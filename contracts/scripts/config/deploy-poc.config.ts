@@ -52,7 +52,7 @@ const params: DeployParams = {
     metadataAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
     payoutAdmin: '0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F',
     matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
-    roundStartTime: 1632442000, // Friday, September 24, 2021 12:06:40 AM GMT
+    roundStartTime: 1632460000, // Friday, September 24, 2021 05:06:40 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
     ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
