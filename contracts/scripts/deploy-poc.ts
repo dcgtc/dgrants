@@ -11,6 +11,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
 // IIFE async function so "await"s can be performed for each operation
 (async function () {
   const network = hre.network.name;
+  // Polygon gas price is predictable and often overestimated, so just hardcode a price for simplicity
   const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('2', 'gwei') } : {};
 
   const logger = new ScriptLogger('poc', network);
@@ -37,16 +38,22 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
     logger.recordContract('GrantRegistry', registry.address);
 
     // Deploy the GrantRoundManager
-    const GrantRoundManager = await ethers.getContractFactory('GrantRoundManager', deployer);
-    const roundManager = await GrantRoundManager.deploy(
-      registry.address,
-      networkParams.donationToken,
-      networkParams.uniswapFactory,
-      networkParams.weth,
-      overrides
-    );
+    const managerArtifact = network === 'polygon' ? 'GrantRoundManagerUniV2' : 'GrantRoundManager';
+    const GrantRoundManager = await ethers.getContractFactory(managerArtifact, deployer);
+    let roundManager;
+    if (network === 'polygon') {
+      roundManager = await GrantRoundManager.deploy(registry.address, networkParams.donationToken, overrides);
+    } else {
+      roundManager = await GrantRoundManager.deploy(
+        registry.address,
+        networkParams.donationToken,
+        networkParams.uniswapFactory,
+        networkParams.weth,
+        overrides
+      );
+    }
     await roundManager.deployed();
-    logger.recordContract('GrantRoundManager', roundManager.address);
+    logger.recordContract(managerArtifact, roundManager.address);
 
     // Upload the Round metadata to IPFS (3 steps)
     const metadata = networkParams.metadataJson;
