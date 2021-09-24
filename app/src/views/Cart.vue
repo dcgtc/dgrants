@@ -112,13 +112,13 @@
                   <!-- match estimates -->
                   <div v-if="clrPredictions[item.grantId]">
                     <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      <template v-if="clr.matching !== false">
+                      <span v-if="typeof clr.matching === 'number'">
                         <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                       </template>
                     </span>
                     <span
-                      v-if="clrPredictions[item.grantId].reduce((carr, clr) => carr || clr.matching !== false, false)"
+                      v-if="clrPredictions[item.grantId].reduce((carr, clr) => carr || typeof clr.matching === 'number', false)"
                       class="inline-block"
                       >&nbsp;estimated matching</span
                     >
