@@ -59,7 +59,8 @@ export interface L2ChainInfo extends L1ChainInfo {
 
 type ChainInfo = { readonly [chainId: number]: L1ChainInfo | L2ChainInfo } & {
   readonly [chainId in SupportedL2ChainId]: L2ChainInfo;
-} & { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
+} &
+  { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
 
 // --- Template tokens ---
 // Templates for tokens where the only difference between networks is the token address and chainId (or no

@@ -20,7 +20,7 @@ export type CartItem =
 export type EtherscanGroup = 'tx' | 'token' | 'address';
 
 // Cart prediction entries
-export type CartPrediction = { matching: number; matchingToken: TokenInfo };
+export type CartPrediction = { matching: number | boolean; matchingToken: TokenInfo };
 export type CartPredictions = {
   [grantId: string]: CartPrediction[];
 };

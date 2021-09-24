@@ -237,6 +237,7 @@ export async function getGrantRoundGrantData(
   contributions: Contribution[],
   trustBonus: { [address: string]: number },
   grantRound: GrantRound,
+  grantRoundMetadata: Record<string, GrantRoundMetadataResolution>,
   grantIds: string[],
   forceRefresh = false
 ) {
@@ -284,23 +285,30 @@ export async function getGrantRoundGrantData(
           // get all predictions for each grant in this round
           ls_grantPredictions = (
             await Promise.all(
-              grantIds.map((grantId: string) =>
-                clr.predict({
-                  grantId: BigNumber.from(grantId).toString(),
-                  predictionPoints: [0, 1, 10, 100, 1000, 10000],
-                  trustBonusScores: trustBonusScores,
-                  grantRoundContributions: {
-                    grantRound: grantRound.address,
-                    totalPot: BigNumber.from(grantRound.funds).toNumber(),
-                    matchingTokenDecimals: grantRound.matchingToken.decimals,
-                    contributions: ls_grantDonations,
-                  },
-                })
-              )
+              grantIds.map(async (grantId: string) => {
+                let prediction: GrantPrediction | undefined = undefined;
+                const metadata = grantRoundMetadata[grantRound.metaPtr];
+                if (metadata && metadata.grants?.includes(parseInt(grantId))) {
+                  prediction = await clr.predict({
+                    grantId: BigNumber.from(grantId).toString(),
+                    predictionPoints: [0, 1, 10, 100, 1000, 10000],
+                    trustBonusScores: trustBonusScores,
+                    grantRoundContributions: {
+                      grantRound: grantRound.address,
+                      totalPot: BigNumber.from(grantRound.funds).toNumber(),
+                      matchingTokenDecimals: grantRound.matchingToken.decimals,
+                      contributions: ls_grantDonations,
+                    },
+                  });
+                }
+                return prediction;
+              })
             )
           ).reduce((predictions, prediction) => {
             // record as a dict (grantId -> GrantPrediction)
-            predictions[prediction.grantId] = prediction;
+            if (prediction) {
+              predictions[prediction.grantId] = prediction;
+            }
             return predictions;
           }, {} as Record<string, GrantPrediction>);
         }
@@ -345,29 +353,36 @@ export function getGrantsGrantRoundDetails(
   // get all contributions for this grant
   const grant_contributions = filterContributionsByGrantId(grantId, contributions);
 
-  return rounds.map((round) => {
-    // get the predictions for this grant in this round
-    const predictions = getPredictionsForGrantInRound(grantId, grantRoundsCLRData[round.address]);
-    // filter only contributions which should be considered for this round (should we also/only check metadata here?)
-    const roundContributions = filterContributionsByGrantRound(round, grant_contributions);
-    // sum the contributions which were made against this round
-    const roundsContributionTotal = roundContributions
-      .reduce((carr, contrib) => (contrib ? contrib.amount + carr : carr), 0)
-      .toString();
+  return rounds
+    .map((round) => {
+      const metadata = roundsMetadata[round.metaPtr];
+      if (metadata && metadata.grants?.includes(parseInt(grantId))) {
+        // get the predictions for this grant in this round
+        const predictions = getPredictionsForGrantInRound(grantId, grantRoundsCLRData[round.address]);
+        // filter only contributions which should be considered for this round (should we also/only check metadata here?)
+        const roundContributions = filterContributionsByGrantRound(round, grant_contributions);
+        // sum the contributions which were made against this round
+        const roundsContributionTotal = roundContributions
+          .reduce((carr, contrib) => (contrib ? contrib.amount + carr : carr), 0)
+          .toString();
 
-    return {
-      grantId: grantId,
-      address: round.address,
-      metaPtr: round.metaPtr,
-      name: roundsMetadata[round.metaPtr].name || '',
-      matchingToken: round.matchingToken,
-      donationToken: round.donationToken,
-      contributions: roundContributions,
-      balance: formatNumber(roundsContributionTotal, 2),
-      matching: predictions && formatNumber(predictions.predictions[0].predictedGrantMatch, 2),
-      prediction1: predictions && formatNumber(predictions.predictions[1].predictionDiff, 2),
-      prediction10: predictions && formatNumber(predictions.predictions[2].predictionDiff, 2),
-      prediction100: predictions && formatNumber(predictions.predictions[3].predictionDiff, 2),
-    } as GrantsRoundDetails;
-  });
+        return {
+          grantId: grantId,
+          address: round.address,
+          metaPtr: round.metaPtr,
+          name: metadata?.name || '',
+          matchingToken: round.matchingToken,
+          donationToken: round.donationToken,
+          contributions: roundContributions,
+          balance: formatNumber(roundsContributionTotal, 2),
+          matching: predictions && formatNumber(predictions.predictions[0].predictedGrantMatch, 2),
+          prediction1: predictions && formatNumber(predictions.predictions[1].predictionDiff, 2),
+          prediction10: predictions && formatNumber(predictions.predictions[2].predictionDiff, 2),
+          prediction100: predictions && formatNumber(predictions.predictions[3].predictionDiff, 2),
+        } as GrantsRoundDetails;
+      } else {
+        return false;
+      }
+    })
+    .filter((round) => round);
 }

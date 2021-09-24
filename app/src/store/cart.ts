@@ -59,7 +59,7 @@ const SWAP_PATHS = {
   },
 };
 
-const { grants, grantRounds, grantRoundsCLRData } = useDataStore();
+const { grants, grantRounds, grantRoundsCLRData, grantRoundMetadata } = useDataStore();
 const { chainId } = useWalletStore();
 const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
@@ -386,26 +386,31 @@ export default function useCartStore() {
       const token = item.contributionToken;
       // collect the matching values for each grant in each round
       _predictions[item.grantId] = (grantRounds.value || []).map((round) => {
-        // all calculations are denominated in the rounds donationToken
-        const roundToken = round.donationToken;
-        // get the predictions for this grant in this round
-        const clr_predictions = getPredictionsForGrantInRound(item.grantId, grantRoundsCLRData.value[round.address]);
-        // no conversion is required if tokens are in the same currency
-        const contributionIsRoundToken = token.address == roundToken.address;
-        // if contribution/donationToken token is DAI we can skip that step of the conversion
-        const contributionIsDai = token.symbol === 'DAI';
-        const roundTokenIsDai = roundToken.symbol === 'DAI';
-        // take the initial contributionAmount and convert it to be denominated in donationToken
-        let amount = item.contributionAmount;
-        // convert amount to the donationToken (double hop to get into dai then into the donationToken)
-        amount = contributionIsDai || contributionIsRoundToken ? amount : getConvertedAmount(amount, token.address, 1);
-        amount =
-          roundTokenIsDai || contributionIsRoundToken ? amount : getConvertedAmount(amount, roundToken.address, -1);
+        let matching: number | boolean = false;
+        const metadata = grantRoundMetadata.value[round.metaPtr];
+        if (metadata && metadata.grants?.includes(parseInt(item.grantId))) {
+          // all calculations are denominated in the rounds donationToken
+          const roundToken = round.donationToken;
+          // get the predictions for this grant in this round
+          const clr_predictions = getPredictionsForGrantInRound(item.grantId, grantRoundsCLRData.value[round.address]);
+          // no conversion is required if tokens are in the same currency
+          const contributionIsRoundToken = token.address == roundToken.address;
+          // if contribution/donationToken token is DAI we can skip that step of the conversion
+          const contributionIsDai = token.symbol === 'DAI';
+          const roundTokenIsDai = roundToken.symbol === 'DAI';
+          // take the initial contributionAmount and convert it to be denominated in donationToken
+          let amount = item.contributionAmount;
+          // convert amount to the donationToken (double hop to get into dai then into the donationToken)
+          amount =
+            contributionIsDai || contributionIsRoundToken ? amount : getConvertedAmount(amount, token.address, 1);
+          amount =
+            roundTokenIsDai || contributionIsRoundToken ? amount : getConvertedAmount(amount, roundToken.address, -1);
 
-        const matching = getPredictedMatchingForAmount(
-          clr_predictions,
-          amount // pass in the donationToken denominated amount
-        );
+          matching = getPredictedMatchingForAmount(
+            clr_predictions,
+            amount // pass in the donationToken denominated amount
+          );
+        }
 
         return {
           matching: matching,
@@ -426,10 +431,12 @@ export default function useCartStore() {
     cart.value.forEach((item) => {
       if (_predictions[item.grantId]) {
         _predictions[item.grantId].forEach((prediction: CartPrediction) => {
-          if (!_predictionTotals[prediction.matchingToken.symbol]) {
-            _predictionTotals[prediction.matchingToken.symbol] = 0;
+          if (typeof prediction.matching !== 'boolean') {
+            if (!_predictionTotals[prediction.matchingToken.symbol]) {
+              _predictionTotals[prediction.matchingToken.symbol] = 0;
+            }
+            _predictionTotals[prediction.matchingToken.symbol] += prediction.matching;
           }
-          _predictionTotals[prediction.matchingToken.symbol] += prediction.matching;
         });
       }
     });

@@ -99,6 +99,7 @@ export default function useDataStore() {
             contributions.contributions,
             trustBonusScores.trustBonus,
             grantRound,
+            grantRoundMetadata.value,
             grantIds,
             forceRefresh
           );

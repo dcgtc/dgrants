@@ -12,7 +12,7 @@
       :readonly="readonly"
       :disabled="disabled"
       :placeholder="placeholder"
-      :min="type === 'number' && min ? min : undefined"
+      :min="type === 'number' ? min : undefined"
     />
 
     <div v-if="!isValid">
