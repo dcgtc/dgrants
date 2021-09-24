@@ -37,6 +37,18 @@ if (!alchemyApiKey) {
   alchemyApiKey = '00000000000000000000000000000000';
 }
 
+// Choose node URL to fork from based on ENV var specifying the
+// network name; this var can be defined inline with commands
+const forkNetwork = process.env.HARDHAT_FORK_NETWORK as string;
+let forkNodeURL: string;
+
+if (forkNetwork === 'polygon') {
+  forkNodeURL = 'https://polygon-mainnet.g.alchemy.com/v2/';
+} else {
+  // default to mainnet
+  forkNodeURL = 'https://eth-mainnet.alchemyapi.io/v2/';
+}
+
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
   const dummyPrivateKey = '0x0000000000000000000000000000000000000000000000000000000000000001';
@@ -61,8 +73,8 @@ const config: HardhatUserConfig = {
       hardfork: 'london',
       initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
       forking: {
-        url: `https://eth-mainnet.alchemyapi.io/v2/${alchemyApiKey}`,
-        blockNumber: 13186295, // mainnet block, but works fine for Polygon too
+        url: `${forkNodeURL}${alchemyApiKey}`,
+        blockNumber: forkNetwork === 'polygon' ? 19443600 : 13186295,
       },
       accounts: {
         mnemonic,
