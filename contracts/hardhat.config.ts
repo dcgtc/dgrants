@@ -50,11 +50,15 @@ if (forkNetwork === 'polygon') {
   forkNodeURL = 'https://eth-mainnet.alchemyapi.io/v2/';
 }
 
+// Configure dummy private key, so CI doesn't fail due a lack of private key env var, which is only needed for
+// contract deployment anyway (i.e. not required for CI)
+const dummyPrivateKey = '0x0000000000000000000000000000000000000000000000000000000000000001';
+const deployPrivateKey = (process.env.DEPLOY_PRIVATE_KEY as string) || dummyPrivateKey;
+
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   const url: string = `https://eth-${network}.alchemyapi.io/v2/${alchemyApiKey}`;
-  const dummyPrivateKey = '0x0000000000000000000000000000000000000000000000000000000000000001';
   return {
-    accounts: [(process.env.DEPLOY_PRIVATE_KEY as string) || dummyPrivateKey],
+    accounts: [deployPrivateKey],
     chainId: chainIds[network],
     allowUnlimitedContractSize: true,
     url,
@@ -84,7 +88,7 @@ const config: HardhatUserConfig = {
     },
     rinkeby: createTestnetConfig('rinkeby'),
     polygon: {
-      accounts: [process.env.DEPLOY_PRIVATE_KEY as string],
+      accounts: [deployPrivateKey],
       chainId: chainIds.polygon,
       url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
     },
