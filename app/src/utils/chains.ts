@@ -167,7 +167,7 @@ const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '0x3692d6dE91E7Efd98d761fffe4d1541dAEF6030c',
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_UNI_V2_ABI,
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
-    rpcUrl: `https://polygon-mainnet.g.alchemy.com/v2/${ALCHEMY_API_KEY}`,
+    rpcUrl: 'https://polygon-rpc.com/',
     startBlock: 19437770,
   },
   [SupportedChainId.RINKEBY]: {
