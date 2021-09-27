@@ -168,7 +168,7 @@
               <div class="text-sm text-right">Transaction</div>
               <div>{{ cartStatus }}</div>
             </div>
-            <button class="btn disabled float-right" disabled><Spinner1Icon /></button>
+            <button class="btn disabled spinner float-right" disabled><Spinner1Icon /></button>
           </div>
         </div>
       </div>
