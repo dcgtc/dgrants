@@ -202,7 +202,22 @@ import useWalletStore from 'src/store/wallet';
 
 function useCart() {
   const { grantMetadata: meta } = useDataStore();
-  const { cart, lsCart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart, setCart } = useCartStore(); // prettier-ignore
+  const {
+    cart,
+    cartSummary,
+    cartSummaryString,
+    checkout,
+    clearCart,
+    clrPredictions,
+    clrPredictionsByToken,
+    fetchQuotes,
+    initializeCart,
+    lsCart,
+    quotes,
+    removeFromCart,
+    setCart,
+    updateCart,
+  } = useCartStore();
 
   // fetchQuotes whenever network changes
   const { provider, isCorrectNetwork } = useWalletStore();
@@ -258,7 +273,27 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, hideEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart, isCorrectNetwork }; // prettier-ignore
+  return {
+    cart,
+    cartSummaryString,
+    clearCart,
+    clrPredictions,
+    clrPredictionsByToken,
+    completeCheckout,
+    equivalentContributionAmount,
+    executeCheckout,
+    fetchQuotes,
+    grantMetadata,
+    hideEquivalentContributionAmount,
+    initializeCart,
+    isCorrectNetwork,
+    lsCart,
+    removeFromCart,
+    setCart,
+    status,
+    txHash,
+    updateCart,
+  };
 }
 
 export default defineComponent({
