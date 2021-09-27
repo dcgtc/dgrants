@@ -23,11 +23,19 @@ import GrantCard from 'src/components/GrantCard.vue';
 import useCartStore from 'src/store/cart';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
+// hard-coded grant ID List
+import grantIDList from 'src/CustomGrantIndexList.json';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
 const defaultSortingMode = 'newest';
 const grantsSortingMode = ref<SortingMode>(defaultSortingMode);
+
+function createCustomGrantList(grants: Grant[]) {
+  const customGrantList: Grant[] = [];
+  grantIDList.forEach((val) => customGrantList.push(grants[val]));
+  return customGrantList;
+}
 
 function useSortedGrants(grants: Grant[]) {
   const sortedGrants = ref(grants);
@@ -88,13 +96,14 @@ export default defineComponent({
   },
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
+    const grantList = grantIDList.length > 0 ? createCustomGrantList(props.grants) : props.grants;
 
     onUnmounted(() => {
       grantsSortingMode.value = defaultSortingMode;
     });
 
     return {
-      ...useSortedGrants(props.grants),
+      ...useSortedGrants(grantList),
       isInCart,
       addToCart,
       removeFromCart,
