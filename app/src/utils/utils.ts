@@ -25,10 +25,21 @@ export function isDefined(val: unknown) {
 
 // Formats a number for display to the user, by rounding to the specified number of decimals and adding commas
 export function formatNumber(value: BigNumberish, decimals: number): string {
-  // `BigNumber.from()` can't take decimal inputs
+  // `BigNumber.from()` can't take decimal inputs nor exponential inputs
   value = typeof value === 'number' || typeof value === 'string' ? Number(value) : BigNumber.from(value);
-  // Return value with minimum number of decimals shown, e.g. return '123' if input is 123.00
-  return commify(parseFloat(Number(value).toFixed(decimals)));
+  // Return value with minimum number of decimals shown, e.g. return '123' if input is 123.00.
+  // When number > MAX_SAFE_INTEGER, we lose precision because JS can't handle numbers that large.
+  // When number >= 1e21, it formats the number as 1e+21 instead of 1000...000, causing the call to `commify` to fail
+  // because it doesn't support scientific notation. In those cases, we catch the error and convert to a formatted
+  // string using `.toLocaleString()`. In reality, we don't want users checking out with numbers that large anyway
+  // due to precision loss, and in reality this will not happen because no one owns that many tokens. So the
+  // try/catch is mainly for UX reasons here to resolve https://github.com/dcgtc/dgrants/issues/291
+  const number = parseFloat(Number(value).toFixed(decimals));
+  try {
+    return commify(number);
+  } catch (err) {
+    return number.toLocaleString();
+  }
 }
 
 // Expects a unix timestamp and will return a human readable message of how far in the past/future it is
