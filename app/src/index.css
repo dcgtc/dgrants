@@ -106,6 +106,19 @@
   .btn svg {
     @apply stroke-3 stroke-white object-contain h-6 w-6 md:h-8 md:w-8;
   }
+
+  .btn.spinner svg {
+    animation: rotate 1s linear infinite;
+  }
+
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
 }
 
 /* Add styles to utilities */
