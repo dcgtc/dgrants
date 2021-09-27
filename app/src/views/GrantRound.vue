@@ -48,8 +48,8 @@
           <button
             type="submit"
             class="btn btn-primary mr-5"
-            :class="{ disabled: !isFormValid }"
-            :disabled="!isFormValid"
+            :class="{ disabled: !isFormValid || !isCorrectNetwork }"
+            :disabled="!isFormValid || !isCorrectNetwork"
           >
             Add Funds
           </button>
@@ -199,7 +199,7 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 function useGrantRoundDetail() {
   const { grantRounds, grantRoundMetadata: _grantRoundMetadata, poll } = useDataStore();
 
-  const { signer, userAddress } = useWalletStore();
+  const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
 
   const grantRoundAddress = computed(() => route.params.address);
@@ -315,6 +315,7 @@ function useGrantRoundDetail() {
   async function addFunds() {
     // Get contract instances
     if (!signer.value) throw new Error('Please connect a wallet');
+    if (!isCorrectNetwork.value) throw new Error('Wrong network');
 
     // pull data from form
     const { amount } = form.value;
@@ -362,6 +363,7 @@ function useGrantRoundDetail() {
     isAddingFunds,
     isValidUrl,
     isFormValid,
+    isCorrectNetwork,
     grantRound,
     grantRoundMetadata,
     form,
