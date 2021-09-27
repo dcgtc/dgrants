@@ -66,12 +66,12 @@
               </div>
               <!-- text -->
               <div class="col-span-4 lg:col-span-1">
-                <div
+                <span
                   class="link"
                   @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(item.grantId).toString() } })"
                 >
                   {{ grantMetadata[item.metaPtr]?.name }}
-                </div>
+                </span>
               </div>
               <!-- input -->
               <div class="col-span-4 lg:col-span-1">
@@ -108,7 +108,7 @@
                 <div class="text-grey-400 text-left lg:text-right">
                   <!-- match estimates -->
                   <div v-if="clrPredictions[item.grantId]">
-                    <span v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
+                    <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
                       <template v-if="clr.matching >= 0">
                         <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
