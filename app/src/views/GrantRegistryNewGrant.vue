@@ -142,8 +142,8 @@
         <button
           type="submit"
           class="btn btn-primary ml-auto"
-          :class="{ disabled: !isFormValid }"
-          :disabled="!isFormValid"
+          :class="{ disabled: !isFormValid || !isCorrectNetwork }"
+          :disabled="!isFormValid || !isCorrectNetwork"
         >
           Create Grant
         </button>
@@ -171,7 +171,7 @@ import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefine
 import * as ipfs from 'src/utils/data/ipfs';
 
 function useNewGrant() {
-  const { signer, grantRegistry } = useWalletStore();
+  const { signer, grantRegistry, isCorrectNetwork } = useWalletStore();
   const { poll } = useDataStore();
 
   const txHash = ref<string>();
@@ -227,6 +227,7 @@ function useNewGrant() {
     const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
     const properties = { websiteURI: website, githubURI: github, twitterURI };
     if (!signer.value) throw new Error('Please connect a wallet');
+    if (!isCorrectNetwork.value) throw new Error('Wrong network');
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, logoURI, properties })
       .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
@@ -256,6 +257,7 @@ function useNewGrant() {
     isFormValid,
     isLogoValid,
     isDefined,
+    isCorrectNetwork,
     form,
     LOREM_IPSOM_TEXT,
     txHash,

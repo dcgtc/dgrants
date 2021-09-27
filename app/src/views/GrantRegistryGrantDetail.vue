@@ -249,8 +249,8 @@
             <button
               type="submit"
               class="btn btn-primary mr-6"
-              :class="{ disabled: !isFormValid }"
-              :disabled="!isFormValid"
+              :class="{ disabled: !isFormValid || !isCorrectNetwork }"
+              :disabled="!isFormValid || !isCorrectNetwork"
             >
               Update Grant
             </button>
@@ -312,7 +312,7 @@ function useGrantDetail() {
     grantRoundsCLRData: roundsCLRData,
     grantContributions: allContributions,
   } = useDataStore();
-  const { signer, provider, userAddress, grantRegistry } = useWalletStore();
+  const { signer, provider, userAddress, grantRegistry, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
 
   // --- expose grant data ---
@@ -512,6 +512,7 @@ function useGrantDetail() {
     const { owner, payee, name, description, website, github, twitter, logo } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
+    if (!isCorrectNetwork.value) throw new Error('Wrong network');
 
     // Get registry instance
     const registry = grantRegistry.value;
@@ -596,6 +597,7 @@ function useGrantDetail() {
     isValidTwitter,
     isValidLogo,
     isDefined,
+    isCorrectNetwork,
     isFormValid,
     grant,
     grantMetadata,
