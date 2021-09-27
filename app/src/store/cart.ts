@@ -219,49 +219,54 @@ export default function useCartStore() {
    * @notice Executes donations
    */
   async function checkout(): Promise<ContractTransaction> {
-    const { signer, userAddress, grantRoundManager } = useWalletStore();
-    const manager = grantRoundManager.value;
-    const { swaps, donations, deadline } = await getCartDonationInputs();
+    try {
+      const { signer, userAddress, grantRoundManager } = useWalletStore();
+      const manager = grantRoundManager.value;
+      const { swaps, donations, deadline } = await getCartDonationInputs();
 
-    // Check all balances
-    for (const swap of swaps) {
-      await assertSufficientBalance(getInputToken(swap), swap.amountIn);
-    }
+      // Check all balances
+      for (const swap of swaps) {
+        await assertSufficientBalance(getInputToken(swap), swap.amountIn);
+      }
 
-    // Get number of approvals needed (this is handed separately than execution for UI/UX reasons, so we can show
-    // the user information about number of transactions left)
-    const tokensToApprove: string[] = [];
-    for (const swap of swaps) {
-      const tokenAddress = getInputToken(swap);
-      if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
-      const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
-      const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
-      if (allowance.lt(swap.amountIn)) tokensToApprove.push(token.address);
-    }
+      // Get number of approvals needed (this is handed separately than execution for UI/UX reasons, so we can show
+      // the user information about number of transactions left)
+      const tokensToApprove: string[] = [];
+      for (const swap of swaps) {
+        const tokenAddress = getInputToken(swap);
+        if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
+        const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
+        const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
+        if (allowance.lt(swap.amountIn)) tokensToApprove.push(token.address);
+      }
 
-    // Execute approvals if required
-    const txsNeeded = tokensToApprove.length + 1; // the +1 is for the actual checkout transaction
-    let lastApprovalIndex = 0;
-    for (const tokenAddress of tokensToApprove) {
+      // Execute approvals if required
+      const txsNeeded = tokensToApprove.length + 1; // the +1 is for the actual checkout transaction
+      let lastApprovalIndex = 0;
+      for (const tokenAddress of tokensToApprove) {
+        cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
+        const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
+        const tx = <ContractTransaction>await token.approve(manager.address, MaxUint256);
+        await tx.wait(); // we wait for each approval to be mined to avoid gas estimation complexity
+        lastApprovalIndex += 1;
+      }
       cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
-      const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
-      const tx = <ContractTransaction>await token.approve(manager.address, MaxUint256);
-      await tx.wait(); // we wait for each approval to be mined to avoid gas estimation complexity
-      lastApprovalIndex += 1;
+
+      // Determine if we need to send value with this transaction. We cast swaps to `any` or TS complains that
+      // we can't use `find` since `swaps` has two potential types that are incompatible with each other
+      const ethSwap = (<any>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
+      const value = ethSwap ? ethSwap.amountIn : 0;
+
+      // Execute donation
+      // The donate function has two different signatures depending on chainId (e.g. GrantRoundManager
+      // vs GrantRoundManagerUniV2 contracts), and the static TS type inference can't tell the difference, so we
+      // ignore the TS error
+      // @ts-ignore
+      return <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
+    } catch (e) {
+      cartStatus.value = '';
+      throw e;
     }
-    cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
-
-    // Determine if we need to send value with this transaction. We cast swaps to `any` or TS complains that
-    // we can't use `find` since `swaps` has two potential types that are incompatible with each other
-    const ethSwap = (<any>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
-    const value = ethSwap ? ethSwap.amountIn : 0;
-
-    // Execute donation
-    // The donate function has two different signatures depending on chainId (e.g. GrantRoundManager
-    // vs GrantRoundManagerUniV2 contracts), and the static TS type inference can't tell the difference, so we
-    // ignore the TS error
-    // @ts-ignore
-    return <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
   }
 
   /**
