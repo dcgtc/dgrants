@@ -68,6 +68,7 @@ const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 const lsCart = ref<CartItemOptions[]>([]); // localStorage cart
 const cart = ref<CartItem[]>([]); // source of truth for what's in the user's cart
 const quotes = ref<Record<string, number>>({}); // mapping from token address to DAI exchange rate, i.e. multiple token quantity by the exchange rate to get the value in DAI
+const cartStatus = ref<string>('');
 
 // --- Composition function for state management ---
 export default function useCartStore() {
@@ -207,6 +208,14 @@ export default function useCartStore() {
   }
 
   /**
+   * @notice Resets cart store state
+   */
+  function clearCartState() {
+    clearCart();
+    cartStatus.value = '';
+  }
+
+  /**
    * @notice Executes donations
    */
   async function checkout(): Promise<ContractTransaction> {
@@ -219,17 +228,28 @@ export default function useCartStore() {
       await assertSufficientBalance(getInputToken(swap), swap.amountIn);
     }
 
-    // Execute approvals if required
+    // Get number of approvals needed (this is handed separately than execution for UI/UX reasons, so we can show
+    // the user information about number of transactions left)
+    const tokensToApprove: string[] = [];
     for (const swap of swaps) {
       const tokenAddress = getInputToken(swap);
       if (tokenAddress === ETH_ADDRESS || tokenAddress === WETH_ADDRESS) continue; // no approvals for ETH, and explicit WETH donation not supported
       const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
       const allowance = <BigNumber>await token.allowance(userAddress.value, manager.address);
-      if (allowance.lt(swap.amountIn)) {
-        const tx = <ContractTransaction>await token.approve(manager.address, MaxUint256);
-        await tx.wait(); // we wait for each approval to be mined to avoid gas estimation complexity
-      }
+      if (allowance.lt(swap.amountIn)) tokensToApprove.push(token.address);
     }
+
+    // Execute approvals if required
+    const txsNeeded = tokensToApprove.length + 1; // the +1 is for the actual checkout transaction
+    let lastApprovalIndex = 0;
+    for (const tokenAddress of tokensToApprove) {
+      cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
+      const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
+      const tx = <ContractTransaction>await token.approve(manager.address, MaxUint256);
+      await tx.wait(); // we wait for each approval to be mined to avoid gas estimation complexity
+      lastApprovalIndex += 1;
+    }
+    cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
 
     // Determine if we need to send value with this transaction. We cast swaps to `any` or TS complains that
     // we can't use `find` since `swaps` has two potential types that are incompatible with each other
@@ -417,6 +437,7 @@ export default function useCartStore() {
     // WARNING: Be careful -- the `cart` ref is directly exposed so it can be edited by v-model, so just make
     // sure to call `updateCart()` with the appropriate inputs whenever the `cart` ref is modified
     cart,
+    cartStatus: computed(() => cartStatus.value),
     lsCart,
     quotes: computed(() => quotes.value),
     // Getters
@@ -429,6 +450,7 @@ export default function useCartStore() {
     addToCart,
     checkout,
     clearCart,
+    clearCartState,
     fetchQuotes,
     initializeCart,
     isInCart,
