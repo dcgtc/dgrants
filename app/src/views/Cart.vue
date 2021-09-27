@@ -170,6 +170,7 @@
       <div class="mt-12 mb-12">
         <div class="flex gap-x-4 justify-end">
           <button
+            v-if="cartStatus === ''"
             @click="executeCheckout"
             class="btn"
             :class="{ disabled: !isCorrectNetwork || !isCheckoutValid }"
@@ -177,6 +178,13 @@
           >
             checkout
           </button>
+          <div v-else class="flex gap-x-4 justify-end">
+            <div>
+              <div class="text-sm text-right">Transaction</div>
+              <div>{{ cartStatus }}</div>
+            </div>
+            <button class="btn disabled float-right" disabled><Spinner1Icon /></button>
+          </div>
         </div>
       </div>
     </div>
@@ -200,7 +208,7 @@
 <script lang="ts">
 // --- External Imports ---
 import { computed, defineComponent, ref, watch } from 'vue';
-import { TwitterIcon, CloseIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon, CloseIcon, Spinner1Icon } from '@fusion-icons/vue/interface';
 // --- Component Imports ---
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
@@ -220,6 +228,7 @@ function useCart() {
   const { grantMetadata: meta } = useDataStore();
   const {
     cart,
+    cartStatus,
     cartSummary,
     cartSummaryString,
     checkout,
@@ -298,6 +307,7 @@ function useCart() {
   return {
     BigNumber,
     cart,
+    cartStatus,
     cartSummaryString,
     clearCart,
     clrPredictions,
@@ -327,10 +337,11 @@ export default defineComponent({
     BaseHeader,
     BaseInput,
     BaseSelect,
-    TransactionStatus,
-    TwitterIcon,
-    CloseIcon,
     LoadingSpinner,
+    TransactionStatus,
+    CloseIcon,
+    Spinner1Icon,
+    TwitterIcon,
   },
   setup() {
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
