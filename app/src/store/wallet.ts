@@ -227,6 +227,7 @@ export default function useWalletStore() {
   const isSupportedNetwork = computed(
     () => (network.value ? DGRANTS_CHAIN_ID === network.value.chainId : true) // assume valid if we have no network information
   );
+  const isCorrectNetwork = computed(() => network.value && DGRANTS_CHAIN_ID === network.value.chainId);
 
   // ----------------------------------------------------- Exports -----------------------------------------------------
 
@@ -243,6 +244,7 @@ export default function useWalletStore() {
     chainId,
     grantRegistry,
     grantRoundManager,
+    isCorrectNetwork,
     isSupportedNetwork,
     multicall,
     network: computed(() => network.value),

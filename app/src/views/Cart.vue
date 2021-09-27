@@ -154,7 +154,14 @@
 
       <div class="mt-12 mb-12">
         <div class="flex gap-x-4 justify-end">
-          <button @click="executeCheckout" class="btn">checkout</button>
+          <button
+            @click="executeCheckout"
+            class="btn"
+            :class="{ disabled: !isCorrectNetwork }"
+            :disabled="!isCorrectNetwork"
+          >
+            checkout
+          </button>
         </div>
       </div>
     </div>
@@ -198,7 +205,7 @@ function useCart() {
   const { cart, lsCart, cartSummary, cartSummaryString, checkout, clearCart, clrPredictions, clrPredictionsByToken, fetchQuotes, initializeCart, quotes, removeFromCart, updateCart, setCart } = useCartStore(); // prettier-ignore
 
   // fetchQuotes whenever network changes
-  const { provider } = useWalletStore();
+  const { provider, isCorrectNetwork } = useWalletStore();
   // and on network change
   watch(
     () => [provider.value],
@@ -242,6 +249,7 @@ function useCart() {
   });
 
   async function executeCheckout() {
+    if (!isCorrectNetwork.value) throw new Error('Wrong network');
     const tx = await checkout();
     txHash.value = tx.hash;
   }
@@ -250,7 +258,7 @@ function useCart() {
     if (success) clearCart();
   }
 
-  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, hideEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart }; // prettier-ignore
+  return { cart, lsCart, cartSummaryString, grantMetadata, clearCart, completeCheckout, fetchQuotes, initializeCart, clrPredictions, clrPredictionsByToken, hideEquivalentContributionAmount, equivalentContributionAmount, executeCheckout, removeFromCart, setCart, status, txHash, updateCart, isCorrectNetwork }; // prettier-ignore
 }
 
 export default defineComponent({
