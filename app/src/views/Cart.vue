@@ -142,15 +142,21 @@
         </div>
       </div>
 
-      <div class="py-8 border-b border-grey-100" :class="{ hidden: hideEquivalentContributionAmount }">
-        <div v-if="equivalentContributionAmount && equivalentContributionAmount >= 0" class="flex gap-x-4 justify-end">
+      <div
+        v-if="equivalentContributionAmount >= 0"
+        class="py-8 border-b border-grey-100"
+        :class="{ hidden: hideEquivalentContributionAmount }"
+      >
+        <div class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Equivalent to:</span>
           <span>~{{ formatNumber(equivalentContributionAmount, 2) }} DAI</span>
         </div>
-        <LoadingSpinner v-else />
       </div>
 
-      <div class="py-8 border-b border-grey-100" v-if="equivalentContributionAmount && equivalentContributionAmount >= 0" >
+      <div
+        class="py-8 border-b border-grey-100"
+        v-if="equivalentContributionAmount && equivalentContributionAmount >= 0"
+      >
         <div v-if="Object.keys(clrPredictionsByToken).length" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Estimated matching value:</span>
           <span v-for="(symbol, index) in Object.keys(clrPredictionsByToken)" :key="index">
