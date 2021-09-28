@@ -234,6 +234,7 @@
             <template v-slot:input>
               <BaseImageUpload
                 v-model="form.logo"
+                :logoURI="form.logoURI"
                 width="w-full"
                 id="grant-logo"
                 :rules="isValidLogo"
@@ -451,6 +452,7 @@ function useGrantDetail() {
     github: string;
     twitter: string;
     logo: File | undefined;
+    logoURI: string | undefined;
   }>({
     owner: grant.value?.owner || '',
     payee: grant.value?.payee || '',
@@ -460,6 +462,7 @@ function useGrantDetail() {
     github: grantMetadata.value?.properties?.githubURI || '',
     twitter: cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '',
     logo: undefined,
+    logoURI: undefined,
   });
 
   const isLogoValid = ref(true);
@@ -491,6 +494,9 @@ function useGrantDetail() {
   async function updateLogo(logo: File | undefined) {
     isLogoValid.value = await isValidLogo(logo);
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
+    form.value.logoURI = logo
+      ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
+      : '';
   }
 
   /**
@@ -509,7 +515,7 @@ function useGrantDetail() {
    */
   const saveEdits = async () => {
     // Validation
-    const { owner, payee, name, description, website, github, twitter, logo } = form.value;
+    const { owner, payee, name, description, website, github, twitter, logoURI } = form.value;
     if (!grant.value) throw new Error('No grant selected');
     if (!signer.value) throw new Error('Please connect a wallet');
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
@@ -526,13 +532,12 @@ function useGrantDetail() {
     const isMetaPtrUpdated =
       name !== gMetadata?.name ||
       description !== gMetadata?.description ||
+      logoURI !== gMetadata?.logoURI ||
       website !== gMetadata?.properties?.websiteURI ||
       github !== gMetadata?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(gMetadata?.properties?.twitterURI);
+
     if (isMetaPtrUpdated) {
-      const logoURI = logo
-        ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
-        : gMetadata?.logoURI;
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
       metaPtr = await ipfs
@@ -579,6 +584,7 @@ function useGrantDetail() {
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
+    form.value.logoURI = grantMetadata.value?.logoURI || undefined;
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';
