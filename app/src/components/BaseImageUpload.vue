@@ -1,26 +1,6 @@
 <template>
-  <!-- Uploaded Image Preview -->
-  <div v-if="logoURI" class="py-8">
-    <div class="grid grid-cols-12 items-center gap-x-4 md:gap-x-8">
-      <!-- image -->
-      <div class="col-span-5 md:col-span-2 mb-3 md:mb-0">
-        <img class="shadow-light" :src="logoURI" />
-      </div>
-
-      <!-- filename -->
-      <div class="col-span-6 md:col-span-4 mb-3 md:mb-0 truncate">
-        {{ logoURI }}
-      </div>
-
-      <!-- delete icon -->
-      <div class="col-span-1 md:col-span-3 mb-3 md:mb-0 justify-self-end">
-        <XIcon class="icon icon-primary icon-small cursor-pointer" @click="removeLogo" />
-      </div>
-    </div>
-  </div>
-
   <!-- Image Upload -->
-  <template v-else>
+  <template v-if="!logoURI || !isValid">
     <div class="block">
       <label class="w-100 flex flex-col bg-white items-center px-6 py-8 border border-grey-400 cursor-pointer">
         <input type="file" @input="onInput" class="hidden" />
@@ -47,10 +27,35 @@
         </div>
       </label>
     </div>
-    <div v-if="!isValid && !logoURI" class="bg-pink p-4 text-white" :id="`${id}-error`">
+
+    <div v-if="logoURI && !isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">
       {{ errorMsg }}
     </div>
   </template>
+
+  <template v-else-if="isUploading">
+    <span>Uploading to IPFS...</span>
+  </template>
+
+  <!-- Uploaded Image Preview -->
+  <div v-else-if="logoURI" class="py-8">
+    <div class="grid grid-cols-12 items-center gap-x-4 md:gap-x-8">
+      <!-- image -->
+      <div class="col-span-5 md:col-span-2 mb-3 md:mb-0">
+        <img class="shadow-light" :src="logoURI" />
+      </div>
+
+      <!-- filename -->
+      <div class="col-span-6 md:col-span-4 mb-3 md:mb-0 truncate">
+        {{ logoURI }}
+      </div>
+
+      <!-- delete icon -->
+      <div class="col-span-1 md:col-span-3 mb-3 md:mb-0 justify-self-end">
+        <XIcon class="icon icon-primary icon-small cursor-pointer" @click="removeLogo" />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -71,6 +76,7 @@ export default defineComponent({
     width: { type: String, required: false, default: 'w-full' }, // input field width
     showBorder: { type: Boolean, required: false, default: true }, // show border below input
     logoURI: { type: String, required: false, default: undefined }, // URI of uploaded image
+    isUploading: { type: Boolean, required: false, default: false },
     rules: {
       // Validation rules, as a function that takes one input and returns a bool
       type: Function,
