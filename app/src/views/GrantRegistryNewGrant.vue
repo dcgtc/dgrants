@@ -121,20 +121,13 @@
         </template>
       </InputRow>
 
-      <!-- Uploaded Image logo -->
-      <InputRow v-if="form.logoURI">
-        <template v-slot:label>Logo:</template>
-        <template v-slot:input>
-          <BaseImageRow v-model="form.logoURI" id="grant-logo-uri" :URI="form.logoURI" />
-        </template>
-      </InputRow>
-
       <!-- Grant logo -->
       <InputRow>
         <template v-slot:label>Upload Logo:</template>
         <template v-slot:input>
           <BaseImageUpload
             v-model="form.logo"
+            :logoURI="form.logoURI"
             width="w-full"
             id="grant-logo"
             :rules="isValidLogo"
@@ -167,7 +160,6 @@ import { computed, defineComponent, ref } from 'vue';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import InputRow from 'src/components/InputRow.vue';
 import BaseInput from 'src/components/BaseInput.vue';
-import BaseImageRow from 'src/components/BaseImageRow.vue';
 import BaseImageUpload from 'src/components/BaseImageUpload.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
@@ -196,7 +188,7 @@ function useNewGrant() {
     github: string;
     twitter: string;
     logo: File | undefined;
-    logoURI: string;
+    logoURI: string | undefined;
   }>({
     owner: '',
     payee: '',
@@ -206,7 +198,7 @@ function useNewGrant() {
     github: '',
     twitter: '',
     logo: undefined,
-    logoURI: '',
+    logoURI: undefined,
   });
 
   const isLogoValid = ref(true);
@@ -284,7 +276,6 @@ export default defineComponent({
   components: {
     BaseHeader,
     BaseInput,
-    BaseImageRow,
     BaseImageUpload,
     BaseTextarea,
     InputRow,
