@@ -468,7 +468,7 @@ function useGrantDetail() {
   const isLogoValid = ref(true);
   const isFormValid = computed(() => {
     if (!grant.value) return false;
-    const { owner, payee, name, description, website, github, twitter } = form.value;
+    const { owner, payee, name, description, website, github, twitter, logoURI } = form.value;
     const areFieldsValid =
       isValidAddress(owner) &&
       isValidAddress(payee) &&
@@ -486,7 +486,8 @@ function useGrantDetail() {
       description !== grantMetadata.value?.description ||
       website !== grantMetadata.value?.properties?.websiteURI ||
       github !== grantMetadata.value?.properties?.githubURI ||
-      twitter !== cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI);
+      twitter !== cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) ||
+      logoURI !== grantMetadata.value?.logoURI;
 
     return areFieldsValid && areFieldsUpdated;
   });

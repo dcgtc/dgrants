@@ -134,6 +134,7 @@
             errorMsg="Logo must be in png or svg format, under 512 kB, with dimensions of 1920x1080"
             :required="false"
             @update:modelValue="updateLogo"
+            :isUploading="isUploadingLogo"
           />
         </template>
       </InputRow>
@@ -177,6 +178,7 @@ function useNewGrant() {
 
   const txHash = ref<string>();
   const grantId = ref<string>();
+  const isUploadingLogo = ref<boolean>();
 
   // Define form fields and parameters
   const form = ref<{
@@ -218,9 +220,11 @@ function useNewGrant() {
   async function updateLogo(logo: File | undefined) {
     isLogoValid.value = await isValidLogo(logo);
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
+    isUploadingLogo.value = true;
     form.value.logoURI = logo
       ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
       : '';
+    isUploadingLogo.value = false;
   }
 
   /**
@@ -268,6 +272,7 @@ function useNewGrant() {
     txHash,
     grantId,
     pushRoute,
+    isUploadingLogo,
   };
 }
 
