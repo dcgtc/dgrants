@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onUnmounted, PropType, ref } from 'vue';
+import { computed, defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
 // --- App Imports ---
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantCard from 'src/components/GrantCard.vue';
@@ -23,17 +23,16 @@ import GrantCard from 'src/components/GrantCard.vue';
 import useCartStore from 'src/store/cart';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
-// hard-coded grant ID List
-import grantIDList from 'src/CustomGrantIndexList.json';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
 const defaultSortingMode = 'newest';
 const grantsSortingMode = ref<SortingMode>(defaultSortingMode);
+const grantIdList = ref([]);
 
 function createCustomGrantList(grants: Grant[]) {
   const customGrantList: Grant[] = [];
-  grantIDList.forEach((val) => customGrantList.push(grants[val]));
+  grantIdList.value.forEach((val) => customGrantList.push(grants[val]));
   return customGrantList;
 }
 
@@ -96,14 +95,22 @@ export default defineComponent({
   },
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    const grantList = grantIDList.length > 0 ? createCustomGrantList(props.grants) : props.grants;
+    const grantList = computed(() =>
+      grantIdList.value.length > 0 ? createCustomGrantList(props.grants) : props.grants
+    );
+
+    onMounted(async () => {
+      const url =
+        'https://raw.githubusercontent.com/dcgtc/dgrants/top-level-grant-filter/app/src/CustomGrantIndexList.json';
+      grantIdList.value = await fetch(url).then((res) => res.json());
+    });
 
     onUnmounted(() => {
       grantsSortingMode.value = defaultSortingMode;
     });
 
     return {
-      ...useSortedGrants(grantList),
+      ...useSortedGrants(grantList.value),
       isInCart,
       addToCart,
       removeFromCart,
