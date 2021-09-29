@@ -1,5 +1,8 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { GrantMetadata } from '@dgrants/types';
+import { getStorageKey, setStorageKey } from './utils';
+import { LocalStorageData } from 'src/types';
+import { Ref } from 'vue';
 
 const retrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
 
@@ -39,4 +42,46 @@ export const getMetaPtr = ({ cid }: { cid: string }) => {
  */
 export const resolveMetaPtr = (url: string) => {
   return fetch(url).then((res) => res.json());
+};
+
+/**
+ * @notice Helper method that fetches metadata for a Grant or GrantRound, and saves the data
+ * to the state as soon as it's received
+ * @param metaPtrs Array of URLs to resolve
+ * @param metadata Name of the store's ref to assign resolve metadata to
+ */
+export const fetchMetaPtrs = async (metaPtrs: string[], metadata: Ref) => {
+  // check for any missing entries
+  const newMetadata = metaPtrs
+    .filter((metaPtr) => !metadata.value[metaPtr] || metadata.value[metaPtr].status === 'error')
+    .reduce((prev, cur) => {
+      return {
+        ...prev,
+        [cur]: { status: 'pending' },
+      };
+    }, {});
+  // when there is new metadata to load...
+  if (Object.keys(newMetadata).length) {
+    // save these pending metadata objects to state
+    metadata.value = { ...metadata.value, ...newMetadata };
+    // resolve metadata via metaPtr and update state
+    void (await Promise.all(
+      Object.keys(newMetadata).map(async (url) => {
+        try {
+          // save each individual ipfs result into storage
+          let data = await getStorageKey('ipfs-' + url);
+          if (!data) {
+            data = await resolveMetaPtr(url);
+            await setStorageKey('ipfs-' + url, data as LocalStorageData);
+          }
+          metadata.value[url] = { status: 'resolved', ...data };
+        } catch (e) {
+          metadata.value[url] = { status: 'error' };
+          console.error(e);
+        }
+      })
+    ));
+  }
+
+  return metadata;
 };
