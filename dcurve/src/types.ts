@@ -39,7 +39,7 @@ export type ContributionsByGrantId = {
   [grantId: string]: {
     grantId: string;
     grantAddress: string;
-    contributions: Contribution[];
+    contributions: Record<string, Contribution>;
   };
 };
 
