@@ -10,7 +10,7 @@ import {
 import { LocalStorageData } from 'src/types';
 // --- Methods and Data ---
 import useWalletStore from 'src/store/wallet';
-import { BigNumber, Contract, Event } from 'ethers';
+import { BigNumber, BigNumberish, Contract, Event } from 'ethers';
 import { formatUnits } from 'ethers/lib/utils';
 import { formatNumber, callMulticallContract } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
@@ -47,7 +47,7 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
       // every block
       if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1 || START_BLOCK;
+        const fromBlock = ls_blockNumber + 1;
         const newRounds =
           (
             await grantRoundManager.value?.queryFilter(
@@ -56,7 +56,6 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
               blockNumber
             )
           ).map((e: Event) => e.args?.grantRound) || [];
-
         // add new rounds
         ls_roundAddresses.push(...newRounds);
       }
@@ -238,7 +237,8 @@ export async function getGrantRoundGrantData(
   trustBonus: { [address: string]: number },
   grantRound: GrantRound,
   grantRoundMetadata: Record<string, GrantRoundMetadataResolution>,
-  grantIds: string[],
+  grantPayees: Record<string, string>,
+  grantIds: BigNumberish[],
   forceRefresh = false
 ) {
   const clr = new CLR({
@@ -252,28 +252,43 @@ export async function getGrantRoundGrantData(
       blockNumber: blockNumber,
     },
     async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
-      const roundGrantData = localStorageData?.data?.grantRoundCLR || {};
+      // unpack round state
+      const roundAddress = grantRound.address;
+      const matchingTokenDecimals = grantRound.matchingToken.decimals;
+      const totalPot = BigNumber.from(grantRound.funds).toNumber();
+
       // unpack current ls state
+      const roundGrantData = localStorageData?.data?.grantRoundCLR || {};
+      const ls_totalPot = roundGrantData?.totalPot || 0;
+      // add new donations/predictions to ls state
       let ls_grantDonations: Contribution[] = roundGrantData?.contributions || [];
       let ls_grantPredictions = roundGrantData?.predictions || {};
+
       // every block
       if (
         forceRefresh ||
         !localStorageData ||
         (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
+        // get the rounds metadata
+        const metadata = grantRoundMetadata[grantRound.metaPtr];
         // total the number of contributions being considered in the current prediction
         const oldDonationCount = ls_grantDonations.length;
         // fetch contributions
         ls_grantDonations = Object.values(contributions).filter((contribution: Contribution) => {
           // check that the contribution is valid
-          const inRound = contribution.inRounds?.includes(grantRound.address);
+          const inRound = metadata.grants?.includes(BigNumber.from(contribution.grantId).toNumber());
 
           // only include transactions from this grantRound which havent been ignored
           return inRound;
         });
-        // re-run predict if there are any new contributions/grants
-        if (ls_grantDonations.length > oldDonationCount || grantIds.length > Object.keys(ls_grantPredictions).length) {
+
+        // recalculate when totalPot increases or when there are new grantDonations
+        if (
+          ls_totalPot < totalPot ||
+          ls_grantDonations.length > oldDonationCount ||
+          (metadata.grants?.length || 0) > Object.keys(ls_grantPredictions).length
+        ) {
           // scores are to be presented in an array
           const trustBonusScores = Object.keys(trustBonus).map((address) => {
             return {
@@ -285,18 +300,17 @@ export async function getGrantRoundGrantData(
           // get all predictions for each grant in this round
           ls_grantPredictions = (
             await Promise.all(
-              grantIds.map(async (grantId: string) => {
+              grantIds.map(async (grantId: BigNumberish) => {
                 let prediction: GrantPrediction | undefined = undefined;
-                const metadata = grantRoundMetadata[grantRound.metaPtr];
-                if (metadata && metadata.grants?.includes(parseInt(grantId))) {
+                if (metadata && metadata.grants?.includes(BigNumber.from(grantId).toNumber())) {
                   prediction = await clr.predict({
                     grantId: BigNumber.from(grantId).toString(),
                     predictionPoints: [0, 1, 10, 100, 1000, 10000],
                     trustBonusScores: trustBonusScores,
                     grantRoundContributions: {
-                      grantRound: grantRound.address,
-                      totalPot: BigNumber.from(grantRound.funds).toNumber(),
-                      matchingTokenDecimals: grantRound.matchingToken.decimals,
+                      grantRound: roundAddress,
+                      totalPot: totalPot,
+                      matchingTokenDecimals: matchingTokenDecimals,
                       contributions: ls_grantDonations,
                     },
                   });
@@ -307,6 +321,7 @@ export async function getGrantRoundGrantData(
           ).reduce((predictions, prediction) => {
             // record as a dict (grantId -> GrantPrediction)
             if (prediction) {
+              prediction.grantId = BigNumber.from(prediction.grantId).toString();
               predictions[prediction.grantId] = prediction;
             }
             return predictions;
@@ -316,15 +331,15 @@ export async function getGrantRoundGrantData(
 
       const grantRoundCLR = {
         grantRoundCLR: {
-          grantRound: grantRound.address,
-          totalPot: BigNumber.from(grantRound.funds).toNumber(),
-          matchingTokenDecimals: grantRound.matchingToken.decimals,
+          grantRound: roundAddress,
+          totalPot: totalPot,
+          matchingTokenDecimals: matchingTokenDecimals,
           contributions: ls_grantDonations,
           predictions: ls_grantPredictions,
         } as GrantRoundCLR,
       };
 
-      if (ls_grantDonations.length && save) {
+      if (Object.keys(ls_grantPredictions).length && save) {
         save();
       }
 
@@ -337,7 +352,7 @@ export async function getGrantRoundGrantData(
  * @notice returns the predictions for this grant in the given round
  */
 export function getPredictionsForGrantInRound(grantId: string, roundData: GrantRoundCLR) {
-  return roundData.predictions && roundData.predictions[Number(grantId)];
+  return roundData && roundData.predictions && roundData.predictions[Number(grantId)];
 }
 
 /**

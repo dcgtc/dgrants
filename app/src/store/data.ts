@@ -3,7 +3,7 @@
  */
 
 // --- External imports ---
-import { computed, Ref, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 // --- Our imports ---
 import { BigNumber } from 'src/utils/ethers';
@@ -11,7 +11,6 @@ import useWalletStore from 'src/store/wallet';
 import { getAllGrants } from 'src/utils/data/grants';
 import { getContributions, getTrustBonusScores } from 'src/utils/data/contributions';
 import { getAllGrantRounds, getGrantRound, getGrantRoundGrantData } from 'src/utils/data/grantRounds';
-import { getStorage, setStorage } from 'src/utils/data/utils';
 import {
   Grant,
   Contribution,
@@ -20,12 +19,13 @@ import {
   GrantMetadataResolution,
   GrantRoundMetadataResolution,
 } from '@dgrants/types';
-import { resolveMetaPtr } from 'src/utils/data/ipfs';
+import { fetchMetaPtrs } from 'src/utils/data/ipfs';
 import { TokenInfo } from '@uniswap/token-lists';
 import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 
 // --- Parameters required ---
-const { provider, grantRoundManager } = useWalletStore();
+const { provider, grantRoundManager: _grantRoundManager, network } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -49,6 +49,9 @@ export default function useDataStore() {
     // Get blockdata
     lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
 
+    // Get computed on grantRoundManager
+    const grantRoundManager = computed(() => _grantRoundManager.value);
+
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
       getAllGrants(lastBlockNumber.value, forceRefresh),
@@ -56,7 +59,7 @@ export default function useDataStore() {
       grantRoundManager.value.donationToken(),
     ]);
 
-    // collect the grants into a grantId->payoutAddress obj
+    // Collect the grants into a grantId->payoutAddress obj
     const grantsList = grantsData.grants || [];
     const grantIds = grantsList.map((grant: Grant) => grant.id);
     const grantPayees = grantsList.reduce((grants: Record<string, string>, grant: Grant, key: number) => {
@@ -75,6 +78,13 @@ export default function useDataStore() {
       })
     )) as GrantRound[];
 
+    // Fetch Metadata
+    const grantMetaPtrs = grantsList.map((grant: Grant) => grant.metaPtr);
+    const grantRoundMetaPtrs = grantRoundsList.map((grantRound: GrantRound) => grantRound.metaPtr);
+    // Update Metadata synchronously
+    void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
+    void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
+
     // Get latest set of contributions
     const contributions = await getContributions(
       lastBlockNumber.value,
@@ -90,102 +100,93 @@ export default function useDataStore() {
       forceRefresh
     );
 
-    // Pull all contributions for the current GrantRounds
-    const grantDataByRound: Record<string, GrantRoundCLR> = (
-      (await Promise.all(
-        grantRoundsList.map(async (grantRound: GrantRound) => {
-          const data = await getGrantRoundGrantData(
-            lastBlockNumber.value,
-            contributions.contributions,
-            trustBonusScores.trustBonus,
-            grantRound,
-            grantRoundMetadata.value,
-            grantIds,
-            forceRefresh
+    // Set up a watch so that we only update calculations when every rounds metadata is present
+    watch(
+      () => [grantRoundMetadata.value],
+      async () => {
+        // only do predictions once after resolving all grantRounds
+        const gotAllMetadata = !grantRoundsList
+          .map((grantRound: GrantRound) => {
+            return grantRoundMetadata.value[grantRound.metaPtr].status === 'resolved';
+          })
+          .includes(false);
+        // calculate predictions after we've got all rounds metadata
+        if (gotAllMetadata) {
+          // collect all the GrantRoundGrantData once the metaData has resolved
+          const grantRoundCLRs = (await Promise.all(
+            grantRoundsList.map(async (grantRound: GrantRound) => {
+              const data = await getGrantRoundGrantData(
+                lastBlockNumber.value,
+                contributions.contributions,
+                trustBonusScores.trustBonus,
+                grantRound,
+                grantRoundMetadata.value,
+                grantPayees,
+                grantIds,
+                forceRefresh
+              );
+
+              return data.grantRoundCLR;
+            })
+          )) as GrantRoundCLR[];
+          // reduce the results into a grantRoundAddress->GrantRoundCLR store
+          grantRoundsCLRData.value = grantRoundCLRs.reduce(
+            (byRound: Record<string, GrantRoundCLR>, data: GrantRoundCLR) => {
+              byRound[data.grantRound] = data;
+
+              return byRound;
+            },
+            {} as Record<string, GrantRoundCLR>
           );
-
-          return data.grantRoundCLR;
-        })
-      )) as GrantRoundCLR[]
-    ).reduce((byRound, data) => {
-      byRound[data.grantRound] = data;
-
-      return byRound;
-    }, {} as Record<string, GrantRoundCLR>);
-
-    // Fetch Metadata
-    const grantMetaPtrs = grantsList.map((grant: Grant) => grant.metaPtr);
-    const grantRoundMetaPtrs = grantRoundsList.map((grantRound: GrantRound) => grantRound.metaPtr);
-    void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
-    void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
+        }
+      },
+      { immediate: true }
+    );
 
     // Save off data
     grants.value = grantsList as Grant[];
     grantContributions.value = contributions.contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
-    grantRoundsCLRData.value = grantDataByRound as Record<string, GrantRoundCLR>;
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
   }
 
   /**
-   * @notice Helper method that fetches metadata for a Grant or GrantRound, and saves the data
-   * to the state as soon as it's received
-   * @param metaPtrs Array of URLs to resolve
-   * @param metadata Name of the store's ref to assign resolve metadata to
-   */
-  async function fetchMetaPtrs(metaPtrs: string[], metadata: Ref) {
-    const newMetadata = metaPtrs
-      .filter((metaPtr) => !metadata.value[metaPtr])
-      .reduce((prev, cur) => {
-        return {
-          ...prev,
-          [cur]: { status: 'pending' },
-        };
-      }, {});
-    // save these pending metadata objects to state
-    metadata.value = { ...metadata.value, ...newMetadata };
-    // resolve metadata via metaPtr and update state
-    void (await Promise.all(
-      Object.keys(newMetadata).map(async (url) => {
-        try {
-          // save each individual ipfs result into storage
-          let data = getStorage('ipfs-' + url);
-          if (!data) {
-            data = await resolveMetaPtr(url);
-            setStorage('ipfs-' + url, data);
-          }
-          metadata.value[url] = { status: 'resolved', ...data };
-        } catch (e) {
-          metadata.value[url] = { status: 'error' };
-          console.error(e);
-        }
-      })
-    ));
-    // trigger a set at the root
-    metadata.value = { ...metadata.value };
-
-    return metadata;
-  }
-
-  /**
-   * @notice Throttle calls to rawPoll()
+   * @notice Throttle calls to rawPoll() and catch any errors
    */
   let timeout: ReturnType<typeof setTimeout> | undefined;
-  function poll(forceRefresh = false) {
+  async function poll(forceRefresh = false) {
     if (!timeout) {
-      rawPoll(forceRefresh);
-      timeout = setTimeout(function () {
-        timeout = undefined;
-      }, 1000);
+      try {
+        await rawPoll(forceRefresh);
+        timeout = setTimeout(function () {
+          timeout = undefined;
+        }, 1000);
+      } catch (e) {
+        console.log('dGrants: Data fetch error - please check your network -- ', e);
+      }
     }
   }
 
   /**
    * @notice Call this method to poll now, then poll on each new block
    */
-  function startPolling() {
+  async function startPolling() {
     provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
     provider.value.on('block', (/* block: number */) => void poll());
+    // record the network value to detect changes
+    const networkValue = (await getStorageKey('network'))?.data || network.value;
+    // watch the network
+    watch(
+      () => [network.value],
+      async () => {
+        // clear storage and poll again for all network changes after first load
+        if (networkValue && networkValue.chainId !== network.value?.chainId) {
+          void (await DefaultStorage.clear());
+          void poll();
+        }
+        await setStorageKey('network', { data: { chainId: network.value?.chainId } });
+      }
+    );
   }
 
   return {
