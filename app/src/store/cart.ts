@@ -252,17 +252,14 @@ export default function useCartStore() {
       }
       cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
 
-      // Determine if we need to send value with this transaction. We cast swaps to `any` or TS complains that
-      // we can't use `find` since `swaps` has two potential types that are incompatible with each other
-      const ethSwap = (<any>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
+      // Determine if we need to send value with this transaction.
+      const ethSwap = (<(SwapSummary | SwapSummaryUniV2)[]>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
       const value = ethSwap ? ethSwap.amountIn : 0;
 
       // Execute donation
       // The donate function has two different signatures depending on chainId (e.g. GrantRoundManager
-      // vs GrantRoundManagerUniV2 contracts), and the static TS type inference can't tell the difference, so we
-      // ignore the TS error
-      // @ts-ignore
-      return <ContractTransaction>await manager.donate(swaps, deadline, donations, { value });
+      // vs GrantRoundManagerUniV2 contracts)
+      return <ContractTransaction>await manager.donate(<(SwapSummary & SwapSummaryUniV2)[]>swaps, deadline, donations, { value });
     } catch (e) {
       cartStatus.value = '';
       throw e;
@@ -299,9 +296,10 @@ export default function useCartStore() {
       const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);
 
-      // Compute ratio. We cast swaps to `any` or TS complains that we can't use `find` since `swaps` has
-      // two potential types that are incompatible with each other
-      const swap = (<any[]>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === tokenAddress);
+      // Compute ratio.
+      const swap = (<(SwapSummary | SwapSummaryUniV2)[]>swaps).find(
+        (swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === tokenAddress
+      );
       if (!swap) throw new Error('Could not find matching swap for donation');
       const ratio = donationAmount.mul(WAD).div(swap.amountIn); // ratio of `token` to donate, specified as numerator where WAD = 1e18 = 100%
 
