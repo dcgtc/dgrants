@@ -32,7 +32,7 @@ import { getAddress } from 'src/utils/ethers';
 import { GRANT_REGISTRY_ABI, MULTICALL_ABI } from 'src/utils/constants';
 import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 
-const { startPolling } = useDataStore();
+const { poll } = useDataStore();
 const { setLastWallet } = useSettingsStore();
 const defaultChainId = SupportedChainId.MAINNET;
 const defaultProvider = new JsonRpcProvider(RPC_URL);
@@ -183,7 +183,7 @@ export default function useWalletStore() {
     network.value = markRaw(_network);
 
     // Start polling for data
-    startPolling();
+    poll();
   }
 
   /**
