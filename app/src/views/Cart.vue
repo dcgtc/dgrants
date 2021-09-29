@@ -110,20 +110,22 @@
               <div class="col-span-4 lg:col-span-1">
                 <div class="text-grey-400 text-left lg:text-right">
                   <!-- match estimates -->
-                  <div v-if="clrPredictions[item.grantId]">
+                  <div
+                    v-if="
+                      clrPredictions[item.grantId].reduce(
+                        (carr, clr) => carr || typeof clr.matching === 'number',
+                        false
+                      )
+                    "
+                  >
                     <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
                       <span v-if="typeof clr.matching === 'number'">
                         <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                       </template>
                     </span>
-                    <span
-                      v-if="clrPredictions[item.grantId].reduce((carr, clr) => carr || typeof clr.matching === 'number', false)"
-                      class="inline-block"
-                      >&nbsp;estimated matching</span
-                    >
+                    <span class="inline-block lg:block">&nbsp;estimated matching</span>
                   </div>
-
                   <!-- no matching -->
                   <div v-else>
                     <span>not in an active round</span>
@@ -170,10 +172,6 @@
             {{ formatNumber(clrPredictionsByToken[symbol], 2) }} {{ symbol }}
             {{ index !== Object.keys(clrPredictionsByToken).length - 1 ? '+' : '' }}
           </span>
-<<<<<<< HEAD
-=======
-          <span v-else> 0 DAI </span>
->>>>>>> Ensures we only calculate matching for the grants in a round
         </div>
         <LoadingSpinner v-else />
       </div>
