@@ -121,7 +121,6 @@ export default function useDataStore() {
                 trustBonusScores.trustBonus,
                 grantRound,
                 grantRoundMetadata.value,
-                grantPayees,
                 grantIds,
                 forceRefresh
               );
