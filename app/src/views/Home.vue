@@ -84,13 +84,15 @@ export default defineComponent({
   },
   setup() {
     const {
+      grants: _grants,
+      grantMetadata: _grantMetadata,
       grantRounds: _grantRounds,
       grantRoundMetadata: _grantRoundMetadata,
-      grants,
-      grantMetadata,
     } = useDataStore();
 
     // --- Data sources ---
+    const grants = computed(() => _grants.value);
+    const grantMetadata = computed(() => _grantMetadata.value);
     const grantRounds = computed(() => _grantRounds.value);
     const grantRoundMetadata = computed(() => _grantRoundMetadata.value);
 

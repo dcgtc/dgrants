@@ -97,7 +97,7 @@
           <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
           <div v-if="selectedRound == 0">
             <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
-              <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+              <ContributionRow :contribution="contribution" :donationToken="donationToken" />
             </div>
           </div>
           <div v-else>
@@ -105,7 +105,7 @@
               v-for="(contribution, index) in grantContributionsByRound[selectedRound - 1].contributions"
               :key="Number(index)"
             >
-              <ContributionRow :contribution="contribution" :donationToken="rounds && rounds[0].donationToken" />
+              <ContributionRow :contribution="contribution" :donationToken="donationToken" />
             </div>
           </div>
         </div>
@@ -313,6 +313,7 @@ function useGrantDetail() {
     grantRoundMetadata: roundsMetadata,
     grantRoundsCLRData: roundsCLRData,
     grantContributions: allContributions,
+    grantRoundsDonationToken: donationToken,
   } = useDataStore();
   const { signer, provider, userAddress, grantRegistry, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -335,19 +336,19 @@ function useGrantDetail() {
   const txHash = ref<string>();
 
   watch(
-    () => [grant.value, grantId.value, rounds.value, roundsMetadata.value, provider.value],
+    () => [grant.value, grantId.value, rounds.value, roundsCLRData.value, provider.value],
     () => {
       // enter loading state between loads
       loading.value = true;
       // ensure the computed props are ready before fetching data
-      if (rounds.value && roundsMetadata.value && provider.value) {
+      if (donationToken.value && rounds.value && roundsCLRData.value && provider.value) {
         // get all contributions for this grant
         const contributions = filterContributionsByGrantId(grantId.value.toString(), allContributions?.value || []);
         // sum all contributions made against this grant
         const contributionsTotal = `${formatNumber(
           contributions.reduce((total, contribution) => contribution?.amount + total, 0),
           2
-        )} ${rounds.value && rounds.value[0].donationToken.symbol}`;
+        )} ${rounds.value && donationToken.value.symbol}`;
         // collect this grants details from every round that it is a member of (should we use the metadata here?)
         const contributionsByRound = getGrantsGrantRoundDetails(
           grantId.value.toString(),
@@ -596,6 +597,7 @@ function useGrantDetail() {
   }
 
   return {
+    donationToken,
     updateLogo,
     loading,
     grantId,
