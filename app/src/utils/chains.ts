@@ -59,8 +59,7 @@ export interface L2ChainInfo extends L1ChainInfo {
 
 type ChainInfo = { readonly [chainId: number]: L1ChainInfo | L2ChainInfo } & {
   readonly [chainId in SupportedL2ChainId]: L2ChainInfo;
-} &
-  { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
+} & { readonly [chainId in SupportedL1ChainId]: L1ChainInfo };
 
 // --- Template tokens ---
 // Templates for tokens where the only difference between networks is the token address and chainId (or no
@@ -139,7 +138,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-    startBlock: 13285176,
+    startBlock: 13186294,
   },
   [SupportedChainId.MAINNET]: {
     explorer: 'https://etherscan.io',
