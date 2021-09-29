@@ -1,3 +1,5 @@
+import { LocalForageConfig } from 'src/types';
+
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ABI = [
   'function getCurrentBlockTimestamp() view returns (uint256 timestamp)',
@@ -34,12 +36,18 @@ export const ERC20_ABI = [
 
 export const LOREM_IPSOM_TEXT = 'A brief description of your grant goes here.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'; // prettier-ignore
 
-// LocalStorage keys
+// LocalForage config
+export const localForageConfig: LocalForageConfig = {
+  name: 'dGrants',
+  version: 1,
+};
+
+// LocalForage keys
 export const allGrantsKey = 'AllGrants';
 export const allGrantRoundsKey = 'AllGrantRounds';
 export const contributionsKey = 'Contributions';
 export const trustBonusKey = 'TrustBonus';
 
-// LocalStorage key-prefixes (partial key, we store an object for each instance)
+// LocalForage key-prefixes (partial key, we store an object for each instance)
 export const grantRoundKeyPrefix = 'GrantRound-';
 export const grantRoundsCLRDataKeyPrefix = 'GrantRoundsGrantData-';

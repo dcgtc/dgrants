@@ -1,6 +1,6 @@
 // --- Types ---
 import { Contribution, GrantRound } from '@dgrants/types';
-import { LocalStorageAnyObj } from 'src/types';
+import { LocalForageAnyObj } from 'src/types';
 import { TokenInfo } from '@uniswap/token-lists';
 // --- Utils ---
 import { fetchTrustBonusScore } from '@dgrants/utils/src/trustBonus';
@@ -35,14 +35,14 @@ export async function getContributions(
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageAnyObj | undefined, save?: (saveData?: LocalStorageAnyObj) => void) => {
+    async (LocalForageData?: LocalForageAnyObj | undefined, save?: (saveData?: LocalForageAnyObj) => void) => {
       // pick up contributions from the localStorage obj
-      const ls_contributions: Record<string, Contribution> = localStorageData?.data?.contributions || {};
+      const ls_contributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
 
       // every block
-      if (forceRefresh || !localStorageData || (localStorageData && localStorageData.blockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && LocalForageData.blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = localStorageData?.blockNumber + 1 || START_BLOCK;
+        const fromBlock = LocalForageData?.blockNumber + 1 || START_BLOCK;
         // get any new donations to the grantRound
         const grantDonations =
           (await grantRoundManager.value?.queryFilter(
@@ -112,25 +112,25 @@ export async function getTrustBonusScores(
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageAnyObj | undefined, save?: () => void) => {
-      const ls_trustBonus = localStorageData?.data?.trustBonus || {};
-      const ls_contributors = localStorageData?.data?.contributors || [];
+    async (LocalForageData?: LocalForageAnyObj | undefined, save?: () => void) => {
+      const ls_trustBonus = LocalForageData?.data?.trustBonus || {};
+      const ls_contributors = LocalForageData?.data?.contributors || [];
       // collect any new contributor
       const newContributorAddresses: Set<string> = new Set();
       // every block
       if (
         forceRefresh ||
-        !localStorageData ||
-        (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
+        !LocalForageData ||
+        (LocalForageData && (LocalForageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // set score for null user to prevent linear from fetching (if there are no other scores matched)
         ls_trustBonus['0x0'] = 0.5;
         // collect any new contributors
         Object.values(contributions).forEach((contribution) => {
           if (
-            !localStorageData ||
+            !LocalForageData ||
             !contribution?.blockNumber ||
-            contribution.blockNumber > (localStorageData.blockNumber || START_BLOCK)
+            contribution.blockNumber > (LocalForageData.blockNumber || START_BLOCK)
           ) {
             newContributorAddresses.add(contribution.address);
           }

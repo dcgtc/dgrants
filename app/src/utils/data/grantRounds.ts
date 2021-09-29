@@ -7,7 +7,7 @@ import {
   GrantRoundMetadataResolution,
   GrantPrediction,
 } from '@dgrants/types';
-import { LocalStorageData } from 'src/types';
+import { LocalForageData } from 'src/types';
 // --- Methods and Data ---
 import useWalletStore from 'src/store/wallet';
 import { BigNumber, BigNumberish, Contract, Event } from 'ethers';
@@ -38,14 +38,14 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
+    async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       const { grantRoundManager } = useWalletStore();
       // use the ls_blockNumber to decide if we need to update the roundAddresses
-      const ls_blockNumber = localStorageData?.blockNumber || START_BLOCK;
+      const ls_blockNumber = LocalForageData?.blockNumber || START_BLOCK;
       // only update roundAddress if new ones are added...
-      const ls_roundAddresses = localStorageData?.data?.roundAddresses || [];
+      const ls_roundAddresses = LocalForageData?.data?.roundAddresses || [];
       // every block
-      if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
         const fromBlock = ls_blockNumber + 1;
         const newRounds =
@@ -88,10 +88,10 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
+    async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       const { provider } = useWalletStore();
       // use the ls_blockNumber to decide if we need to update the rounds data
-      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      const ls_blockNumber = LocalForageData?.blockNumber || 0;
       // current state
       let {
         startTime,
@@ -105,7 +105,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         matchingToken,
         funds,
         donationTokenAddress,
-      } = localStorageData?.data?.grantRound || {};
+      } = LocalForageData?.data?.grantRound || {};
       // open the rounds contract
       const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
       // collect the donationToken & matchingToken before promise.all'ing everything
@@ -113,7 +113,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
       // use matchingTokenContract to get balance
       const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
       // full update of stored data
-      if (forceRefresh || !localStorageData) {
+      if (forceRefresh || !LocalForageData) {
         // Define calls to be read using multicall
         [
           donationTokenAddress,
@@ -158,7 +158,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
         // record the funds as a human readable number
         funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
-      } else if (localStorageData && ls_blockNumber < blockNumber) {
+      } else if (LocalForageData && ls_blockNumber < blockNumber) {
         // get the most recent block we collected
         const fromBlock = ls_blockNumber + 1 || 0;
         // get updated metadata
@@ -250,14 +250,14 @@ export async function getGrantRoundGrantData(
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageData | undefined, save?: () => void) => {
+    async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       // unpack round state
       const roundAddress = grantRound.address;
       const matchingTokenDecimals = grantRound.matchingToken.decimals;
       const totalPot = BigNumber.from(grantRound.funds).toNumber();
 
       // unpack current ls state
-      const roundGrantData = localStorageData?.data?.grantRoundCLR || {};
+      const roundGrantData = LocalForageData?.data?.grantRoundCLR || {};
       const ls_totalPot = roundGrantData?.totalPot || 0;
       // add new donations/predictions to ls state
       let ls_grantDonations: Contribution[] = roundGrantData?.contributions || [];
@@ -266,8 +266,8 @@ export async function getGrantRoundGrantData(
       // every block
       if (
         forceRefresh ||
-        !localStorageData ||
-        (localStorageData && (localStorageData.blockNumber || START_BLOCK) < blockNumber)
+        !LocalForageData ||
+        (LocalForageData && (LocalForageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // get the rounds metadata
         const metadata = grantRoundMetadata[grantRound.metaPtr];

@@ -25,12 +25,18 @@ export type CartPredictions = {
   [grantId: string]: CartPrediction[];
 };
 
+// Version/name given to the default localForage instance
+export type LocalForageConfig = {
+  name: string;
+  version: number;
+};
+
 // Generic localStorage type to store key->any
-export type LocalStorageAnyObj = {
+export type LocalForageAnyObj = {
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
-export type LocalStorageData = {
+export type LocalForageData = {
   ts?: BigNumberish;
   blockNumber?: number;
-  data: LocalStorageAnyObj;
+  data: LocalForageAnyObj;
 };
