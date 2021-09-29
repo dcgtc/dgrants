@@ -19,6 +19,12 @@
     scroll-behavior: smooth;
   }
 
+  h1 {
+    @apply text-headline;
+  }
+
+  /********* NOTIFICATION STYLES */
+
   .bn-notify-custom {
     margin-left: 0px;
   }
@@ -59,9 +65,7 @@
     display: none;
   }
 
-  h1 {
-    @apply text-headline;
-  }
+  /********* INPUT STYLES  */
 
   [type="text"],
   [type="email"],
@@ -82,6 +86,34 @@
     @apply hover:border-grey-500;
     @apply focus:outline-none focus:border-grey-500 focus:ring-0;
     font-size: 100%;
+  }
+
+  /********* WALLET MODAL STYLES */
+
+  /*The full page modal container*/
+  .bn-onboard-custom.bn-onboard-modal {
+    font-family: Source Code Pro, monospace;
+    @apply bg-white bg-opacity-90 font-normal;
+  }
+
+  /*The container for the modal content*/
+  .bn-onboard-custom.bn-onboard-modal-content {
+    @apply border-2 border-grey-500 rounded-none px-6 py-6;
+  }
+
+  /*The header of the modal*/
+  .bn-onboard-custom.bn-onboard-modal-content-header {
+    @apply mb-0;
+  }
+
+  /*The heading within the header*/
+  .bn-onboard-custom.bn-onboard-modal-content-header-heading {
+    @apply font-medium m-0;
+    font-size: 100%;
+  }
+
+  .bn-onboard-custom.bn-onboard-modal-content-header-icon {
+    display: none;
   }
 }
 
