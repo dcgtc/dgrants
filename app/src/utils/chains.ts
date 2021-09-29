@@ -125,7 +125,7 @@ const ALL_SUPPORTED_TOKENS_MAPPING: { readonly [chainId: number]: Record<string,
 })();
 
 // --- Data for all supported chains ---
-const ALL_CHAIN_INFO: ChainInfo = {
+export const ALL_CHAIN_INFO: ChainInfo = {
   [SupportedChainId.HARDHAT]: {
     explorer: 'https://etherscan.io',
     label: 'Hardhat',

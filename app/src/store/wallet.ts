@@ -23,7 +23,7 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
-import { CHAIN_INFO, DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
+import { ALL_CHAIN_INFO, CHAIN_INFO, DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
 import { BigNumber, Contract, hexStripZeros, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers'; // prettier-ignore
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
@@ -54,8 +54,14 @@ function resetState() {
 }
 
 // Settings
+const rpcUrlsByChain: Record<string, string> = {};
+Object.entries(ALL_CHAIN_INFO).forEach(([chainId, chainData]) => (rpcUrlsByChain[String(chainId)] = chainData.rpcUrl));
+
 const walletChecks = [{ checkName: 'connect' }];
-const wallets = [{ walletName: 'metamask', preferred: true }]; // TODO determine set of wallets to support, and make sure rpcUrls are reactive based on network
+const wallets = [
+  { walletName: 'metamask', preferred: true },
+  { walletName: 'walletConnect', rpc: rpcUrlsByChain, preferred: true },
+];
 
 export default function useWalletStore() {
   // ------------------------------------------------ Wallet Connection ------------------------------------------------
@@ -166,6 +172,7 @@ export default function useWalletStore() {
 
     // Get ENS name if user is connected to mainnet
     const chainId = _provider.network.chainId; // must be done after the .getNetwork() call
+    console.log('connected on chainId: ', chainId);
     const _userEns = chainId === 1 ? await _provider.lookupAddress(_userAddress) : null;
 
     // Now we save the user's info to the store. We don't do this earlier because the UI is reactive based on these

@@ -12,6 +12,7 @@ const messagesToIgnore = [
   'walletSelect must be called before walletCheck', // user decided not to connect wallet
   'unknown account #0', // happens when we try to connect to a locked wallet
   'TypeError: _context.t2 is not a constructor', // https://github.com/dcgtc/dgrants/issues/26
+  'PollingBlockTracker - encountered an error while attempting to update latest block', // occurs if you use walletconnect + Argent and connect with a chainId different than DGRANTS_CHAIN_ID
 ];
 
 /**
