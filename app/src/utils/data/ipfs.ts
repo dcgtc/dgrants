@@ -1,7 +1,7 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { GrantMetadata } from '@dgrants/types';
 import { getStorageKey, setStorageKey } from './utils';
-import { LocalStorageData } from 'src/types';
+import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
 const retrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
@@ -72,7 +72,7 @@ export const fetchMetaPtrs = async (metaPtrs: string[], metadata: Ref) => {
           let data = await getStorageKey('ipfs-' + url);
           if (!data) {
             data = await resolveMetaPtr(url);
-            await setStorageKey('ipfs-' + url, data as LocalStorageData);
+            await setStorageKey('ipfs-' + url, data as LocalForageData);
           }
           metadata.value[url] = { status: 'resolved', ...data };
         } catch (e) {

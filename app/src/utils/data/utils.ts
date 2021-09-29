@@ -1,14 +1,12 @@
 // --- Types ---
-import { LocalStorageData, LocalStorageAnyObj } from 'src/types';
+import { LocalForageData, LocalForageAnyObj, LocalForageConfig } from 'src/types';
+import { localForageConfig } from 'src/utils/constants';
 import * as localForage from 'localforage';
 
 /**
  * @notice Default localForage instance
  */
-export const DefaultStorage = getStorage({
-  name: 'dGrants',
-  version: 1,
-});
+export const DefaultStorage = getStorage(localForageConfig);
 
 /**
  * @notice Sync the response from `callback` with localStorage (get/set)
@@ -20,23 +18,23 @@ export const DefaultStorage = getStorage({
  */
 export async function syncStorage(
   key: string,
-  meta: LocalStorageAnyObj,
+  meta: LocalForageAnyObj,
   callback: (
-    localStorageData?: LocalStorageData,
-    save?: (saveData?: LocalStorageAnyObj) => void
-  ) => Promise<LocalStorageAnyObj>,
+    LocalForageData?: LocalForageData,
+    save?: (saveData?: LocalForageAnyObj) => void
+  ) => Promise<LocalForageAnyObj>,
   useStorage?: LocalForage
 ) {
   // allow callback to mark shouldSave
   let altData = undefined;
   let shouldSave = undefined;
   // retrieve state from localStorage
-  const localStorageData = await getStorageKey(key, useStorage);
+  const LocalForageData = await getStorageKey(key, useStorage);
   // check for updates
-  // - `callback` is passed a `localStorageData` object (the current state) and a `save` fn
+  // - `callback` is passed a `LocalForageData` object (the current state) and a `save` fn
   // - `callback` should return an Object which syncStorage will return as response
   // - `callback` may call `save` and pass in an alternative object to save into localStorage
-  const data = await callback(localStorageData, (saveData?) => ((shouldSave = true), (altData = saveData)));
+  const data = await callback(LocalForageData, (saveData?) => ((shouldSave = true), (altData = saveData)));
   // save new state
   if (shouldSave) {
     // merge data with meta and store into storage mechanism (localStorage)
@@ -57,7 +55,7 @@ export async function syncStorage(
 /**
  * @notice Get a new instance of localForage with the given config
  */
-export function getStorage(config: LocalForageOptions) {
+export function getStorage(config: LocalForageConfig) {
   return localForage.createInstance(config);
 }
 
@@ -65,12 +63,12 @@ export function getStorage(config: LocalForageOptions) {
  * @notice Get stored data at given key
  */
 export async function getStorageKey(key: string, useStorage?: LocalForage) {
-  return (await (useStorage || DefaultStorage).getItem(key)) as LocalStorageData | undefined;
+  return (await (useStorage || DefaultStorage).getItem(key)) as LocalForageData | undefined;
 }
 
 /**
  * @notice Save new data to the given key
  */
-export async function setStorageKey(key: string, value: LocalStorageData, useStorage?: LocalForage) {
+export async function setStorageKey(key: string, value: LocalForageData, useStorage?: LocalForage) {
   return await (useStorage || DefaultStorage).setItem(key, value);
 }

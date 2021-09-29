@@ -1,6 +1,6 @@
 // --- Types ---
 import { Grant } from '@dgrants/types';
-import { LocalStorageData, LocalStorageAnyObj } from 'src/types';
+import { LocalForageData, LocalForageAnyObj } from 'src/types';
 // --- Utils ---
 import { syncStorage } from 'src/utils/data/utils';
 import { BigNumber, Event } from 'ethers';
@@ -25,13 +25,13 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
     {
       blockNumber: blockNumber,
     },
-    async (localStorageData?: LocalStorageData | undefined, save?: (saveData: LocalStorageAnyObj) => void) => {
+    async (LocalForageData?: LocalForageData | undefined, save?: (saveData: LocalForageAnyObj) => void) => {
       // use the ls_blockNumber to decide if we need to update the grants
-      const ls_blockNumber = localStorageData?.blockNumber || 0;
+      const ls_blockNumber = LocalForageData?.blockNumber || 0;
       // pull the indexed grants data from localStorage
-      const ls_grants = localStorageData?.data?.grants || {};
+      const ls_grants = LocalForageData?.data?.grants || {};
       // every block
-      if (forceRefresh || !localStorageData || (localStorageData && ls_blockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
         const fromBlock = ls_blockNumber + 1 || START_BLOCK;
         // pull any newly created or edited grants from all blocks since we last polled
