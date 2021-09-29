@@ -46,7 +46,7 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType } from 'vue';
+import { ref, defineComponent, PropType, computed } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
@@ -57,14 +57,14 @@ import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/uti
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
-function getTotalRaised(grantId: any) {
+function getTotalRaised(grantId: BigNumberish) {
   const { grantRounds, grantContributions } = useDataStore();
-  const contributions = filterContributionsByGrantId(grantId.value.toString(), grantContributions?.value || []);
+  const contributions = filterContributionsByGrantId(grantId.toString(), grantContributions?.value || []);
   const raised = `${formatNumber(
     contributions.reduce((total, contribution) => contribution?.amount + total, 0),
     2
   )} ${grantRounds.value && grantRounds.value[0].donationToken.symbol}`;
-  return { raised };
+  return raised;
 }
 
 export default defineComponent({
@@ -77,8 +77,10 @@ export default defineComponent({
   },
   components: { CartIcon },
   setup(props) {
-    const grantId = ref<any>(props.id);
+    const grantId = ref<BigNumberish>(props.id);
+    const raised = computed(() => getTotalRaised(grantId.value));
     const { addToCart, isInCart, removeFromCart } = useCartStore();
+
     return {
       addToCart,
       removeFromCart,
@@ -87,7 +89,7 @@ export default defineComponent({
       getEtherscanUrl,
       pushRoute,
       BigNumber,
-      ...getTotalRaised(grantId),
+      raised,
     };
   },
 });

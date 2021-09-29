@@ -39,7 +39,7 @@
           <!--round-->
           <div>
             <span class="text-grey-400 mr-4">Matching:</span>
-            <span>{{ round.matching }} {{ round.matchingToken.symbol }}</span>
+            <span>{{ round.matching || '...' }} {{ round.matchingToken.symbol }}</span>
             <span>, {{ round.name }}</span>
           </div>
 
