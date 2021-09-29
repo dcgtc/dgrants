@@ -237,7 +237,6 @@ export async function getGrantRoundGrantData(
   trustBonus: { [address: string]: number },
   grantRound: GrantRound,
   grantRoundMetadata: Record<string, GrantRoundMetadataResolution>,
-  grantPayees: Record<string, string>,
   grantIds: BigNumberish[],
   forceRefresh = false
 ) {

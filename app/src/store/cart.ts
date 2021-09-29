@@ -253,13 +253,17 @@ export default function useCartStore() {
       cartStatus.value = `${lastApprovalIndex + 1} of ${txsNeeded} pending`;
 
       // Determine if we need to send value with this transaction.
-      const ethSwap = (<(SwapSummary | SwapSummaryUniV2)[]>swaps).find((swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS);
+      const ethSwap = (<(SwapSummary | SwapSummaryUniV2)[]>swaps).find(
+        (swap: SwapSummary | SwapSummaryUniV2) => getInputToken(swap) === WETH_ADDRESS
+      );
       const value = ethSwap ? ethSwap.amountIn : 0;
 
       // Execute donation
       // The donate function has two different signatures depending on chainId (e.g. GrantRoundManager
       // vs GrantRoundManagerUniV2 contracts)
-      return <ContractTransaction>await manager.donate(<(SwapSummary & SwapSummaryUniV2)[]>swaps, deadline, donations, { value });
+      return <ContractTransaction>(
+        await manager.donate(<(SwapSummary & SwapSummaryUniV2)[]>swaps, deadline, donations, { value })
+      );
     } catch (e) {
       cartStatus.value = '';
       throw e;

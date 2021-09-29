@@ -119,7 +119,7 @@
                     "
                   >
                     <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      <span v-if="typeof clr.matching === 'number'">
+                      <template v-if="typeof clr.matching === 'number'">
                         <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                       </template>
