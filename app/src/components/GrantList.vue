@@ -21,6 +21,7 @@ import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantCard from 'src/components/GrantCard.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
+import useWalletStore from 'src/store/wallet';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
 
@@ -32,12 +33,15 @@ const grantIdList = ref([]);
 
 function createCustomGrantList(grants: Grant[]) {
   const customGrantList: Grant[] = [];
-  grantIdList.value.forEach((val) => customGrantList.push(grants[val]));
+  for (const val of grantIdList.value) {
+    if (!grants[val]) return;
+    customGrantList.push(grants[val]);
+  }
   return customGrantList;
 }
 
 function useSortedGrants(grants: Grant[]) {
-  const sortedGrants = ref(grants);
+  const sortedGrants = computed(() => (grantIdList.value.length > 0 ? createCustomGrantList(grants) : grants));
 
   function sortGrants(order: SortingMode) {
     grantsSortingMode.value = order;
@@ -95,14 +99,12 @@ export default defineComponent({
   },
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    const grantList = computed(() =>
-      grantIdList.value.length > 0 ? createCustomGrantList(props.grants) : props.grants
-    );
+    const { chainId } = useWalletStore();
 
     onMounted(async () => {
-      const url =
-        'https://raw.githubusercontent.com/dcgtc/dgrants/top-level-grant-filter/app/src/CustomGrantIndexList.json';
-      grantIdList.value = await fetch(url).then((res) => res.json());
+      const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+      const json = await fetch(url).then((res) => res.json());
+      grantIdList.value = json[chainId.value];
     });
 
     onUnmounted(() => {
@@ -110,7 +112,7 @@ export default defineComponent({
     });
 
     return {
-      ...useSortedGrants(grantList.value),
+      ...useSortedGrants(props.grants),
       isInCart,
       addToCart,
       removeFromCart,
