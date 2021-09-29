@@ -65,7 +65,6 @@ export function lerp(x_lower: number, x_upper: number, y_lower: number, y_upper:
  * @param {Number} amount Human readable amount denominated in the GrantRounds matchingToken
  */
 export function getPredictedMatchingForAmount(clr_predictions: GrantPrediction, amount: number) {
-
   if (amount < 0) {
     return 0;
   }

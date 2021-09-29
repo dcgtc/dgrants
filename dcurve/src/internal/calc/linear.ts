@@ -34,11 +34,16 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
       contributionsByGrantId[contribution.grantId] = {
         grantId: contribution.grantId,
         grantAddress: contribution.grantAddress,
-        contributions: [],
+        contributions: {},
       };
       contributionAddresses.add(contribution.address);
     }
-    contributionsByGrantId[contribution.grantId].contributions.push(contribution);
+    // sum contributions from the same contributor to dampen effects
+    if (!contributionsByGrantId[contribution.grantId].contributions[contribution.address]) {
+      contributionsByGrantId[contribution.grantId].contributions[contribution.address] = { ...contribution };
+    } else {
+      contributionsByGrantId[contribution.grantId].contributions[contribution.address].amount += contribution.amount;
+    }
   });
 
   let trustBonusScores = clrArgs.trustBonusScores || [];
@@ -67,7 +72,7 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
     let sumOfSqrtContrib = 0;
     let sumOfContrib = 0;
     // calculate sum of sqrt of contributions and contributions
-    details.contributions.forEach((contribution) => {
+    Object.values(details.contributions).forEach((contribution) => {
       // get contributor's trust bonus score
       const trustBonusScore = trustBonusScores.find(
         (trustScore: TrustBonusScore) => trustScore.address == contribution.address
