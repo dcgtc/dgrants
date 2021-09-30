@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, onUnmounted, PropType, ref } from 'vue';
+import { watch, computed, defineComponent, onMounted, onUnmounted, PropType, ComputedRef, ref } from 'vue';
 // --- App Imports ---
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantCard from 'src/components/GrantCard.vue';
@@ -34,14 +34,14 @@ const grantIdList = ref([]);
 function createCustomGrantList(grants: Grant[]) {
   const customGrantList: Grant[] = [];
   for (const val of grantIdList.value) {
-    if (!grants[val]) return;
+    if (!grants[val]) break;
     customGrantList.push(grants[val]);
   }
   return customGrantList;
 }
 
-function useSortedGrants(grants: Grant[]) {
-  const sortedGrants = computed(() => (grantIdList.value.length > 0 ? createCustomGrantList(grants) : grants));
+function useSortedGrants(grants: ComputedRef<Grant[]>) {
+  const sortedGrants = ref(grants.value);
 
   function sortGrants(order: SortingMode) {
     grantsSortingMode.value = order;
@@ -50,7 +50,14 @@ function useSortedGrants(grants: Grant[]) {
     else sortedGrants.value = sortedGrants.value.sort(() => (Math.random() < 0.5 ? 1 : -1));
   }
 
-  sortGrants(grantsSortingMode.value);
+  watch(
+    () => grantIdList.value,
+    async () => {
+      sortedGrants.value = grants.value;
+      sortGrants(grantsSortingMode.value);
+    },
+    { immediate: true }
+  );
 
   const grantRegistryListNav = computed(
     () =>
@@ -100,6 +107,9 @@ export default defineComponent({
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
     const { chainId } = useWalletStore();
+    const grantList = computed(() =>
+      grantIdList.value.length > 0 ? createCustomGrantList(props.grants) : props.grants
+    );
 
     onMounted(async () => {
       const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
@@ -112,7 +122,7 @@ export default defineComponent({
     });
 
     return {
-      ...useSortedGrants(props.grants),
+      ...useSortedGrants(grantList),
       isInCart,
       addToCart,
       removeFromCart,
