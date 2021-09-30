@@ -34,7 +34,7 @@ const grantIdList = ref([]);
 function createCustomGrantList(grants: Grant[]) {
   const customGrantList: Grant[] = [];
   for (const val of grantIdList.value) {
-    if (!grants[val]) break;
+    if (!grants[val]) continue;
     customGrantList.push(grants[val]);
   }
   return customGrantList;
