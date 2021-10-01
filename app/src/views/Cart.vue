@@ -60,8 +60,11 @@
             <div class="grid grid-cols-4 items-center gap-x-8 gap-y-4">
               <!-- image -->
               <div class="col-span-4 lg:col-span-1">
-                <figure class="max-w-lg">
-                  <img class="shadow-light" :src="grantMetadata[item.metaPtr]?.logoURI || '/placeholder_grant.svg'" />
+                <figure class="aspect-w-16 aspect-h-9 shadow-light">
+                  <img
+                    class="w-full h-full object-center object-cover group-hover:opacity-90"
+                    :src="grantMetadata[item.metaPtr]?.logoURI || '/placeholder_grant.svg'"
+                  />
                 </figure>
               </div>
               <!-- text -->
