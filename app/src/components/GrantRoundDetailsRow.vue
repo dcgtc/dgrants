@@ -1,9 +1,12 @@
 <template>
   <div class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2 gap-x-14">
     <!--grid:left (img)-->
-    <div>
-      <img class="shadow-light object-cover h-full" :src="grantRoundMetadata?.logoURI || '/placeholder_grant.svg'" />
-    </div>
+    <figure class="aspect-w-16 aspect-h-9 shadow-light">
+      <img
+        class="w-full h-full object-center object-cover"
+        :src="grantRoundMetadata?.logoURI || '/placeholder_grant.svg'"
+      />
+    </figure>
 
     <!--grid:right (txt)-->
     <div class="my-6 px-8 md:px-0">

@@ -2,8 +2,8 @@
 <template>
   <figure class="group cursor-pointer" @click="pushRoute({ name: 'dgrants-round', params: { address: address } })">
     <!--img-->
-    <div>
-      <img class="shadow-light group-hover:opacity-90" :src="imgurl" />
+    <div class="aspect-w-16 aspect-h-9 shadow-light">
+      <img class="w-full h-full object-center object-cover group-hover:opacity-90" :src="imgurl" />
     </div>
 
     <figcaption class="mt-4">

@@ -5,9 +5,14 @@
     class="group cursor-pointer"
     @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
   >
-    <!--img-->
+    <!--wrapper to position img and cart button-->
     <div class="relative">
-      <img class="shadow-light group-hover:opacity-90" :src="imgurl" />
+      <!--img-->
+      <div class="aspect-w-16 aspect-h-9 shadow-light">
+        <img class="w-full h-full object-center object-cover group-hover:opacity-90" :src="imgurl" />
+      </div>
+
+      <!--cart button-->
       <div class="absolute bottom-0 right-0">
         <button
           class="btn opacity-0 group-hover:opacity-100"
@@ -18,6 +23,7 @@
         </button>
       </div>
     </div>
+
     <figcaption class="mt-4">
       <div class="truncate">{{ name }}</div>
       <div>

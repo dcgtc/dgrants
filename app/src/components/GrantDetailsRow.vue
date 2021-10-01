@@ -2,8 +2,8 @@
   <!-- grid sm:1col md:2col -->
   <section class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2">
     <!--grid:left (img)-->
-    <figure>
-      <img class="shadow-light object-cover h-full" :src="logoURI || '/placeholder_grant.svg'" />
+    <figure class="aspect-w-16 aspect-h-9 shadow-light">
+      <img class="w-full h-full object-center object-cover" :src="logoURI || '/placeholder_grant.svg'" />
     </figure>
 
     <!--grid:right (txt)-->

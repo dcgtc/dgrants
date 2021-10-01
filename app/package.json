@@ -19,6 +19,7 @@
     "@dgrants/types": "^0.0.1",
     "@fusion-icons/vue": "^0.0.0",
     "@headlessui/vue": "^1.2.0",
+    "@tailwindcss/aspect-ratio": "^0.2.1",
     "@tailwindcss/forms": "^0.3.3",
     "@uniswap/token-lists": "^1.0.0-beta.25",
     "@uniswap/v3-sdk": "^3.3.2",
