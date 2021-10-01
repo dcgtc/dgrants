@@ -238,9 +238,10 @@
                 width="w-full"
                 id="grant-logo"
                 :rules="isValidLogo"
-                errorMsg="Logo must be in png or svg format, under 512 kB, with dimensions of 1920x1080"
+                errorMsg="Logo must be in png or svg format, under 512 kB, with dimensions greater than 960x540"
                 :required="false"
                 @update:modelValue="updateLogo"
+                :isUploading="isUploadingLogo"
               />
             </template>
           </InputRow>
@@ -442,6 +443,7 @@ function useGrantDetail() {
   // --- Edit capabilities ---
   const isOwner = computed(() => userAddress.value === grant.value?.owner);
   const isEditing = ref(false);
+  const isUploadingLogo = ref<boolean>(false);
 
   const form = ref<{
     owner: string;
@@ -494,10 +496,12 @@ function useGrantDetail() {
 
   async function updateLogo(logo: File | undefined) {
     isLogoValid.value = await isValidLogo(logo);
+    if (isLogoValid.value) isUploadingLogo.value = true;
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
     form.value.logoURI = logo
       ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
       : '';
+    isUploadingLogo.value = false;
   }
 
   /**
@@ -625,6 +629,7 @@ function useGrantDetail() {
     LOREM_IPSOM_TEXT,
     txHash,
     areLinksDefined,
+    isUploadingLogo,
   };
 }
 
