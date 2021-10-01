@@ -1,6 +1,10 @@
 <template>
+  <template v-if="isUploading">
+    <span>Uploading to IPFS...</span>
+  </template>
+
   <!-- Image Upload -->
-  <template v-if="!logoURI || !isValid">
+  <template v-else-if="!logoURI || !isValid">
     <div class="block">
       <label class="w-100 flex flex-col bg-white items-center px-6 py-8 border border-grey-400 cursor-pointer">
         <input type="file" @input="onInput" class="hidden" />
@@ -31,10 +35,6 @@
     <div v-if="logoURI && !isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">
       {{ errorMsg }}
     </div>
-  </template>
-
-  <template v-else-if="isUploading">
-    <span>Uploading to IPFS...</span>
   </template>
 
   <!-- Uploaded Image Preview -->
