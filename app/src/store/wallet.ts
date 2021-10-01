@@ -172,7 +172,6 @@ export default function useWalletStore() {
 
     // Get ENS name if user is connected to mainnet
     const chainId = _provider.network.chainId; // must be done after the .getNetwork() call
-    console.log('connected on chainId: ', chainId);
     const _userEns = chainId === 1 ? await _provider.lookupAddress(_userAddress) : null;
 
     // Now we save the user's info to the store. We don't do this earlier because the UI is reactive based on these
