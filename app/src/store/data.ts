@@ -25,7 +25,7 @@ import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 
 // --- Parameters required ---
-const { provider, grantRoundManager: _grantRoundManager, network } = useWalletStore();
+const { provider, grantRoundManager, network } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -40,6 +40,8 @@ const grantRoundMetadata = ref<Record<string, GrantRoundMetadataResolution>>({})
 const grantRoundsCLRData = ref<Record<string, GrantRoundCLR>>({});
 const grantRoundsDonationToken = ref<TokenInfo>();
 
+const timeout = ref<ReturnType<typeof setTimeout> | undefined>();
+
 // --- Store methods and exports ---
 export default function useDataStore() {
   /**
@@ -49,8 +51,7 @@ export default function useDataStore() {
     // Get blockdata
     lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
 
-    // Get computed on grantRoundManager
-    const grantRoundManager = computed(() => _grantRoundManager.value);
+    console.log(lastBlockNumber.value);
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
@@ -60,6 +61,7 @@ export default function useDataStore() {
     ]);
 
     // Collect the grants into a grantId->payoutAddress obj
+    console.log(grantsData);
     const grantsList = grantsData.grants || [];
     const grantIds = grantsList.map((grant: Grant) => grant.id);
     const grantPayees = grantsList.reduce((grants: Record<string, string>, grant: Grant, key: number) => {
@@ -86,19 +88,17 @@ export default function useDataStore() {
     void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
 
     // Get latest set of contributions
-    const contributions = await getContributions(
-      lastBlockNumber.value,
-      grantPayees,
-      SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
-      forceRefresh
-    );
+    const contributions =
+      (await getContributions(
+        lastBlockNumber.value,
+        grantPayees,
+        SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
+        forceRefresh
+      )) || {};
 
     // Pull all trust scores from gitcoin api (depends on the contributions from getContributions)
-    const trustBonusScores = await getTrustBonusScores(
-      lastBlockNumber.value,
-      contributions.contributions,
-      forceRefresh
-    );
+    const trustBonusScores =
+      (await getTrustBonusScores(lastBlockNumber.value, contributions.contributions || [], forceRefresh)) || {};
 
     // Set up a watch so that we only update calculations when every rounds metadata is present
     watch(
@@ -117,8 +117,8 @@ export default function useDataStore() {
             grantRoundsList.map(async (grantRound: GrantRound) => {
               const data = await getGrantRoundGrantData(
                 lastBlockNumber.value,
-                contributions.contributions,
-                trustBonusScores.trustBonus,
+                contributions.contributions || [],
+                trustBonusScores.trustBonus || {},
                 grantRound,
                 grantRoundMetadata.value,
                 grantIds,
@@ -152,15 +152,15 @@ export default function useDataStore() {
   /**
    * @notice Throttle calls to rawPoll() and catch any errors
    */
-  let timeout: ReturnType<typeof setTimeout> | undefined;
   async function poll(forceRefresh = false) {
-    if (!timeout) {
+    if (!timeout.value) {
       try {
         await rawPoll(forceRefresh);
-        timeout = setTimeout(function () {
-          timeout = undefined;
+        timeout.value = setTimeout(function () {
+          timeout.value = undefined;
         }, 1000);
       } catch (e) {
+        console.log(e);
         console.log('dGrants: Data fetch error - please check your network -- ', e);
       }
     }
@@ -170,8 +170,12 @@ export default function useDataStore() {
    * @notice Call this method to poll now, then poll on each new block
    */
   async function startPolling() {
-    provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
-    provider.value.on('block', (/* block: number */) => void poll());
+    // provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
+    // provider.value.on('block', (/* block: number */) => void poll());
+    // WIP:
+    //     - POLL ONCE SO THAT WE DONT GET A RACE-CONDITION ON POLYGON
+    //     - WE NEED TO RETRIEVE INTIIAL STATE SO THAT WE DONT SEND OFF MULTIPLE REQUESTS FOR THE SAME START_BLOCK
+    poll();
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
     // watch the network

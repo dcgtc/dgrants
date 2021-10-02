@@ -1,12 +1,12 @@
 // --- Types ---
 import { LocalForageData, LocalForageAnyObj, LocalForageConfig } from 'src/types';
-import { localForageConfig } from 'src/utils/constants';
+import { DefaultForageConfig } from 'src/utils/constants';
 import * as localForage from 'localforage';
 
 /**
  * @notice Default localForage instance
  */
-export const DefaultStorage = getStorage(localForageConfig);
+export const DefaultStorage = getStorage(DefaultForageConfig);
 
 /**
  * @notice Sync the response from `callback` with localStorage (get/set)
@@ -25,16 +25,18 @@ export async function syncStorage(
   ) => Promise<LocalForageAnyObj>,
   useStorage?: LocalForage
 ) {
+  // retrieve state from localStorage
+  const LocalForageData = await getStorageKey(key, useStorage);
+  // pull the data
+  let data = LocalForageData?.data;
   // allow callback to mark shouldSave
   let altData = undefined;
   let shouldSave = undefined;
-  // retrieve state from localStorage
-  const LocalForageData = await getStorageKey(key, useStorage);
   // check for updates
   // - `callback` is passed a `LocalForageData` object (the current state) and a `save` fn
   // - `callback` should return an Object which syncStorage will return as response
   // - `callback` may call `save` and pass in an alternative object to save into localStorage
-  const data = await callback(LocalForageData, (saveData?) => ((shouldSave = true), (altData = saveData)));
+  data = await callback(LocalForageData, (saveData?) => ((shouldSave = true), (altData = saveData)));
   // save new state
   if (shouldSave) {
     // merge data with meta and store into storage mechanism (localStorage)

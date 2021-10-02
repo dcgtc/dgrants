@@ -9,6 +9,7 @@ import { allGrantsKey } from 'src/utils/constants';
 import { START_BLOCK } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
+import { batchFilterCall } from '../utils';
 
 // --- pull in the registry contract
 const { grantRegistry } = useWalletStore();
@@ -33,16 +34,24 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       // every block
       if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1 || START_BLOCK;
+        const fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
         // pull any newly created or edited grants from all blocks since we last polled
         const [newGrants, updatedGrants] = await Promise.all([
-          grantRegistry.value?.queryFilter(
-            grantRegistry?.value?.filters?.GrantCreated(null, null, null, null),
+          batchFilterCall(
+            {
+              contract: grantRegistry.value,
+              filter: 'GrantCreated',
+              args: [null, null, null, null],
+            },
             fromBlock,
             blockNumber
           ),
-          grantRegistry.value?.queryFilter(
-            grantRegistry?.value?.filters?.GrantUpdated(null, null, null, null),
+          batchFilterCall(
+            {
+              contract: grantRegistry.value,
+              filter: 'GrantUpdated',
+              args: [null, null, null, null],
+            },
             fromBlock,
             blockNumber
           ),

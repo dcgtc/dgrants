@@ -37,8 +37,10 @@ export const ERC20_ABI = [
 export const LOREM_IPSOM_TEXT = 'A brief description of your grant goes here.\n\nLorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.'; // prettier-ignore
 
 // LocalForage config
-export const localForageConfig: LocalForageConfig = {
+export const DefaultForageConfig: LocalForageConfig = {
+  // this store should be used for any on-chain/off-chain data but never user data (as we might clear it without notice)
   name: 'dGrants',
+  // we can bump this version number to bust the users cache
   version: 1,
 };
 

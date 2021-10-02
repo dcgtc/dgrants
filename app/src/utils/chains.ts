@@ -50,6 +50,7 @@ interface L1ChainInfo {
   readonly grantRoundManagerAbi: ContractInterface;
   readonly multicall: string;
   readonly startBlock: number; // block to start scanning from when looking for events, if none is cached, recommend GrantRegistry deploy block
+  readonly filterBlockLimit: number; // the number of blocks to batch filter calls into
 }
 
 export interface L2ChainInfo extends L1ChainInfo {
@@ -139,6 +140,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 13186294,
+    filterBlockLimit: -1,
   },
   [SupportedChainId.MAINNET]: {
     explorer: 'https://etherscan.io',
@@ -153,6 +155,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 13285176,
+    filterBlockLimit: -1,
   },
   [SupportedChainId.POLYGON]: {
     bridge: 'https://wallet.polygon.technology/bridge/',
@@ -169,6 +172,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: 'https://polygon-rpc.com/',
     startBlock: 19437770,
+    filterBlockLimit: 99999,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io',
@@ -183,6 +187,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     startBlock: 9306030,
+    filterBlockLimit: -1,
   },
 };
 
@@ -198,3 +203,4 @@ export const GRANT_ROUND_MANAGER_ABI = CHAIN_INFO.grantRoundManagerAbi;
 export const MULTICALL_ADDRESS = CHAIN_INFO.multicall;
 export const RPC_URL = CHAIN_INFO.rpcUrl;
 export const START_BLOCK = CHAIN_INFO.startBlock;
+export const FILTER_BLOCK_LIMIT = CHAIN_INFO.filterBlockLimit;
