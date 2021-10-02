@@ -1,7 +1,7 @@
 // App-specific type definition go here
 import { Grant, GrantMetadata } from '@dgrants/types';
 import { TokenInfo } from '@uniswap/token-lists';
-import { BigNumberish } from 'ethers';
+import { Contract } from 'ethers';
 
 // Cart info saved in localStorage
 export type CartItemOptions = {
@@ -36,7 +36,13 @@ export type LocalForageAnyObj = {
   [key: string]: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 export type LocalForageData = {
-  ts?: BigNumberish;
   blockNumber?: number;
   data: LocalForageAnyObj;
+};
+
+// Arguments to pass in to a BatchFilterCall()
+export type BatchFilterQuery = {
+  contract: Contract;
+  filter: string;
+  args: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
 };

@@ -3,13 +3,14 @@
  */
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
+import { Event } from 'ethers';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
-import { EtherscanGroup } from 'src/types';
+import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
-import { ETHERSCAN_BASE_URL, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
+import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -250,4 +251,44 @@ export async function callMulticallContract(
   const { returnData } = (await multicall.value?.tryBlockAndAggregate(false, getMulticallData(calls))) || {};
 
   return decodeMulticallReturnData(returnData, calls);
+}
+
+/**
+ * @notice Batch filter calls so that no block exceeds the FILTER_BLOCK_LIMIT
+ * @param query {contract, filter, args} The contract, filter and args we want to query
+ * @param startBlock Number The block we want to query from
+ * @param endBlock Number The block we want to query to
+ * @returns all results returned in an array
+ */
+export async function batchFilterCall(query: BatchFilterQuery, startBlock: number, endBlock: number) {
+  // collect a list of blocks to feed to promise.all
+  const forBlocks = [];
+  // startBlock exceeds endBlock after final batch
+  while (startBlock < endBlock) {
+    // get the results
+    forBlocks.push({
+      startBlock: startBlock,
+      // stop at the endBlock
+      endBlock:
+        FILTER_BLOCK_LIMIT === -1 || startBlock + FILTER_BLOCK_LIMIT > endBlock
+          ? endBlock
+          : startBlock + FILTER_BLOCK_LIMIT,
+    });
+    // move to the next block or end
+    startBlock += FILTER_BLOCK_LIMIT === -1 ? endBlock : FILTER_BLOCK_LIMIT;
+  }
+  console.log(forBlocks);
+  // await for each query filter
+  const blocks = await Promise.all(
+    forBlocks.map((block) =>
+      query.contract.queryFilter(query.contract.filters[query.filter](...query.args), block.startBlock, block.endBlock)
+    )
+  );
+
+  // flat map the results
+  return blocks.reduce((res: Event[], resSet: Event[]) => {
+    res.push(...resSet);
+
+    return res;
+  }, [] as Event[]);
 }

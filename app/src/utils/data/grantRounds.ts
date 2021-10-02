@@ -12,7 +12,7 @@ import { LocalForageData } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { BigNumber, Contract, Event } from 'ethers';
 import { formatUnits } from 'ethers/lib/utils';
-import { formatNumber, callMulticallContract } from '../utils';
+import { formatNumber, callMulticallContract, batchFilterCall } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
@@ -41,17 +41,21 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
     async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       const { grantRoundManager } = useWalletStore();
       // use the ls_blockNumber to decide if we need to update the roundAddresses
-      const ls_blockNumber = LocalForageData?.blockNumber || START_BLOCK;
+      const ls_blockNumber = LocalForageData?.blockNumber || 0;
       // only update roundAddress if new ones are added...
       const ls_roundAddresses = LocalForageData?.data?.roundAddresses || [];
       // every block
       if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1;
+        const fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
         const newRounds =
           (
-            await grantRoundManager.value?.queryFilter(
-              grantRoundManager.value?.filters.GrantRoundCreated(null),
+            await batchFilterCall(
+              {
+                contract: grantRoundManager.value,
+                filter: 'GrantRoundCreated',
+                args: [null],
+              },
               fromBlock,
               blockNumber
             )
@@ -160,12 +164,24 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
       } else if (LocalForageData && ls_blockNumber < blockNumber) {
         // get the most recent block we collected
-        const fromBlock = ls_blockNumber + 1 || 0;
+        const fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
         // get updated metadata
         const [updatedMetadata, newTransfers] = await Promise.all([
-          roundContract.queryFilter(roundContract.filters.MetadataUpdated(), fromBlock, blockNumber),
-          matchingTokenContract.queryFilter(
-            matchingTokenContract.filters.Transfer(null, grantRoundAddress),
+          batchFilterCall(
+            {
+              contract: roundContract,
+              filter: 'MetadataUpdated',
+              args: [],
+            },
+            fromBlock,
+            blockNumber
+          ),
+          batchFilterCall(
+            {
+              contract: matchingTokenContract,
+              filter: 'Transfer',
+              args: [null, grantRoundAddress],
+            },
             fromBlock,
             blockNumber
           ),
