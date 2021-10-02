@@ -10,7 +10,7 @@ import { Log } from '@ethersproject/providers';
 import { abi as UNISWAP_POOL_ABI } from '@uniswap/v3-core/artifacts/contracts/interfaces/IUniswapV3Pool.sol/IUniswapV3Pool.json';
 import { FeeAmount, Pool, Route, computePoolAddress, encodeRouteToPath } from '@uniswap/v3-sdk';
 import { Token } from '@uniswap/sdk-core';
-import { Grant } from '@dgrants/types';
+import { GrantEthers } from '@dgrants/types';
 
 const { defaultAbiCoder, hexStripZeros, hexZeroPad, keccak256 } = utils;
 
@@ -42,7 +42,7 @@ export type SupportedToken = keyof typeof tokens;
 
 // --- Assertions ---
 // Verifies that two Grant objects are equal
-export function expectEqualGrants(grant1: Grant, grant2: Grant): void {
+export function expectEqualGrants(grant1: GrantEthers, grant2: GrantEthers): void {
   expect(grant1.id).to.equal(grant2.id);
   expect(grant1.owner).to.equal(grant2.owner);
   expect(grant1.payee).to.equal(grant2.payee);
