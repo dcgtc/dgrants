@@ -4,7 +4,7 @@ type NetworkParams = {
   roundAddress: string;
   ipfsRetrievalEndpoint: string;
   roundLogoPath: string; // this path must be relative to the 'contracts' directory
-  metadataJson: Record<string, any>;
+  metadataJson: Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 type DeployParams = Record<string, NetworkParams>;

@@ -6,7 +6,7 @@ import params from './config/deploy-poc.config';
 
 const { ethers } = hre;
 
-const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!);
+const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-line @typescript-eslint/no-non-null-assertion
 
 // IIFE async function so "await"s can be performed for each operation
 (async function () {
