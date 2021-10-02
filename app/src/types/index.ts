@@ -5,7 +5,7 @@ import { BigNumberish } from 'ethers';
 
 // Cart info saved in localStorage
 export type CartItemOptions = {
-  grantId: string;
+  grantId: number;
   contributionTokenAddress: string; // store address instead of TokenInfo to reduce localStorage size used
   contributionAmount: number; // store as a human-readable number for better form UX
 };
@@ -22,7 +22,7 @@ export type EtherscanGroup = 'tx' | 'token' | 'address';
 // Cart prediction entries
 export type CartPrediction = { matching: number | boolean; matchingToken: TokenInfo };
 export type CartPredictions = {
-  [grantId: string]: CartPrediction[];
+  [grantId: number]: CartPrediction[];
 };
 
 // Version/name given to the default localForage instance

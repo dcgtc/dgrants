@@ -1,11 +1,8 @@
 <!-- GrantCard -->
 
 <template>
-  <figure
-    class="group cursor-pointer"
-    @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(id).toString() } })"
-  >
-    <!--wrapper to position img and cart button-->
+  <figure class="group cursor-pointer" @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })">
+    <!--img-->
     <div class="relative">
       <!--img-->
       <div class="aspect-w-16 aspect-h-9 shadow-light">
@@ -46,20 +43,19 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, PropType, computed } from 'vue';
+import { ref, defineComponent, computed } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
-import { BigNumber, BigNumberish } from 'src/utils/ethers';
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
 import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
-function getTotalRaised(grantId: BigNumberish) {
+function getTotalRaised(grantId: number) {
   const { grantRounds, grantContributions } = useDataStore();
-  const contributions = filterContributionsByGrantId(grantId.toString(), grantContributions?.value || []);
+  const contributions = filterContributionsByGrantId(grantId, grantContributions?.value || []);
   const raised = `${formatNumber(
     contributions.reduce((total, contribution) => contribution?.amount + total, 0),
     2
@@ -70,14 +66,14 @@ function getTotalRaised(grantId: BigNumberish) {
 export default defineComponent({
   name: 'GrantCard',
   props: {
-    id: { type: Object as PropType<BigNumberish>, required: true },
+    id: { type: Number, required: true },
     name: { type: String, required: true },
     imgurl: { type: String, required: true },
     ownerAddress: { type: String, required: true },
   },
   components: { CartIcon },
   setup(props) {
-    const grantId = ref<BigNumberish>(props.id);
+    const grantId = ref<number>(props.id);
     const raised = computed(() => getTotalRaised(grantId.value));
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
@@ -88,7 +84,6 @@ export default defineComponent({
       formatAddress,
       getEtherscanUrl,
       pushRoute,
-      BigNumber,
       raised,
     };
   },

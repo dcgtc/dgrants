@@ -58,7 +58,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
             } as Grant;
           })
           .forEach((grant) => {
-            ls_grants[BigNumber.from(grant.id).toString()] = grant as Grant;
+            ls_grants[BigNumber.from(grant.id).toNumber()] = grant as Grant;
           });
       }
 
@@ -68,7 +68,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
           return {
             ...grant,
             // return the id as a BigNumber
-            id: BigNumber.from(grant.id),
+            id: BigNumber.from(grant.id).toNumber(),
           } as Grant;
         }),
       };

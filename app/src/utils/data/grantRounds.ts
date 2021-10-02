@@ -10,7 +10,7 @@ import {
 import { LocalForageData } from 'src/types';
 // --- Methods and Data ---
 import useWalletStore from 'src/store/wallet';
-import { BigNumber, BigNumberish, Contract, Event } from 'ethers';
+import { BigNumber, Contract, Event } from 'ethers';
 import { formatUnits } from 'ethers/lib/utils';
 import { formatNumber, callMulticallContract } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
@@ -237,7 +237,7 @@ export async function getGrantRoundGrantData(
   trustBonus: { [address: string]: number },
   grantRound: GrantRound,
   grantRoundMetadata: Record<string, GrantRoundMetadataResolution>,
-  grantIds: BigNumberish[],
+  grantIds: number[],
   forceRefresh = false
 ) {
   const clr = new CLR({
@@ -299,11 +299,11 @@ export async function getGrantRoundGrantData(
           // get all predictions for each grant in this round
           ls_grantPredictions = (
             await Promise.all(
-              grantIds.map(async (grantId: BigNumberish) => {
+              grantIds.map(async (grantId: number) => {
                 let prediction: GrantPrediction | undefined = undefined;
-                if (metadata && metadata.grants?.includes(BigNumber.from(grantId).toNumber())) {
+                if (metadata && metadata.grants?.includes(grantId)) {
                   prediction = await clr.predict({
-                    grantId: BigNumber.from(grantId).toString(),
+                    grantId: grantId,
                     predictionPoints: [0, 1, 10, 100, 1000, 10000],
                     trustBonusScores: trustBonusScores,
                     grantRoundContributions: {
@@ -320,7 +320,6 @@ export async function getGrantRoundGrantData(
           ).reduce((predictions, prediction) => {
             // record as a dict (grantId -> GrantPrediction)
             if (prediction) {
-              prediction.grantId = BigNumber.from(prediction.grantId).toString();
               predictions[prediction.grantId] = prediction;
             }
             return predictions;
@@ -350,7 +349,7 @@ export async function getGrantRoundGrantData(
 /**
  * @notice returns the predictions for this grant in the given round
  */
-export function getPredictionsForGrantInRound(grantId: string, roundData: GrantRoundCLR) {
+export function getPredictionsForGrantInRound(grantId: number, roundData: GrantRoundCLR) {
   return roundData && roundData.predictions && roundData.predictions[Number(grantId)];
 }
 
@@ -358,7 +357,7 @@ export function getPredictionsForGrantInRound(grantId: string, roundData: GrantR
  * @notice Returns the details for all grantRounds this grant is a member of
  */
 export function getGrantsGrantRoundDetails(
-  grantId: string,
+  grantId: number,
   rounds: GrantRound[],
   roundsMetadata: Record<string, GrantRoundMetadataResolution>,
   grantRoundsCLRData: Record<string, GrantRoundCLR>,
@@ -370,7 +369,7 @@ export function getGrantsGrantRoundDetails(
   return rounds
     .map((round) => {
       const metadata = roundsMetadata[round.metaPtr];
-      if (metadata && metadata.grants?.includes(parseInt(grantId))) {
+      if (metadata && metadata.grants?.includes(grantId)) {
         // get the predictions for this grant in this round
         const predictions = getPredictionsForGrantInRound(grantId, grantRoundsCLRData[round.address]);
         // filter only contributions which should be considered for this round (should we also/only check metadata here?)
