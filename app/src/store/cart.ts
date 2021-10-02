@@ -171,7 +171,7 @@ export default function useCartStore() {
    * @param grantId Grant ID to add to the cart
    */
   function addToCart(grantId: number | undefined) {
-    if (!grantId) return;
+    if (grantId === undefined) return;
 
     // Do nothing if this item is already in the cart
     const cartGrantIds = cart.value.map((grant) => grant.grantId);
@@ -195,7 +195,7 @@ export default function useCartStore() {
    * @param grantId Grant ID to remove from the cart
    */
   function removeFromCart(grantId: number | undefined) {
-    if (!grantId) return;
+    if (grantId === undefined) return;
     setCart(cart.value.filter((grant) => grant.grantId !== grantId));
   }
 
