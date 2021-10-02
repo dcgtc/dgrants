@@ -4,15 +4,21 @@ import { TokenInfo } from '@uniswap/token-lists';
 // --- Grants ---
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for
 // handling the Grant struct as done below
-export type GrantObject = {
+export type GrantEthersArray = [BigNumber, string, string, string];
+export type GrantEthersObject = { 
+  id: BigNumber; 
+  owner: string; 
+  payee: string; 
+  metaPtr: string; 
+};
+export type GrantEthers = GrantEthersObject | GrantEthersArray & GrantEthersObject;
+// internally we cast id:BigNumber from GrantEthers to a number for Grant
+export type Grant = {
   id: number;
   owner: string;
   payee: string;
   metaPtr: string;
 };
-export type GrantArray = [BigNumber, string, string, string];
-export type GrantEthers = GrantArray & GrantObject;
-export type Grant = GrantObject | GrantEthers;
 
 // Metadata resolve from a grant's metadata pointer URL
 export type GrantMetadata = {
