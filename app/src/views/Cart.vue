@@ -124,7 +124,7 @@
                         <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
                       </template>
                     </span>
-                    <span class="inline-block lg:block">&nbsp;estimated matching</span>
+                    <span class="inline-block lg:block">estimated matching</span>
                   </div>
                   <!-- no matching -->
                   <div v-else>

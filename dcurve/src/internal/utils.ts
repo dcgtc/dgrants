@@ -14,7 +14,7 @@ import { GrantRoundContributions, Contribution, GrantPrediction } from '@dgrants
  * @returns grantRoundContributions
  */
 export const addAnonymousContribution = (
-  grantId: string,
+  grantId: number,
   grantRoundContributions: GrantRoundContributions,
   amount: number
 ): GrantRoundContributions => {
@@ -41,7 +41,7 @@ export const addAnonymousContribution = (
  * @param grantsDistribution
  * @returns match
  */
-export const getGrantMatch = (grantId: string, grantsDistribution: GrantsDistribution): number => {
+export const getGrantMatch = (grantId: number, grantsDistribution: GrantsDistribution): number => {
   const contributions: GrantMatch[] = grantsDistribution.distribution.filter(
     (grantMatch) => grantMatch.grantId === grantId
   );

@@ -61,7 +61,6 @@ const SWAP_PATHS = {
 
 const { grants, grantRounds, grantRoundsCLRData, grantRoundMetadata } = useDataStore();
 const { chainId } = useWalletStore();
-const toString = (val: BigNumberish) => BigNumber.from(val).toString();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
 // --- State ---
@@ -127,9 +126,9 @@ export default function useCartStore() {
     // Generate full cart data
     const _lsCart: CartItemOptions[] = [];
     const _cart: CartItem[] = [];
-    newCart.forEach((item) => {
+    newCart.forEach((item: CartItemOptions | CartItem) => {
       const { grantId, contributionAmount } = item;
-      const grant = grants.value?.filter((grant) => grant.id.toString() === grantId)[0] as Grant; // TODO may be slow for large numbers of grants
+      const grant = grants.value?.filter((grant) => grant.id === grantId)[0] as Grant; // TODO may be slow for large numbers of grants
       const tokenAddr = 'contributionToken' in item ? item.contributionToken.address : item.contributionTokenAddress;
       const token = SUPPORTED_TOKENS_MAPPING[tokenAddr];
       _lsCart.push({ grantId, contributionTokenAddress: token.address, contributionAmount });
@@ -149,10 +148,10 @@ export default function useCartStore() {
    * @param grantId Grant ID to update
    * @param data A token address to update the token, or a human-readable number to update the amount
    */
-  function updateCart(grantId: BigNumberish, data: string | number) {
+  function updateCart(grantId: number, data: string | number) {
     // Get index of the grant to replace
     const _lsCart = lsCart.value;
-    const index = _lsCart.findIndex((item) => item.grantId === toString(grantId));
+    const index = _lsCart.findIndex((item) => item.grantId === grantId);
 
     // Handle token address update (type check is because if `data` is a decimal number `toHex` would fail)
     if (typeof data !== 'number' && isAddress(toHex(data))) {
@@ -171,19 +170,19 @@ export default function useCartStore() {
    * @notice Adds an item to the cart
    * @param grantId Grant ID to add to the cart
    */
-  function addToCart(grantId: BigNumberish | undefined) {
+  function addToCart(grantId: number | undefined) {
     if (!grantId) return;
 
     // Do nothing if this item is already in the cart
     const cartGrantIds = cart.value.map((grant) => grant.grantId);
-    if (cartGrantIds.includes(toString(grantId))) return;
+    if (cartGrantIds.includes(grantId)) return;
 
     // Otherwise, add it to the cart and update localStorage
     const DEFAULT_CONTRIBUTION_TOKEN = SUPPORTED_TOKENS.find((token) => token.symbol === 'DAI');
     const newCart = [
       ...lsCart.value,
       {
-        grantId: toString(grantId),
+        grantId: grantId,
         contributionTokenAddress: <string>DEFAULT_CONTRIBUTION_TOKEN?.address,
         contributionAmount: DEFAULT_CONTRIBUTION_AMOUNT,
       },
@@ -195,9 +194,9 @@ export default function useCartStore() {
    * @notice Removes a grant from the cart based on it's `grantId`
    * @param grantId Grant ID to remove from the cart
    */
-  function removeFromCart(grantId: BigNumberish | undefined) {
+  function removeFromCart(grantId: number | undefined) {
     if (!grantId) return;
-    setCart(cart.value.filter((grant) => grant.grantId !== toString(grantId)));
+    setCart(cart.value.filter((grant) => grant.grantId !== grantId));
   }
 
   /**
@@ -342,9 +341,9 @@ export default function useCartStore() {
    * @notice Returns true if the provided grantId is in the cart, false otherwise
    * @param grantId Grant ID to check
    */
-  function isInCart(grantId: BigNumberish): boolean {
+  function isInCart(grantId: number): boolean {
     const grantIds = lsCart.value.map((item) => item.grantId);
-    return grantIds.includes(toString(grantId));
+    return grantIds.includes(grantId);
   }
 
   /**
@@ -390,7 +389,7 @@ export default function useCartStore() {
       _predictions[item.grantId] = (grantRounds.value || []).map((round) => {
         let matching: number | boolean = false;
         const metadata = grantRoundMetadata.value[round.metaPtr];
-        if (metadata && metadata.grants?.includes(parseInt(item.grantId))) {
+        if (metadata && metadata.grants?.includes(item.grantId)) {
           // all calculations are denominated in the rounds donationToken
           const roundToken = round.donationToken;
           // get the predictions for this grant in this round

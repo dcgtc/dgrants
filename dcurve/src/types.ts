@@ -36,8 +36,8 @@ export type GrantRoundFetchArgs = {
  * @field {value} contributions (Contribution)
  */
 export type ContributionsByGrantId = {
-  [grantId: string]: {
-    grantId: string;
+  [grantId: number]: {
+    grantId: number;
     grantAddress: string;
     contributions: Record<string, Contribution>;
   };
@@ -55,7 +55,7 @@ export type ContributionsByGrantId = {
  * @field {[trustBonusScores]} trust bonus scores
  */
 export type GrantPredictionArgs = {
-  grantId: string;
+  grantId: number;
   predictionPoints: number[];
   grantRoundContributions: GrantRoundContributions;
   trustBonusScores?: TrustBonusScore[];
@@ -71,7 +71,7 @@ export type GrantPredictionArgs = {
  * @field {match} match amount
  */
 export type GrantMatch = {
-  grantId: string;
+  grantId: number;
   address: string;
   match: number;
 };
@@ -104,7 +104,7 @@ export type InitArgs = {
  * @field {match} match amount
  */
 export type PayoutMatch = {
-  grantIds: string[];
+  grantIds: number[];
   address: string;
   match: number;
 };

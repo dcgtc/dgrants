@@ -104,7 +104,7 @@ export class CLR {
     const calcAlgo = options['calcAlgo'];
 
     // unpack the prediction arguments
-    const grantId: string = args.grantId;
+    const grantId: number = args.grantId;
     const predictionPoints: number[] = args.predictionPoints;
     const grantRoundContributions: GrantRoundContributions = args.grantRoundContributions;
     const trustBonusScores = args.trustBonusScores;

@@ -2,7 +2,7 @@
   <!-- General filters -->
   <BaseFilterNav :items="grantRegistryListNav" :button="button" title="grants:" />
   <ul class="base-grid">
-    <li v-for="grant in sortedGrants" :key="grant.id.toString()">
+    <li v-for="grant in sortedGrants" :key="grant.id">
       <GrantCard
         :id="grant.id"
         :name="(grantMetadata && grantMetadata[grant.metaPtr]?.name) || '...'"

@@ -5,7 +5,7 @@ import { TokenInfo } from '@uniswap/token-lists';
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for
 // handling the Grant struct as done below
 export type GrantObject = {
-  id: BigNumber;
+  id: number;
   owner: string;
   payee: string;
   metaPtr: string;
@@ -47,7 +47,7 @@ export type GrantMetadataResolution = Partial<GrantMetadata> & {
  * @field {blockNumber} blockNumber that mined the transaction
  */
 export type Contribution = {
-  grantId: string;
+  grantId: number;
   grantAddress: string;
   address: string;
   amount: number;
@@ -82,7 +82,7 @@ export type CLRPrediction = {
  * @field {[GrantPrediction]} list of GrantPrediction
  */
 export type GrantPrediction = {
-  grantId: string;
+  grantId: number;
   grantRound: string;
   predictions: CLRPrediction[];
 };

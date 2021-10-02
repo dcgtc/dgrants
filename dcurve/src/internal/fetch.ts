@@ -49,7 +49,7 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
     const tx = await contribution.getTransaction();
 
     // check that the contribution is valid
-    const grantId = contribution?.args?.grantId.toString();
+    const grantId = contribution?.args?.grantId.toNumber();
     const inRound = contribution?.args?.rounds.includes(args.grantRound);
     const isIgnoredGrant = args?.ignore?.grants?.includes(grantId);
     const isIgnoredContributor = args?.ignore?.contributionAddress?.indexOf(tx.from) !== -1;

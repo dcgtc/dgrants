@@ -58,7 +58,7 @@ export async function getContributions(
             const tx = await contribution.getTransaction();
 
             // check that the contribution is valid
-            const grantId = contribution?.args?.grantId.toString();
+            const grantId = contribution?.args?.grantId.toNumber();
             const inRounds = contribution?.args?.rounds;
             // record the new transaction
             ls_contributions[`${tx.hash}-${grantId}`] = {
@@ -167,7 +167,7 @@ export async function getTrustBonusScores(
 /**
  * @notice given a grantId and the contributions return only contributions for the grant
  */
-export function filterContributionsByGrantId(grantId: string, contributions: Contribution[]) {
+export function filterContributionsByGrantId(grantId: number, contributions: Contribution[]) {
   // filter contributions that are for this grantId
   return contributions.filter((contribution: Contribution) => {
     // check that the contribution is valid

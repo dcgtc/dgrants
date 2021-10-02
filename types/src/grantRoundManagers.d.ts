@@ -9,7 +9,7 @@ export interface SwapSummary {
 
 // Donation struct from GrantRoundManager
 export interface Donation {
-  grantId: BigNumberish;
+  grantId: number;
   token: string; // token address
   ratio: BigNumberish;
   rounds: string[];
