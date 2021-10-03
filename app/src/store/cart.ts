@@ -378,6 +378,19 @@ export default function useCartStore() {
   const swapPaths = computed(() => SWAP_PATHS[chainId.value]);
 
   /**
+   * @notice Is any of the cart content in a round
+   */
+  const cartInRound = computed<boolean>(() => {
+    return cart.value
+      .map((item) =>
+        (grantRounds.value || []).reduce((inRound: boolean, round) => {
+          return inRound || grantRoundMetadata.value[round.metaPtr].grants?.includes(item.grantId) || false;
+        }, false)
+      )
+      .reduce((inRound, isInRound) => inRound || isInRound, false);
+  });
+
+  /**
    * @notice Returns all clr matching for each grant and each round
    */
   const clrPredictions = computed<CartPredictions>(() => {
@@ -455,6 +468,7 @@ export default function useCartStore() {
     lsCart,
     quotes: computed(() => quotes.value),
     // Getters
+    cartInRound: computed(() => cartInRound.value),
     cartItemsCount: computed(() => cart.value.length),
     cartSummary: computed(() => cartSummary.value),
     cartSummaryString: computed(() => cartSummaryString.value),
