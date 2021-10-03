@@ -164,7 +164,7 @@
 
       <div
         class="py-8 border-b border-grey-100"
-        v-if="equivalentContributionAmount && equivalentContributionAmount >= 0"
+        v-if="equivalentContributionAmount && equivalentContributionAmount >= 0 && cartInRound"
       >
         <div v-if="Object.keys(clrPredictionsByToken).length" class="flex gap-x-4 justify-end">
           <span class="text-grey-400">Estimated matching value:</span>
@@ -251,6 +251,7 @@ function useCart() {
     removeFromCart,
     setCart,
     updateCart,
+    cartInRound,
   } = useCartStore();
 
   // fetchQuotes whenever network changes
@@ -337,6 +338,7 @@ function useCart() {
     updateCart,
     isValidAmount,
     isCheckoutValid,
+    cartInRound,
   };
 }
 
