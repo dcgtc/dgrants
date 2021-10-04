@@ -12,6 +12,7 @@ import useWalletStore from 'src/store/wallet';
 import { batchFilterCall } from '../utils';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
+import { getMetadata } from './ipfs';
 
 // --- pull in the registry contract
 const { grantRegistry, provider } = useWalletStore();
@@ -159,6 +160,11 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
 
         // use grantId as a number
         grantId = BigNumber.from(grantId).toNumber();
+
+        // update the grants metadata
+        if (ls_grants[grantId] && ls_grants[grantId].metaPtr !== metaPtr) {
+          void (await getMetadata(metaPtr, refs.grantMetadata));
+        }
 
         // add the new grant
         ls_grants[grantId] = {
