@@ -19,7 +19,7 @@ export const addAnonymousContribution = (
   amount: number
 ): GrantRoundContributions => {
   // create anonymous contribution
-  const anonymous_contribution: Contribution = {
+  const anonymousContribution: Contribution = {
     grantId: grantId,
     grantAddress: '0x0',
     address: '0x0',
@@ -29,7 +29,7 @@ export const addAnonymousContribution = (
 
   // update grantRoundContributions to include the anon contribution
   const contributions = [...grantRoundContributions.contributions];
-  contributions.push(anonymous_contribution);
+  contributions.push(anonymousContribution);
 
   grantRoundContributions.contributions = contributions;
   return grantRoundContributions;
@@ -55,69 +55,69 @@ export const getGrantMatch = (grantId: number, grantsDistribution: GrantsDistrib
  *
  * @returns Number Value that fits the curve for x
  */
-export function lerp(x_lower: number, x_upper: number, y_lower: number, y_upper: number, x: number) {
-  return y_lower + ((y_upper - y_lower) * (x - x_lower)) / (x_upper - x_lower);
+export function lerp(xLower: number, xUpper: number, yLower: number, yUpper: number, x: number) {
+  return yLower + ((yUpper - yLower) * (x - xLower)) / (xUpper - xLower);
 }
 
 /**
  * Util function to find the predicted match for a given amount of matchingTokens
  *
- * @param {GrantPrediction} clr_predictions Object containing predictions for the Grant in a GrantRound
+ * @param {GrantPrediction} clrPredictions Object containing predictions for the Grant in a GrantRound
  * @param {Number} amount Human readable amount denominated in the GrantRounds matchingToken
  */
-export function getPredictedMatchingForAmount(clr_predictions: GrantPrediction, amount: number) {
+export function getPredictedMatchingForAmount(clrPredictions: GrantPrediction, amount: number) {
   if (amount < 0) {
     return 0;
   }
 
   // the matching for this grant in this round if we contribute the amount
-  let predicted_clr = 0;
+  let clrPrediction = 0;
   // predictions should be provided with the same axis
-  const contributions_axis = [0, 1, 10, 100, 1000, 10000];
+  const contributionsAxis = [0, 1, 10, 100, 1000, 10000];
   // get all predictions for this grant in this round
-  const clr_prediction_curve = clr_predictions?.predictions?.map((prediction, key) => {
+  const clrPredictionCurve = clrPredictions?.predictions?.map((prediction, key) => {
     return key == 0 ? prediction.predictedGrantMatch : prediction.predictionDiff;
   });
   // set up lerp input for more accurate predicted matching
-  if (!clr_prediction_curve || !amount || isNaN(amount)) {
-    predicted_clr = 0;
-  } else if (contributions_axis.indexOf(amount) > 0) {
-    predicted_clr = clr_prediction_curve[contributions_axis.indexOf(amount)];
+  if (!clrPredictionCurve || !amount || isNaN(amount)) {
+    clrPrediction = 0;
+  } else if (contributionsAxis.indexOf(amount) > 0) {
+    clrPrediction = clrPredictionCurve[contributionsAxis.indexOf(amount)];
   } else {
-    let x_lower = 0;
-    let x_upper = 0;
-    let y_lower = 0;
-    let y_upper = 0;
+    let xLower = 0;
+    let xUpper = 0;
+    let yLower = 0;
+    let yUpper = 0;
 
     if (0 < amount && amount < 1) {
-      x_lower = 0;
-      x_upper = 1;
-      y_lower = clr_prediction_curve[0];
-      y_upper = clr_prediction_curve[1];
+      xLower = 0;
+      xUpper = 1;
+      yLower = clrPredictionCurve[0];
+      yUpper = clrPredictionCurve[1];
     } else if (1 < amount && amount < 10) {
-      x_lower = 1;
-      x_upper = 10;
-      y_lower = clr_prediction_curve[1];
-      y_upper = clr_prediction_curve[2];
+      xLower = 1;
+      xUpper = 10;
+      yLower = clrPredictionCurve[1];
+      yUpper = clrPredictionCurve[2];
     } else if (10 < amount && amount < 100) {
-      x_lower = 10;
-      x_upper = 100;
-      y_lower = clr_prediction_curve[2];
-      y_upper = clr_prediction_curve[3];
+      xLower = 10;
+      xUpper = 100;
+      yLower = clrPredictionCurve[2];
+      yUpper = clrPredictionCurve[3];
     } else if (100 < amount && amount < 1000) {
-      x_lower = 100;
-      x_upper = 1000;
-      y_lower = clr_prediction_curve[3];
-      y_upper = clr_prediction_curve[4];
+      xLower = 100;
+      xUpper = 1000;
+      yLower = clrPredictionCurve[3];
+      yUpper = clrPredictionCurve[4];
     } else {
-      x_lower = 1000;
-      x_upper = 10000;
-      y_lower = clr_prediction_curve[4];
-      y_upper = clr_prediction_curve[5];
+      xLower = 1000;
+      xUpper = 10000;
+      yLower = clrPredictionCurve[4];
+      yUpper = clrPredictionCurve[5];
     }
     // Linear interpolation for more accurate prediction
-    predicted_clr = lerp(x_lower, x_upper, y_lower, y_upper, amount);
+    clrPrediction = lerp(xLower, xUpper, yLower, yUpper, amount);
   }
 
-  return predicted_clr;
+  return clrPrediction;
 }

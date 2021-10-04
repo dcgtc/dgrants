@@ -1,5 +1,5 @@
 // --- Types ---
-import { Grant } from '@dgrants/types';
+import { Grant, GrantSubgraph } from '@dgrants/types';
 import { LocalForageData, LocalForageAnyObj } from 'src/types';
 // --- Utils ---
 import { syncStorage } from 'src/utils/data/utils';
@@ -31,23 +31,16 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       blockNumber: blockNumber,
     },
     async (LocalForageData?: LocalForageData | undefined, save?: (saveData: LocalForageAnyObj) => void) => {
-      // use the ls_blockNumber to decide if we need to update the grants
-      const ls_blockNumber = LocalForageData?.blockNumber || 0;
+      // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
+      const _lsBlockNumber = LocalForageData?.blockNumber || 0;
       // pull the indexed grants data from localStorage
-      const ls_grants = LocalForageData?.data?.grants || {};
+      const _lsGrants = LocalForageData?.data?.grants || {};
       // every block
-      if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < blockNumber)) {
         // get the most recent block we collected
-        let fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
+        let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
         // attempt to use the subgraph first
         if (SUBGRAPH_URL) {
-          type Subgraph_Grant = {
-            id: BigNumberish;
-            owner: string;
-            payee: string;
-            metaPtr: string;
-            lastUpdatedBlockNumber: number;
-          };
           try {
             // make the request
             const res = await fetch(SUBGRAPH_URL, {
@@ -68,18 +61,18 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
             // resolve the json
             const json = await res.json();
             // update each of the grants
-            json.data.grants.forEach((grant: Subgraph_Grant) => {
+            json.data.grants.forEach((grant: GrantSubgraph) => {
               // update to most recent block collected
               fromBlock = Math.max(fromBlock, grant.lastUpdatedBlockNumber);
               const grantId = BigNumber.from(grant.id).toNumber();
-              ls_grants[grantId] = {
+              _lsGrants[grantId] = {
                 id: grantId,
                 owner: getAddress(grant.owner),
                 payee: getAddress(grant.payee),
                 metaPtr: grant.metaPtr,
               } as Grant;
             });
-          } catch (e) {
+          } catch {
             console.log('dGrants: Data fetch error - Subgraph request failed');
           }
         }
@@ -117,14 +110,14 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
               } as Grant;
             })
             .forEach((grant) => {
-              ls_grants[grant.id] = grant as Grant;
+              _lsGrants[grant.id] = grant as Grant;
             });
         }
       }
 
       // hydrate data from localStorage
       const grants = {
-        grants: (Object.values(ls_grants) as Grant[]).map((grant) => {
+        grants: (Object.values(_lsGrants) as Grant[]).map((grant) => {
           return {
             ...grant,
           } as Grant;
@@ -134,7 +127,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
       // conditionally save the state
       if (grants.grants.length && save) {
         save({
-          grants: ls_grants,
+          grants: _lsGrants,
         });
       }
 
@@ -149,6 +142,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
  */
 export function grantListener(name: string, refs: Record<string, Ref>) {
   const listener = async (grantId: BigNumberish, owner: string, payee: string, metaPtr: string) => {
+    console.log(`New ${name} event: `, { grantId: BigNumber.from(grantId).toNumber() });
     void (await syncStorage(
       allGrantsKey,
       {
@@ -156,18 +150,18 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
       },
       async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
         // pull the indexed grants data from localStorage
-        const ls_grants = LocalForageData?.data?.grants || {};
+        const _lsGrants = LocalForageData?.data?.grants || {};
 
         // use grantId as a number
         grantId = BigNumber.from(grantId).toNumber();
 
         // update the grants metadata
-        if (ls_grants[grantId] && ls_grants[grantId].metaPtr !== metaPtr) {
+        if (_lsGrants[grantId] && _lsGrants[grantId].metaPtr !== metaPtr) {
           void (await getMetadata(metaPtr, refs.grantMetadata));
         }
 
         // add the new grant
-        ls_grants[grantId] = {
+        _lsGrants[grantId] = {
           id: grantId,
           owner: getAddress(owner),
           payee: getAddress(payee),
@@ -175,7 +169,7 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
         };
 
         // update the stored grants
-        refs.grants.value = Object.values(ls_grants) as Grant[];
+        refs.grants.value = Object.values(_lsGrants) as Grant[];
 
         // save into localstorage
         if (save) {
@@ -184,7 +178,7 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
 
         // return object to be saved
         return {
-          grants: ls_grants,
+          grants: _lsGrants,
         };
       }
     ));

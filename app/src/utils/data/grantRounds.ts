@@ -6,6 +6,7 @@ import {
   GrantsRoundDetails,
   GrantRoundMetadataResolution,
   GrantPrediction,
+  GrantRoundSubgraph,
 } from '@dgrants/types';
 import { LocalForageData } from 'src/types';
 // --- Methods and Data ---
@@ -43,42 +44,42 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
       blockNumber: blockNumber,
     },
     async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
-      // use the ls_blockNumber to decide if we need to update the roundAddresses
-      const ls_blockNumber = LocalForageData?.blockNumber || 0;
+      // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
+      const _lsBlockNumber = LocalForageData?.blockNumber || 0;
       // only update roundAddress if new ones are added...
-      const ls_roundAddresses = new Set(LocalForageData?.data?.roundAddresses || []);
+      const _lsRoundAddresses = new Set(LocalForageData?.data?.roundAddresses || []);
       // get the most recent block we collected
-      let fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
+      let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
       // every block
-      if (forceRefresh || !LocalForageData || (LocalForageData && ls_blockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < blockNumber)) {
         // attempt to use the subgraph first
         if (SUBGRAPH_URL) {
-          type Subgraph_GrantRound = {
-            address: string;
-            lastUpdatedBlockNumber: number;
-          };
-          // make the request
-          const res = await fetch(SUBGRAPH_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `{
-                grantRounds(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
-                  address
-                  lastUpdatedBlockNumber
-                }
-              }`,
-            }),
-          });
-          // resolve the json
-          const json = await res.json();
-          // update each of the grants
-          json.data.grantRounds.forEach((grantRound: Subgraph_GrantRound) => {
-            // update to most recent block collected
-            fromBlock = Math.max(fromBlock, grantRound.lastUpdatedBlockNumber);
-            // collate grantRoundAddresses
-            ls_roundAddresses.add(getAddress(grantRound.address));
-          });
+          try {
+            // make the request
+            const res = await fetch(SUBGRAPH_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: `{
+                  grantRounds(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                    address
+                    lastUpdatedBlockNumber
+                  }
+                }`,
+              }),
+            });
+            // resolve the json
+            const json = await res.json();
+            // update each of the grants
+            json.data.grantRounds.forEach((grantRound: GrantRoundSubgraph) => {
+              // update to most recent block collected
+              fromBlock = Math.max(fromBlock, grantRound.lastUpdatedBlockNumber);
+              // collate grantRoundAddresses
+              _lsRoundAddresses.add(getAddress(grantRound.address));
+            });
+          } catch {
+            console.log('dGrants: Data fetch error - Subgraph request failed');
+          }
         }
         // collect the remainder of the blocks
         if (fromBlock < blockNumber) {
@@ -94,14 +95,14 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
             )
           ).forEach((e: Event) => {
             // collate grantRoundAddresses
-            ls_roundAddresses.add(getAddress(e.args?.grantRound));
+            _lsRoundAddresses.add(getAddress(e.args?.grantRound));
           });
         }
       }
 
       // hydrate/format roundAddresses for use
       const roundAddresses = {
-        roundAddresses: [...ls_roundAddresses],
+        roundAddresses: [..._lsRoundAddresses],
       };
 
       // conditionally save the new roundAddresses
@@ -128,8 +129,8 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
       blockNumber: blockNumber,
     },
     async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
-      // use the ls_blockNumber to decide if we need to update the rounds data
-      const ls_blockNumber = LocalForageData?.blockNumber || 0;
+      // use the _lsBlockNumber to decide if we need to update the rounds data
+      const _lsBlockNumber = LocalForageData?.blockNumber || 0;
       // current state
       let {
         startTime,
@@ -196,7 +197,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
         // record the funds as a human readable number
         funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
-      } else if (LocalForageData && ls_blockNumber < blockNumber) {
+      } else if (LocalForageData && _lsBlockNumber < blockNumber) {
         // get updated metadata
         const [newMetaPtr, balance] = await Promise.all([
           roundContract.metaPtr(),
@@ -279,14 +280,14 @@ export async function getGrantRoundGrantData(
       // unpack round state
       const roundAddress = grantRound.address;
       const matchingTokenDecimals = grantRound.matchingToken.decimals;
-      const totalPot = BigNumber.from(grantRound.funds).toNumber();
+      const totalPot = grantRound.funds;
 
       // unpack current ls state
       const roundGrantData = LocalForageData?.data?.grantRoundCLR || {};
-      const ls_totalPot = roundGrantData?.totalPot || 0;
+      const _lsTotalPot = roundGrantData?.totalPot || 0;
       // add new donations/predictions to ls state
-      let ls_grantDonations: Contribution[] = roundGrantData?.contributions || [];
-      let ls_grantPredictions = roundGrantData?.predictions || {};
+      let _lsGrantDonations: Contribution[] = roundGrantData?.contributions || [];
+      let _lsGrantPredictions = roundGrantData?.predictions || {};
 
       // every block
       if (
@@ -297,9 +298,9 @@ export async function getGrantRoundGrantData(
         // get the rounds metadata
         const metadata = grantRoundMetadata[grantRound.metaPtr];
         // total the number of contributions being considered in the current prediction
-        const oldDonationCount = ls_grantDonations.length;
+        const oldDonationCount = _lsGrantDonations.length;
         // fetch contributions
-        ls_grantDonations = Object.values(contributions)
+        _lsGrantDonations = Object.values(contributions)
           .filter((contribution: Contribution) => {
             // check that the contribution is valid
             const inRound = metadata.grants?.includes(BigNumber.from(contribution.grantId).toNumber());
@@ -311,9 +312,9 @@ export async function getGrantRoundGrantData(
 
         // recalculate when totalPot increases or when there are new grantDonations
         if (
-          ls_totalPot < totalPot ||
-          ls_grantDonations.length > oldDonationCount ||
-          (metadata.grants?.length || 0) > Object.keys(ls_grantPredictions).length
+          _lsTotalPot < totalPot ||
+          _lsGrantDonations.length > oldDonationCount ||
+          (metadata.grants?.length || 0) > Object.keys(_lsGrantPredictions).length
         ) {
           // scores are to be presented in an array
           const trustBonusScores = Object.keys(trustBonus).map((address) => {
@@ -324,7 +325,7 @@ export async function getGrantRoundGrantData(
           });
 
           // get all predictions for each grant in this round
-          ls_grantPredictions = (
+          _lsGrantPredictions = (
             await Promise.all(
               grantIds.map(async (grantId: number) => {
                 let prediction: GrantPrediction | undefined = undefined;
@@ -337,7 +338,7 @@ export async function getGrantRoundGrantData(
                       grantRound: roundAddress,
                       totalPot: totalPot,
                       matchingTokenDecimals: matchingTokenDecimals,
-                      contributions: ls_grantDonations,
+                      contributions: _lsGrantDonations,
                     },
                   });
                 }
@@ -359,12 +360,12 @@ export async function getGrantRoundGrantData(
           grantRound: roundAddress,
           totalPot: totalPot,
           matchingTokenDecimals: matchingTokenDecimals,
-          contributions: ls_grantDonations,
-          predictions: ls_grantPredictions,
+          contributions: _lsGrantDonations,
+          predictions: _lsGrantPredictions,
         } as GrantRoundCLR,
       };
 
-      if (Object.keys(ls_grantPredictions).length && save) {
+      if (Object.keys(_lsGrantPredictions).length && save) {
         save();
       }
 
@@ -441,7 +442,7 @@ async function updateGrantRound(
 ) {
   // blockNumber from the provider
   const blockNumber = await provider.value.getBlockNumber();
-  // update ls_roundAddresses
+  // update _lsRoundAddresses
   void (await syncStorage(
     allGrantRoundsKey,
     {
@@ -449,8 +450,8 @@ async function updateGrantRound(
     },
     async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       // only update roundAddress if new ones are added...
-      const ls_roundAddresses = LocalForageData?.data?.roundAddresses || [];
-      const grantRoundAddresses = new Set(ls_roundAddresses);
+      const _lsRoundAddresses = LocalForageData?.data?.roundAddresses || [];
+      const grantRoundAddresses = new Set(_lsRoundAddresses);
       grantRoundAddresses.add(grantRoundAddress);
 
       // hydrate/format roundAddresses for use
@@ -498,7 +499,7 @@ async function updateGrantRound(
 /**
  * @notice Attach an event listener on grantRoundManager->grantRoundCreated
  */
-export function grantRoundListener(
+export function GrantRoundCreatedListener(
   args: {
     listeners: { off: () => Contract }[];
     grantIds: number[];
@@ -508,6 +509,7 @@ export function grantRoundListener(
   refs: Record<string, Ref>
 ) {
   const listener = async (grantRoundAddress: string) => {
+    console.log('New GrantRound created: ', grantRoundAddress);
     // open the rounds contract
     const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
     // open the rounds contract
@@ -542,6 +544,7 @@ export function grantRoundListener(
     );
   };
 
+  // apply the GrantRoundCreated filter and listen for events
   grantRoundManager.value.on('GrantRoundCreated', listener);
 
   return {
@@ -566,10 +569,11 @@ export function metadataUpdatedListener(
     console.log('Updating GrantRounds MetaPtr: ', oldMetaPtr, newMetaPtr);
     // update the grants metadata
     void (await getMetadata(newMetaPtr, refs.grantRoundMetadata));
-    // push the new grant round
+    // update all of the grantRounds onchain data
     void (await updateGrantRound(args.grantRoundAddress, args, refs));
   };
 
+  // apply the MetadataUpdated filter and listen for events
   args.grantRoundContract.on('MetadataUpdated', listener);
 
   return {
@@ -590,15 +594,16 @@ export function matchingTokenListener(
   },
   refs: Record<string, Ref>
 ) {
-  // filter for the grantRoundAddress
-  const filter = args.matchingTokenContract.filters.Transfer(null, args.grantRoundAddress);
-
   const listener = async (to: string, amount: BigNumberish, from: string) => {
     console.log(`New contributions: ${to} - ${BigNumber.from(amount).toString()} - ${from}`);
-    // push the new grant round
+    // update all of the grantRounds onchain data
     void (await updateGrantRound(args.grantRoundAddress, args, refs));
   };
 
+  // filter for the grantRoundAddress
+  const filter = args.matchingTokenContract.filters.Transfer(null, args.grantRoundAddress);
+
+  // apply the Transfer filter and listen for events
   args.matchingTokenContract.on(filter, listener);
 
   return {
