@@ -1,17 +1,25 @@
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { TokenInfo } from '@uniswap/token-lists';
 
 // --- Grants ---
 // The output from ethers/typechain allows array or object access to grant data, so we must define types for
 // handling the Grant struct as done below
 export type GrantEthersArray = [BigNumber, string, string, string];
-export type GrantEthersObject = { 
-  id: BigNumber; 
-  owner: string; 
-  payee: string; 
-  metaPtr: string; 
+export type GrantEthersObject = {
+  id: BigNumber;
+  owner: string;
+  payee: string;
+  metaPtr: string;
 };
-export type GrantEthers = GrantEthersObject | GrantEthersArray & GrantEthersObject;
+export type GrantEthers = GrantEthersObject | (GrantEthersArray & GrantEthersObject);
+// When pulled from the subgraph a grant will have the following properties
+export type GrantSubgraph = {
+  id: BigNumberish;
+  owner: string;
+  payee: string;
+  metaPtr: string;
+  lastUpdatedBlockNumber: number;
+};
 // internally we cast id:BigNumber from GrantEthers to a number for Grant
 export type Grant = {
   id: number;
@@ -63,6 +71,28 @@ export type Contribution = {
   donationToken?: TokenInfo;
   txHash?: string;
   blockNumber?: number;
+};
+
+/**
+ * Object for an individual Contribution as supplied by the subgraph
+ *
+ * @type ContributionSubgraph
+ * @field {grantId} grant id in the registry to which the contribution was made
+ * @field {tokenIn} the token in which the contribution was made
+ * @field {donationAmount} the amount being contributed
+ * @field {from} address which made the contribution
+ * @field {hash} the events tx hash
+ * @field {rounds} in which rounds this contribution is to be part of
+ * @field {lastUpdatedBlockNumber} the blockNumber on which this entity was lastUpdated
+ */
+type ContributionSubgraph = {
+  grantId: string;
+  tokenIn: string;
+  donationAmount: string;
+  from: string;
+  hash: string;
+  rounds: string[];
+  lastUpdatedBlockNumber: number;
 };
 
 /**

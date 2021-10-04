@@ -1,5 +1,5 @@
 // --- Types ---
-import { Contribution, GrantRound } from '@dgrants/types';
+import { Contribution, ContributionSubgraph, GrantRound } from '@dgrants/types';
 import { LocalForageAnyObj } from 'src/types';
 import { TokenInfo } from '@uniswap/token-lists';
 // --- Utils ---
@@ -40,63 +40,58 @@ export async function getContributions(
         blockNumber: blockNumber,
       },
       async (LocalForageData?: LocalForageAnyObj | undefined, save?: (saveData?: LocalForageAnyObj) => void) => {
-        // use the ls_blockNumber to decide if we need to update the roundAddresses
-        const ls_blockNumber = LocalForageData?.blockNumber || 0;
+        // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
+        const _lsBlockNumber = LocalForageData?.blockNumber || 0;
         // pick up contributions from the localStorage obj
-        const ls_contributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
+        const _lsContributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
 
         // get the most recent block we collected
-        let fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
+        let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
 
         // every block
         if (forceRefresh || !LocalForageData || (LocalForageData && fromBlock < blockNumber)) {
           if (SUBGRAPH_URL) {
-            type Subgraph_GrantDonation = {
-              grantId: string;
-              tokenIn: string;
-              donationAmount: string;
-              from: string;
-              hash: string;
-              rounds: string[];
-              lastUpdatedBlockNumber: number;
-            };
-            // make the request
-            const res = await fetch(SUBGRAPH_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: `{
-                  grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
-                    grantId
-                    tokenIn
-                    donationAmount
-                    from
-                    hash
-                    rounds
-                    lastUpdatedBlockNumber
-                  }
-                }`,
-              }),
-            });
-            // resolve the json
-            const json = await res.json();
-            // update each of the grants
-            json.data.grantDonations.forEach((contribution: Subgraph_GrantDonation) => {
-              // update to most recent block collected
-              fromBlock = Math.max(fromBlock, contribution.lastUpdatedBlockNumber);
-              const grantId = BigNumber.from(contribution.grantId).toNumber();
-              ls_contributions[`${contribution.hash}-${grantId}`] = {
-                grantId: grantId,
-                amount: parseFloat(formatUnits(contribution.donationAmount, donationToken.decimals)),
-                inRounds: contribution.rounds.map((address: string) => getAddress(address)),
-                grantAddress: grantPayees[grantId],
-                tokenIn: getAddress(contribution.tokenIn),
-                address: getAddress(contribution.from),
-                donationToken: donationToken,
-                txHash: contribution.hash,
-                blockNumber: contribution.lastUpdatedBlockNumber,
-              };
-            });
+            try {
+              // make the request
+              const res = await fetch(SUBGRAPH_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  query: `{
+                    grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                      grantId
+                      tokenIn
+                      donationAmount
+                      from
+                      hash
+                      rounds
+                      lastUpdatedBlockNumber
+                    }
+                  }`,
+                }),
+              });
+              // resolve the json
+              const json = await res.json();
+              // update each of the grants
+              json.data.grantDonations.forEach((contribution: ContributionSubgraph) => {
+                // update to most recent block collected
+                fromBlock = Math.max(fromBlock, contribution.lastUpdatedBlockNumber);
+                const grantId = BigNumber.from(contribution.grantId).toNumber();
+                _lsContributions[`${contribution.hash}-${grantId}`] = {
+                  grantId: grantId,
+                  amount: parseFloat(formatUnits(contribution.donationAmount, donationToken.decimals)),
+                  inRounds: contribution.rounds.map((address: string) => getAddress(address)),
+                  grantAddress: grantPayees[grantId],
+                  tokenIn: getAddress(contribution.tokenIn),
+                  address: getAddress(contribution.from),
+                  donationToken: donationToken,
+                  txHash: contribution.hash,
+                  blockNumber: contribution.lastUpdatedBlockNumber,
+                };
+              });
+            } catch {
+              console.log('dGrants: Data fetch error - Subgraph request failed');
+            }
           }
           // collect the remainder of the blocks
           if (fromBlock < blockNumber) {
@@ -121,7 +116,7 @@ export async function getContributions(
                 const grantId = contribution?.args?.grantId.toNumber();
 
                 // record the new transaction
-                ls_contributions[`${tx.hash}-${grantId}`] = {
+                _lsContributions[`${tx.hash}-${grantId}`] = {
                   grantId: grantId,
                   amount: parseFloat(formatUnits(contribution?.args?.donationAmount, donationToken.decimals)),
                   inRounds: contribution?.args?.rounds.map((address: string) => getAddress(address)),
@@ -139,7 +134,7 @@ export async function getContributions(
 
         // convert back to Contribitions[] and sort
         const contributions = {
-          contributions: Object.values(ls_contributions).sort((a: Contribution, b: Contribution) =>
+          contributions: Object.values(_lsContributions).sort((a: Contribution, b: Contribution) =>
             (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
           ) as Contribution[],
         };
@@ -147,7 +142,7 @@ export async function getContributions(
         // mark for renewal and save off the { txHash: Contribution } version to avoid duplicates
         if ((contributions.contributions || []).length > 0 && save) {
           save({
-            contributions: ls_contributions,
+            contributions: _lsContributions,
           });
         }
 
@@ -177,8 +172,8 @@ export async function getTrustBonusScores(
         blockNumber: blockNumber,
       },
       async (LocalForageData?: LocalForageAnyObj | undefined, save?: () => void) => {
-        const ls_trustBonus = LocalForageData?.data?.trustBonus || {};
-        const ls_contributors = LocalForageData?.data?.contributors || [];
+        const _lsTrustBonus = LocalForageData?.data?.trustBonus || {};
+        const _lsContributors = LocalForageData?.data?.contributors || [];
         // collect any new contributor
         const newContributorAddresses: Set<string> = new Set();
         // every block
@@ -188,7 +183,7 @@ export async function getTrustBonusScores(
           (LocalForageData && (LocalForageData.blockNumber || START_BLOCK) < blockNumber)
         ) {
           // set score for null user to prevent linear from fetching (if there are no other scores matched)
-          ls_trustBonus['0x0'] = 0.5;
+          _lsTrustBonus['0x0'] = 0.5;
           // collect any new contributors
           Object.values(contributions).forEach((contribution) => {
             if (
@@ -206,7 +201,7 @@ export async function getTrustBonusScores(
             if (!status.ok) console.error(status.message);
             if (data) {
               data.forEach((trustBonus) => {
-                ls_trustBonus[trustBonus.address] = trustBonus.score;
+                _lsTrustBonus[trustBonus.address] = trustBonus.score;
               });
             }
           }
@@ -214,12 +209,12 @@ export async function getTrustBonusScores(
 
         // compile response data
         const trustBonus = {
-          trustBonus: ls_trustBonus,
-          contributors: [...new Set([...ls_contributors, ...newContributorAddresses])],
+          trustBonus: _lsTrustBonus,
+          contributors: [...new Set([..._lsContributors, ...newContributorAddresses])],
         };
 
         // mark this for renewal
-        if (Object.keys(ls_trustBonus || {}).length > 0 && save) {
+        if (Object.keys(_lsTrustBonus || {}).length > 0 && save) {
           save();
         }
 
@@ -278,6 +273,14 @@ export function grantDonationListener(
   ) => {
     // console.log(name, grantId, tokenIn, donationAmount, rounds);
     const blockNumber = await provider.value.getBlockNumber();
+    // get tx details to pull contributor details from
+    const tx = await event.getTransaction();
+    // log the new contribution
+    console.log('New contribution: ', {
+      grantId: BigNumber.from(grantId).toNumber(),
+      donationAmount: BigNumber.from(donationAmount).toNumber(),
+      from: tx.from,
+    });
     // store the new contribution
     const contributions = await syncStorage(
       contributionsKey,
@@ -286,13 +289,11 @@ export function grantDonationListener(
       },
       async (LocalForageData?: LocalForageAnyObj | undefined, save?: (saveData: LocalForageAnyObj) => void) => {
         // pull the contributions
-        const ls_contributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
-        // get tx details to pull contributor details from
-        const tx = await event.getTransaction();
+        const _lsContributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
         // check that the contribution is valid
         grantId = BigNumber.from(grantId).toNumber();
         // record the new transaction
-        ls_contributions[`${tx.hash}-${grantId}`] = {
+        _lsContributions[`${tx.hash}-${grantId}`] = {
           grantId: grantId,
           amount: parseFloat(formatUnits(donationAmount, args.donationToken.decimals)),
           inRounds: grantRounds,
@@ -306,12 +307,12 @@ export function grantDonationListener(
 
         if (save) {
           save({
-            contributions: ls_contributions,
+            contributions: _lsContributions,
           });
         }
 
         // convert back to Contribitions[], sort and save to refs
-        refs.contributions.value = Object.values(ls_contributions).sort((a: Contribution, b: Contribution) =>
+        refs.contributions.value = Object.values(_lsContributions).sort((a: Contribution, b: Contribution) =>
           (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
         ) as Contribution[];
 

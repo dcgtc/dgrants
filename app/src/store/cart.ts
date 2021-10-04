@@ -406,7 +406,7 @@ export default function useCartStore() {
           // all calculations are denominated in the rounds donationToken
           const roundToken = round.donationToken;
           // get the predictions for this grant in this round
-          const clr_predictions = getPredictionsForGrantInRound(item.grantId, grantRoundsCLRData.value[round.address]);
+          const clrPredictions = getPredictionsForGrantInRound(item.grantId, grantRoundsCLRData.value[round.address]);
           // no conversion is required if tokens are in the same currency
           const contributionIsRoundToken = token.address == roundToken.address;
           // if contribution/donationToken token is DAI we can skip that step of the conversion
@@ -421,7 +421,7 @@ export default function useCartStore() {
             roundTokenIsDai || contributionIsRoundToken ? amount : getConvertedAmount(amount, roundToken.address, -1);
 
           matching = getPredictedMatchingForAmount(
-            clr_predictions,
+            clrPredictions,
             amount // pass in the donationToken denominated amount
           );
         }
