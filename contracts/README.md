@@ -105,6 +105,8 @@ You must configure various deployment parameters on a per-network basis in the `
 
 You can configure the metadata that will be published and used for the Round by editing the `./scripts/grant-round-metadata.json`. The entire contents of the file are uploaded and published.
 
+NOTE: Before deploying to the desired network, make sure `roundStartTime` in `scripts/config/deploy-poc.config.ts` is set to a start time in the future.
+
 ### Update Script
 
 The repo contains a script which automates the update of a `GrantRound`'s metadata.
