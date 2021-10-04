@@ -14,6 +14,7 @@ const routes: Array<RouteRecordRaw> = [
   { path: '/cart', name: 'Cart', component: () => import('../views/Cart.vue') },
   { path: '/dgrants', name: 'dgrants', component: () => import('../views/GrantRegistryList.vue') },
   { path: '/dgrants/new', name: 'dgrants-new', component: () => import('../views/GrantRegistryNewGrant.vue') },
+  { path: '/dgrants/submitted', name: 'dgrants-submitted', component: () => import('../views/GrantSubmitted.vue') },
   { path: '/dgrants/:id', name: 'dgrants-id', component: () => import('../views/GrantRegistryGrantDetail.vue') },
   { path: '/dgrants/rounds/', name: 'dgrants-rounds-list', component: () => import('../views/GrantRoundsList.vue') },
   {
