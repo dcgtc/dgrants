@@ -332,7 +332,7 @@ function useGrantRoundDetail() {
 
     // check if contract is already approved as a spender
     const allowance = await checkAllowance(token, userAddress.value, grantRound.value.address);
-    if (allowance < contributionAmount) {
+    if (allowance.lt(contributionAmount)) {
       await getApproval(token, grantRound.value.address, MaxUint256);
     }
 

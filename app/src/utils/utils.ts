@@ -125,7 +125,7 @@ export function isValidAmount(val: number | undefined) {
 // Check for approved allowance
 export async function checkAllowance(token: Contract, ownerAddress: string | undefined, spenderAddress: string) {
   // return the balance held for userAddress
-  return ownerAddress ? await token.allowance(ownerAddress, spenderAddress) : 0;
+  return ownerAddress ? await token.allowance(ownerAddress, spenderAddress) : BigNumber.from(0);
 }
 
 // Get approval for the round contract to spend the amount on behalf of the user
