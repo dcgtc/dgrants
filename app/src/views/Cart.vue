@@ -242,6 +242,7 @@ function useCart() {
     cartSummaryString,
     checkout,
     clearCart,
+    clearCartState,
     clrPredictions,
     clrPredictionsByToken,
     fetchQuotes,
@@ -311,7 +312,7 @@ function useCart() {
   }
 
   function completeCheckout(success: boolean) {
-    if (success) clearCart();
+    if (success) clearCartState();
   }
 
   return {
@@ -320,6 +321,7 @@ function useCart() {
     cartStatus,
     cartSummaryString,
     clearCart,
+    clearCartState,
     clrPredictions,
     clrPredictionsByToken,
     completeCheckout,
