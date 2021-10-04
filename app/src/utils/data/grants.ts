@@ -169,8 +169,8 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
         // add the new grant
         ls_grants[grantId] = {
           id: grantId,
-          owner: owner,
-          payee: payee,
+          owner: getAddress(owner),
+          payee: getAddress(payee),
           metaPtr: metaPtr,
         };
 
