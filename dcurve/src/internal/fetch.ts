@@ -61,6 +61,7 @@ export const fetch = async (args: GrantRoundFetchArgs) => {
         amount: parseFloat(
           formatUnits(contribution?.args?.donationAmount, args.supportedTokens[donationToken].decimals)
         ),
+        tokenIn: contribution?.args?.tokenIn,
         grantAddress: grantsDict[grantId],
         address: tx.from,
       });

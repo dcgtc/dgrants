@@ -65,23 +65,31 @@ export const fetchMetaPtrs = async (metaPtrs: string[], metadata: Ref) => {
     // save these pending metadata objects to state
     metadata.value = { ...metadata.value, ...newMetadata };
     // resolve metadata via metaPtr and update state
-    void (await Promise.all(
-      Object.keys(newMetadata).map(async (url) => {
-        try {
-          // save each individual ipfs result into storage
-          let data = await getStorageKey('ipfs-' + url);
-          if (!data) {
-            data = await resolveMetaPtr(url);
-            await setStorageKey('ipfs-' + url, data as LocalForageData);
-          }
-          metadata.value[url] = { status: 'resolved', ...data };
-        } catch (e) {
-          metadata.value[url] = { status: 'error' };
-          console.error(e);
-        }
-      })
-    ));
+    void (await Promise.all(Object.keys(newMetadata).map(async (url) => getMetadata(url, metadata))));
   }
 
   return metadata;
+};
+
+/**
+ * @notice Helper method that fetches and or returns metadata for a Grant or GrantRound, and saves the data
+ * to the state as soon as it's received
+ * @param url String URL to resolve
+ * @param metadata Ref store's ref to assign resolved metadata to
+ */
+export const getMetadata = async (url: string, metadata: Ref) => {
+  try {
+    // save each individual ipfs result into storage
+    let data = await getStorageKey('ipfs-' + url);
+    if (!data) {
+      data = await resolveMetaPtr(url);
+      await setStorageKey('ipfs-' + url, data as LocalForageData);
+    }
+    metadata.value[url] = { status: 'resolved', ...data };
+  } catch (e) {
+    metadata.value[url] = { status: 'error' };
+    console.error(e);
+  }
+
+  return metadata.value[url];
 };

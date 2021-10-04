@@ -197,7 +197,7 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 
 // --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
-  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, poll } = useDataStore();
+  const { grantRounds, grantRoundMetadata: _grantRoundMetadata } = useDataStore();
 
   const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -228,7 +228,9 @@ function useGrantRoundDetail() {
   const grantRound = computed(() => {
     if (grantRounds.value) {
       // filter for a matching GrantRound
-      const round = grantRounds.value.filter((round) => round.address === getAddress(<string>route.params.address));
+      const round = grantRounds.value.filter(
+        (grantRound) => getAddress(<string>grantRound.address) === getAddress(<string>route.params.address)
+      );
 
       return <GrantRound>(round.length ? round[0] : { error: `No GrantRound @ ${route.params.address}` });
     } else {
@@ -244,7 +246,7 @@ function useGrantRoundDetail() {
 
     if (grantRounds.value) {
       grantRounds.value.forEach((round, index) => {
-        if (round.address == getAddress(<string>route.params.address)) {
+        if (getAddress(<string>round.address) == getAddress(<string>route.params.address)) {
           if (grantRounds.value?.length && index - 1 != 0) {
             // check to see if there is previous round
             prevRound = <GrantRound>grantRounds.value[index - 1];
@@ -263,7 +265,7 @@ function useGrantRoundDetail() {
 
     if (grantRounds.value) {
       grantRounds.value.forEach((round, index) => {
-        if (round.address == getAddress(<string>route.params.address)) {
+        if (getAddress(<string>round.address) == getAddress(<string>route.params.address)) {
           if (index + 1 == grantRounds.value?.length) {
             // check to see if there is a next round
             nextRound = <GrantRound>grantRounds.value[index + 1];
@@ -338,9 +340,6 @@ function useGrantRoundDetail() {
 
     // invoke addMatchingFunds on the round contract
     await addMatchingFunds(round, contributionAmount);
-
-    // poll for the updated state and toggle page state back to display mode
-    await poll();
   }
 
   /**

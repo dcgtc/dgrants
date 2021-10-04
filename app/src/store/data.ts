@@ -6,11 +6,16 @@
 import { computed, ref, watch } from 'vue';
 
 // --- Our imports ---
-import { BigNumber } from 'src/utils/ethers';
+import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
-import { getAllGrants } from 'src/utils/data/grants';
-import { getContributions, getTrustBonusScores } from 'src/utils/data/contributions';
-import { getAllGrantRounds, getGrantRound, getGrantRoundGrantData } from 'src/utils/data/grantRounds';
+import { getAllGrants, grantListener } from 'src/utils/data/grants';
+import { getContributions, getTrustBonusScores, grantDonationListener } from 'src/utils/data/contributions';
+import {
+  getAllGrantRounds,
+  getGrantRound,
+  getGrantRoundGrantData,
+  grantRoundListener,
+} from 'src/utils/data/grantRounds';
 import {
   Grant,
   Contribution,
@@ -42,16 +47,35 @@ const grantRoundsDonationToken = ref<TokenInfo>();
 
 const timeout = ref<ReturnType<typeof setTimeout> | undefined>();
 
+/**
+ * @notice Used to record any listeners that we currently have in place
+ */
+type ListenerResponse = {
+  off: () => Contract;
+};
+
+// Used to record any listeners that we currently have in place
+const listeners = ref<ListenerResponse[]>([]);
+
+/**
+ * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
+ */
+async function removeAllListeners() {
+  // listeners in an array and flush {contract, eventName}
+  listeners.value = listeners.value.reduce((empty, listener) => (listener.off(), empty), []);
+}
+
 // --- Store methods and exports ---
 export default function useDataStore() {
   /**
-   * @notice Called each block to poll for data, but can also be called on-demand, e.g. after user submits a transaction
+   * @notice Called on init and network change - but can also be called on demand
    */
-  async function rawPoll(forceRefresh = false) {
+  async function rawInit(forceRefresh = false) {
+    // Remove all listeners
+    await removeAllListeners();
+
     // Get blockdata
     lastBlockNumber.value = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
-
-    console.log(lastBlockNumber.value);
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
@@ -61,7 +85,6 @@ export default function useDataStore() {
     ]);
 
     // Collect the grants into a grantId->payoutAddress obj
-    console.log(grantsData);
     const grantsList = grantsData.grants || [];
     const grantIds = grantsList.map((grant: Grant) => grant.id);
     const grantPayees = grantsList.reduce((grants: Record<string, string>, grant: Grant, key: number) => {
@@ -89,16 +112,18 @@ export default function useDataStore() {
 
     // Get latest set of contributions
     const contributions =
-      (await getContributions(
-        lastBlockNumber.value,
-        grantPayees,
-        SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
-        forceRefresh
-      )) || {};
+      (
+        await getContributions(
+          lastBlockNumber.value,
+          grantPayees,
+          SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
+          forceRefresh
+        )
+      )?.contributions || {};
 
     // Pull all trust scores from gitcoin api (depends on the contributions from getContributions)
     const trustBonusScores =
-      (await getTrustBonusScores(lastBlockNumber.value, contributions.contributions || [], forceRefresh)) || {};
+      (await getTrustBonusScores(lastBlockNumber.value, contributions || [], forceRefresh))?.trustBonus || {};
 
     // Set up a watch so that we only update calculations when every rounds metadata is present
     watch(
@@ -117,8 +142,8 @@ export default function useDataStore() {
             grantRoundsList.map(async (grantRound: GrantRound) => {
               const data = await getGrantRoundGrantData(
                 lastBlockNumber.value,
-                contributions.contributions || [],
-                trustBonusScores.trustBonus || {},
+                contributions || [],
+                trustBonusScores || {},
                 grantRound,
                 grantRoundMetadata.value,
                 grantIds,
@@ -144,25 +169,71 @@ export default function useDataStore() {
 
     // Save off data
     grants.value = grantsList as Grant[];
-    grantContributions.value = contributions.contributions as Contribution[];
+    grantContributions.value = contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
+
+    // grantRounds have 3 associated listeners; GrantRoundCreated, MetadataUpdated and matchingToken Transfers
+    // metadataUpdatedListener and matchingTokenListener responses will be pushed on to listeners asynchronously
+    listeners.value.push(
+      grantRoundListener(
+        'GrantRoundCreated',
+        {
+          listeners: listeners.value,
+          grantIds: grantIds,
+          contributions: contributions,
+          trustBonus: trustBonusScores,
+        },
+        {
+          grantRounds,
+          grantRoundsCLRData,
+          grantRoundMetadata,
+        }
+      )
+    );
+
+    // All grant details can be fetched from the grantRegistry
+    listeners.value.push(
+      grantListener('GrantCreated', {
+        grants,
+        grantMetadata,
+      })
+    );
+    listeners.value.push(
+      grantListener('GrantUpdated', {
+        grants,
+        grantMetadata,
+      })
+    );
+
+    // Contributions are routed through the grantRoundManager
+    listeners.value.push(
+      grantDonationListener(
+        {
+          grantIds: grantIds,
+          trustBonus: trustBonusScores,
+          grantPayees: grantPayees,
+          donationToken: SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo,
+        },
+        {
+          contributions: grantContributions,
+          grantRounds,
+          grantRoundsCLRData,
+          grantRoundMetadata,
+        }
+      )
+    );
   }
 
   /**
-   * @notice Throttle calls to rawPoll() and catch any errors
+   * @notice Throttle calls to rawInit() and catch any errors
    */
-  async function poll(forceRefresh = false) {
+  async function init(forceRefresh = false) {
     if (!timeout.value) {
-      try {
-        await rawPoll(forceRefresh);
-        timeout.value = setTimeout(function () {
-          timeout.value = undefined;
-        }, 1000);
-      } catch (e) {
-        console.log(e);
-        console.log('dGrants: Data fetch error - please check your network -- ', e);
-      }
+      await rawInit(forceRefresh);
+      timeout.value = setTimeout(function () {
+        timeout.value = undefined;
+      }, 1000);
     }
   }
 
@@ -170,14 +241,10 @@ export default function useDataStore() {
    * @notice Call this method to poll now, then poll on each new block
    */
   async function startPolling() {
-    // provider.value.removeAllListeners(); // remove all existing listeners to avoid duplicate polling
-    // provider.value.on('block', (/* block: number */) => void poll());
-    // WIP:
-    //     - POLL ONCE SO THAT WE DONT GET A RACE-CONDITION ON POLYGON
-    //     - WE NEED TO RETRIEVE INTIIAL STATE SO THAT WE DONT SEND OFF MULTIPLE REQUESTS FOR THE SAME START_BLOCK
-    poll();
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
+    // init the current state
+    void (await init());
     // watch the network
     watch(
       () => [network.value],
@@ -185,7 +252,7 @@ export default function useDataStore() {
         // clear storage and poll again for all network changes after first load
         if (networkValue && networkValue.chainId !== network.value?.chainId) {
           void (await DefaultStorage.clear());
-          void poll();
+          void init();
         }
         await setStorageKey('network', { data: { chainId: network.value?.chainId } });
       }
@@ -195,7 +262,7 @@ export default function useDataStore() {
   return {
     // Methods
     startPolling,
-    poll,
+    init,
     // Data
     lastBlockNumber: computed(() => lastBlockNumber.value || 0),
     grants: computed(() => grants.value),

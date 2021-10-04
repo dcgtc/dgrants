@@ -4,18 +4,20 @@ import { LocalForageAnyObj } from 'src/types';
 import { TokenInfo } from '@uniswap/token-lists';
 // --- Utils ---
 import { fetchTrustBonusScore } from '@dgrants/utils/src/trustBonus';
-import { formatUnits } from 'ethers/lib/utils';
-import { Event } from 'ethers';
+import { formatUnits, getAddress, id } from 'ethers/lib/utils';
+import { BigNumber, BigNumberish, Event, EventFilter } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
 import { contributionsKey, trustBonusKey } from 'src/utils/constants';
-import { START_BLOCK } from 'src/utils/chains';
+import { GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 import { batchFilterCall } from '../utils';
+import { Ref } from 'vue';
+import { getGrantRoundGrantData } from './grantRounds';
 
 // --- pull in the registry contract
-const { grantRoundManager } = useWalletStore();
+const { provider, grantRoundManager } = useWalletStore();
 
 /**
  * @notice Get/Refresh all contributions
@@ -43,44 +45,96 @@ export async function getContributions(
         // pick up contributions from the localStorage obj
         const ls_contributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
 
+        // get the most recent block we collected
+        let fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
+
         // every block
-        if (forceRefresh || !LocalForageData || (LocalForageData && LocalForageData.blockNumber < blockNumber)) {
-          // get the most recent block we collected
-          const fromBlock = ls_blockNumber ? ls_blockNumber + 1 : START_BLOCK;
-
-          // get any new donations to the grantRound
-          const grantDonations = await batchFilterCall(
-            {
-              contract: grantRoundManager.value,
-              filter: 'GrantDonation',
-              args: [null, null, null, null],
-            },
-            fromBlock,
-            blockNumber
-          );
-
-          // resolve contributions
-          void (await Promise.all(
-            grantDonations.map(async (contribution: Event) => {
-              // get tx details to pull contributor details from
-              const tx = await contribution.getTransaction();
-
-              // check that the contribution is valid
-              const grantId = contribution?.args?.grantId.toNumber();
-              const inRounds = contribution?.args?.rounds;
-              // record the new transaction
-              ls_contributions[`${tx.hash}-${grantId}`] = {
+        if (forceRefresh || !LocalForageData || (LocalForageData && fromBlock < blockNumber)) {
+          if (SUBGRAPH_URL) {
+            type Subgraph_GrantDonation = {
+              grantId: string;
+              tokenIn: string;
+              donationAmount: string;
+              from: string;
+              hash: string;
+              rounds: string[];
+              lastUpdatedBlockNumber: number;
+            };
+            // make the request
+            const res = await fetch(SUBGRAPH_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: `{
+                  grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                    grantId
+                    tokenIn
+                    donationAmount
+                    from
+                    hash
+                    rounds
+                    lastUpdatedBlockNumber
+                  }
+                }`,
+              }),
+            });
+            // resolve the json
+            const json = await res.json();
+            // update each of the grants
+            json.data.grantDonations.forEach((contribution: Subgraph_GrantDonation) => {
+              // update to most recent block collected
+              fromBlock = Math.max(fromBlock, contribution.lastUpdatedBlockNumber);
+              const grantId = BigNumber.from(contribution.grantId).toNumber();
+              ls_contributions[`${contribution.hash}-${grantId}`] = {
                 grantId: grantId,
-                amount: parseFloat(formatUnits(contribution?.args?.donationAmount, donationToken.decimals)),
-                inRounds: inRounds,
+                amount: parseFloat(formatUnits(contribution.donationAmount, donationToken.decimals)),
+                inRounds: contribution.rounds.map((address: string) => getAddress(address)),
                 grantAddress: grantPayees[grantId],
-                address: tx.from,
+                tokenIn: getAddress(contribution.tokenIn),
+                address: getAddress(contribution.from),
                 donationToken: donationToken,
-                txHash: tx.hash,
-                blockNumber: tx.blockNumber,
+                txHash: contribution.hash,
+                blockNumber: contribution.lastUpdatedBlockNumber,
               };
-            })
-          ));
+            });
+          }
+          // collect the remainder of the blocks
+          if (fromBlock < blockNumber) {
+            // get any new donations to the grantRound
+            const grantDonations = await batchFilterCall(
+              {
+                contract: grantRoundManager.value,
+                filter: 'GrantDonation',
+                args: [null, null, null, null],
+              },
+              fromBlock,
+              blockNumber
+            );
+
+            // resolve contributions
+            void (await Promise.all(
+              grantDonations.map(async (contribution: Event) => {
+                // get tx details to pull contributor details from
+                const tx = await contribution.getTransaction();
+
+                // check that the contribution is valid
+                const grantId = contribution?.args?.grantId.toNumber();
+
+                // record the new transaction
+                ls_contributions[`${tx.hash}-${grantId}`] = {
+                  grantId: grantId,
+                  amount: parseFloat(formatUnits(contribution?.args?.donationAmount, donationToken.decimals)),
+                  inRounds: contribution?.args?.rounds.map((address: string) => getAddress(address)),
+                  grantAddress: grantPayees[grantId],
+                  address: getAddress(tx.from),
+                  tokenIn: getAddress(contribution?.args?.tokenIn),
+                  donationToken: donationToken,
+                  txHash: tx.hash,
+                  blockNumber: tx.blockNumber,
+                };
+              })
+            ));
+          }
         }
 
         // convert back to Contribitions[] and sort
@@ -201,4 +255,112 @@ export function filterContributionsByGrantRound(round: GrantRound, contributions
     // only include contributions for this GrantRound
     return forThisGrantRound;
   });
+}
+
+/**
+ * @notice Attach an event listener on grantRoundManager-> grantDonation
+ */
+export function grantDonationListener(
+  args: {
+    grantPayees: Record<string, string>;
+    donationToken: TokenInfo;
+    grantIds: number[];
+    trustBonus: Record<string, number>;
+  },
+  refs: Record<string, Ref>
+) {
+  const listener = async (
+    grantId: BigNumberish,
+    tokenIn: string,
+    donationAmount: BigNumberish,
+    grantRounds: string[],
+    event: Event
+  ) => {
+    // console.log(name, grantId, tokenIn, donationAmount, rounds);
+    const blockNumber = await provider.value.getBlockNumber();
+    // store the new contribution
+    const contributions = await syncStorage(
+      contributionsKey,
+      {
+        blockNumber: blockNumber,
+      },
+      async (LocalForageData?: LocalForageAnyObj | undefined, save?: (saveData: LocalForageAnyObj) => void) => {
+        // pull the contributions
+        const ls_contributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
+        // get tx details to pull contributor details from
+        const tx = await event.getTransaction();
+        // check that the contribution is valid
+        grantId = BigNumber.from(grantId).toNumber();
+        // record the new transaction
+        ls_contributions[`${tx.hash}-${grantId}`] = {
+          grantId: grantId,
+          amount: parseFloat(formatUnits(donationAmount, args.donationToken.decimals)),
+          inRounds: grantRounds,
+          grantAddress: args.grantPayees[grantId],
+          address: tx.from,
+          donationToken: args.donationToken,
+          tokenIn: tokenIn,
+          txHash: tx.hash,
+          blockNumber: tx.blockNumber,
+        };
+
+        if (save) {
+          save({
+            contributions: ls_contributions,
+          });
+        }
+
+        // convert back to Contribitions[], sort and save to refs
+        refs.contributions.value = Object.values(ls_contributions).sort((a: Contribution, b: Contribution) =>
+          (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
+        ) as Contribution[];
+
+        return {
+          contributions: refs.contributions.value,
+        };
+      }
+    );
+
+    // trustBonus
+    await getTrustBonusScores(blockNumber, contributions);
+
+    // getGrantRoundGrantData
+    void (await Promise.all(
+      grantRounds.map(async (grantRoundAddress: string) => {
+        if (grantRounds.indexOf(grantRoundAddress) !== -1) {
+          const grantRound = refs.grantRounds.value.find(
+            (round: GrantRound) => getAddress(round.address) == getAddress(grantRoundAddress)
+          );
+
+          // get the clr data for the round
+          const grantRoundCLRData = await getGrantRoundGrantData(
+            blockNumber,
+            contributions.contributions,
+            args.trustBonus || {},
+            grantRound,
+            refs.grantRoundMetadata.value,
+            args.grantIds,
+            false
+          );
+
+          // update the ref
+          refs.grantRoundsCLRData.value[grantRoundAddress] = grantRoundCLRData.grantRoundCLR;
+        }
+      })
+    ));
+  };
+
+  // filter for every event by topic so that we can get to the event args too
+  const filter = {
+    address: GRANT_ROUND_MANAGER_ADDRESS,
+    topics: [id('GrantDonation(uint96,address,uint256,address[])')],
+  } as EventFilter;
+
+  // attach listener
+  grantRoundManager.value.on(filter, listener);
+
+  // return destroy method
+  return {
+    off: () => grantRoundManager.value.off(filter, listener),
+  };
 }
