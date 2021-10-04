@@ -23,6 +23,7 @@ export const addAnonymousContribution = (
     grantId: grantId,
     grantAddress: '0x0',
     address: '0x0',
+    tokenIn: '0x0',
     amount: amount,
   };
 

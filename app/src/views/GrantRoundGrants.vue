@@ -32,7 +32,9 @@ function useGrantRoundDetail() {
   const grantRound = computed(() => {
     if (grantRounds.value) {
       // filter for a matching GrantRound
-      const round = grantRounds.value.filter((round) => round.address === getAddress(<string>route.params.address));
+      const round = grantRounds.value.filter(
+        (round) => getAddress(<string>round.address) === getAddress(<string>route.params.address)
+      );
 
       return <GrantRound>(round.length ? round[0] : { error: `No GrantRound @ ${route.params.address}` });
     } else {

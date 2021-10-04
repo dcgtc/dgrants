@@ -2,7 +2,7 @@
   <!-- General filters -->
   <BaseFilterNav :items="grantRegistryListNav" :button="button" title="grants:" />
   <ul class="base-grid">
-    <li v-for="grant in sortedGrants" :key="grant.id">
+    <li v-for="grant in sortedGrants" :key="grant.id.toString()">
       <GrantCard
         :id="grant.id"
         :name="(grantMetadata && grantMetadata[grant.metaPtr]?.name) || '...'"
@@ -40,7 +40,7 @@ function createCustomGrantList(grants: Grant[]) {
 }
 
 function useSortedGrants(grants: ComputedRef<Grant[]>) {
-  const sortedGrants = ref(grants.value);
+  const sortedGrants = ref([...grants.value]);
 
   function sortGrants(order: SortingMode) {
     grantsSortingMode.value = order;
@@ -52,7 +52,7 @@ function useSortedGrants(grants: ComputedRef<Grant[]>) {
   watch(
     () => grantIdList.value,
     async () => {
-      sortedGrants.value = grants.value;
+      sortedGrants.value = [...grants.value];
       sortGrants(grantsSortingMode.value);
     },
     { immediate: true }

@@ -277,16 +277,16 @@ export async function batchFilterCall(query: BatchFilterQuery, startBlock: numbe
     // move to the next block or end
     startBlock += FILTER_BLOCK_LIMIT === -1 ? endBlock : FILTER_BLOCK_LIMIT;
   }
-  console.log(forBlocks);
+
   // await for each query filter
-  const blocks = await Promise.all(
+  const events = await Promise.all(
     forBlocks.map((block) =>
       query.contract.queryFilter(query.contract.filters[query.filter](...query.args), block.startBlock, block.endBlock)
     )
   );
 
   // flat map the results
-  return blocks.reduce((res: Event[], resSet: Event[]) => {
+  return events.reduce((res: Event[], resSet: Event[]) => {
     res.push(...resSet);
 
     return res;

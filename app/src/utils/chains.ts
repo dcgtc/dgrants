@@ -38,6 +38,7 @@ interface L1ChainInfo {
   readonly tokens: TokenInfo[];
   readonly tokensMapping: Record<string, TokenInfo>;
   readonly rpcUrl: string;
+  readonly subgraphUrl: string | false;
   readonly nativeCurrency: {
     name: string;
     symbol: string;
@@ -139,6 +140,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    subgraphUrl: false,
     startBlock: 13186294,
     filterBlockLimit: -1,
   },
@@ -154,6 +156,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    subgraphUrl: false,
     startBlock: 13285176,
     filterBlockLimit: -1,
   },
@@ -171,8 +174,9 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_UNI_V2_ABI,
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: 'https://polygon-rpc.com/',
+    subgraphUrl: 'https://api.studio.thegraph.com/query/10555/testing-dgrants/v0.0.1d-matic',
     startBlock: 19437770,
-    filterBlockLimit: 99999,
+    filterBlockLimit: 25000,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io',
@@ -186,6 +190,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    subgraphUrl: 'https://api.studio.thegraph.com/query/10555/testing-dgrants/v0.0.1d-rinkeby',
     startBlock: 9306030,
     filterBlockLimit: -1,
   },
@@ -202,5 +207,6 @@ export const GRANT_ROUND_MANAGER_ADDRESS = CHAIN_INFO.grantRoundManager;
 export const GRANT_ROUND_MANAGER_ABI = CHAIN_INFO.grantRoundManagerAbi;
 export const MULTICALL_ADDRESS = CHAIN_INFO.multicall;
 export const RPC_URL = CHAIN_INFO.rpcUrl;
+export const SUBGRAPH_URL = CHAIN_INFO.subgraphUrl;
 export const START_BLOCK = CHAIN_INFO.startBlock;
 export const FILTER_BLOCK_LIMIT = CHAIN_INFO.filterBlockLimit;

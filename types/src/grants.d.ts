@@ -57,6 +57,7 @@ export type Contribution = {
   grantAddress: string;
   address: string;
   amount: number;
+  tokenIn: string;
   // these help to identify the contribution but are optional
   inRounds?: string[];
   donationToken?: TokenInfo;
