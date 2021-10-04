@@ -1,7 +1,7 @@
 <template>
   <div>
     <BaseHeader
-      name="Thank you for your grant submission! Your grant has been queue'd for review and upon approval will be visible to everyone. Average time to review is less than 24 hours."
+      name="Thank you for your grant submission! Your grant has been queued for review and upon approval will be visible to everyone. Average time to review is less than 24 hours."
     />
   </div>
 </template>
