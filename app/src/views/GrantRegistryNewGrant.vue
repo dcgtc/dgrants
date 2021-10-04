@@ -4,7 +4,7 @@
     <TransactionStatus
       :hash="txHash"
       buttonLabel="CONTINUE"
-      :buttonAction="() => (grantId ? pushRoute({ name: 'dgrants-id', params: { id: grantId } }) : null)"
+      :buttonAction="() => (grantId ? pushRoute({ name: 'dgrants-submitted' }) : null)"
     />
   </div>
 
