@@ -102,7 +102,7 @@ export function isValidTwitter(val: string | undefined) {
 // Returns true if the provided logo is valid
 export async function isValidLogo(file: File | undefined) {
   if (!file) return true;
-  if (file.size > 512000) return false;
+  if (file.size > 5242880) return false;
   if (!(file.type.includes('image/png') || file.type.includes('image/svg'))) return false;
 
   const dimensions = await new Promise<{ width: number; height: number }>((resolve) => {
