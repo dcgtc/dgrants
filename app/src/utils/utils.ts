@@ -113,7 +113,7 @@ export async function isValidLogo(file: File | undefined) {
     };
   });
 
-  return dimensions.width >= 960 && dimensions.height >= 540;
+  return dimensions.width >= 500 && dimensions.height >= 500;
 }
 
 // Returns true if the provided amount is valid
