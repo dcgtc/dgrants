@@ -175,7 +175,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: 'https://polygon-rpc.com/',
     subgraphUrl: 'https://api.studio.thegraph.com/query/10555/testing-dgrants/v0.0.1e-matic',
-    startBlock: 19437770,
+    startBlock: 19834043,
     filterBlockLimit: 25000,
   },
   [SupportedChainId.RINKEBY]: {
