@@ -146,14 +146,14 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
 /**
  * @notice Attach an event listener on grantRegistry->GrantCreated
  */
-export function grantListener(name: string, args: Record<string, Ref>) {
+export function grantListener(name: string, refs: Record<string, Ref>) {
   const listener = async (grantId: BigNumberish, owner: string, payee: string, metaPtr: string) => {
     void (await syncStorage(
       allGrantsKey,
       {
-        blockNumber: provider.value.getBlockNumber(),
+        blockNumber: await provider.value.getBlockNumber(),
       },
-      async (LocalForageData?: LocalForageData | undefined, save?: (saveData?: LocalForageAnyObj) => void) => {
+      async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
         // pull the indexed grants data from localStorage
         const ls_grants = LocalForageData?.data?.grants || {};
 
@@ -169,7 +169,7 @@ export function grantListener(name: string, args: Record<string, Ref>) {
         };
 
         // update the stored grants
-        args.grants.value = Object.values(ls_grants) as Grant[];
+        refs.grants.value = Object.values(ls_grants) as Grant[];
 
         // save into localstorage
         if (save) {
