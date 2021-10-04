@@ -107,7 +107,7 @@ export default defineComponent({
     const { addToCart, isInCart, removeFromCart } = useCartStore();
     const { chainId } = useWalletStore();
     const grantList = computed(() =>
-      grantIdList.value.length > 0 ? createCustomGrantList(props.grants) : props.grants
+      grantIdList.value?.length > 0 ? createCustomGrantList(props.grants) : props.grants
     );
 
     onMounted(async () => {
