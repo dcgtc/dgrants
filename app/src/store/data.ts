@@ -173,11 +173,11 @@ export default function useDataStore() {
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
 
-    // grantRounds have 3 associated listeners; GrantRoundCreated, MetadataUpdated and matchingToken Transfers
-    // metadataUpdatedListener and matchingTokenListener responses will be pushed on to listeners asynchronously
+    // grantRoundListener watches for `GrantRoundCreated` events on the `grantRoundManager` and then associates two new listeners:
+    // - grantRound.MetadataUpdated - pushed to listeners async - grantRound specific
+    // - matchingToken.Transfers - pushed to listeners async - grantRound specific
     listeners.value.push(
       grantRoundListener(
-        'GrantRoundCreated',
         {
           listeners: listeners.value,
           grantIds: grantIds,
