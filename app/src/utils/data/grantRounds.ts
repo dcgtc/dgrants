@@ -499,7 +499,6 @@ async function updateGrantRound(
  * @notice Attach an event listener on grantRoundManager->grantRoundCreated
  */
 export function grantRoundListener(
-  name: string,
   args: {
     listeners: { off: () => Contract }[];
     grantIds: number[];
@@ -543,10 +542,10 @@ export function grantRoundListener(
     );
   };
 
-  grantRoundManager.value.on(name, listener);
+  grantRoundManager.value.on('GrantRoundCreated', listener);
 
   return {
-    off: () => grantRoundManager.value.off(name, listener),
+    off: () => grantRoundManager.value.off('GrantRoundCreated', listener),
   };
 }
 
