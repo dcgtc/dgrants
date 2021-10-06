@@ -3,7 +3,7 @@
  */
 
 // --- External imports ---
-import { computed, ref, watch } from 'vue';
+import { computed, Ref, ref, watch } from 'vue';
 
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
@@ -14,7 +14,9 @@ import {
   getAllGrantRounds,
   getGrantRound,
   getGrantRoundGrantData,
-  GrantRoundCreatedListener,
+  grantRoundCreatedListener,
+  matchingTokenListener,
+  metadataUpdatedListener,
 } from 'src/utils/data/grantRounds';
 import {
   Grant,
@@ -28,6 +30,7 @@ import { fetchMetaPtrs } from 'src/utils/data/ipfs';
 import { TokenInfo } from '@uniswap/token-lists';
 import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
+import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 
 // --- Parameters required ---
 const { provider, grantRoundManager, network } = useWalletStore();
@@ -173,42 +176,70 @@ export default function useDataStore() {
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
 
-    // GrantRoundCreatedListener watches for `GrantRoundCreated` events on the `grantRoundManager` and
-    // then associates two new listeners:
-    // - grantRound.MetadataUpdated - pushed to listeners async - grantRound specific
-    // - matchingToken.Transfers - pushed to listeners async - grantRound specific
+    // Set up refs to pass into listeners
+    const refs: Record<string, Ref> = {
+      contributions: grantContributions,
+      grantRounds: grantRounds,
+      grantRoundsCLRData: grantRoundsCLRData,
+      grantRoundMetadata: grantRoundMetadata,
+    };
+
+    // Set up watchers on the grantRounds
+    grantRoundsList.forEach(async (grantRound) => {
+      // open the rounds contract
+      const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, provider.value);
+      // open the rounds contract
+      const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, provider.value);
+      // attach listeners to the rounds
+      listeners.value.push(
+        metadataUpdatedListener(
+          {
+            grantRoundContract: roundContract,
+            grantRoundAddress: grantRound.address,
+            contributions: contributions,
+            grantIds: grantIds,
+            trustBonus: trustBonusScores,
+          },
+          refs
+        ),
+        matchingTokenListener(
+          {
+            matchingTokenContract: matchingTokenContract,
+            grantRoundAddress: grantRound.address,
+            contributions: contributions,
+            grantIds: grantIds,
+            trustBonus: trustBonusScores,
+          },
+          refs
+        )
+      );
+    });
+
+    // Set up watchers for new grants/grantRounds/contributions
     listeners.value.push(
-      GrantRoundCreatedListener(
+      // grantRoundCreatedListener watches for `GrantRoundCreated` events on the `grantRoundManager` and
+      // then associates two new listeners:
+      // - grantRound.MetadataUpdated - pushed to listeners async - grantRound specific
+      // - matchingToken.Transfers - pushed to listeners async - grantRound specific
+      grantRoundCreatedListener(
         {
           listeners: listeners.value,
           grantIds: grantIds,
           contributions: contributions,
           trustBonus: trustBonusScores,
         },
-        {
-          grantRounds,
-          grantRoundsCLRData,
-          grantRoundMetadata,
-        }
-      )
-    );
-
-    // All grant details can be fetched from the grantRegistry
-    listeners.value.push(
+        refs
+      ),
+      // All grant details can be fetched from the grantRegistry
       grantListener('GrantCreated', {
         grants,
         grantMetadata,
-      })
-    );
-    listeners.value.push(
+      }),
       grantListener('GrantUpdated', {
         grants,
         grantMetadata,
-      })
-    );
-
-    // Contributions are routed through the grantRoundManager
-    listeners.value.push(
+      }),
+      // Contributions are routed through the grantRoundManager
       grantDonationListener(
         {
           grantIds: grantIds,
@@ -216,12 +247,7 @@ export default function useDataStore() {
           grantPayees: grantPayees,
           donationToken: SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo,
         },
-        {
-          contributions: grantContributions,
-          grantRounds,
-          grantRoundsCLRData,
-          grantRoundMetadata,
-        }
+        refs
       )
     );
   }
