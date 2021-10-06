@@ -60,7 +60,6 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
   return {
     accounts: [deployPrivateKey],
     chainId: chainIds[network],
-    allowUnlimitedContractSize: true,
     url,
   };
 }
