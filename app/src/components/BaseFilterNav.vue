@@ -5,6 +5,9 @@
     <div class="flex flex-col gap-y-4 md:flex-row gap-x-8">
       <!-- nav items wrapper -->
       <div class="flex flex-wrap whitespace-nowrap content-center gap-x-8 gap-y-4">
+        <!--optional title -->
+        <div v-if="title" class="uppercase font-medium">{{ title }}</div>
+
         <!-- nav item loop -->
         <ul v-for="(item, index) in items" :key="item.label">
           <!-- nav item -->
@@ -63,6 +66,7 @@ export default defineComponent({
   name: 'BaseFilterNav',
   components: {},
   props: {
+    title: { type: String, required: false },
     items: { type: Array as PropType<FilterNavItem[]>, required: true },
     active: { type: Number, required: false, default: 0 },
     button: { type: Object as PropType<undefined | FilterNavButton>, required: false, default: undefined },
