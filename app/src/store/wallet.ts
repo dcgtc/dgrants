@@ -41,6 +41,7 @@ const defaultProvider = new JsonRpcProvider(RPC_URL);
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
+const defProvider = ref<Web3Provider | JsonRpcProvider>(markRaw(defaultProvider)); // default provider
 const provider = ref<Web3Provider | JsonRpcProvider>(markRaw(defaultProvider)); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
@@ -253,6 +254,7 @@ export default function useWalletStore() {
     isCorrectNetwork,
     isSupportedNetwork,
     multicall,
+    defaultProvider: computed(() => defProvider.value),
     network: computed(() => network.value),
     provider: computed(() => provider.value),
     signer: computed(() => signer.value),

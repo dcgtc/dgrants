@@ -33,7 +33,7 @@ import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/uti
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 
 // --- Parameters required ---
-const { provider, grantRoundManager, network } = useWalletStore();
+const { provider, defaultProvider, grantRoundManager, network } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -284,6 +284,9 @@ export default function useDataStore() {
    * @notice Call this method to poll now, then poll on each new block
    */
   async function startPolling() {
+    // clear old wallet connections
+    provider.value.removeAllListeners(); // provider used when wallet is connected
+    defaultProvider.value.removeAllListeners(); // provider used when no wallet is connected
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
     // watch the network
