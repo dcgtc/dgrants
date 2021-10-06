@@ -499,7 +499,7 @@ async function updateGrantRound(
 /**
  * @notice Attach an event listener on grantRoundManager->grantRoundCreated
  */
-export function GrantRoundCreatedListener(
+export function grantRoundCreatedListener(
   args: {
     listeners: { off: () => Contract }[];
     grantIds: number[];
@@ -516,7 +516,6 @@ export function GrantRoundCreatedListener(
     const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, provider.value);
     // update the grants round
     void updateGrantRound(grantRoundAddress, args, refs);
-
     // init and record the new listeners
     args.listeners.push(
       metadataUpdatedListener(
@@ -528,9 +527,7 @@ export function GrantRoundCreatedListener(
           trustBonus: args.trustBonus,
         },
         refs
-      )
-    );
-    args.listeners.push(
+      ),
       matchingTokenListener(
         {
           matchingTokenContract: matchingTokenContract,
