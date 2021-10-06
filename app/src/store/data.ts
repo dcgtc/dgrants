@@ -28,7 +28,7 @@ import {
 } from '@dgrants/types';
 import { fetchMetaPtrs } from 'src/utils/data/ipfs';
 import { TokenInfo } from '@uniswap/token-lists';
-import { SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+import { GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 
@@ -74,6 +74,17 @@ export default function useDataStore() {
    * @notice Called on init and network change - but can also be called on demand
    */
   async function rawInit(forceRefresh = false) {
+    // Check contracts are available on the given provider (or default provider)
+    const [isGrantRegistryDeployed, isGrantRoundManagerDeployed] = await Promise.all([
+      (await provider.value.getCode(GRANT_REGISTRY_ADDRESS)) !== '0x',
+      (await provider.value.getCode(GRANT_ROUND_MANAGER_ADDRESS)) !== '0x',
+    ]);
+
+    // This ensures we're only attempting to load data from contracts which exist
+    if (!isGrantRegistryDeployed && !isGrantRoundManagerDeployed) {
+      return false;
+    }
+
     // Remove all listeners
     await removeAllListeners();
 
@@ -98,13 +109,15 @@ export default function useDataStore() {
 
     // Pull state from each GrantRound
     const roundAddresses = grantRoundData.roundAddresses || [];
-    const grantRoundsList = (await Promise.all(
-      roundAddresses.map(async (grantRoundAddress: string) => {
-        const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
+    const grantRoundsList = (
+      await Promise.all(
+        roundAddresses.map(async (grantRoundAddress: string) => {
+          const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
 
-        return data?.grantRound;
-      })
-    )) as GrantRound[];
+          return data?.grantRound;
+        })
+      )
+    ).filter((grantRound) => grantRound) as GrantRound[];
 
     // Fetch Metadata
     const grantMetaPtrs = grantsList.map((grant: Grant) => grant.metaPtr);
@@ -250,6 +263,9 @@ export default function useDataStore() {
         refs
       )
     );
+
+    // init complete
+    return true;
   }
 
   /**
@@ -270,8 +286,6 @@ export default function useDataStore() {
   async function startPolling() {
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
-    // init the current state
-    void (await init());
     // watch the network
     watch(
       () => [network.value],
@@ -279,11 +293,14 @@ export default function useDataStore() {
         // clear storage and poll again for all network changes after first load
         if (networkValue && networkValue.chainId !== network.value?.chainId) {
           void (await DefaultStorage.clear());
-          void init();
+          void (await init());
         }
+        // update for next time
         await setStorageKey('network', { data: { chainId: network.value?.chainId } });
       }
     );
+    // init the current state
+    void (await init());
   }
 
   return {
