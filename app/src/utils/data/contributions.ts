@@ -278,7 +278,7 @@ export function grantDonationListener(
     // log the new contribution
     console.log('New contribution: ', {
       grantId: BigNumber.from(grantId).toNumber(),
-      donationAmount: BigNumber.from(donationAmount).toNumber(),
+      donationAmount: parseFloat(formatUnits(donationAmount, args.donationToken.decimals)),
       from: tx.from,
     });
     // store the new contribution
