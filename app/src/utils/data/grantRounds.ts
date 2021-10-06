@@ -465,7 +465,7 @@ async function updateGrantRound(
       }
 
       // push the new grant round
-      const grantRound = (await getGrantRound(blockNumber, grantRoundAddress)) as GrantRound;
+      const grantRound = (await getGrantRound(blockNumber, grantRoundAddress)).grantRound as GrantRound;
 
       // get the clr data for the round
       const grantRoundCLRData = await getGrantRoundGrantData(
