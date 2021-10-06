@@ -145,103 +145,115 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         funds,
         donationTokenAddress,
       } = LocalForageData?.data?.grantRound || {};
-      // open the rounds contract
-      const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
-      // collect the donationToken & matchingToken before promise.all'ing everything
-      const matchingTokenAddress = matchingToken?.address || (await roundContract.matchingToken());
-      // use matchingTokenContract to get balance
-      const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
-      // full update of stored data
-      if (forceRefresh || !LocalForageData) {
-        // Define calls to be read using multicall
-        [
-          donationTokenAddress,
-          startTime,
-          endTime,
-          metadataAdmin,
-          payoutAdmin,
-          registryAddress,
-          metaPtr,
-          hasPaidOut,
-          funds,
-        ] = await callMulticallContract([
-          // pull the grantRound data from its contract
-          {
-            target: grantRoundAddress,
-            contract: roundContract,
-            fns: [
-              'donationToken',
-              'startTime',
-              'endTime',
-              'metadataAdmin',
-              'payoutAdmin',
-              'registry',
-              'metaPtr',
-              'hasPaidOut',
-            ],
-          },
-          // get the balance from the matchinTokenContract
-          {
-            target: matchingTokenAddress,
-            contract: matchingTokenContract,
-            fns: [
-              {
-                fn: 'balanceOf',
-                args: [grantRoundAddress],
-              },
-            ],
-          },
-        ]);
-        // get the donation/matching token
-        matchingToken = SUPPORTED_TOKENS_MAPPING[matchingTokenAddress];
-        donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
-        // record the funds as a human readable number
-        funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
-      } else if (LocalForageData && _lsBlockNumber < blockNumber) {
-        // get updated metadata
-        const [newMetaPtr, balance] = await Promise.all([
-          roundContract.metaPtr(),
-          matchingTokenContract.balanceOf(grantRoundAddress),
-        ]);
-        // update to the new metaPtr
-        metaPtr = newMetaPtr;
-        // update to the new balance
-        funds = parseFloat(formatUnits(balance, SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)).toString();
-      }
-      // build status against now (unix)
-      const now = Date.now() / 1000;
-      // place the GrantRound details into a GrantRound object
-      const grantRound = {
-        grantRound: {
-          startTime,
-          endTime,
-          metadataAdmin,
-          payoutAdmin,
-          registryAddress,
-          metaPtr,
-          hasPaidOut,
-          donationToken: donationToken,
-          matchingToken: matchingToken,
-          address: grantRoundAddress,
-          funds: funds,
-          status:
-            now >= BigNumber.from(startTime).toNumber() && now < BigNumber.from(endTime).toNumber()
-              ? 'Active'
-              : now < BigNumber.from(startTime).toNumber()
-              ? 'Upcoming'
-              : 'Completed',
-          registry: GRANT_REGISTRY_ADDRESS,
-          error: undefined,
-        } as GrantRound,
-      };
+      // no contract deployed here...
+      if ((await provider.value.getCode(grantRoundAddress)) === '0x') {
+        // return empty state
+        return (
+          LocalForageData || {
+            data: {},
+          }
+        );
+      } else {
+        // open the rounds contract
+        const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
+        // collect the donationToken & matchingToken before promise.all'ing everything
+        const matchingTokenAddress = matchingToken?.address || (await roundContract.matchingToken());
+        // use matchingTokenContract to get balance
+        const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
+        // full update of stored data
+        if (forceRefresh || !LocalForageData) {
+          // Define calls to be read using multicall
+          [
+            donationTokenAddress,
+            startTime,
+            endTime,
+            metadataAdmin,
+            payoutAdmin,
+            registryAddress,
+            metaPtr,
+            hasPaidOut,
+            funds,
+          ] = await callMulticallContract([
+            // pull the grantRound data from its contract
+            {
+              target: grantRoundAddress,
+              contract: roundContract,
+              fns: [
+                'donationToken',
+                'startTime',
+                'endTime',
+                'metadataAdmin',
+                'payoutAdmin',
+                'registry',
+                'metaPtr',
+                'hasPaidOut',
+              ],
+            },
+            // get the balance from the matchinTokenContract
+            {
+              target: matchingTokenAddress,
+              contract: matchingTokenContract,
+              fns: [
+                {
+                  fn: 'balanceOf',
+                  args: [grantRoundAddress],
+                },
+              ],
+            },
+          ]);
+          // get the donation/matching token
+          matchingToken = SUPPORTED_TOKENS_MAPPING[matchingTokenAddress];
+          donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
+          // record the funds as a human readable number
+          funds = parseFloat(
+            formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)
+          );
+        } else if (LocalForageData && _lsBlockNumber < blockNumber) {
+          // get updated metadata
+          const [newMetaPtr, balance] = await Promise.all([
+            roundContract.metaPtr(),
+            matchingTokenContract.balanceOf(grantRoundAddress),
+          ]);
+          // update to the new metaPtr
+          metaPtr = newMetaPtr;
+          // update to the new balance
+          funds = parseFloat(formatUnits(balance, SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)).toString();
+        }
+        // build status against now (unix)
+        const now = Date.now() / 1000;
+        // place the GrantRound details into a GrantRound object
+        const grantRound = {
+          grantRound: {
+            startTime,
+            endTime,
+            metadataAdmin,
+            payoutAdmin,
+            registryAddress,
+            metaPtr,
+            hasPaidOut,
+            donationToken: donationToken,
+            matchingToken: matchingToken,
+            address: grantRoundAddress,
+            funds: funds,
+            status:
+              now >= BigNumber.from(startTime).toNumber() && now < BigNumber.from(endTime).toNumber()
+                ? 'Active'
+                : now < BigNumber.from(startTime).toNumber()
+                ? 'Upcoming'
+                : 'Completed',
+            registry: GRANT_REGISTRY_ADDRESS,
+            error: undefined,
+          } as GrantRound,
+        };
 
-      // mark this for renewal
-      if (grantRound.grantRound.startTime && save) {
-        save();
-      }
+        // mark this for renewal
+        if (grantRound.grantRound.startTime && save) {
+          save();
+        }
 
-      // return the GrantRound data
-      return grantRound;
+        // return the GrantRound data
+        return grantRound;
+      }
     }
   );
 }
