@@ -48,13 +48,13 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref, SetupContext, watch } from 'vue';
+import { computed, defineComponent, Ref, ref, SetupContext, watch } from 'vue';
 import { getEtherscanUrl } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 const emittedEventName = 'onReceipt'; // emitted once we receive the transaction receipt
 
-function useTransactionStatus(hash: string, context: SetupContext<'onReceipt'[]>) {
+function useTransactionStatus(hash: Ref, context: SetupContext<'onReceipt'[]>) {
   // Transaction status management
   const status = ref<'pending' | 'success' | 'failed'>('pending'); // available states
   const emitTxReceipt = (success: boolean) => context.emit(emittedEventName, success); // emit event when we get receipt
@@ -75,15 +75,20 @@ function useTransactionStatus(hash: string, context: SetupContext<'onReceipt'[]>
   );
 
   // Etherscan URL helpers
-  const etherscanUrl = computed(() => getEtherscanUrl(hash));
+  const etherscanUrl = computed(() => getEtherscanUrl(hash.value));
 
   // On mount, fetch receipt and wait for it to be mined, and emit event with receipt status once mined
-  onMounted(async () => {
-    const { provider } = useWalletStore();
-    const receipt = await provider.value.waitForTransaction(hash);
-    status.value = receipt.status === 1 ? 'success' : 'failed';
-    emitTxReceipt(Boolean(receipt.status));
-  });
+  const { provider } = useWalletStore();
+  // if the props.hash changes then we need to await the new tx
+  watch(
+    () => hash.value,
+    async () => {
+      const receipt = await provider.value.waitForTransaction(hash.value);
+      status.value = receipt.status === 1 ? 'success' : 'failed';
+      emitTxReceipt(Boolean(receipt.status));
+    },
+    { immediate: true }
+  );
 
   return { etherscanUrl, status, timeString };
 }
@@ -97,10 +102,13 @@ export default defineComponent({
     buttonAction: { type: Function, required: false, default: undefined }, // if buttonLabel is present, execute this method when button is clicked
   },
   setup(props, context) {
+    // pass the hash as a ref so that we can watch for changes
+    const hash = computed<string>(() => props.hash);
+
     return {
       action: props.buttonAction,
       label: props.buttonLabel,
-      ...useTransactionStatus(props.hash, context),
+      ...useTransactionStatus(hash, context),
     };
   },
 });

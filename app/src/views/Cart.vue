@@ -230,7 +230,7 @@ import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { BigNumber } from 'src/utils/ethers';
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
-import { pushRoute, formatNumber, isValidAmount } from 'src/utils/utils';
+import { pushRoute, formatNumber, isValidAmount, watchTransaction } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 function useCart() {
@@ -307,8 +307,18 @@ function useCart() {
 
   async function executeCheckout() {
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
-    const tx = await checkout();
-    txHash.value = tx.hash;
+    // watch the transaction and note any errors
+    try {
+      // watchTransaction will throw if the tx is cancelled
+      void (await watchTransaction(() => checkout(), txHash));
+    } catch (error) {
+      // clear txHash if cancelled
+      if (error.cancelled) {
+        txHash.value = '';
+      } else {
+        throw error;
+      }
+    }
   }
 
   function completeCheckout(success: boolean) {

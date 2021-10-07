@@ -264,7 +264,10 @@ export default function useCartStore() {
         await manager.donate(<(SwapSummary & SwapSummaryUniV2)[]>swaps, deadline, donations, { value })
       );
     } catch (e) {
-      cartStatus.value = '';
+      // clear cart status if cancelled
+      if (e.code == '4001') {
+        cartStatus.value = '';
+      }
       throw e;
     }
   }

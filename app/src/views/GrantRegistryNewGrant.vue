@@ -168,7 +168,7 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
-import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle, isValidLogo } from 'src/utils/utils'; // prettier-ignore
+import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle, isValidLogo, watchTransaction } from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 
 function useNewGrant() {
@@ -239,18 +239,16 @@ function useNewGrant() {
       .uploadGrantMetadata({ name, description, logoURI, properties })
       .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
 
-    const tx = await grantRegistry.value.createGrant(owner, payee, metaPtr);
-    txHash.value = tx.hash;
-    // TODO: show waiting state screen
-    await tx.wait();
-
-    // Parse receipt to find the grant ID
-    const receipt = await signer.value.provider.getTransactionReceipt(tx.hash);
-    const log = grantRegistry.value.interface.parseLog(receipt.logs[0]); // there is only one emitted event
-
-    grantId.value = log.args.id;
-    // Poll so the store has the latest data, then navigate to the grant page
-    // await poll();
+    // watch the transaction to check for any replacements/cancellations and update txHash accordingly
+    const tx = await watchTransaction(() => grantRegistry.value.createGrant(owner, payee, metaPtr), txHash);
+    // if the tx resolved...
+    if (tx) {
+      // Parse receipt to find the grant ID
+      const receipt = await tx.wait();
+      const log = grantRegistry.value.interface.parseLog(receipt.logs[0]); // there is only one emitted event
+      // set the grantId
+      grantId.value = log.args.id;
+    }
   }
 
   return {
