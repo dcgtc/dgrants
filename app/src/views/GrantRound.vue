@@ -165,15 +165,7 @@ import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
-import {
-  BigNumber,
-  BigNumberish,
-  Contract,
-  ContractTransaction,
-  getAddress,
-  MaxUint256,
-  parseUnits,
-} from 'src/utils/ethers';
+import { BigNumber, BigNumberish, Contract, getAddress, MaxUint256, parseUnits } from 'src/utils/ethers';
 import {
   daysAgo,
   formatAddress,
@@ -183,6 +175,7 @@ import {
   hasStatus,
   isDefined,
   assertSufficientBalance,
+  watchTransaction,
 } from 'src/utils/utils';
 
 // --- Types ---
@@ -346,11 +339,8 @@ function useGrantRoundDetail() {
    * @notice Submit `addMatchingFunds` tx to contribute to the fund
    */
   async function addMatchingFunds(round: GrantRoundContract, amount: BigNumber) {
-    // send funds to the matching pool (*Note: Unable to test this until we get an ERC20 balance into the hardhat accounts)
-    const tx: ContractTransaction = await round.addMatchingFunds(amount);
-    txHash.value = tx.hash;
-    // After tx mines, poll so the store has the latest data
-    await tx.wait();
+    // send funds to the matching pool
+    return await watchTransaction(() => round.addMatchingFunds(amount), txHash);
   }
 
   return {

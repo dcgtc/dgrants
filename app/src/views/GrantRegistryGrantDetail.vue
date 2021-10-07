@@ -281,7 +281,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
-import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl } from 'src/utils/utils'; // prettier-ignore
+import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl, watchTransaction} from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
@@ -529,7 +529,7 @@ function useGrantDetail() {
     const registry = grantRegistry.value;
 
     // Determine which update method to call
-    let tx: ContractTransaction;
+    let txCall: () => Promise<ContractTransaction>;
     const g = grant.value; // for better readability in the if statements
     let metaPtr = g.metaPtr;
 
@@ -552,23 +552,20 @@ function useGrantDetail() {
 
     if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {
       // update Grant Owner
-      tx = await registry.updateGrantOwner(g.id, owner);
+      txCall = () => registry.updateGrantOwner(g.id, owner);
     } else if (owner === g.owner && payee !== g.payee && !isMetaPtrUpdated) {
       // update Grant Payee
-      tx = await registry.updateGrantPayee(g.id, payee);
+      txCall = () => registry.updateGrantPayee(g.id, payee);
     } else if (owner === g.owner && payee === g.payee && isMetaPtrUpdated) {
       // update Grant MetaPtr
-      tx = await registry.updateGrantMetaPtr(g.id, metaPtr);
+      txCall = () => registry.updateGrantMetaPtr(g.id, metaPtr);
     } else {
       // update all
-      tx = await registry.updateGrant(g.id, owner, payee, metaPtr);
+      txCall = () => registry.updateGrant(g.id, owner, payee, metaPtr);
     }
 
-    txHash.value = tx.hash;
-
-    // After tx mines, poll so the store has the latest data, then navigate to the grant page
-    await tx.wait();
-    // await poll();
+    // watch the transaction to check for any replacements/cancellations and update txHash accordingly
+    void (await watchTransaction(txCall, txHash));
   };
 
   /**

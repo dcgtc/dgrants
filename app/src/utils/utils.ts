@@ -11,6 +11,8 @@ import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
 import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
+import { Logger } from 'ethers/lib/utils';
+import { Ref } from 'vue';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -177,6 +179,43 @@ export async function assertSufficientBalance(tokenAddress: string, requiredAmou
     );
   }
   return true;
+}
+
+/**
+ * @notice Await for a transaction to complete and watch for replacements
+ * @param call ()=>ContractTransaction A call to init the transaction
+ * @param stateRef Ref<hash> A pointer to update with the tx hash/state
+ * @returns Promise<ContractTransaction> A promise of the final ContractTransaction that replaces the initial call() response
+ */
+export async function watchTransaction(
+  call: () => Promise<ContractTransaction>,
+  stateRef: Ref
+): Promise<ContractTransaction> {
+  // tx is picked up from the provided call and updated if replaced
+  let tx: ContractTransaction;
+  // do the call inside a try catch so that we see the error first
+  try {
+    // get the ContractTransaction from the call
+    tx = await call();
+    // provisionally set the tx.hash to move onto next page
+    stateRef.value = tx.hash;
+    // wait for the transaction to be mined
+    void (await tx.wait());
+  } catch (error) {
+    if (error.code === Logger.errors.TRANSACTION_REPLACED) {
+      // recursively watch for completion of replacement
+      if (!error.cancelled) {
+        // the user used "speed up" or something similar
+        // in their client, but we now have the updated info
+        tx = await watchTransaction(() => error.replacement, stateRef);
+      } else {
+        stateRef.value = '';
+      }
+    }
+  }
+
+  // wrap the tx in a promise to ensure consistent typing
+  return new Promise((resolve) => resolve(tx));
 }
 
 /**
