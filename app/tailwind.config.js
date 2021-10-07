@@ -1,7 +1,22 @@
 const colors = require('tailwindcss/colors'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 module.exports = {
-  purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+  purge: {
+    content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+    // never shake these custom stylings...
+    safelist: [
+      'bn-notify-custom',
+      'bn-notify-notification',
+      'bn-notify-notification-status-icon',
+      'bn-onboard-custom',
+      'bn-onboard-modal',
+      'bn-onboard-modal-content',
+      'bn-onboard-modal-content-header',
+      'bn-onboard-modal-content-header-heading',
+      'bn-onboard-modal-content-header-icon',
+    ],
+  },
+  darkMode: false,
   // Default theme: https://github.com/tailwindlabs/tailwindcss/blob/master/stubs/defaultConfig.stub.js#L7
   theme: {
     fontFamily: {

@@ -23,6 +23,29 @@
     @apply text-headline;
   }
 
+  /********* INPUT STYLES  */
+
+  [type="text"],
+  [type="email"],
+  [type="url"],
+  [type="password"],
+  [type="number"],
+  [type="date"],
+  [type="datetime-local"],
+  [type="month"],
+  [type="search"],
+  [type="tel"],
+  [type="time"],
+  [type="week"],
+  [multiple],
+  textarea,
+  select {
+    @apply w-full p-4 border border-grey-400;
+    @apply hover:border-grey-500;
+    @apply focus:outline-none focus:border-grey-500 focus:ring-0;
+    font-size: 100%;
+  }
+
   /********* NOTIFICATION STYLES */
 
   .bn-notify-custom {
@@ -63,29 +86,6 @@
   /* icons  */
   .bn-notify-custom .bn-notify-notification-status-icon {
     display: none;
-  }
-
-  /********* INPUT STYLES  */
-
-  [type="text"],
-  [type="email"],
-  [type="url"],
-  [type="password"],
-  [type="number"],
-  [type="date"],
-  [type="datetime-local"],
-  [type="month"],
-  [type="search"],
-  [type="tel"],
-  [type="time"],
-  [type="week"],
-  [multiple],
-  textarea,
-  select {
-    @apply w-full p-4 border border-grey-400;
-    @apply hover:border-grey-500;
-    @apply focus:outline-none focus:border-grey-500 focus:ring-0;
-    font-size: 100%;
   }
 
   /********* WALLET MODAL STYLES */
