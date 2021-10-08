@@ -26,6 +26,7 @@ export default defineComponent({
     };
   },
   setup() {
+    // LOOK AT MY COOL NEW COMMENT
     // Start polling, load cart, load settings, and try connecting user's wallet on page load
     const { initializeCart } = useCartStore();
     const { startPolling } = useDataStore();
