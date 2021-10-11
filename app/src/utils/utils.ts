@@ -292,3 +292,16 @@ export async function batchFilterCall(query: BatchFilterQuery, startBlock: numbe
     return res;
   }, [] as Event[]);
 }
+
+/**
+ * @notice Sort GrantRound by startTime
+ * @param a GrantRound
+ * @param b GrantRound
+ */
+export const sortByStartTime = (a: GrantRound, b: GrantRound) => {
+  return BigNumber.from(a.startTime).toNumber() < BigNumber.from(b.startTime).toNumber()
+    ? -1
+    : BigNumber.from(a.startTime).toNumber() === BigNumber.from(b.startTime).toNumber()
+    ? 0
+    : 1;
+};
