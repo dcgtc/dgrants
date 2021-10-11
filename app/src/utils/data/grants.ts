@@ -20,15 +20,16 @@ const { grantRegistry, provider } = useWalletStore();
 /**
  * @notice Get/Refresh all Grants
  *
- * @param {number} blockNumber The current blockNumber
  * @param {boolean} forceRefresh Force the cache to refresh
  */
 
-export async function getAllGrants(blockNumber: number, forceRefresh = false) {
+export async function getAllGrants(forceRefresh = false) {
+  const latestBlockNumber = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
+
   return await syncStorage(
     allGrantsKey,
     {
-      blockNumber: blockNumber,
+      blockNumber: latestBlockNumber,
     },
     async (LocalForageData?: LocalForageData | undefined, save?: (saveData: LocalForageAnyObj) => void) => {
       // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
@@ -77,7 +78,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
           }
         }
         // get remaining blocks from rpc
-        if (fromBlock < blockNumber) {
+        if (fromBlock < latestBlockNumber) {
           // pull any newly created or edited grants from all blocks since we last polled
           const [newGrants, updatedGrants] = await Promise.all([
             batchFilterCall(
@@ -87,7 +88,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
                 args: [null, null, null, null],
               },
               fromBlock,
-              blockNumber
+              latestBlockNumber
             ),
             batchFilterCall(
               {
@@ -96,7 +97,7 @@ export async function getAllGrants(blockNumber: number, forceRefresh = false) {
                 args: [null, null, null, null],
               },
               fromBlock,
-              blockNumber
+              latestBlockNumber
             ),
           ]);
           // set the mapped entries into the indexed grants data

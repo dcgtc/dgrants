@@ -98,8 +98,8 @@ export default function useDataStore() {
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
-      getAllGrants(lastBlockNumber.value, forceRefresh),
-      getAllGrantRounds(lastBlockNumber.value, forceRefresh),
+      getAllGrants(forceRefresh),
+      getAllGrantRounds(forceRefresh),
       grantRoundManager.value.donationToken(),
     ]);
 

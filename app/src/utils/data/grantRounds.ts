@@ -34,14 +34,15 @@ const { grantRoundManager, provider } = useWalletStore();
 /**
  * @notice Get/Refresh all GrantRound addresses
  *
- * @param {number} blockNumber The currenct block number
  * @param {boolean} forceRefresh Force the cache to refresh
  */
-export async function getAllGrantRounds(blockNumber: number, forceRefresh = false) {
+export async function getAllGrantRounds(forceRefresh = false) {
+  const latestBlockNumber = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
+
   return await syncStorage(
     allGrantRoundsKey,
     {
-      blockNumber: blockNumber,
+      blockNumber: latestBlockNumber,
     },
     async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
       // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
@@ -82,7 +83,7 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
           }
         }
         // collect the remainder of the blocks
-        if (fromBlock < blockNumber) {
+        if (fromBlock < latestBlockNumber) {
           (
             await batchFilterCall(
               {
@@ -91,7 +92,7 @@ export async function getAllGrantRounds(blockNumber: number, forceRefresh = fals
                 args: [null],
               },
               fromBlock,
-              blockNumber
+              latestBlockNumber
             )
           ).forEach((e: Event) => {
             // collate grantRoundAddresses
