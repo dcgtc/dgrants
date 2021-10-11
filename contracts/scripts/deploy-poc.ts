@@ -22,6 +22,12 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
     if (!networkParams) {
       throw new Error(`Invalid network ${network}`);
     }
+
+    const nowInSeconds = Math.ceil(Date.now() / 1000);
+    if (networkParams.roundStartTime < nowInSeconds) {
+      throw new Error(`Please set roundStartTime to a time in the future`);
+    }
+
     logger.config = networkParams;
 
     // Get the deployer address
