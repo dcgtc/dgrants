@@ -136,6 +136,16 @@
         }}</a>
       </div>
     </div>
+    <!-- CONTRIBUTIONS -->
+    <template v-if="grantRoundMatchingContributions.length > 0">
+      <SectionHeader title="Contributions" />
+      <div>
+        <BaseFilterNav :items="contributionsNav" />
+        <div v-for="(contribution, index) in grantRoundMatchingContributions" :key="Number(index)">
+          <ContributionRow :contribution="contribution" :donationToken="donationToken" />
+        </div>
+      </div>
+    </template>
   </div>
 
   <!-- No grant round selected -->
@@ -155,6 +165,8 @@ import { useRoute } from 'vue-router';
 // --- Components ---
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
+import BaseFilterNav from 'src/components/BaseFilterNav.vue';
+import ContributionRow from 'src/components/ContributionRow.vue';
 import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
 import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
@@ -198,6 +210,7 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 // --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
   const { grantRounds, grantRoundMetadata: _grantRoundMetadata } = useDataStore();
+  const grantRoundMatchingContributions = [];
 
   const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -364,6 +377,7 @@ function useGrantRoundDetail() {
     isFormValid,
     isCorrectNetwork,
     grantRound,
+    grantRoundMatchingContributions,
     grantRoundMetadata,
     form,
     showAddFunds,
@@ -380,8 +394,10 @@ function useGrantRoundDetail() {
 export default defineComponent({
   name: 'GrantRoundGrants',
   components: {
+    BaseFilterNav,
     BaseHeader,
     BaseInput,
+    ContributionRow,
     GrantRoundDetailsRow,
     InputRow,
     SectionHeader,
