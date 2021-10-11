@@ -36,11 +36,19 @@
 
 <script lang="ts">
 // --- Types ---
-import { Breadcrumb, FilterNavItem, GrantRound } from '@dgrants/types';
+import { Breadcrumb, FilterNavItem } from '@dgrants/types';
 // --- Utils ---
 import { computed, defineComponent, ref } from 'vue';
 import { BigNumber } from 'ethers';
-import { daysAgo, formatAddress, formatNumber, pushRoute, unixToLocaleString, hasStatus } from 'src/utils/utils';
+import {
+  daysAgo,
+  formatAddress,
+  formatNumber,
+  pushRoute,
+  unixToLocaleString,
+  hasStatus,
+  sortByStartTime,
+} from 'src/utils/utils';
 // --- Data and Methods ---
 import useDataStore from 'src/store/data';
 // --- Components ---
@@ -48,14 +56,6 @@ import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
-
-// sort by startTime
-const sortByStartTime = (a: GrantRound, b: GrantRound) =>
-  BigNumber.from(a.startTime).toNumber() < BigNumber.from(b.startTime).toNumber()
-    ? -1
-    : BigNumber.from(a.startTime).toNumber() === BigNumber.from(b.startTime).toNumber()
-    ? 0
-    : 1;
 
 export default defineComponent({
   name: 'GrantRoundsList',
