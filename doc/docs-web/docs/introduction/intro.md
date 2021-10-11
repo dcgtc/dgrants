@@ -3,7 +3,7 @@ sidebar_position: 1
 
 ---
 
-# What is DGrants?
+# What is dGrants?
 
 In May of 2021 Gitcoin released GTC in order to decentralize Gitcoin governance to our community. Much has already been written about why this is important, including in our announcement post here, but in general we believe decentralization is the best way to fulfill our mission to build and fund the open web. By turning governance over to the community we increase Gitcoin’s legitimacy, getting not just consent but also administration from those we serve.
 
@@ -13,4 +13,4 @@ The first place the Decentralize Gitcoin Workstream will concentrate their effor
 
 What we’re looking to do is turn Grants into an open source protocol, one which anyone may fork and build on top of (dGrants). That way projects may benefit from using the Quadratic Funding algorithm and related technology to run their own grants programs. Users may freely create and fund grants without being censored. Once the Grants protocol is available projects may build their own UX and curation model on top of it as well, giving their communities a unique experience. The workstream will provide working reference implementations of a Grant Explorer UI and curation module which can be forked and modified if desired.
 
-# Why DGrants? 
+# Why dGrants?
