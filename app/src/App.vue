@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, ref, onMounted } from 'vue';
 import About from './components/About.vue';
 import NetworkSelector from './components/NetworkSelector.vue';
 import LayoutHeader from './components/LayoutHeader.vue';
@@ -20,12 +20,8 @@ import useWalletStore from 'src/store/wallet';
 export default defineComponent({
   name: 'App',
   components: { About, LayoutHeader, NetworkSelector },
-  data() {
-    return {
-      showAbout: false,
-    };
-  },
   setup() {
+    const showAbout = ref(false);
     // Start polling, load cart, load settings, and try connecting user's wallet on page load
     const { initializeCart } = useCartStore();
     const { startPolling } = useDataStore();
@@ -37,11 +33,15 @@ export default defineComponent({
       await initializeSettings();
       if (lastWallet.value) await connectWallet(lastWallet.value);
     });
-  },
-  methods: {
-    toggleAbout() {
-      this.showAbout = !this.showAbout;
-    },
+
+    function toggleAbout() {
+      showAbout.value = !showAbout.value;
+    }
+
+    return {
+      toggleAbout,
+      showAbout,
+    };
   },
 });
 </script>
