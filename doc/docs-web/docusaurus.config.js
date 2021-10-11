@@ -41,10 +41,10 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'DGrants',
+        title: 'dGrants',
         logo: {
-          alt: 'DGrants Logo',
-          src: 'img/default.png',
+          alt: 'dGrants Logo',
+          src: 'https://grants.gtcdao.net/logo.svg',
         },
         items: [
           {
