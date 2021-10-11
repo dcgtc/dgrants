@@ -4,15 +4,15 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 // With JSDoc @type annotations, IDEs can provide config autocompletion
 /** @type {import('@docusaurus/types').DocusaurusConfig} */
 (module.exports = {
-  title: 'DGrants Documentation',
-  tagline: 'Decentralizing DGrants',
-  url: 'https://your-docusaurus-test-site.com',
+  title: 'dGrants Documentation',
+  tagline: 'Decentralizing Gitcoin Grants',
+  url: 'https://grants.gtcdao.net/',
   baseUrl: '/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/default.png',
-  organizationName: 'amosgoh', // Usually your GitHub org/user name.
-  projectName: 'dgrants-docs', // Usually your repo name.
+  organizationName: 'dcgtc', // Usually your GitHub org/user name.
+  projectName: 'dgrants', // Usually your repo name.
 
   presets: [
     [
