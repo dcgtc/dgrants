@@ -39,6 +39,12 @@ contract GrantRound {
   /// @notice Emitted when a grant round metadata pointer is updated
   event MetadataUpdated(string oldMetaPtr, string indexed newMetaPtr);
 
+  /// @notice Emitted when a contributor adds funds using the matching pool token
+  event AddMatchingFunds(uint256 amount, address indexed contributor);
+
+  /// @notice Emitted when the matching token is paid out
+  event PaidOutGrants(uint256 amount, address indexed payoutAddress);
+
   // --- Core methods ---
   /**
    * @notice Instantiates a new grant round
@@ -84,6 +90,7 @@ contract GrantRound {
   function addMatchingFunds(uint256 _amount) external {
     require(block.timestamp < endTime, "GrantRound: Method must be called before round has ended");
     matchingToken.safeTransferFrom(msg.sender, address(this), _amount);
+    emit AddMatchingFunds(_amount, msg.sender);
   }
 
   /**
@@ -96,6 +103,7 @@ contract GrantRound {
     uint256 balance = matchingToken.balanceOf(address(this));
     hasPaidOut = true;
     matchingToken.safeTransfer(_payoutAddress, balance);
+    emit PaidOutGrants(balance, _payoutAddress);
   }
 
   /**
