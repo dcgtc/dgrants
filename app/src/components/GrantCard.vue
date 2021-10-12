@@ -43,6 +43,7 @@
 </template>
 
 <script lang="ts">
+import { ethers, BigNumberish } from 'ethers';
 import { ref, defineComponent, computed } from 'vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
@@ -53,9 +54,12 @@ import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/uti
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
-function getTotalRaised(grantId: number) {
+function getTotalRaised(grantId: BigNumberish) {
   const { grantRounds, grantContributions } = useDataStore();
-  const contributions = filterContributionsByGrantId(grantId, grantContributions?.value || []);
+  const contributions = filterContributionsByGrantId(
+    ethers.BigNumber.from(grantId).toNumber(),
+    grantContributions?.value || []
+  );
   const raised = `${formatNumber(
     contributions.reduce((total, contribution) => contribution?.amount + total, 0),
     2
@@ -73,7 +77,7 @@ export default defineComponent({
   },
   components: { CartIcon },
   setup(props) {
-    const grantId = ref<number>(props.id);
+    const grantId = ref<BigNumberish>(props.id);
     const raised = computed(() => getTotalRaised(grantId.value));
     const { addToCart, isInCart, removeFromCart } = useCartStore();
 
