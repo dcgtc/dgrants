@@ -28,12 +28,17 @@ import {
 } from '@dgrants/types';
 import { fetchMetaPtrs } from 'src/utils/data/ipfs';
 import { TokenInfo } from '@uniswap/token-lists';
-import { GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, SUPPORTED_TOKENS_MAPPING } from 'src/utils/chains';
+import {
+  GRANT_REGISTRY_ADDRESS,
+  GRANT_ROUND_MANAGER_ADDRESS,
+  SUPPORTED_TOKENS_MAPPING,
+  DEFAULT_PROVIDER,
+} from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 
 // --- Parameters required ---
-const { provider, defaultProvider, grantRoundManager, network } = useWalletStore();
+const { provider, grantRoundManager, network } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -286,7 +291,7 @@ export default function useDataStore() {
   async function startPolling() {
     // clear old wallet connections
     provider.value.removeAllListeners(); // provider used when wallet is connected
-    defaultProvider.value.removeAllListeners(); // provider used when no wallet is connected
+    DEFAULT_PROVIDER.removeAllListeners(); // provider used when no wallet is connected
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
     // watch the network

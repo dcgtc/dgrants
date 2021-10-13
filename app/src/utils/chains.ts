@@ -1,7 +1,7 @@
 // based off of: https://github.com/Uniswap/uniswap-interface/blob/81b13469371b3371a55b4b29c7365b1610a8d865/src/constants/chains.ts
 import { TokenInfo } from '@uniswap/token-lists';
 import {GRANT_ROUND_MANAGER_ABI as GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI, GRANT_ROUND_MANAGER_UNI_V2_ABI} from 'src/utils/constants'; // prettier-ignore
-import { ContractInterface, getAddress } from 'src/utils/ethers';
+import { ContractInterface, getAddress, JsonRpcProvider } from 'src/utils/ethers';
 
 // --- Types and data ---
 export enum SupportedChainId {
@@ -210,3 +210,6 @@ export const RPC_URL = CHAIN_INFO.rpcUrl;
 export const SUBGRAPH_URL = CHAIN_INFO.subgraphUrl;
 export const START_BLOCK = CHAIN_INFO.startBlock;
 export const FILTER_BLOCK_LIMIT = CHAIN_INFO.filterBlockLimit;
+
+// --- initiate the default provider and pass as a constant ---
+export const DEFAULT_PROVIDER = new JsonRpcProvider(RPC_URL);
