@@ -310,7 +310,7 @@ function useCart() {
     // watch the transaction and note any errors
     try {
       // watchTransaction will throw if the tx is cancelled
-      void (await watchTransaction(() => checkout(), txHash));
+      await watchTransaction(() => checkout(), txHash);
     } catch (error) {
       // clear txHash if cancelled
       if (error.cancelled) {

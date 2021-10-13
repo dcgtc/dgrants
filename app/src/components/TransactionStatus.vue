@@ -77,7 +77,7 @@ function useTransactionStatus(hash: Ref, context: SetupContext<'onReceipt'[]>) {
   // Etherscan URL helpers
   const etherscanUrl = computed(() => getEtherscanUrl(hash.value));
 
-  // On mount, fetch receipt and wait for it to be mined, and emit event with receipt status once mined
+  // watch for new tx hashes then fetch receipt and wait for it to be mined, finally emit event with receipt status once mined
   const { provider } = useWalletStore();
   // if the props.hash changes then we need to await the new tx
   watch(
