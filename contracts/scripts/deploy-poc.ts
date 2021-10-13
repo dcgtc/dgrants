@@ -24,7 +24,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
     }
 
     const nowInSeconds = Math.ceil(Date.now() / 1000);
-    if (networkParams.roundStartTime < nowInSeconds) {
+    if (networkParams.roundStartTime < nowInSeconds + 60) {
       throw new Error(`Please set roundStartTime to a time in the future`);
     }
 
