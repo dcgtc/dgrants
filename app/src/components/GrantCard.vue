@@ -59,7 +59,7 @@ function getTotalRaised(grantId: number) {
   const raised = `${formatNumber(
     contributions.reduce((total, contribution) => contribution?.amount + total, 0),
     2
-  )} ${grantRounds.value && grantRounds.value[0].donationToken.symbol}`;
+  )} ${grantRounds.value && grantRounds.value[0] && grantRounds.value[0].donationToken.symbol}`;
   return raised;
 }
 
