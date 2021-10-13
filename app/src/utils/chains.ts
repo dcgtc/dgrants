@@ -174,7 +174,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_UNI_V2_ABI,
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: 'https://polygon-rpc.com/',
-    subgraphUrl: 'https://api.studio.thegraph.com/query/10555/testing-dgrants/v0.0.1e-matic',
+    subgraphUrl: 'https://api.thegraph.com/subgraphs/name/dcgtc/dc-gitcoin-grants-matic',
     startBlock: 19834043,
     filterBlockLimit: 25000,
   },
