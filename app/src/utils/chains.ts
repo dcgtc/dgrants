@@ -190,7 +190,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
-    subgraphUrl: 'https://api.studio.thegraph.com/query/10555/testing-dgrants/v0.0.1d-rinkeby',
+    subgraphUrl: 'https://api.thegraph.com/subgraphs/name/dcgtc/dc-gitcoin-grants-rinkeby',
     startBlock: 9306030,
     filterBlockLimit: -1,
   },
