@@ -23,7 +23,7 @@
 import { computed, ref, markRaw } from 'vue';
 import useDataStore from 'src/store/data';
 import useSettingsStore from 'src/store/settings';
-import { ALL_CHAIN_INFO, CHAIN_INFO, DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, RPC_URL, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
+import { ALL_CHAIN_INFO, CHAIN_INFO, DGRANTS_CHAIN_ID, GRANT_REGISTRY_ADDRESS, GRANT_ROUND_MANAGER_ADDRESS, MULTICALL_ADDRESS, DEFAULT_PROVIDER, SupportedChainId } from 'src/utils/chains'; // prettier-ignore
 import { BigNumber, Contract, hexStripZeros, JsonRpcProvider, JsonRpcSigner, Network, Web3Provider } from 'src/utils/ethers'; // prettier-ignore
 import { formatAddress } from 'src/utils/utils';
 import Onboard from 'bnc-onboard';
@@ -35,14 +35,12 @@ import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 const { startPolling } = useDataStore();
 const { setLastWallet } = useSettingsStore();
 const defaultChainId = SupportedChainId.MAINNET;
-const defaultProvider = new JsonRpcProvider(RPC_URL);
 
 // State variables
 let onboard: OnboardAPI; // instance of Blocknative's onboard.js library
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const rawProvider = ref<any>(); // raw provider from the user's wallet, e.g. EIP-1193 provider
-const defProvider = ref<Web3Provider | JsonRpcProvider>(markRaw(defaultProvider)); // default provider
-const provider = ref<Web3Provider | JsonRpcProvider>(markRaw(defaultProvider)); // ethers provider
+const provider = ref<Web3Provider | JsonRpcProvider>(markRaw(DEFAULT_PROVIDER)); // ethers provider
 const signer = ref<JsonRpcSigner>(); // ethers signer
 const userAddress = ref<string>(); // user's wallet address
 const userEns = ref<string | null>(); // user's ENS name
@@ -221,7 +219,7 @@ export default function useWalletStore() {
   // ----------------------------------------------------- Getters -----------------------------------------------------
   // Default to mainnet for all network-based getters
   const chainId = computed(() => (network.value?.chainId || defaultChainId) as SupportedChainId);
-  const contractProvider = computed(() => (chainId.value === DGRANTS_CHAIN_ID ? signer.value : defaultProvider));
+  const contractProvider = computed(() => (chainId.value === DGRANTS_CHAIN_ID ? signer.value : DEFAULT_PROVIDER));
   const grantRegistry = computed(() => {
     return <GrantRegistry>new Contract(GRANT_REGISTRY_ADDRESS, GRANT_REGISTRY_ABI, contractProvider.value);
   });
@@ -254,7 +252,6 @@ export default function useWalletStore() {
     isCorrectNetwork,
     isSupportedNetwork,
     multicall,
-    defaultProvider: computed(() => defProvider.value),
     network: computed(() => network.value),
     provider: computed(() => provider.value),
     signer: computed(() => signer.value),
