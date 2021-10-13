@@ -4,14 +4,13 @@
 import router from 'src/router/index';
 import { RouteLocationRaw } from 'vue-router';
 import { Event } from 'ethers';
-import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress } from 'src/utils/ethers';
+import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress, Logger } from 'src/utils/ethers';
 import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { GrantRound } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
 import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
-import { Logger } from 'ethers/lib/utils';
 import { Ref } from 'vue';
 
 // --- Formatters ---
@@ -133,10 +132,8 @@ export async function checkAllowance(token: Contract, ownerAddress: string | und
 
 // Get approval for the round contract to spend the amount on behalf of the user
 export async function getApproval(token: Contract, address: string, amount: BigNumberish) {
-  // get approval
-  const tx: ContractTransaction = await token.approve(address, amount);
-  // wait for approval to go through
-  await tx.wait();
+  // get approval and wait for it to go through (or be replaced/cancelled)
+  await watchTransaction(() => token.approve(address, amount));
 }
 
 // --- Other ---
@@ -184,13 +181,34 @@ export async function assertSufficientBalance(tokenAddress: string, requiredAmou
 
 /**
  * @notice Await for a transaction to complete and watch for replacements
+ *
+ * This should be used whenever you would normally reach for tx.wait();
+ *
+ * example:
+ *
+ * ```
+ *
+ *     // this will be updated with the transaction hash even if a replacement is sent
+ *     const txHash = ref<string>('');
+ *
+ *     // here we wrap a contract interaction in a anon fn so that we can catch any errors
+ *     // watchTransaction will resolve to a mined tx, and txHash will hold the resolved tx hash
+ *     const tx = await watchTransaction(() => registry.updateGrantOwner(grantId, owner), txHash);
+ *
+ *     // get the tx receipt
+ *     const receipt = tx.wait();
+ *
+ *     ...
+ *
+ * ```
+ *
  * @param call ()=>ContractTransaction A call to init the transaction
  * @param stateRef Ref<hash> A pointer to update with the tx hash/state
  * @returns Promise<ContractTransaction> A promise of the final ContractTransaction that replaces the initial call() response
  */
 export async function watchTransaction(
   call: () => Promise<ContractTransaction>,
-  stateRef: Ref
+  stateRef?: Ref
 ): Promise<ContractTransaction> {
   // tx is picked up from the provided call and updated if replaced
   let tx: ContractTransaction;
@@ -198,10 +216,12 @@ export async function watchTransaction(
   try {
     // get the ContractTransaction from the call
     tx = await call();
-    // provisionally set the tx.hash to move onto next page
-    stateRef.value = tx.hash;
+    // set the new tx.hash into the stateRef
+    if (stateRef) {
+      stateRef.value = tx.hash;
+    }
     // wait for the transaction to be mined
-    void (await tx.wait());
+    await tx.wait();
   } catch (error) {
     if (error.code === Logger.errors.TRANSACTION_REPLACED) {
       // recursively watch for completion of replacement
@@ -209,7 +229,7 @@ export async function watchTransaction(
         // the user used "speed up" or something similar
         // in their client, but we now have the updated info
         tx = await watchTransaction(() => error.replacement, stateRef);
-      } else {
+      } else if (stateRef) {
         stateRef.value = '';
       }
     }

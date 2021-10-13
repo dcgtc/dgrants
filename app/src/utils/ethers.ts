@@ -28,4 +28,5 @@ export { hexDataSlice, hexStripZeros } from '@ethersproject/bytes';
 export { Contract } from '@ethersproject/contracts';
 export { JsonRpcProvider, JsonRpcSigner, Web3Provider } from '@ethersproject/providers';
 export { commify, formatUnits, parseUnits } from '@ethersproject/units';
+export { Logger } from '@ethersproject/logger';
 export { MaxUint256 } from '@ethersproject/constants';

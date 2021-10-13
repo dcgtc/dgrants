@@ -265,9 +265,8 @@ export default function useCartStore() {
       );
     } catch (e) {
       // clear cart status if cancelled
-      if (e.code == '4001') {
-        cartStatus.value = '';
-      }
+      cartStatus.value = '';
+
       throw e;
     }
   }

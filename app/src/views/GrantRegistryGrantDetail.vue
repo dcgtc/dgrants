@@ -565,7 +565,7 @@ function useGrantDetail() {
     }
 
     // watch the transaction to check for any replacements/cancellations and update txHash accordingly
-    void (await watchTransaction(txCall, txHash));
+    await watchTransaction(txCall, txHash);
   };
 
   /**
