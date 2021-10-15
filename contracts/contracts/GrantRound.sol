@@ -43,7 +43,7 @@ contract GrantRound {
   event AddMatchingFunds(uint256 amount, address indexed contributor);
 
   /// @notice Emitted when the matching token is paid out
-  event PaidOutGrants(uint256 amount, address indexed payoutAddress);
+  event PaidOutGrants(uint256 amount);
 
   // --- Core methods ---
   /**
@@ -103,7 +103,7 @@ contract GrantRound {
     uint256 balance = matchingToken.balanceOf(address(this));
     hasPaidOut = true;
     matchingToken.safeTransfer(_payoutAddress, balance);
-    emit PaidOutGrants(balance, _payoutAddress);
+    emit PaidOutGrants(balance);
   }
 
   /**

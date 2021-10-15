@@ -145,12 +145,13 @@ describe('GrantRound', function () {
   });
 
   describe('addMatchingFunds - Add funds to matching round', () => {
-    it('updates contract and user balances', async function () {
+    it('updates contract and user balances and emits an event', async function () {
       const { mockMatchingERC20, roundContract } = await loadFixture(setup);
-      await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(donorAmount));
-      expect(await mockMatchingERC20.balanceOf(roundContract.address)).to.be.equal(
-        ethers.utils.parseEther(donorAmount)
-      );
+      const amt = ethers.utils.parseEther(donorAmount);
+      await expect(roundContract.connect(mpUser).addMatchingFunds(amt))
+        .to.emit(roundContract, 'AddMatchingFunds')
+        .withArgs(amt, mpUser.address);
+      expect(await mockMatchingERC20.balanceOf(roundContract.address)).to.be.equal(amt);
     });
   });
 
@@ -183,12 +184,16 @@ describe('GrantRound', function () {
   });
 
   describe('Round end corner cases', () => {
-    it('sends remaining matching pool funds to payout address', async function () {
+    it('sends remaining matching pool funds to payout address and emits an event', async function () {
       const { mockMatchingERC20, roundContract } = await loadFixture(setup);
-      await roundContract.connect(mpUser).addMatchingFunds(ethers.utils.parseEther(donorAmount));
+      const amt = ethers.utils.parseEther(donorAmount);
+
+      await roundContract.connect(mpUser).addMatchingFunds(amt);
       await timeTravel(endTime + 1);
-      await roundContract.connect(payoutAdmin).payoutGrants(grantPayee.address);
-      expect(await mockMatchingERC20.balanceOf(grantPayee.address)).to.be.equal(ethers.utils.parseEther(donorAmount));
+      await expect(roundContract.connect(payoutAdmin).payoutGrants(grantPayee.address))
+        .to.emit(roundContract, 'PaidOutGrants')
+        .withArgs(amt);
+      expect(await mockMatchingERC20.balanceOf(grantPayee.address)).to.be.equal(amt);
     });
 
     it('reverts if not the grant round payout administrator', async function () {
