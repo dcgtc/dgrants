@@ -117,7 +117,7 @@ const config: HardhatUserConfig = {
       // https://hardhat.org/hardhat-network/#solidity-optimizer-support
       optimizer: {
         enabled: true,
-        runs: 25000, // above this, GrantRoundManager starts to exceed size limit
+        runs: 2000, // above this, GrantRoundManager starts to exceed size limit
       },
     },
   },
