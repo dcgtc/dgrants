@@ -8,19 +8,21 @@
     <div>
       <!-- Status filtered Cards -->
       <template v-if="grantRoundLists[selectedTab] && grantRoundLists[selectedTab]?.rounds?.length">
-        <ul class="base-grid">
-          <li v-for="(grantRound, index) in grantRoundLists[selectedTab].rounds" :key="grantRound.address">
-            <GrantRoundCard
-              :id="index"
-              :ptr="grantRound.metaPtr"
-              :address="grantRound.address"
-              :name="grantRoundMetadata[grantRound.metaPtr].name ?? ''"
-              :imgurl="grantRoundMetadata[grantRound.metaPtr].logoURI ?? '/placeholder_round.svg'"
-              :grantsTotal="grantRoundMetadata[grantRound.metaPtr].grants?.length ?? 0"
-              :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
-            />
-          </li>
-        </ul>
+        <section class="pb-20">
+          <ul class="base-grid-big">
+            <li v-for="(grantRound, index) in grantRoundLists[selectedTab].rounds" :key="grantRound.address">
+              <GrantRoundCard
+                :id="index"
+                :ptr="grantRound.metaPtr"
+                :address="grantRound.address"
+                :name="grantRoundMetadata[grantRound.metaPtr].name ?? ''"
+                :imgurl="grantRoundMetadata[grantRound.metaPtr].logoURI ?? '/placeholder_round.svg'"
+                :grantsTotal="grantRoundMetadata[grantRound.metaPtr].grants?.length ?? 0"
+                :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
+              />
+            </li>
+          </ul>
+        </section>
       </template>
       <!-- Empty state -->
       <template v-else>
