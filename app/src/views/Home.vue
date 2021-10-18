@@ -2,7 +2,7 @@
   <div v-if="grantRoundMetadata && grantRounds && Object.keys(grantRoundMetadata).length == grantRounds.length">
     <!--------------- INTRO --------------->
     <section class="px-4 md:px-12 py-20 border-b border-grey-100 text-center">
-      <h1>Decentral Grants</h1>
+      <h1>Decentralized Grants</h1>
 
       <!-- description -->
       <p class="italic mt-8 mx-auto max-w-4xl text-grey-400">
@@ -22,27 +22,27 @@
       <!-- stats -->
       <div class="flex flex-wrap gap-y-4 gap-x-12 justify-center mt-12">
         <!-- rounds -->
-        <div class="">
+        <div>
           <div class="text-grey-400 uppercase">rounds</div>
-          <h1>1</h1>
+          <h1>{{ grantRounds?.length }}</h1>
         </div>
 
         <!--seperator-->
         <div class="hidden md:block bg-grey-100 w-px"></div>
 
         <!-- grants -->
-        <div class="">
+        <div>
           <div class="text-grey-400 uppercase">grants</div>
-          <h1>123</h1>
+          <h1>{{ grants?.length }}</h1>
         </div>
 
         <!--seperator-->
         <div class="hidden md:block bg-grey-100 w-px"></div>
 
         <!-- contributions -->
-        <div class="">
+        <div>
           <div class="text-grey-400 uppercase">contributions</div>
-          <h1>1234</h1>
+          <h1>{{ grantContributions?.length }}</h1>
         </div>
       </div>
     </section>
@@ -180,6 +180,7 @@ export default defineComponent({
       grantMetadata: _grantMetadata,
       grantRounds: _grantRounds,
       grantRoundMetadata: _grantRoundMetadata,
+      grantContributions: _grantContributions,
     } = useDataStore();
 
     // --- Data sources ---
@@ -187,6 +188,7 @@ export default defineComponent({
     const grantMetadata = computed(() => _grantMetadata.value);
     const grantRounds = computed(() => _grantRounds.value);
     const grantRoundMetadata = computed(() => _grantRoundMetadata.value);
+    const grantContributions = computed(() => _grantContributions.value);
 
     // --- BaseHeader Navigation ---
     const breadcrumb = computed(
@@ -246,6 +248,8 @@ export default defineComponent({
       selectedTab,
       unixToLocaleString,
       grants,
+      grantRounds,
+      grantContributions,
       grantMetadata,
       ...useGrantRegistryList(),
     };
