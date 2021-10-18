@@ -206,8 +206,8 @@
     <TransactionStatus
       @onReceipt="completeCheckout"
       :hash="txHash"
-      buttonLabel="Home"
-      :buttonAction="() => pushRoute({ name: 'Home' })"
+      buttonLabel="Share"
+      :buttonAction="() => pushRoute({ name: 'PostCheckout' })"
     />
   </div>
 
