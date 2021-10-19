@@ -39,7 +39,7 @@
         <!-- grants -->
         <div>
           <div class="text-grey-400 uppercase">grants</div>
-          <h1>{{ grants?.length }}</h1>
+          <h1>{{ validGrantsCount }}</h1>
         </div>
 
         <!--seperator-->
@@ -151,7 +151,7 @@
 // --- Types ---
 import { Breadcrumb, FilterNavItem, FilterNavButton } from '@dgrants/types';
 // --- Utils ---
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, onMounted, ref } from 'vue';
 import { BigNumber } from 'ethers';
 import {
   daysAgo,
@@ -171,6 +171,9 @@ import GrantRoundCard from 'src/components/GrantRoundCard.vue';
 import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { ArrowRightIcon } from '@fusion-icons/vue/interface';
+import useWalletStore from 'src/store/wallet';
+
+const validGrantsCount = ref([]);
 
 function useGrantRegistryList() {
   const filterNavButton = <FilterNavButton>{
@@ -193,6 +196,13 @@ export default defineComponent({
     ArrowRightIcon,
   },
   setup() {
+    onMounted(async () => {
+      const { chainId } = useWalletStore();
+      const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+      const json = await fetch(url).then((res) => res.json());
+      validGrantsCount.value = json[chainId.value].length;
+    });
+
     const {
       grants: _grants,
       grantMetadata: _grantMetadata,
@@ -269,6 +279,7 @@ export default defineComponent({
       grantRounds,
       grantContributions,
       grantMetadata,
+      validGrantsCount,
       ...useGrantRegistryList(),
     };
   },
