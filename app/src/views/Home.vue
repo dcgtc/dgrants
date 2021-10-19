@@ -9,7 +9,13 @@
         facilitates open source developers creating grants to collect contributions in a decentralized way. Read more
         about <router-link to="/dgrants" class="link">Grants</router-link> and
         <router-link to="/dgrants/rounds" class="link">Rounds</router-link> in the
-        <router-link to="#" class="link">FAQ</router-link>.
+        <a
+          href="https://github.com/dcgtc/dgrants/wiki/dGrants-FAQ"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="link"
+          >FAQ</a
+        >
       </p>
 
       <!-- create grant -->
@@ -52,7 +58,13 @@
       <h1>Rounds</h1>
       <p class="italic text-grey-400">
         Grant Rounds are collections of Grants which receive matching from a pool.
-        <router-link to="#" class="link">Learn more</router-link>
+        <a
+          href="https://github.com/dcgtc/dgrants/wiki/dGrants-FAQ#q-what-is-a-grant-round"
+          target="_blank"
+          rel="noreferrer noopener"
+          class="link"
+          >Learn more</a
+        >
       </p>
     </section>
 
@@ -109,7 +121,13 @@
     <h1>Grants</h1>
     <p class="italic text-grey-400">
       Grants are a facility for projects to receive donations to their cause.
-      <router-link to="#" class="link">Learn more</router-link>
+      <a
+        href="https://github.com/dcgtc/dgrants/wiki/dGrants-FAQ#q-what-is-a-grant"
+        target="_blank"
+        rel="noreferrer noopener"
+        class="link"
+        >Learn more</a
+      >
     </p>
   </section>
 
