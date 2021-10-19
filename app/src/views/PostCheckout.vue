@@ -12,7 +12,7 @@
             :href="
               'https://twitter.com/intent/tweet' +
               '?text=' +
-              encodeURIComponent('Completed contribution at Gitcoins Decentral Grants App!') +
+              encodeURIComponent('Completed contribution at Gitcoins Decentralized Grants App!') +
               '&url=' +
               encodeURIComponent('https://grants.gtcdao.net')
             "
