@@ -1,4 +1,5 @@
 import '@nomiclabs/hardhat-waffle';
+import '@nomiclabs/hardhat-etherscan';
 import '@typechain/hardhat';
 import 'hardhat-gas-reporter';
 import 'solidity-coverage';
@@ -72,6 +73,11 @@ const config: HardhatUserConfig = {
     enabled: process.env.REPORT_GAS ? true : false,
     excludeContracts: [],
     src: './contracts',
+  },
+  etherscan: {
+    // Your API key for Etherscan/Polygonscan
+    // Obtain one at https://etherscan.io/ or https://polygonscan.com
+    apiKey: process.env.ETHERSCAN_API_KEY,
   },
   networks: {
     hardhat: {
