@@ -42,6 +42,7 @@
     "vue-router": "^4.0.0-0"
   },
   "devDependencies": {
+    "@nomiclabs/hardhat-etherscan": "^2.1.6",
     "@types/chai": "^4.2.11",
     "@types/mocha": "^8.2.2",
     "@typescript-eslint/eslint-plugin": "^4.26.1",
