@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(grantRoundMetadata).length">
+  <div v-if="grantRoundMetadata && grantRounds && Object.keys(grantRoundMetadata).length == grantRounds.length">
     <!-- Simple breadcrumb pointing back to the landing -->
     <BaseHeader :breadcrumbContent="breadcrumb" name="Decentralized Grants Explorer" />
 
@@ -145,6 +145,7 @@ export default defineComponent({
       daysAgo,
       formatAddress,
       formatNumber,
+      grantRounds,
       grantRoundLists,
       grantRoundMetadata,
       grantRoundsNav,
