@@ -206,8 +206,8 @@
     <TransactionStatus
       @onReceipt="completeCheckout"
       :hash="txHash"
-      buttonLabel="Share"
-      :buttonAction="() => pushRoute({ name: 'PostCheckout' })"
+      buttonLabel="Home"
+      :buttonAction="() => pushRoute({ name: 'Home' })"
     />
   </div>
 
@@ -322,7 +322,10 @@ function useCart() {
   }
 
   function completeCheckout(success: boolean) {
-    if (success) clearCartState();
+    if (success) {
+      clearCartState();
+      pushRoute({ name: 'PostCheckout' });
+    }
   }
 
   return {
