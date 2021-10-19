@@ -173,7 +173,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { ArrowRightIcon } from '@fusion-icons/vue/interface';
 import useWalletStore from 'src/store/wallet';
 
-const validGrantsCount = ref([]);
+const validGrantsCount = ref<number>(0);
 
 function useGrantRegistryList() {
   const filterNavButton = <FilterNavButton>{
@@ -200,7 +200,7 @@ export default defineComponent({
       const { chainId } = useWalletStore();
       const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
       const json = await fetch(url).then((res) => res.json());
-      validGrantsCount.value = json[chainId.value].length;
+      validGrantsCount.value = json[chainId.value]?.length;
     });
 
     const {
