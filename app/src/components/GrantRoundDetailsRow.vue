@@ -12,7 +12,7 @@
     <div class="my-6 px-8 md:px-0">
       <!-- Funds -->
       <div>
-        <span class="text-grey-400 mr-4">Funds:</span>
+        <span class="text-grey-400 mr-4">Matching Funds:</span>
         <span>
           {{ grantRound.funds.toString() }}
           {{ grantRound.matchingToken.symbol }}
@@ -69,8 +69,13 @@
 
       <!-- Matching -->
       <div>
-        <span class="text-grey-400 mr-4">Matching:</span>
-        <span>{{ grantRoundMetadata?.matchingAlgorithm }}</span>
+        <span class="text-grey-400 mr-4">Matching Algorithm:</span>
+        <span>
+          <template v-if="grantRoundMetadata?.matchingAlgorithm">
+            {{ grantRoundMetadata?.matchingAlgorithm }}
+          </template>
+          <template v-else> Linear </template>
+        </span>
       </div>
 
       <!-- See Grants -->
