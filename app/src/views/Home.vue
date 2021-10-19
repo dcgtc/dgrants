@@ -33,14 +33,15 @@
           <h1>{{ grantRounds?.length }}</h1>
         </div>
 
-        <!--seperator-->
-        <div class="hidden md:block bg-grey-100 w-px"></div>
-
-        <!-- grants -->
-        <div>
-          <div class="text-grey-400 uppercase">grants</div>
-          <h1>{{ validGrantsCount }}</h1>
-        </div>
+        <template v-if="validGrantsCount && validGrantsCount > 0">
+          <!--seperator-->
+          <div class="hidden md:block bg-grey-100 w-px"></div>
+          <!-- grants -->
+          <div>
+            <div class="text-grey-400 uppercase">grants</div>
+            <h1>{{ validGrantsCount }}</h1>
+          </div>
+        </template>
 
         <!--seperator-->
         <div class="hidden md:block bg-grey-100 w-px"></div>
@@ -151,7 +152,7 @@
 // --- Types ---
 import { Breadcrumb, FilterNavItem, FilterNavButton } from '@dgrants/types';
 // --- Utils ---
-import { computed, defineComponent, onMounted, ref } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import { BigNumber } from 'ethers';
 import {
   daysAgo,
@@ -195,13 +196,18 @@ export default defineComponent({
     LoadingSpinner,
     ArrowRightIcon,
   },
+
   setup() {
-    onMounted(async () => {
-      const { chainId } = useWalletStore();
-      const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
-      const json = await fetch(url).then((res) => res.json());
-      validGrantsCount.value = json[chainId.value]?.length;
-    });
+    watch(
+      () => [],
+      async () => {
+        const { chainId } = useWalletStore();
+        const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+        const json = await fetch(url).then((res) => res.json());
+        validGrantsCount.value = json[chainId.value]?.length;
+      },
+      { immediate: true }
+    );
 
     const {
       grants: _grants,
