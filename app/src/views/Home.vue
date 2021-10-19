@@ -282,7 +282,6 @@ export default defineComponent({
       selectedTab,
       unixToLocaleString,
       grants,
-      grantRounds,
       grantContributions,
       grantMetadata,
       validGrantsCount,
