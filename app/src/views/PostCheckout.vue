@@ -5,24 +5,26 @@
       <div class="mt-8 flex gap-4 justify-center">
         <button @click="routerGo(-1)" class="btn">Back</button>
         <button @click="routerPush('/')" class="btn">Home</button>
-        <button class="btn">
-          <a
-            target="_blank"
-            rel="noreferrer noopener"
-            :href="
-              'https://twitter.com/intent/tweet' +
-              '?text=' +
-              encodeURIComponent('Completed contribution at Gitcoins Decentralized Grants App!') +
-              '&url=' +
-              encodeURIComponent('https://grants.gtcdao.net')
-            "
-          >
+        <a
+          target="_blank"
+          rel="noreferrer noopener"
+          :href="
+            'https://twitter.com/intent/tweet' +
+            '?text=' +
+            encodeURIComponent(
+              'I just made a contribution to a grant using the new Gitcoin DAO decentralized grants platform! Join me in supporting public goods and open source at https://grants.gtcdao.net'
+            ) +
+            '&url=' +
+            encodeURIComponent('https://grants.gtcdao.net')
+          "
+        >
+          <button class="btn">
             <div class="flex items-center gap-x-2 cursor-pointer">
               <TwitterIcon class="icon" />
               <span>Tweet</span>
             </div>
-          </a>
-        </button>
+          </button>
+        </a>
       </div>
     </div>
   </section>
