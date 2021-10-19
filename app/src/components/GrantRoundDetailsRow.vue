@@ -74,7 +74,7 @@
           <template v-if="grantRoundMetadata?.matchingAlgorithm">
             {{ grantRoundMetadata?.matchingAlgorithm }}
           </template>
-          <template v-else> Linear </template>
+          <template v-else>Linear</template>
         </span>
       </div>
 
