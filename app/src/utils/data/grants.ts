@@ -37,7 +37,7 @@ export async function getAllGrants(forceRefresh = false) {
       // pull the indexed grants data from localStorage
       const _lsGrants = LocalForageData?.data?.grants || {};
       // every block
-      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < latestBlockNumber)) {
         // get the most recent block we collected
         let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
         // attempt to use the subgraph first
@@ -49,7 +49,7 @@ export async function getAllGrants(forceRefresh = false) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `{
-                  grants(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                  grants(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}) {
                     id
                     owner
                     payee

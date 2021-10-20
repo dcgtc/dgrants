@@ -52,7 +52,7 @@ export async function getAllGrantRounds(forceRefresh = false) {
       // get the most recent block we collected
       let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
       // every block
-      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < blockNumber)) {
+      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < latestBlockNumber)) {
         // attempt to use the subgraph first
         if (SUBGRAPH_URL) {
           try {
@@ -62,7 +62,7 @@ export async function getAllGrantRounds(forceRefresh = false) {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `{
-                  grantRounds(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                  grantRounds(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}) {
                     address
                     lastUpdatedBlockNumber
                   }
