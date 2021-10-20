@@ -47,8 +47,8 @@ function useGrantRoundDetail() {
    */
   const grants = computed(() => {
     if (allGrants.value && grantRoundMetadata?.value?.grants) {
-      const grantIdsInRound = Object.keys(grantRoundMetadata?.value['grants']);
-      return allGrants.value.filter((grant) => grantIdsInRound.includes(grant.id.toString()));
+      const grantIdsInRound = grantRoundMetadata?.value['grants'];
+      return allGrants.value.filter((grant) => grantIdsInRound.includes(grant.id));
     } else {
       return <Grant[]>[];
     }
