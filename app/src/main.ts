@@ -30,7 +30,10 @@ window.onerror = function (msg, url, line, col, err) {
 // reason for the rejection
 // More info: https://stackoverflow.com/questions/31472439/catch-all-unhandled-javascript-promise-rejections
 window.addEventListener('unhandledrejection', function (event) {
-  throw new Error(event.reason); // we re-throw the error so it gets picked up by the above handler
+  if (event.reason) {
+    console.log('Rejection params:', event.reason);
+    handleError(event.reason);
+  }
 });
 
 // --- Setup complete, mount app ---
