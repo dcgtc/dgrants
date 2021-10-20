@@ -202,7 +202,9 @@ export default defineComponent({
       () => [],
       async () => {
         const { chainId } = useWalletStore();
-        const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+        const dateStr = Date.now();
+        const url =
+          'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json?unique=' + dateStr;
         const json = await fetch(url).then((res) => res.json());
         validGrantsCount.value = json[chainId.value]?.length;
       },
