@@ -113,7 +113,9 @@ export default defineComponent({
     );
 
     onMounted(async () => {
-      const url = 'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+      const dateStr = Date.now();
+      const url =
+        'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json?unique=' + dateStr;
       const json = await fetch(url).then((res) => res.json());
       grantIdList.value = json[DGRANTS_CHAIN_ID];
     });
