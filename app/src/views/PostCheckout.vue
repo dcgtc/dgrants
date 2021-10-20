@@ -25,6 +25,17 @@
             </div>
           </button>
         </a>
+        <a
+          target="_blank"
+          rel="noreferrer noopener"
+          href="https://docs.google.com/forms/d/10cQ1iUK7km5LT9HSwyoS0k08Akxhzd3PhILi2Pepd-M/edit?usp=sharing"
+        >
+          <button class="btn">
+            <div class="flex items-center gap-x-2 cursor-pointer">
+              <span>Give Us Feedback</span>
+            </div>
+          </button>
+        </a>
       </div>
     </div>
   </section>
