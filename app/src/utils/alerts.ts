@@ -1,18 +1,37 @@
 import BNotify, { NotificationType } from 'bnc-notify';
 import { JsonRpcProvider } from 'src/utils/ethers';
 import { getEtherscanUrl } from 'src/utils/utils';
+import { CHAIN_LABEL } from './chains';
 
 // Instantiate Blocknative's notify.js. We don't pass a dappId/networkId so we can use in UI only mode for any
 // notifications we need, i.e. not just Blocknative transaction notifications
 const bNotify = BNotify({ desktopPosition: 'topRight' });
-const defaultTimeout = 5000; // 4 seconds
+const defaultTimeout = 5000; // 5 seconds
 
 // Some error messages we don't want to show to the user, so return in these cases
 const messagesToIgnore = [
   'walletSelect must be called before walletCheck', // user decided not to connect wallet
   'unknown account #0', // happens when we try to connect to a locked wallet
-  'TypeError: _context.t2 is not a constructor', // https://github.com/dcgtc/dgrants/issues/26
+  '_context.t2 is not a constructor', // https://github.com/dcgtc/dgrants/issues/26
   'PollingBlockTracker - encountered an error while attempting to update latest block', // occurs if you use walletconnect + Argent and connect with a chainId different than DGRANTS_CHAIN_ID
+];
+
+// Some error messages we want to display alternative messages for
+const messagesToReplace = [
+  // this error is thrown if the user has an incorrect rpc_url set-up in their wallet
+  {
+    find: [
+      "Non-200 status code: '404'", // occurs when we cannot connect to the host
+      'Response has no error or result for request', // occurs when an rpc req timesout
+    ],
+    replace: `It appears that either your network connection or provider URL for ${CHAIN_LABEL} is experiencing issues.<br/><br/>Please check your internet connection or try changing your provider/RPC URL in Metamask if this issue persists.`,
+  },
+  // replace every other message with a human readable catchAll
+  {
+    find: ['.*'],
+    replace:
+      'Something bad has happened and I need an adult. Please email <a href="support-grants@gtcdao.net">support-grants@gtcdao.net</a> with a description of your problem.',
+  },
 ];
 
 /**
@@ -23,6 +42,10 @@ const messagesToIgnore = [
 export function notifyUser(alertType: NotificationType, message: string) {
   // If message matches any of the substrings in messagesToIgnore, we return and don't show the alert
   if (new RegExp(messagesToIgnore.join('|')).test(message)) return;
+
+  // If message matches a replacement, we use that instead of the given message
+  message =
+    messagesToReplace.find((replacement) => new RegExp(replacement.find.join('|')).test(message))?.replace || message;
 
   bNotify.notification({
     autoDismiss: alertType === 'error' ? 10000 : defaultTimeout,

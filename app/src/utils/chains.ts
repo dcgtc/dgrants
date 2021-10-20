@@ -198,6 +198,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
 
 // --- Chain-specific exports based on `VITE_DGRANTS_CHAIN_ID` ---
 export const CHAIN_INFO = ALL_CHAIN_INFO[DGRANTS_CHAIN_ID];
+export const CHAIN_LABEL = CHAIN_INFO.label;
 export const ETHERSCAN_BASE_URL = CHAIN_INFO.explorer;
 export const SUPPORTED_TOKENS = CHAIN_INFO.tokens;
 export const SUPPORTED_TOKENS_MAPPING = CHAIN_INFO.tokensMapping;
