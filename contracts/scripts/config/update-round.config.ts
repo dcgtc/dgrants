@@ -32,6 +32,12 @@ const params: DeployParams = {
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
+  polygon: {
+    roundAddress: '0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4',
+    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    roundLogoPath: './scripts/config/assets/moonshot-round.svg',
+    metadataJson,
+  },
 };
 
 export default params;

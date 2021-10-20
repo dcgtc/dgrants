@@ -1,0 +1,20 @@
+{
+  "deployer": "0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B",
+  "config": {
+    "roundAddress": "0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4",
+    "ipfsRetrievalEndpoint": "https://ipfs-dev.fleek.co/ipfs",
+    "roundLogoPath": "./scripts/config/assets/moonshot-round.svg",
+    "metadataJson": {
+      "name": "Moonshot Collective",
+      "description": "The Moonshot Collective is a Gitcoin DAO workstream focused on rapid protoyping. This round is a collection of grants created by and supporting the Moonshot Collective team and projects.",
+      "grants": [4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+      "logoURI": "https://ipfs-dev.fleek.co/ipfs/QmYiSoCyMrBvQAPzoz1oboawynKRCZQT24nZDcwLdS1bCq"
+    }
+  },
+  "contracts": {},
+  "actions": {
+    "PublishGrantRoundLogo": "QmYiSoCyMrBvQAPzoz1oboawynKRCZQT24nZDcwLdS1bCq",
+    "PublishGrantRoundMetadata": "QmPMERYmqZtbHmqd2UzRhX9F4cixnMQU2GFa2hYAsQ6J3D",
+    "UpdateRoundMetaPtr": "0x32ecdd893a60780a04fc37eafec855ddfae4527ef499a454491feab1e70e034f"
+  }
+}
