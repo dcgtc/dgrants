@@ -201,9 +201,8 @@ export default defineComponent({
     watch(
       () => [],
       async () => {
-        const dateStr = Date.now();
-        const url =
-          'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json?unique=' + dateStr;
+        const uniqueStr = '?unique=' + Date.now();
+        const url = import.meta.env.VITE_GRANT_WHITELIST_URI + uniqueStr;
         const json = await fetch(url).then((res) => res.json());
         validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
       },
