@@ -281,6 +281,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
+import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl, watchTransaction} from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
@@ -302,6 +303,8 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Icons ---
 import { TwitterIcon } from '@fusion-icons/vue/interface';
 import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
+
+const grantIdList = ref([]);
 
 function useGrantDetail() {
   // --- get current state ---
@@ -391,10 +394,28 @@ function useGrantDetail() {
     return grants.value[grantid] ? { name: 'dgrants-id', params: { id: grantid } } : undefined;
   };
   const nextGrant = computed(() => {
-    return getGrantTargetFor(grantId.value + 1);
+    let nextIndex = grantId.value + 1;
+    const idList = grantIdList.value as Array<number>;
+    const len = grants.value ? grants.value.length : 0;
+    for (let i = 0; i < len; i++) {
+      if (idList.includes(nextIndex)) {
+        break;
+      }
+      nextIndex++;
+    }
+    return getGrantTargetFor(nextIndex);
   });
   const lastGrant = computed(() => {
-    return getGrantTargetFor(grantId.value - 1);
+    let lastIndex = grantId.value - 1;
+    const idList = grantIdList.value as Array<number>;
+    const len = grants.value ? grants.value.length : 0;
+    for (let i = 0; i < len; i++) {
+      if (idList.includes(lastIndex)) {
+        break;
+      }
+      lastIndex--;
+    }
+    return getGrantTargetFor(lastIndex);
   });
 
   // --- Contribution display details ---
@@ -650,6 +671,18 @@ export default defineComponent({
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
+
+    watch(
+      () => [],
+      async () => {
+        const dateStr = Date.now();
+        const url =
+          'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json?unique=' + dateStr;
+        const json = await fetch(url).then((res) => res.json());
+        grantIdList.value = json[DGRANTS_CHAIN_ID];
+      },
+      { immediate: true }
+    );
 
     return { isInCart, addToCart, removeFromCart, ...useGrantDetail() };
   },
