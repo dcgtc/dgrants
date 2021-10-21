@@ -4,7 +4,7 @@ import { getStorageKey, setStorageKey } from './utils';
 import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
-const retrievalEndpoint = 'https://ipfs-dev.fleek.co/ipfs';
+const retrievalEndpoint = 'https://ipfs.fleek.co/ipfs';
 
 export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
 
