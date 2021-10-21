@@ -6,7 +6,7 @@
 
       <!-- description -->
       <p class="italic mt-8 mx-auto max-w-4xl text-grey-400">
-        facilitates open source developers creating grants to collect contributions in a decentralized way. Read more
+        Facilitating open source developers creating grants to collect contributions in a decentralized way. Read more
         about <router-link to="/dgrants" class="link">Grants</router-link> and
         <router-link to="/dgrants/rounds" class="link">Rounds</router-link> in the
         <a
