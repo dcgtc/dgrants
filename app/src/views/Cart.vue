@@ -324,7 +324,7 @@ function useCart() {
   function completeCheckout(success: boolean) {
     if (success) {
       clearCartState();
-      pushRoute({ name: 'PostCheckout' });
+      pushRoute({ name: 'post-checkout' });
     }
   }
 

@@ -3,7 +3,6 @@
     <div class="grid justify-center text-center">
       <h1 class="text-grey-500">Thank you for contributing!</h1>
       <div class="mt-8 flex gap-4 justify-center">
-        <button @click="routerGo(-1)" class="btn">Back</button>
         <button @click="routerPush('/')" class="btn">Home</button>
         <a
           target="_blank"
