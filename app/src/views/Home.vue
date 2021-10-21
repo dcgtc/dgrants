@@ -172,7 +172,7 @@ import GrantRoundCard from 'src/components/GrantRoundCard.vue';
 import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { ArrowRightIcon } from '@fusion-icons/vue/interface';
-import useWalletStore from 'src/store/wallet';
+import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 
 const validGrantsCount = ref<number>(0);
 
@@ -201,12 +201,11 @@ export default defineComponent({
     watch(
       () => [],
       async () => {
-        const { chainId } = useWalletStore();
         const dateStr = Date.now();
         const url =
           'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json?unique=' + dateStr;
         const json = await fetch(url).then((res) => res.json());
-        validGrantsCount.value = json[chainId.value]?.length;
+        validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
       },
       { immediate: true }
     );
