@@ -13,9 +13,17 @@
         <!-- raised -->
         <div><span class="text-grey-400 mr-4">Raised:</span>{{ totalRaised }}</div>
 
-        <!--contract-->
+        <!-- Donation Address -->
         <div>
-          <span class="text-grey-400 mr-4">Contract:</span>
+          <span class="text-grey-400 mr-4">Donation Address:</span>
+          <a class="link" :href="getEtherscanUrl(payoutAddress, 'address')" target="_blank" rel="noopener noreferrer">{{
+            formatAddress(grant.owner)
+          }}</a>
+        </div>
+
+        <!-- Owner -->
+        <div>
+          <span class="text-grey-400 mr-4">Owner:</span>
           <a class="link" :href="getEtherscanUrl(payoutAddress, 'address')" target="_blank" rel="noopener noreferrer">{{
             formatAddress(payoutAddress)
           }}</a>
