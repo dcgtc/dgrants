@@ -2,6 +2,7 @@
   <section class="px-4 md:px-12 py-4 md:py-12">
     <div class="grid justify-center text-center">
       <h1>Thanks! You’re Awesome. <span class="italic">Seriously.</span></h1>
+
       <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
         Please help dGrants by spread the word with a tweet. Let us now how we can improve – your feedback is
         appreciated.
@@ -22,6 +23,7 @@
         </button>
 
         <!--tweet button-->
+
         <a
           target="_blank"
           rel="noreferrer noopener"
