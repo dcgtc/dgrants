@@ -41,12 +41,18 @@
           </router-link>
 
           <a href="https://github.com/dcgtc" target="_blank" rel="noreferrer noopener">
-            <button class="btn"><GithubIcon /></button
-          ></a>
+            <button class="btn">
+              <GithubIcon />
+              <span>Github</span>
+            </button></a
+          >
 
           <a href="https://twitter.com/gitcoin" target="_blank" rel="noreferrer noopener">
-            <button class="btn"><TwitterIcon /></button
-          ></a>
+            <button class="btn">
+              <TwitterIcon />
+              <span>Twitter</span>
+            </button></a
+          >
         </div>
 
         <!-- license & support link -->
