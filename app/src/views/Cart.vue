@@ -52,14 +52,17 @@
       </div>
     </div>
 
-    <!-- Cart Items -->
-    <div v-for="item in cart" :key="item.grantId" class="px-4 md:px-12">
+    <!-- cart items -->
+    <section v-for="item in cart" :key="item.grantId" class="px-4 md:px-12">
       <div class="py-8 border-b border-grey-100">
-        <div class="grid grid-flow-col items-center gap-x-8">
-          <div>
-            <div class="grid grid-cols-4 items-center gap-x-8 gap-y-4">
-              <!-- image -->
-              <div class="col-span-4 lg:col-span-1">
+        <!-- flexbox for content + right aligned delete icon -->
+        <div class="flex gap-x-8 items-center">
+          <!-- content -->
+          <div class="w-full">
+            <!-- article grid that distributes image, text, input, matching -->
+            <article class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 items-center gap-x-8 gap-y-4">
+              <!--image-->
+              <div>
                 <figure class="aspect-w-16 aspect-h-9 shadow-light">
                   <img
                     class="w-full h-full object-center object-cover group-hover:opacity-90"
@@ -67,17 +70,20 @@
                   />
                 </figure>
               </div>
-              <!-- text -->
-              <div class="col-span-4 lg:col-span-1">
+
+              <!--text-->
+              <div class="">
                 <span
                   class="link"
                   @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(item.grantId).toString() } })"
                 >
-                  {{ grantMetadata[item.metaPtr]?.name }}
+                  {{ grantMetadata[item.metaPtr]?.name }} {{ grantMetadata[item.metaPtr]?.name }}
+                  {{ grantMetadata[item.metaPtr]?.name }} {{ grantMetadata[item.metaPtr]?.name }}
                 </span>
               </div>
-              <!-- input -->
-              <div class="col-span-4 lg:col-span-1">
+
+              <!--inputs-->
+              <div class="">
                 <div class="flex">
                   <BaseInput
                     :modelValue="item.contributionAmount"
@@ -106,41 +112,36 @@
                 </div>
               </div>
 
-              <!-- matching -->
-              <div class="col-span-4 lg:col-span-1">
-                <div class="text-grey-400 text-left lg:text-right">
-                  <!-- match estimates -->
-                  <div
-                    v-if="
-                      clrPredictions[item.grantId].reduce(
-                        (carr, clr) => carr || typeof clr.matching === 'number',
-                        false
-                      )
-                    "
-                  >
-                    <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
-                      <template v-if="typeof clr.matching === 'number'">
-                        <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
-                        <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
-                      </template>
-                    </span>
-                    <span class="inline-block lg:block">estimated matching</span>
-                  </div>
-                  <!-- no matching -->
-                  <div v-else>
-                    <span>not in an active round</span>
-                  </div>
+              <!--matching-->
+              <div class="">
+                <div
+                  v-if="
+                    clrPredictions[item.grantId].reduce((carr, clr) => carr || typeof clr.matching === 'number', false)
+                  "
+                >
+                  <span class="block" v-for="(clr, index) in clrPredictions[item.grantId]" :key="index">
+                    <template v-if="typeof clr.matching === 'number'">
+                      <span>{{ formatNumber(clr.matching, 2) }} {{ clr.matchingToken.symbol }}</span>
+                      <span v-if="index !== clrPredictions[item.grantId].length - 1"> + </span>
+                    </template>
+                  </span>
+                  <span class="inline-block lg:block">estimated matching</span>
+                </div>
+                <!-- no matching -->
+                <div v-else>
+                  <span>not in an active round</span>
                 </div>
               </div>
-            </div>
+            </article>
           </div>
 
+          <!-- delete -->
           <div class="justify-self-end">
             <CloseIcon @click="removeFromCart(item.grantId)" class="icon icon-small icon-primary cursor-pointer" />
           </div>
         </div>
       </div>
-    </div>
+    </section>
 
     <!-- Checkout -->
     <div class="px-4 md:px-12">
