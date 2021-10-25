@@ -82,7 +82,9 @@
           :href="
             'https://twitter.com/intent/tweet' +
             '?text=' +
-            encodeURIComponent('Checkout ' + grantRoundMetadata?.name + ' at Gitcoins Decentral Grants App!') +
+            encodeURIComponent(
+              `Check out the ${grantRoundMetadata?.name} matching round on the new Gitcoin DAO decentralized grants platform!`
+            ) +
             '&url=' +
             encodeURIComponent('https://grants.gtcdao.net/#') +
             $route.path
