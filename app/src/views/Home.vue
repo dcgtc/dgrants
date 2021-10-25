@@ -166,7 +166,6 @@ import {
 // --- Data ---
 import useDataStore from 'src/store/data';
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
-import { GRANT_WHITELIST_URI } from 'src/utils/constants';
 // --- Components ---
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
@@ -202,9 +201,12 @@ export default defineComponent({
       () => [],
       async () => {
         const uniqueStr = '?unique=' + Date.now();
-        const url = GRANT_WHITELIST_URI + uniqueStr;
-        const json = await fetch(url).then((res) => res.json());
-        validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
+        const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
+        if (whitelistUrl) {
+          const url = whitelistUrl + uniqueStr;
+          const json = await fetch(url).then((res) => res.json());
+          validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
+        }
       },
       { immediate: true }
     );
