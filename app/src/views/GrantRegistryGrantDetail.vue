@@ -279,7 +279,7 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { GRANT_WHITELIST_URI, LOREM_IPSOM_TEXT } from 'src/utils/constants';
+import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl, watchTransaction} from 'src/utils/utils'; // prettier-ignore
@@ -676,9 +676,12 @@ export default defineComponent({
       () => [],
       async () => {
         const uniqueStr = '?unique=' + Date.now();
-        const url = GRANT_WHITELIST_URI + uniqueStr;
-        const json = await fetch(url).then((res) => res.json());
-        grantIdList.value = json[DGRANTS_CHAIN_ID];
+        const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
+        if (whitelistUrl) {
+          const url = whitelistUrl + uniqueStr;
+          const json = await fetch(url).then((res) => res.json());
+          grantIdList.value = json[DGRANTS_CHAIN_ID];
+        }
       },
       { immediate: true }
     );
