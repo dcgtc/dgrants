@@ -20,7 +20,7 @@
 
       <!-- create grant -->
       <div class="flex mt-8 justify-center">
-        <router-link to="#">
+        <router-link :to="{ name: 'dgrants-new' }">
           <button class="btn">create grant</button>
         </router-link>
       </div>
