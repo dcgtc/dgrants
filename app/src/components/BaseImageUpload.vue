@@ -8,7 +8,7 @@
     <div class="block">
       <label class="w-100 flex flex-col bg-white items-center px-6 py-8 border border-grey-400 cursor-pointer">
         <input type="file" @input="onInput" class="hidden" />
-        <div class="flex p-12 gap-x-12">
+        <div class="flex py-12 px-0 md:px-12 gap-x-12">
           <div
             class="
               group
@@ -25,8 +25,7 @@
             <ImportIcon class="icon icon-small icon-primary" />
           </div>
           <div class="text-grey-400 flex items-center">
-            1920x1080px<br />
-            *.png
+            {{ errorMsg }}
           </div>
         </div>
       </label>

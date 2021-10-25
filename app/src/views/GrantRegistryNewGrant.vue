@@ -131,7 +131,7 @@
             width="w-full"
             id="grant-logo"
             :rules="isValidLogo"
-            errorMsg="Logo must be in png or svg format, under 512 kB, with dimensions greater than 960x540"
+            errorMsg="Logo must be in png, jpg, or svg format, under 512 kB, with dimensions of at least 500x500"
             :required="false"
             @update:modelValue="updateLogo"
             :isUploading="isUploadingLogo"
