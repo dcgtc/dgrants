@@ -163,16 +163,16 @@ import {
   hasStatus,
   sortByStartTime,
 } from 'src/utils/utils';
-// --- Data and Methods ---
+// --- Data ---
 import useDataStore from 'src/store/data';
+import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
+import { GRANT_WHITELIST_URI } from 'src/utils/constants';
 // --- Components ---
-
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
 import GrantList from 'src/components/GrantList.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { ArrowRightIcon } from '@fusion-icons/vue/interface';
-import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 
 const validGrantsCount = ref<number>(0);
 
@@ -202,7 +202,7 @@ export default defineComponent({
       () => [],
       async () => {
         const uniqueStr = '?unique=' + Date.now();
-        const url = import.meta.env.VITE_GRANT_WHITELIST_URI + uniqueStr;
+        const url = GRANT_WHITELIST_URI + uniqueStr;
         const json = await fetch(url).then((res) => res.json());
         validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
       },

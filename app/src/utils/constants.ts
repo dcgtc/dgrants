@@ -1,5 +1,10 @@
 import { LocalForageConfig } from 'src/types';
 
+// Parse environment variables
+export const GRANT_WHITELIST_URI =
+  import.meta.env.VITE_GRANT_WHITELIST_URI ??
+  'https://storageapi.fleek.co/phutchins-team-bucket/dgrants/staging/whitelist-grants.json';
+
 // Read data using Multicall2: https://github.com/makerdao/multicall
 export const MULTICALL_ABI = [
   'function getCurrentBlockTimestamp() view returns (uint256 timestamp)',
