@@ -31,7 +31,7 @@
             'https://twitter.com/intent/tweet' +
             '?text=' +
             encodeURIComponent(
-              'I just made a contribution to a grant using the new Gitcoin DAO decentralized grants platform! Join me in supporting public goods and open source at https://grants.gtcdao.net'
+              'I just helped fund public goods using the new Gitcoin DAO decentralized grants platform! Join me in supporting public goods and open source at https://grants.gtcdao.net'
             ) +
             '&url=' +
             encodeURIComponent('https://grants.gtcdao.net')
