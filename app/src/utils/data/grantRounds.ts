@@ -603,7 +603,7 @@ export function matchingTokenListener(
   },
   refs: Record<string, Ref>
 ) {
-  const listener = async (to: string, amount: BigNumberish, from: string) => {
+  const listener = async (from: string, to: string, amount: BigNumberish) => {
     console.log(`New contributions: ${to} - ${BigNumber.from(amount).toString()} - ${from}`);
     // update all of the grantRounds onchain data
     void (await updateGrantRound(args.grantRoundAddress, args, refs));
