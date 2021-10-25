@@ -314,18 +314,18 @@ function useGrantRoundDetail() {
     if (!signer.value) throw new Error('Please connect a wallet');
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
 
-    // pull data from form
+    // Pull data from form
     const { amount } = form.value;
     const tokenAddress = grantRound.value.matchingToken.address;
 
-    // set up contracts
+    // Set up contracts
     const token = new Contract(tokenAddress, ERC20_ABI, signer.value);
     const round = <GrantRoundContract>new Contract(grantRound.value.address, GRANT_ROUND_ABI, signer.value);
 
     // contributionAmount must have the right number of decimals and be hexed
     const contributionAmount = parseUnits(amount, grantRound.value.matchingToken.decimals);
 
-    // check if contract is already approved as a spender
+    // Check if contract is already approved as a spender
     const allowance = await checkAllowance(token, userAddress.value, grantRound.value.address);
     if (allowance.lt(contributionAmount)) {
       await getApproval(token, grantRound.value.address, MaxUint256);
@@ -333,8 +333,11 @@ function useGrantRoundDetail() {
 
     assertSufficientBalance(tokenAddress, contributionAmount);
 
-    // invoke addMatchingFunds on the round contract
+    // Invoke addMatchingFunds on the round contract
     await addMatchingFunds(round, contributionAmount);
+
+    // After successful transaction, clear the form data
+    form.value.amount = '';
   }
 
   /**
