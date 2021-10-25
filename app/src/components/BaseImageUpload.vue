@@ -12,13 +12,24 @@
     <div v-if="!isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
   </div>
   <div v-if="val">
-    <div v-if="isValid">It's nice here</div>
-    <div v-if="!isValid">
-      <div class="grid grid-cols-6 gap-4">
-        <div class="col-span-5">
-          <ImageEditor :selectedImage="selectedImage" :desiredRatio="16 / 15" />
+    <div v-if="finalImage">
+      <img :src="finalImage" class="h-36" />
+      <p class="mx-2">{{ val.name }}</p>
+      <button @click="onDiscard" class="mx-2">Discard Image</button>
+    </div>
+    <div v-if="!finalImage">
+      <div v-if="!isValid">
+        <div class="grid grid-cols-6 gap-4">
+          <div class="col-span-5">
+            <ImageEditor
+              @cropped="onCrop"
+              @discard="onDiscard"
+              :mimeType="mimeType"
+              :selectedImage="selectedImage"
+              :desiredRatio="16 / 9"
+            />
+          </div>
         </div>
-        <div class="col-span-1">Actions</div>
       </div>
     </div>
   </div>
@@ -56,6 +67,8 @@ export default defineComponent({
     const val = ref<File | undefined>(props.modelValue as File);
     const isValid = ref(true);
     const selectedImage = ref<any>(null);
+    const mimeType = ref('');
+    const finalImage = ref('');
 
     // Use watcher for rule validation since the rules are async (checking image dimensions is async)
     watch(
@@ -67,6 +80,8 @@ export default defineComponent({
     const handleFile = (file: File) => {
       val.value = file;
       context.emit('update:modelValue', file); // https://v3.vuejs.org/guide/migration/v-model.html#v-model
+
+      mimeType.value = 'not-for-now'; //file.type;
 
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -94,7 +109,20 @@ export default defineComponent({
       const file: File = (target.files as FileList)[0];
       handleFile(file);
     }
-    return { onInput, isValid, val, fileDragOver, fileDrop, selectedImage };
+
+    function onCrop(image: string) {
+      finalImage.value = image;
+      console.log('???', finalImage.value);
+    }
+
+    function onDiscard() {
+      finalImage.value = '';
+      selectedImage.value = null;
+      mimeType.value = '';
+      val.value = undefined;
+    }
+
+    return { onInput, isValid, val, fileDragOver, fileDrop, selectedImage, mimeType, onCrop, onDiscard, finalImage };
   },
 });
 </script>

@@ -1,18 +1,28 @@
 <template>
   <div
     id="image-container"
-    class="relative overflow-hidden border border-current"
+    :class="`relative border overflow-hidden border-current ${isGrabbing ? 'cursor-move' : ''}`"
     :style="`width: 640px; height: ${640 / desiredRatio}px`"
   >
     <img id="selected-image" :src="selectedImage" class="max-w-none absolute" />
   </div>
   <hr />
   <button type="button" @click="draw">Crop</button>
+  <button class="mx-2" type="button" @click="discard">Discard</button>
   <div id="canvas-container"></div>
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
+import { defineComponent, watch, ref } from 'vue';
+
+import {
+  findImageHeightBasedOnRatio,
+  findImageWidthBasedOnRatio,
+  Point,
+  findMoveMouseCursor,
+  getRatioDirection,
+  diffPoints,
+} from '../utils/image-processing';
 
 export default defineComponent({
   name: 'ImageEditor',
@@ -26,18 +36,20 @@ export default defineComponent({
       type: Number,
       default: 16 / 9,
     },
+    mimeType: {
+      type: String,
+    },
   },
 
-  setup(props) {
+  setup(props, context) {
+    const isGrabbing = ref(false);
+
     watch(
       () => props.selectedImage,
       async () => {
         // TODO need to implement a more flexible ratio selection for the component
         // Currently it only works with 1920 x 1080 - 16 x 9
-        interface Point {
-          x: number;
-          y: number;
-        }
+        const { mimeType } = props;
 
         var container = <HTMLDivElement>document.getElementById('image-container');
         var c = <HTMLImageElement>document.getElementById('selected-image');
@@ -45,24 +57,12 @@ export default defineComponent({
         var image = new Image();
         image.src = props.selectedImage;
 
-        var isGrabbing = false;
+        // var isGrabbing = false;
         var grabbinStartPoints = <null | Point>null;
-
-        const getRatioDirection = (image: HTMLImageElement) => {
-          const ratio = image.width / image.height;
-          const ratioDirection = ratio > props.desiredRatio ? true : false;
-          return ratioDirection;
-        };
-
-        const findImageHeightBasedOnRatio = (container: HTMLDivElement, img: HTMLImageElement) => {
-          return (img.height * container.offsetWidth) / img.width;
-        };
-        const findImageWidthBasedOnRatio = (container: HTMLDivElement, img: HTMLImageElement) => {
-          return (img.width * container.offsetHeight) / img.height;
-        };
+        var lastMovePoint = <null | Point>null;
 
         image.onload = () => {
-          const ratioDirection = getRatioDirection(image);
+          const ratioDirection = getRatioDirection(image, props.desiredRatio);
 
           // Initial Size of the image based on it's ratio it will fit by its width or height
 
@@ -82,190 +82,219 @@ export default defineComponent({
             c.style.top = `${(container.offsetHeight - relativeHeight) / 2}px`;
           }
         };
-
-        const findMoveMouseCursor = (container: HTMLElement) => (e: MouseEvent) => {
-          const rect = container.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-          return { x, y };
-        };
-
-        const diffPoints = (p1: Point, p2: Point) => {
-          return { x: p2.x - p1.x, y: p2.y - p1.y };
-        };
-
-        const findMouseCursor = findMoveMouseCursor(container);
+        //  const findMouseCursor = findMoveMouseCursor(container);
 
         c.addEventListener('mousedown', (e) => {
           e.preventDefault();
-          isGrabbing = true;
-          grabbinStartPoints = findMouseCursor(e);
+          isGrabbing.value = true;
+          grabbinStartPoints = findMoveMouseCursor(container)(e);
         });
 
         c.addEventListener('mouseup', () => {
-          if (isGrabbing) {
-            isGrabbing = false;
-            lastMovePoint = null;
-            moveCounter = 0;
+          if (isGrabbing.value) {
+            isGrabbing.value = false;
+            grabbinStartPoints = null;
           }
         });
 
-        var lastMovePoint = <null | Point>null;
-        var moveCounter = 0;
+        const relativeMover = (image: HTMLImageElement, container: HTMLDivElement) => (diff: Point) => {
+          const containerHeight = container.offsetHeight;
+
+          const containerWidth = container.offsetWidth;
+
+          const computedOffsetLeft = image.offsetLeft - diff.x;
+          const computedOffsetTop = image.offsetTop - diff.y;
+          const computedOffsetRight = -1 * (image.width - containerWidth + computedOffsetLeft);
+          const computedOffsetBottom = -1 * (image.height - containerHeight + computedOffsetTop);
+
+          if ((computedOffsetLeft < 0 && computedOffsetRight < 0) || mimeType === 'image/png') {
+            c.style.left = `${computedOffsetLeft}px`;
+          } else if (computedOffsetLeft >= 0) {
+            c.style.left = `${0}px`;
+          } else {
+            c.style.left = `${containerWidth - image.width}px`;
+          }
+
+          if ((computedOffsetTop < 0 && computedOffsetBottom < 0) || mimeType === 'image/png') {
+            c.style.top = `${computedOffsetTop}px`;
+          } else if (computedOffsetTop >= 0) {
+            c.style.top = `${0}px`;
+          } else {
+            c.style.top = `${containerHeight - image.height}px`;
+          }
+        };
 
         c.addEventListener('mousemove', (e) => {
           e.preventDefault();
 
-          if (isGrabbing && grabbinStartPoints) {
+          if (isGrabbing.value && grabbinStartPoints) {
             if (lastMovePoint) {
-              const normalizeDiff = (point: Point) => {
-                let x = point.x;
-                let y = point.y;
-                if (moveCounter > 5) return { x, y };
-                if (point.x < -10) {
-                  x = -10;
-                } else if (point.x > 10) {
-                  x = 10;
-                }
-                if (point.y < -10) {
-                  y = -10;
-                } else if (point.y > 10) {
-                  y = 10;
-                }
-                return { x, y };
-              };
+              const relativeCursor = findMoveMouseCursor(c)(e);
+              const diff = diffPoints(relativeCursor, lastMovePoint);
 
-              const currentDiff = normalizeDiff(diffPoints(findMouseCursor(e), lastMovePoint));
-              const offsetRight = c.width - container.offsetWidth + c.offsetLeft;
-              const offsetLeft = -1 * c.offsetLeft;
-              const offsetTop = -1 * c.offsetTop;
-              const offsetBottom = c.height - container.offsetHeight + c.offsetTop;
-
-              moveCounter++;
-
-              if (currentDiff.x >= 0 && offsetRight >= 0) {
-                c.style.left = `${c.offsetLeft - (currentDiff.x - offsetRight > 0 ? offsetRight : currentDiff.x)}px`;
-              } else if (currentDiff.x < 0 && offsetLeft >= 0) {
-                c.style.left = `${
-                  c.offsetLeft + (-1 * currentDiff.x - offsetLeft > 0 ? offsetLeft : -1 * currentDiff.x)
-                }px`;
-              }
-
-              if (currentDiff.y >= 0 && offsetBottom >= 0) {
-                c.style.top = `${c.offsetTop - (currentDiff.y - offsetBottom > 0 ? offsetBottom : currentDiff.y)}px`;
-              } else if (currentDiff.y < 0 && offsetTop >= 0) {
-                c.style.top = `${
-                  c.offsetTop + (-1 * currentDiff.y - offsetTop > 0 ? offsetTop : -1 * currentDiff.y)
-                }px`;
-              }
+              relativeMover(c, container)(diff);
             }
-            lastMovePoint = findMouseCursor(e);
           }
+          lastMovePoint = findMoveMouseCursor(c)(e);
         });
 
         c.addEventListener('mouseout', () => {
-          if (isGrabbing) {
-            isGrabbing = false;
-            lastMovePoint = null;
-            moveCounter = 0;
+          if (isGrabbing.value) {
+            isGrabbing.value = false;
+            grabbinStartPoints = null;
           }
         });
+
+        const relativeRenderer =
+          (source: HTMLImageElement, image: HTMLImageElement, container: HTMLDivElement, desiredRatio: number) =>
+          (center: Point, insideWidth: number, insideHeight: number) => {
+            const ratioDirection = getRatioDirection(source, desiredRatio);
+
+            //   const ImageHeight = image.height;
+            //   const containerHeight = container.offsetHeight;
+            const ImageHeight = image.height;
+            const containerHeight = container.offsetHeight;
+
+            const ImageWidth = image.width;
+            const containerWidth = container.offsetWidth;
+            if (ratioDirection) {
+              if ((containerHeight / insideHeight) * ImageHeight <= containerHeight && mimeType !== 'image/png') {
+                image.style.height = `${containerHeight}px`;
+              } else {
+                image.style.height = `${(containerHeight / insideHeight) * ImageHeight}px`;
+              }
+            } else {
+              if ((containerWidth / insideWidth) * ImageWidth <= containerWidth && mimeType !== 'image/png') {
+                image.style.width = `${containerWidth}px`;
+              } else {
+                image.style.width = `${(containerWidth / insideWidth) * ImageWidth}px`;
+              }
+            }
+
+            const relativeRatio = image.width / ImageWidth;
+
+            const computedOffsetLeft = -1 * (center.x * relativeRatio - containerWidth / 2);
+            const computedOffsetTop = -1 * (center.y * relativeRatio - containerHeight / 2);
+            const computedOffsetRight = -1 * (image.width - containerWidth + computedOffsetLeft);
+            const computedOffsetBottom = -1 * (image.height - containerHeight + computedOffsetTop);
+
+            if ((computedOffsetLeft < 0 && computedOffsetRight < 0) || mimeType === 'image/png') {
+              c.style.left = `${computedOffsetLeft}px`;
+            } else if (computedOffsetLeft >= 0) {
+              c.style.left = `${0}px`;
+            } else {
+              c.style.left = `${containerWidth - image.width}px`;
+            }
+
+            if ((computedOffsetTop < 0 && computedOffsetBottom < 0) || mimeType === 'image/png') {
+              c.style.top = `${computedOffsetTop}px`;
+            } else if (computedOffsetTop >= 0) {
+              c.style.top = `${0}px`;
+            } else {
+              c.style.top = `${containerHeight - image.height}px`;
+            }
+          };
 
         container.addEventListener('wheel', (e) => {
           // TODO
           // FEATURE : Must add something to zoom around cursor
+
           e.preventDefault();
           const isZoomIn = e.deltaY < 0;
-          const ratioDirection = getRatioDirection(image);
 
-          const offsetRight = c.width - container.offsetWidth + c.offsetLeft;
-          const offsetBottom = c.height - container.offsetHeight + c.offsetTop;
+          const relativeCursor = findMoveMouseCursor(c)(e);
 
-          if (!isZoomIn) {
-            // for zoom out we check to see wether the ratio is bigger or lesser than 16/9
-            // so we could unable user to make the container empty of image
-            // TODO we must do a hell of the cleaning for this code
-            if (ratioDirection && c.height >= container.offsetHeight) {
-              c.style.height = `${
-                c.height - (c.height - container.offsetHeight > 50 ? 50 : c.height - container.offsetHeight)
-              }px`;
-
-              if (offsetRight <= 0) {
-                c.style.left = `${container.offsetWidth - c.width}px`;
-              }
-              if (offsetBottom <= 0) {
-                c.style.top = `${container.offsetHeight - c.height}px`;
-              }
-            } else if (!ratioDirection && c.width >= container.offsetWidth) {
-              c.width = c.width - (c.width - container.offsetWidth > 50 ? 50 : c.width - container.offsetWidth);
-              if (offsetRight <= 0) {
-                c.style.left = `${container.offsetWidth - c.width}px`;
-              }
-              if (offsetBottom <= 0) {
-                c.style.top = `${container.offsetHeight - c.height}px`;
-              }
-            }
+          if (isZoomIn) {
+            relativeRenderer(
+              image,
+              c,
+              container,
+              props.desiredRatio
+            )(
+              { x: relativeCursor.x, y: relativeCursor.y },
+              container.offsetWidth * 0.75,
+              container.offsetHeight * 0.75
+            );
           } else {
-            if (ratioDirection) {
-              c.style.height = `${c.height + 50}px`;
-            } else {
-              c.width = c.width + 50;
-            }
+            relativeRenderer(
+              image,
+              c,
+              container,
+              props.desiredRatio
+            )(
+              { x: relativeCursor.x, y: relativeCursor.y },
+              container.offsetWidth / 0.75,
+              container.offsetHeight / 0.75
+            );
           }
         });
       }
     );
 
     const draw = () => {
+      const findUnRelativeOffsets = (source: HTMLImageElement, image: HTMLImageElement) => {
+        const relativeRatio = image.width / source.width;
+        return {
+          top: image.offsetTop / relativeRatio,
+          left: image.offsetLeft / relativeRatio,
+        };
+      };
+
+      var existedCanvas = <HTMLCanvasElement>document.getElementById('imagemask');
       var container = <HTMLDivElement>document.getElementById('image-container');
       var canvasContainer = <HTMLDivElement>document.getElementById('canvas-container');
+      if (existedCanvas) {
+        canvasContainer.removeChild(existedCanvas);
+      }
       var c = <HTMLImageElement>document.getElementById('selected-image');
       var image = new Image();
       image.src = props.selectedImage;
-
-      // const offsetRight = c.width - container.offsetWidth + c.offsetLeft;
-      // const offsetBottom = c.height - container.offsetHeight + c.offsetTop;
-
       image.onload = () => {
         var canvas = document.createElement('canvas');
         canvas.style.position = 'absolute';
         canvas.style.border = '1px solid';
 
-        console.log(canvasContainer.offsetWidth, image.width, container.offsetWidth, c.width);
+        const unrelativeOffset = findUnRelativeOffsets(image, c);
 
-        const offsetLeft = c.offsetLeft * (image.width / (container.offsetWidth + c.offsetLeft));
-        const offsetTop = c.offsetTop * (image.height / container.offsetHeight);
+        const offsetLeft = unrelativeOffset.left;
+        const offsetTop = unrelativeOffset.top;
 
         const ratio = image.width / image.height;
         const ratioDirection = ratio > props.desiredRatio ? true : false;
 
         if (ratioDirection) {
-          canvas.width = image.height * props.desiredRatio;
-          canvas.height = image.height;
+          const zoomRatio = container.offsetHeight / c.height;
+          canvas.width = image.height * props.desiredRatio * zoomRatio;
+          canvas.height = image.height * zoomRatio;
         } else {
-          canvas.width = image.width;
-          canvas.height = image.width / props.desiredRatio;
+          const zoomRatio = container.offsetWidth / c.width;
+          canvas.width = image.width * zoomRatio;
+          canvas.height = (image.width / props.desiredRatio) * zoomRatio;
         }
 
-        //canvas.style.display = "none";
         canvas.id = 'imagemask';
         canvas.style.display = 'none';
-        console.log(canvasContainer);
         canvasContainer.appendChild(canvas);
-        console.log(image.width, image.height);
         {
           var ctx = canvas.getContext('2d');
           if (ctx) {
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
             ctx.drawImage(image, 0, 0, image.width, image.height, offsetLeft, offsetTop, image.width, image.height);
 
-            var img = canvas.toDataURL('image/jpeg', 0.4);
-            console.log(img);
+            var img = canvas.toDataURL('image/jpeg', 1);
+            context.emit('cropped', img);
           }
         }
       };
     };
 
-    return { draw };
+    const discard = () => {
+      context.emit('discard');
+    };
+
+    return { draw, isGrabbing, discard };
   },
 });
 </script>
