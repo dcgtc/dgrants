@@ -24,8 +24,9 @@ import GrantCard from 'src/components/GrantCard.vue';
 import useCartStore from 'src/store/cart';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
-// --- Utils ---
+// --- Data ---
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
+import { GRANT_WHITELIST_URI } from 'src/utils/constants';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
@@ -114,7 +115,7 @@ export default defineComponent({
 
     onMounted(async () => {
       const uniqueStr = '?unique=' + Date.now();
-      const url = import.meta.env.VITE_GRANT_WHITELIST_URI + uniqueStr;
+      const url = GRANT_WHITELIST_URI + uniqueStr;
       const json = await fetch(url).then((res) => res.json());
       grantIdList.value = json[DGRANTS_CHAIN_ID];
     });
