@@ -26,7 +26,6 @@ import useCartStore from 'src/store/cart';
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
 // --- Data ---
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
-import { GRANT_WHITELIST_URI } from 'src/utils/constants';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
@@ -115,9 +114,12 @@ export default defineComponent({
 
     onMounted(async () => {
       const uniqueStr = '?unique=' + Date.now();
-      const url = GRANT_WHITELIST_URI + uniqueStr;
-      const json = await fetch(url).then((res) => res.json());
-      grantIdList.value = json[DGRANTS_CHAIN_ID];
+      const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
+      if (whitelistUrl) {
+        const url = whitelistUrl + uniqueStr;
+        const json = await fetch(url).then((res) => res.json());
+        grantIdList.value = json[DGRANTS_CHAIN_ID];
+      }
     });
 
     onUnmounted(() => {
