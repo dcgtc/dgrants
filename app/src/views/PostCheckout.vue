@@ -1,9 +1,27 @@
 <template>
   <section class="px-4 md:px-12 py-4 md:py-12">
     <div class="grid justify-center text-center">
-      <h1 class="text-grey-500">Thank you for contributing!</h1>
-      <div class="mt-8 flex flex-wrap gap-4 justify-center">
-        <button @click="routerPush('/')" class="btn">Home</button>
+      <h1>Thanks! You’re Awesome. <span class="italic">Seriously.</span></h1>
+      <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
+        Please help dGrants by spread the word with a tweet. Let us now how we can improve – your feedback is
+        appreciated.
+      </p>
+
+      <!-- button row container -->
+      <div class="mt-12 flex flex-wrap gap-8 justify-center">
+        <!--back button-->
+        <button @click="routerGo(-1)" class="btn">
+          <BackIcon class="icon-small" />
+          <span>Back</span>
+        </button>
+
+        <!--home button-->
+        <button @click="routerPush('/')" class="btn">
+          <HomeIcon class="icon-small" />
+          <span>Home</span>
+        </button>
+
+        <!--tweet button-->
         <a
           target="_blank"
           rel="noreferrer noopener"
@@ -18,21 +36,21 @@
           "
         >
           <button class="btn">
-            <div class="flex items-center gap-x-2 cursor-pointer">
-              <TwitterIcon class="icon" />
-              <span>Tweet</span>
-            </div>
+            <TwitterIcon class="icon-small" />
+            <span>Tweet</span>
           </button>
         </a>
+
+        <!--feedback button-->
+
         <a
           target="_blank"
           rel="noreferrer noopener"
           href="https://docs.google.com/forms/d/10cQ1iUK7km5LT9HSwyoS0k08Akxhzd3PhILi2Pepd-M/edit?usp=sharing"
         >
           <button class="btn">
-            <div class="flex items-center gap-x-2 cursor-pointer">
-              <span>Give Us Feedback</span>
-            </div>
+            <FeedbackIcon class="icon-small" />
+            <span>Feedback</span>
           </button>
         </a>
       </div>
@@ -42,13 +60,22 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { TwitterIcon } from '@fusion-icons/vue/interface';
+
 import { useRouter } from 'vue-router';
+import {
+  TwitterIcon,
+  HomeIcon,
+  ArrowLeftIcon as BackIcon,
+  Chat1Icon as FeedbackIcon,
+} from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'PostCheckout',
   components: {
     TwitterIcon,
+    HomeIcon,
+    BackIcon,
+    FeedbackIcon,
   },
   setup() {
     const router = useRouter();
