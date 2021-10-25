@@ -45,7 +45,7 @@
         <!-- donation -->
         <div class="md:ml-auto">
           <div>
-            {{ contribution.amount }}
+            {{ formatNumber(contribution.amount, 4) }}
             {{ contribution.donationToken?.symbol }}
           </div>
         </div>
