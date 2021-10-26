@@ -24,13 +24,17 @@ const messagesToReplace = [
       "Non-200 status code: '404'", // occurs when we cannot connect to the host
       'Response has no error or result for request', // occurs when an rpc req timesout
     ],
-    replace: `It appears that either your network connection or provider URL for ${CHAIN_LABEL} is experiencing issues.<br/><br/>Please check your internet connection or try changing your provider/RPC URL in Metamask if this issue persists.`,
+    replace: () => `
+      <p>It appears that either your network connection or provider URL for ${CHAIN_LABEL} is experiencing issues.</p><br/>
+      <p>Please check your internet connection or try changing your provider/RPC URL in Metamask if this issue persists.</p></br>`,
   },
   // replace every other message with a human readable catchAll
   {
     find: ['.*'],
-    replace:
-      'Something bad has happened and I need an adult. Please email <a href="support-grants@gtcdao.net">support-grants@gtcdao.net</a> with a description of your problem.',
+    replace: (errorMsg: string) => `
+      <p>Something bad has happened and I need an adult.<p><br/>
+      <p>Please email <a href="support-grants@gtcdao.net">support-grants@gtcdao.net</a> with a description of your problem.</p><br/>
+      <p><i>${errorMsg.length > 103 ? errorMsg.slice(0, 100) + '...' : errorMsg}</i></p></br>`,
   },
 ];
 
@@ -45,7 +49,8 @@ export function notifyUser(alertType: NotificationType, message: string) {
 
   // If message matches a replacement, we use that instead of the given message
   message =
-    messagesToReplace.find((replacement) => new RegExp(replacement.find.join('|')).test(message))?.replace || message;
+    messagesToReplace.find((replacement) => new RegExp(replacement.find.join('|')).test(message))?.replace(message) ||
+    message;
 
   bNotify.notification({
     autoDismiss: alertType === 'error' ? 10000 : defaultTimeout,
@@ -63,8 +68,8 @@ export function notifyUser(alertType: NotificationType, message: string) {
 export function handleError(err: Error, msg = 'An unknown error occurred') {
   console.error(err);
   if (!err) notifyUser('error', msg);
-  else if ('message' in err) notifyUser('error', err.message);
   else if (typeof err === 'string') notifyUser('error', err);
+  else if ('message' in err) notifyUser('error', err.message);
   else notifyUser('error', msg);
 }
 
