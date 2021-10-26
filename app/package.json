@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/app",
-  "version": "0.0.25-7b5a876.0",
+  "version": "0.0.26-35b5843.0",
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
