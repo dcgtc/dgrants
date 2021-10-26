@@ -4,7 +4,7 @@
       <h1>Thanks! You’re Awesome. <span class="italic">Seriously.</span></h1>
 
       <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
-        Please help dGrants by spreading the word with a tweet. Let us now how we can improve – your feedback is
+        Please help dGrants by spreading the word with a tweet. Let us know how we can improve – your feedback is
         appreciated.
       </p>
 
