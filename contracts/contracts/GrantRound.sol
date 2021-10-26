@@ -4,6 +4,7 @@ pragma solidity ^0.7.6;
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./GrantRegistry.sol";
 
+/// #if_succeeds old(hasPaidOut) ==> hasPaidOut;
 contract GrantRound {
   using SafeERC20 for IERC20;
 
@@ -90,6 +91,7 @@ contract GrantRound {
    * @notice When the round ends the payoutAdmin can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
+  /// #if_succeeds !old(hasPaidOut) && hasPaidOut;
   function payoutGrants(address _payoutAddress) external {
     require(block.timestamp >= endTime, "GrantRound: Method must be called after round has ended");
     require(msg.sender == payoutAdmin, "GrantRound: Only the payout administrator can call this method");

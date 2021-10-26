@@ -26,6 +26,10 @@ contract GrantRegistry {
   // TODO use an array instead with ID to index it? Which is better?
   // TODO Will array copy full array to memory in `getAllGrants`?
   /// @notice Mapping from Grant ID to grant data
+  /// #if_assigned[idx] old(grants[idx].owner) == msg.sender;
+  /// #if_assigned[idx].owner old(grants[idx].owner) == msg.sender;
+  /// #if_assigned[idx].payee old(grants[idx].owner) == msg.sender;
+  /// #if_assigned[idx].metaPtr old(grants[idx].owner) == msg.sender;
   mapping(uint96 => Grant) public grants;
 
   // --- Events ---
@@ -42,6 +46,10 @@ contract GrantRegistry {
    * @param _payee Address that receives funds donated to this grant
    * @param _metaPtr URL pointing to grant metadata (for off-chain use)
    */
+  /// #if_succeeds _owner != address(0);
+  /// #if_succeeds grants[old(grantCOunt)].owner == _owner;
+  /// #if_succeeds grants[old(grantCOunt)].payee == _payee;
+  /// #if_succeeds grants[old(grantCOunt)].metaPtr == _metaPtr;
   function createGrant(
     address _owner,
     address _payee,
@@ -114,6 +122,7 @@ contract GrantRegistry {
    * @dev May run out of gas for large values `grantCount`, depending on the node's RpcGasLimit. In these cases,
    * `getGrants` can be used to fetch a subset of grants and aggregate the results of various calls off-chain
    */
+  /// #if_succeeds $result.length == grantCount;
   function getAllGrants() external view returns (Grant[] memory) {
     return getGrants(0, grantCount);
   }
@@ -123,6 +132,9 @@ contract GrantRegistry {
    * @param _startId Grant ID of first grant to return, inclusive, i.e. this grant ID is included in return data
    * @param _endId Grant ID of last grant to return, exclusive, i.e. this grant ID is NOT included in return data
    */
+  /// #if_succeeds {:msg "returns all grants between start and end"}
+  ///  _endId - _startId == $result.length &&
+  /// forall(uint i in 0...$result.length) result[i] == grants[i + _startId];
   function getGrants(uint96 _startId, uint96 _endId) public view returns (Grant[] memory) {
     require(_endId <= grantCount, "GrantRegistry: _endId must be <= grantCount");
     require(_startId <= _endId, "GrantRegistry: Invalid ID range");

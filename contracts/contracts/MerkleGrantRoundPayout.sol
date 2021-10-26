@@ -87,6 +87,9 @@ contract MerkleGrantRoundPayout {
    * @dev Reverts a claim if inputs are invalid
    * @param _claim Claim
    */
+  /// #if_succeeds MerkleProof.verify(_claim.merkleProof, merkleRoot, keccak256(abi.encodePacked(_claim.index, _claim.payee, _claim.amount));
+  /// #if_succeeds old(!hasClaimed(_claim.index)) && hasClaimed(_claim.index);
+  /// #if_succeeds old(token.balanceOf(_claim.payee)) + _claim.amount == token.balanceOf(_claim.payee);
   function claim(Claim calldata _claim) public {
     uint256 _index = _claim.index;
     address _payee = _claim.payee;
