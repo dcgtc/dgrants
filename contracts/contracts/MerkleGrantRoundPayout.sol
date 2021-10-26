@@ -88,7 +88,7 @@ contract MerkleGrantRoundPayout {
    * @param _claim Claim
    */
   /// #if_succeeds {:msg "The claim has a valid merkle proof"}
-  /// MerkleProof.verify(_claim.merkleProof, merkleRoot, keccak256(abi.encodePacked(_claim.index, _claim.payee, _claim.amount));
+  /// MerkleProof.verify(_claim.merkleProof, merkleRoot, keccak256(abi.encodePacked(_claim.index, _claim.payee, _claim.amount)));
   /// #if_succeeds {:msg "The claim can only be submitted once"}
   /// old(!hasClaimed(_claim.index)) && hasClaimed(_claim.index);
   /// #if_succeeds {:msg "The claim payee receives their claim"}
