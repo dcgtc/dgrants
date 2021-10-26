@@ -47,9 +47,9 @@ contract GrantRegistry {
    * @param _metaPtr URL pointing to grant metadata (for off-chain use)
    */
   /// #if_succeeds _owner != address(0);
-  /// #if_succeeds grants[old(grantCOunt)].owner == _owner;
-  /// #if_succeeds grants[old(grantCOunt)].payee == _payee;
-  /// #if_succeeds grants[old(grantCOunt)].metaPtr == _metaPtr;
+  /// #if_succeeds grants[old(grantCount)].owner == _owner;
+  /// #if_succeeds grants[old(grantCount)].payee == _payee;
+  // if_succeeds grants[old(grantCount)].metaPtr == string(_metaPtr);
   function createGrant(
     address _owner,
     address _payee,
@@ -134,7 +134,7 @@ contract GrantRegistry {
    */
   /// #if_succeeds {:msg "returns all grants between start and end"}
   ///  _endId - _startId == $result.length &&
-  /// forall(uint i in 0...$result.length) result[i] == grants[i + _startId];
+  /// (forall(uint96 i in 0...uint96($result.length)) result[i].id == grants[i + _startId].id);
   function getGrants(uint96 _startId, uint96 _endId) public view returns (Grant[] memory) {
     require(_endId <= grantCount, "GrantRegistry: _endId must be <= grantCount");
     require(_startId <= _endId, "GrantRegistry: Invalid ID range");
