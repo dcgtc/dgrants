@@ -72,7 +72,7 @@
               </div>
 
               <!--text-->
-              <div class="">
+              <div>
                 <span
                   class="link"
                   @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(item.grantId).toString() } })"
@@ -82,7 +82,7 @@
               </div>
 
               <!--inputs-->
-              <div class="">
+              <div>
                 <div class="flex">
                   <BaseInput
                     :modelValue="item.contributionAmount"
@@ -112,7 +112,7 @@
               </div>
 
               <!--matching-->
-              <div class="">
+              <div>
                 <div
                   v-if="
                     clrPredictions[item.grantId].reduce((carr, clr) => carr || typeof clr.matching === 'number', false)
