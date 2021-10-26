@@ -1,10 +1,10 @@
 <template>
   <section class="px-4 md:px-12 py-4 md:py-12">
     <div class="grid justify-center text-center">
-      <h1>This page ist lost.</h1>
-
+      <h1 class="text-grey-500">404</h1>
+      <h1>This page is lost.</h1>
       <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
-        We’ve explored deep and wide, but we can’t find the page you were looking for.
+        We’ve explored far and wide, but we can’t find the page you were looking for.
       </p>
 
       <!-- button row container -->
