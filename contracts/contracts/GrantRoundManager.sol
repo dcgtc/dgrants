@@ -111,12 +111,16 @@ contract GrantRoundManager is SwapRouter {
    * @dev `_deadline` is not part of the `_swaps` array since all swaps can use the same `_deadline` to save some gas
    * @dev Caller must ensure the input tokens to the _swaps array are unique
    */
-  /// #if_succeeds donationToken.balanceOf(address(this)) == old(donationToken.balanceOf(address(this)));
-  /// #if_succeeds forall(SwapSummary summary in _swaps)
+  /// #if_succeeds {:msg "No donation tokens should get stuck in this contract"}
+  /// donationToken.balanceOf(address(this)) == old(donationToken.balanceOf(address(this)));
+  /// #if_succeeds {:msg "None of the input tokens should get stuck in this contract"}
+  /// forall(SwapSummary summary in _swaps)
   /// let _tokenIn := IERC20(summary.path.toAddress(0)) in
   /// _tokenIn.balanceOf(address(this)) == old(_tokenIn.balanceOf(address(this)));
-  /// #if_succeeds unchecked_sum(swapOutputs) = 0;
-  /// #if_succeeds unchecked_sum(donationRatios) = 0;
+  /// #if_succeeds {:msg "The swap outputs should be empty after each donation"}
+  /// unchecked_sum(swapOutputs) = 0;
+  /// #if_succeeds {:msg "The donation ratios should bee empty after each donations"}
+  /// unchecked_sum(donationRatios) = 0;
   function donate(
     SwapSummary[] calldata _swaps,
     uint256 _deadline,
@@ -143,10 +147,14 @@ contract GrantRoundManager is SwapRouter {
    * @dev Validates the inputs to a donation call are valid, and reverts if any requirements are violated
    * @param _donations Array of donations that will be executed
    */
-  /// #if_succeeds forall(Donation donation in _donations) donation.grantId < registry.grantCount();
-  /// #if_succeeds forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) round.isActive();
-  /// #if_succeeds forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) round.registry() == registry;
-  /// #if_succeeds forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) donationToken == round.donationToken();
+  /// #if_succeeds {:msg "All donations have a valid  grant id"}
+  /// forall(Donation donation in _donations) donation.grantId < registry.grantCount();
+  /// #if_succeeds {:msg "All rounds being donated to are active"}
+  /// forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) round.isActive();
+  /// #if_succeeds {:msg "All rounds being donated to are connected to the right registry"}
+  /// forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) round.registry() == registry;
+  /// #if_succeeds {:msg "All rounds being donated to are eusing the right token"}
+  /// forall(Donation donation in _donations) forall(GrantRound round in donation.rounds) donationToken == round.donationToken();
   function _validateDonations(Donation[] calldata _donations) internal {
     // TODO consider moving this to the section where we already loop through donations in case that saves a lot of
     // gas. Leaving it here for now to improve readability
@@ -176,13 +184,11 @@ contract GrantRoundManager is SwapRouter {
    * @param _swaps Array of SwapSummary objects describing the swaps required
    * @param _deadline Unix timestamp after which a swap will revert, i.e. swap must be executed before this
    */
-  /// #if_succeeds forall(SwapSummary summary in _swaps) let _tokenIn := IERC20(summary.path.toAddress(0)) in swapOutputs[_tokenIn] >= summary.amountOutMin;
-  /// #if_succeeds forall(SwapSummary summary in _swaps) let _tokenIn := IERC20(summary.path.toAddress(0)) in _tokenIn != donationToken ==>
-  /// old(_tokenIn.balanceOf(this)) >= _tokenIn.balanceOf(this) + summary.amountOutMin;
-  /// #if_succeeds forall(uint i in 0..._swaps.length) forall(uint j in i..._swaps.length)
-  /// let outputTokenI := IERC20(_swaps[i].path.toAddress(_swaps[i].path.length - 20)) in
-  /// let outputTokenJ := IERC20(_swaps[j].path.toAddress(_swaps[j].path.length - 20)) in
-  /// i != j ==> outputTokenI != outputTokenJ;
+  /// #if_succeeds {:msg "Each swap has an unique input token"}
+  /// forall(uint i in 0..._swaps.length) forall(uint j in i..._swaps.length)
+  /// let inputTokenI := IERC20(_swaps[i].path.toAddress(0)) in
+  /// let inputTokenJ := IERC20(_swaps[i].path.toAddress(0)) in
+  /// i != j ==> inputTokenI != inputTokenJ;
   function _executeDonationSwaps(SwapSummary[] calldata _swaps, uint256 _deadline) internal {
     for (uint256 i = 0; i < _swaps.length; i++) {
       // Validate output token is donation token
@@ -216,12 +222,14 @@ contract GrantRoundManager is SwapRouter {
    * @dev Core donation logic that transfers funds to grants
    * @param _donations Array of donations to execute
    */
-  /// #if_succeeds forall(Donation donation in _donations)
+  /// #if_succeeds {:msg "Each donation gets the payee at least their ratio of tokens"}
+  /// forall(Donation donation in _donations)
   /// let recipient = registry.getGrantPayee(donation.grantId) in
   /// let donationAmount := swapOutputs[donation.token] * donation.ratio / WAD in
   /// old(donation.token.balanceOf(recipient)) + donationAmount >= donation.token.balanceOf(recipient);
-  /// #if_succeeds forall(uint i in 0..._donations.length) forall(uint j in i..._donations.length)
-  /// i != j ==> _donations[i].token != _donations[j].token;
+  /// #if_succeeds {:msg "Each donation has a unique grant, token tuple"}
+  /// forall(uint i in 0..._donations.length) forall(uint j in i..._donations.length)
+  /// i != j ==> (_donations[i].token != _donations[j].token || _donations[i].grantId != _donations[j].grantId);
   function _transferDonations(Donation[] calldata _donations) internal {
     for (uint256 i = 0; i < _donations.length; i++) {
       // Get data for this donation

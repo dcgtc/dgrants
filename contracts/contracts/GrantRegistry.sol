@@ -122,7 +122,7 @@ contract GrantRegistry {
    * @dev May run out of gas for large values `grantCount`, depending on the node's RpcGasLimit. In these cases,
    * `getGrants` can be used to fetch a subset of grants and aggregate the results of various calls off-chain
    */
-  /// #if_succeeds $result.length == grantCount;
+  /// #if_succeeds {:msg "All grants are returned"} $result.length == grantCount;
   function getAllGrants() external view returns (Grant[] memory) {
     return getGrants(0, grantCount);
   }

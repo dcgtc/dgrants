@@ -4,7 +4,6 @@ pragma solidity ^0.7.6;
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 import "./GrantRegistry.sol";
 
-/// #if_succeeds old(hasPaidOut) ==> hasPaidOut;
 contract GrantRound {
   using SafeERC20 for IERC20;
 
@@ -31,9 +30,11 @@ contract GrantRound {
   IERC20 public immutable matchingToken;
 
   /// @notice URL pointing to grant round metadata (for off-chain use)
+  /// #if_updated msg.sender == metadataAdmin || msg.sig == bytes4(0);
   string public metaPtr;
 
   /// @notice Set to true if grant round has ended and payouts have been released
+  /// #if_updated old(hasPaidOut) ==> hasPaidOut;
   bool public hasPaidOut;
 
   // --- Events ---
@@ -52,6 +53,7 @@ contract GrantRound {
    * @param _endTime Unix timestamp of the end of the round
    * @param _metaPtr URL pointing to the grant round metadata
    */
+  ///#if_succeeds {:msg "The payout admin can't be set to 0"} payoutAdmin != 0;
   constructor(
     address _metadataAdmin,
     address _payoutAdmin,
@@ -82,6 +84,8 @@ contract GrantRound {
    * @notice Before the round ends this method accepts matching pool funds
    * @param _amount The amount of matching token that will be sent to the contract for the matching pool
    */
+  ///#if_succeeds {:msg "Can only succeed before end time"} block.timestamp < endTime;
+  ///#if_succeeds {:msg "You can't add more funds once the grant has beeen payed out"} !hasPaidOut;
   function addMatchingFunds(uint256 _amount) external {
     require(block.timestamp < endTime, "GrantRound: Method must be called before round has ended");
     matchingToken.safeTransferFrom(msg.sender, address(this), _amount);
@@ -91,7 +95,13 @@ contract GrantRound {
    * @notice When the round ends the payoutAdmin can send the remaining matching pool funds to a given address
    * @param _payoutAddress An address to receive the remaining matching pool funds in the contract
    */
-  /// #if_succeeds !old(hasPaidOut) && hasPaidOut;
+  /// #if_succeeds {:msg "You can only pay out once"} !old(hasPaidOut) && hasPaidOut;
+  /// #if_succeeds {:msg "after payout there shouldn't be remaining balance"} matchingToken.balanceOf(address(this)) == 0;
+  /// #if_succeeds {:msg "Sends the full balance of this contract to the payout address"}
+  ///  old(matchingToken.balanceOf(_payoutAddress) + matchingToken.balanceOf(address(this))) ==
+  /// matchingToken.balanceOf(_payoutAddress);
+  ///#if_succeeds {:msg "Can only succeed after end time"} block.timestamp >= endTime;
+  /// #if_succeeds {:msg "Only the admin can payout"} msg.sender == payoutAdmin;
   function payoutGrants(address _payoutAddress) external {
     require(block.timestamp >= endTime, "GrantRound: Method must be called after round has ended");
     require(msg.sender == payoutAdmin, "GrantRound: Only the payout administrator can call this method");
