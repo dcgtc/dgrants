@@ -312,8 +312,12 @@ export default function useCartStore() {
       return { grantId, token: tokenAddress, ratio, rounds };
     });
 
-    // Return all inputs needed for checkout, using a deadline 20 minutes from now
-    const now = new Date().getTime();
+    // Return all inputs needed for checkout, using a deadline 20 minutes from now from the latest block on L1
+    const { provider } = useWalletStore();
+    const latestBlockNumber = await provider.getBlockNumber();
+    const latestBlock = await provider.getBlock(latestBlockNumber);
+    const now = latestBlock.timestamp;
+
     const nowPlus20Minutes = new Date(now + 20 * 60 * 1000).getTime();
     return { swaps, donations: fixDonationRoundingErrors(donations), deadline: Math.floor(nowPlus20Minutes / 1000) };
   }
