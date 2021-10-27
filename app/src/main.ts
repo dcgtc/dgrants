@@ -21,7 +21,7 @@ app.config.errorHandler = function (err, _vm, info) {
 // More info: https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onerror
 window.onerror = function (msg, url, line, col, err) {
   if (err) {
-    console.log('Error params:', msg, url, line, col);
+    console.error('Error params:', msg, url, line, col);
     handleError(err);
   }
 };
@@ -31,7 +31,7 @@ window.onerror = function (msg, url, line, col, err) {
 // More info: https://stackoverflow.com/questions/31472439/catch-all-unhandled-javascript-promise-rejections
 window.addEventListener('unhandledrejection', function (event) {
   if (event.reason) {
-    console.log('Rejection params:', event.reason);
+    console.error('Rejection params:', event.reason);
     handleError(event.reason);
   }
 });
