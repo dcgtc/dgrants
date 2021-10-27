@@ -365,3 +365,14 @@ export const sortByStartTime = (a: GrantRound, b: GrantRound) => {
     ? 0
     : 1;
 };
+
+/**
+ * @notice Encode all HTML in a given string
+ * @param string A string containing HTML tags
+ * @returns string An encoded version of the input string
+ */
+export function sanitizeHTML(str: string) {
+  const temp = document.createElement('div');
+  temp.textContent = str;
+  return temp.innerHTML;
+}

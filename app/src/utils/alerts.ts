@@ -1,6 +1,6 @@
 import BNotify, { NotificationType } from 'bnc-notify';
 import { JsonRpcProvider } from 'src/utils/ethers';
-import { getEtherscanUrl } from 'src/utils/utils';
+import { getEtherscanUrl, sanitizeHTML } from 'src/utils/utils';
 import { CHAIN_LABEL } from './chains';
 
 // Instantiate Blocknative's notify.js. We don't pass a dappId/networkId so we can use in UI only mode for any
@@ -46,6 +46,9 @@ const messagesToReplace = [
 export function notifyUser(alertType: NotificationType, message: string) {
   // If message matches any of the substrings in messagesToIgnore, we return and don't show the alert
   if (new RegExp(messagesToIgnore.join('|')).test(message)) return;
+
+  // Clean any HTML tags from the message
+  message = sanitizeHTML(message);
 
   // If message matches a replacement, we use that instead of the given message
   message =
