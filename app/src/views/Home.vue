@@ -220,7 +220,7 @@ export default defineComponent({
     } = useDataStore();
 
     // --- Data sources ---
-    const grants = computed(() => _grants.value);
+    const grants = computed(() => _grants?.value?.slice(0, 8));
     const grantMetadata = computed(() => _grantMetadata.value);
     const grantRounds = computed(() => _grantRounds.value);
     const grantRoundMetadata = computed(() => _grantRoundMetadata.value);
