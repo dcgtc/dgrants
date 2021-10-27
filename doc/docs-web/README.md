@@ -7,6 +7,7 @@ This website is built using [Docusaurus 2](https://docusaurus.io/), a modern sta
 ```
 $ yarn
 ```
+If `yarn` causes the following error `Volta error: Yarn is not available.` run ``` volta install yarn```
 
 ### Local Development
 
