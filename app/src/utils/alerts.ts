@@ -33,7 +33,7 @@ const messagesToReplace = [
     find: ['.*'],
     replace: (errorMsg: string) => `
       <p>Something bad has happened and I need an adult.<p><br/>
-      <p>Please email <a href="support-grants@gtcdao.net">support-grants@gtcdao.net</a> with a description of your problem.</p><br/>
+      <p>Please email <a href="mailto:support-grants@gtcdao.net">support-grants@gtcdao.net</a> with a description of your problem.</p><br/>
       <p><i>${errorMsg.length > 103 ? errorMsg.slice(0, 100) + '...' : errorMsg}</i></p></br>`,
   },
 ];
