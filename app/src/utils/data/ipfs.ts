@@ -4,7 +4,8 @@ import { getStorageKey, setStorageKey } from './utils';
 import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
-const retrievalEndpoint = 'https://ipfs.fleek.co/ipfs';
+//const retrievalEndpoint = 'https://ipfs.fleek.co/ipfs';
+const retrievalEndpoint = 'https://ipfs-gateway.gtcdao.net/ipfs';
 
 export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
 
@@ -66,6 +67,9 @@ export const fetchMetaPtrs = async (metaPtrs: string[], metadata: Ref) => {
     metadata.value = { ...metadata.value, ...newMetadata };
     // resolve metadata via metaPtr and update state
     void (await Promise.all(Object.keys(newMetadata).map(async (url) => getMetadata(url, metadata))));
+    //void (await Promise.all(Object.keys(newMetadata).map(async (url) => {
+    //  getMetadata(url, metadata);
+    //})));
   }
 
   return metadata;
@@ -81,8 +85,20 @@ export const getMetadata = async (url: string, metadata: Ref) => {
   try {
     // save each individual ipfs result into storage
     let data = await getStorageKey('ipfs-' + url);
+    const urlMatch = /https:\/\/(?<host>.+)\/ipfs\/(?<hash>.+)/;
+    const result = url.match(urlMatch);
+    url = 'https://ipfs-gateway.gtcdao.net/ipfs/' + result['groups']['hash'];
     if (!data) {
       data = await resolveMetaPtr(url);
+      //var dataResult;
+
+      /*
+      if (data.logoURI) {
+        dataResult = data.logoURI.match(urlMatch);
+        data.logoURI = "https://ipfs-gateway.gtcdao.net/ipfs/" + dataResult['groups']['hash'];
+      }
+      */
+
       await setStorageKey('ipfs-' + url, data as LocalForageData);
     }
     metadata.value[url] = { status: 'resolved', ...data };
