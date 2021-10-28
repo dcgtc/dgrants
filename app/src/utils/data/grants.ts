@@ -116,16 +116,11 @@ export async function getAllGrants(forceRefresh = false) {
         }
       }
 
-      // change ipfs endpoint
-      const grantsMetaPtrsMod = [];
-      for (const grant of Object.values(_lsGrants)) {
-        (grant as Grant).metaPtr.replace('https://ipfs-dev', 'https://ipfs');
-        grantsMetaPtrsMod.push(grant);
-      }
-
       // hydrate data from localStorage
       const grants = {
-        grants: (grantsMetaPtrsMod as Grant[]).map((grant) => {
+        grants: (Object.values(_lsGrants) as Grant[]).map((grant) => {
+          // change ipfs endpoint
+          grant.metaPtr = grant.metaPtr.replace('https://ipfs-dev', 'https://ipfs');
           return {
             ...grant,
           } as Grant;

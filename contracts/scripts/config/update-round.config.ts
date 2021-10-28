@@ -16,25 +16,25 @@ const params: DeployParams = {
 
     // expected address using deploy-poc.ts w/ hardhat default account
     roundAddress: '0x851248dBF29D723f3A12EA9739A9D1c88d1c7faa',
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   mainnet: {
     roundAddress: '0x0000000000000000000000000000000000000000',
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   rinkeby: {
     roundAddress: '0xa287E6E74F4bB2408C36cb0a062e72300cBEc2E9',
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
   polygon: {
     roundAddress: '0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4',
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/moonshot-round.svg',
     metadataJson,
   },
