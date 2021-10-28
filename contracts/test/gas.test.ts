@@ -17,8 +17,8 @@ const { parseUnits } = ethers.utils;
 const { deployContract, loadFixture } = waffle;
 const addr1 = '0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266'; // hardhat account 0, but can be any address
 const addr2 = '0x70997970c51812dc3a010c7d01b50e0d17dc79c8'; // hardhat account 1, but can be any address
-const metaPtr1 = 'https://ipfs-dev.fleek.co/ipfs/QmaHTgor7GhetW3nmev3UqabjrzbKJCe7q1v8Wfg3aZyV4';
-const metaPtr2 = 'https://ipfs-dev.fleek.co/ipfs/QmeqiDZMA41ekPV9BJDx3VGtJbxU34YSS3oorLA8cPuib6';
+const metaPtr1 = 'https://ipfs.fleek.co/ipfs/QmaHTgor7GhetW3nmev3UqabjrzbKJCe7q1v8Wfg3aZyV4';
+const metaPtr2 = 'https://ipfs.fleek.co/ipfs/QmeqiDZMA41ekPV9BJDx3VGtJbxU34YSS3oorLA8cPuib6';
 
 // --- Gas tests ---
 describe('dGrants gas tests', () => {

@@ -19,17 +19,17 @@ const fixtureGrants = async (deployer: SignerWithAddress) => {
     {
       owner: '0x34f4E532a33EB545941e914B25Efe348Aea31f0A',
       payee: '0x06c94663E5884BE4cCe85F0869e95C7712d34803',
-      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmaHTgor7GhetW3nmev3UqabjrzbKJCe7q1v8Wfg3aZyV4',
+      metaPtr: 'https://ipfs.fleek.co/ipfs/QmaHTgor7GhetW3nmev3UqabjrzbKJCe7q1v8Wfg3aZyV4',
     },
     {
       owner: '0x58E52440F56f2A5307772Ec881BCEf2c15e988Ab',
       payee: '0x6f02c37ea174DD05f20aC118da725ffa6A40B990',
-      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/Qma9gnPTmdZ65UVjJd9nkM6S8etti8qtNBD1ta6vVpSSVS',
+      metaPtr: 'https://ipfs.fleek.co/ipfs/Qma9gnPTmdZ65UVjJd9nkM6S8etti8qtNBD1ta6vVpSSVS',
     },
     {
       owner: '0x1fB6C46e6aDD95698352707D7f93a31030c80a0B',
       payee: '0x834e659c6757E250db500fe869877311Bb552966',
-      metaPtr: 'https://ipfs-dev.fleek.co/ipfs/QmTQMgoxDRj8gfNn5Cvznt5CoEE6cz9MQeZrQsNb36BMdm',
+      metaPtr: 'https://ipfs.fleek.co/ipfs/QmTQMgoxDRj8gfNn5Cvznt5CoEE6cz9MQeZrQsNb36BMdm',
     },
   ];
 
