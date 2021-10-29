@@ -53,27 +53,43 @@ export async function getContributions(
           if (SUBGRAPH_URL) {
             try {
               // make the request
-              const res = await fetch(SUBGRAPH_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  query: `{
-                    grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
-                      grantId
-                      tokenIn
-                      donationAmount
-                      from
-                      hash
-                      rounds
-                      lastUpdatedBlockNumber
-                    }
-                  }`,
-                }),
-              });
-              // resolve the json
-              const json = await res.json();
+
+              const limit = 100;
+
+              const fetchUntilAll = async (SUBGRAPH_URL: string, before = [], skip = 0): Promise<any[]> => {
+                const res = await fetch(SUBGRAPH_URL, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    query: `{
+                      grantDonations(first: ${limit}, skip: ${
+                      skip * limit
+                    }, where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
+                        grantId
+                        tokenIn
+                        donationAmount
+                        from
+                        hash
+                        rounds
+                        lastUpdatedBlockNumber
+                      }
+                    }`,
+                  }),
+                });
+                // resolve the json
+                const json = await res.json();
+
+                if (json.data.grantDonations.length) {
+                  return await fetchUntilAll(SUBGRAPH_URL, before, skip + 1);
+                } else {
+                  return [...before];
+                }
+              };
+
+              const donationData = await fetchUntilAll(SUBGRAPH_URL);
+
               // update each of the grants
-              json.data.grantDonations.forEach((contribution: ContributionSubgraph) => {
+              donationData.forEach((contribution: ContributionSubgraph) => {
                 // update to most recent block collected
                 fromBlock = Math.max(fromBlock, contribution.lastUpdatedBlockNumber);
                 const grantId = BigNumber.from(contribution.grantId).toNumber();
