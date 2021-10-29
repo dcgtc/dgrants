@@ -162,6 +162,7 @@ import {
   unixToLocaleString,
   hasStatus,
   sortByStartTime,
+  shuffle,
 } from 'src/utils/utils';
 // --- Data ---
 import useDataStore from 'src/store/data';
@@ -220,7 +221,7 @@ export default defineComponent({
     } = useDataStore();
 
     // --- Data sources ---
-    const grants = computed(() => _grants?.value?.slice(0, 8));
+    const grants = computed(() => (_grants?.value ? shuffle(_grants?.value).slice(0, 8) : _grants?.value));
     const grantMetadata = computed(() => _grantMetadata.value);
     const grantRounds = computed(() => _grantRounds.value);
     const grantRoundMetadata = computed(() => _grantRoundMetadata.value);
