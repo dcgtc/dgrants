@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/contracts",
-  "version": "0.0.17-1cce972.0",
+  "version": "0.0.18-0cdd45c.0",
   "devDependencies": {
     "@dgrants/types": "^0.0.15-2183c99.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
