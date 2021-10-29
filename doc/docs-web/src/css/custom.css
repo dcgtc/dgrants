@@ -36,7 +36,7 @@ html[data-theme='dark'] {
 
 
 .hero[data-theme='dark'] {
-     &--dark {
-      --ifm-hero-text-color: white !important;
-  }
+  --ifm-background-color: #1e2125;
+  --ifm-background-surface-color: #121212;
+  --ifm-hero-text-color: white !important;
 }
