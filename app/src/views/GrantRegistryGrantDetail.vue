@@ -20,7 +20,9 @@
       <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
-        :logoURI="grantMetadata?.logoURI"
+        :logoURI="
+          grantMetadata?.logoURI ? grantMetadata?.logoURI.replace('https://ipfs-dev', 'https://ipfs') : undefined
+        "
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
         :roundDetails="grantContributionsByRound"

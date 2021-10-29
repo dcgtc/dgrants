@@ -28,7 +28,7 @@ const params: DeployParams = {
     matchingToken: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', // GTC
     roundStartTime: 1661990400, // Thursday, September 1, 2022 12:00:00 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -41,7 +41,7 @@ const params: DeployParams = {
     matchingToken: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', // GTC
     roundStartTime: 0,
     roundEndTime: 0,
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -54,7 +54,7 @@ const params: DeployParams = {
     matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
     roundStartTime: 1632460000, // Friday, September 24, 2021 05:06:40 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -67,7 +67,7 @@ const params: DeployParams = {
     matchingToken: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa', // DAI
     roundStartTime: 1631846108, // set start time to time in the future
     roundEndTime: 1731562000,
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -80,7 +80,7 @@ const params: DeployParams = {
     matchingToken: '0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8', // USDC
     roundStartTime: 1631633030,
     roundEndTime: 1731562000,
-    ipfsRetrievalEndpoint: 'https://ipfs-dev.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
