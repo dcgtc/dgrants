@@ -67,7 +67,7 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   const metadataAdmin = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
   const matchingToken = tokens.dai.address;
-  const metaPtr = 'https://ipfs-dev.fleek.co/ipfs/bafybeib5r75zbrzavbskwywct42alawcwo7d4dlyipimvnjy23hfkqhham';
+  const metaPtr = 'https://ipfs.fleek.co/ipfs/bafybeib5r75zbrzavbskwywct42alawcwo7d4dlyipimvnjy23hfkqhham';
 
   const tx = await manager.createGrantRound(
     metadataAdmin,
