@@ -41,7 +41,7 @@ export const DefaultForageConfig: LocalForageConfig = {
   // this store should be used for any on-chain/off-chain data but never user data (as we might clear it without notice)
   name: 'dGrants',
   // we can bump this version number to bust the users cache
-  version: 1,
+  version: 3,
 };
 
 // LocalForage keys

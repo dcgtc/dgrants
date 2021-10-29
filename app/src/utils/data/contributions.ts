@@ -56,7 +56,7 @@ export async function getContributions(
 
               const limit = 100;
 
-              const fetchUntilAll = async (SUBGRAPH_URL: string, before = [], skip = 0): Promise<any[]> => {
+              const fetchUntilAll = async (SUBGRAPH_URL: string, before: any[] = [], skip = 0): Promise<any[]> => {
                 const res = await fetch(SUBGRAPH_URL, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -80,7 +80,8 @@ export async function getContributions(
                 const json = await res.json();
 
                 if (json.data.grantDonations.length) {
-                  return await fetchUntilAll(SUBGRAPH_URL, before, skip + 1);
+                  const current = [...before, ...json.data.grantDonation];
+                  return await fetchUntilAll(SUBGRAPH_URL, current, skip + 1);
                 } else {
                   return [...before];
                 }
