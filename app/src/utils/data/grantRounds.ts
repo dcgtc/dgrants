@@ -230,7 +230,6 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
             metadataAdmin,
             payoutAdmin,
             registryAddress,
-            metaPtr,
             hasPaidOut,
             donationToken: donationToken,
             matchingToken: matchingToken,
@@ -244,6 +243,8 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
                 : 'Completed',
             registry: GRANT_REGISTRY_ADDRESS,
             error: undefined,
+            // change ipfs endpoint
+            metaPtr: metaPtr.replace('https://ipfs-dev', 'https://ipfs'),
           } as GrantRound,
         };
 

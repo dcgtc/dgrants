@@ -204,8 +204,6 @@ export default function useDataStore() {
 
     // Set up watchers on the grantRounds
     grantRoundsList.forEach(async (grantRound) => {
-      // change ipfs endpoint
-      grantRound.metaPtr = grantRound.metaPtr.replace('https://ipfs-dev', 'https://ipfs');
       // open the rounds contract
       const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, provider.value);
       // open the rounds contract
