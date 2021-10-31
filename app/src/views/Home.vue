@@ -150,7 +150,7 @@
 
 <script lang="ts">
 // --- Types ---
-import { Breadcrumb, FilterNavItem, FilterNavButton } from '@dgrants/types';
+import { Breadcrumb, FilterNavItem, FilterNavButton, Grant } from '@dgrants/types';
 // --- Utils ---
 import { computed, defineComponent, ref, watch } from 'vue';
 import { BigNumber } from 'ethers';
@@ -221,7 +221,7 @@ export default defineComponent({
     } = useDataStore();
 
     // --- Data sources ---
-    const grants = computed(() => (_grants?.value ? shuffle(_grants?.value).slice(0, 8) : _grants?.value));
+    const grants = computed(() => (_grants?.value ? shuffle(_grants?.value).slice(0, 8) : _grants?.value) as Grant[]);
     const grantMetadata = computed(() => _grantMetadata.value);
     const grantRounds = computed(() => _grantRounds.value);
     const grantRoundMetadata = computed(() => _grantRoundMetadata.value);

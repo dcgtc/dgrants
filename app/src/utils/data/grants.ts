@@ -121,6 +121,7 @@ export async function getAllGrants(forceRefresh = false) {
         grants: (Object.values(_lsGrants) as Grant[]).map((grant) => {
           // change ipfs endpoint
           grant.metaPtr = grant.metaPtr.replace('https://ipfs-dev', 'https://ipfs');
+
           return {
             ...grant,
           } as Grant;
