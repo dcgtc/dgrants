@@ -56,7 +56,11 @@ export async function getContributions(
 
               const limit = 100;
 
-              const fetchUntilAll = async (SUBGRAPH_URL: string, before: any[] = [], skip = 0): Promise<any[]> => {
+              const fetchUntilAll = async (
+                SUBGRAPH_URL: string,
+                before: ContributionSubgraph[] = [],
+                skip = 0
+              ): Promise<any[]> => {
                 const res = await fetch(SUBGRAPH_URL, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
