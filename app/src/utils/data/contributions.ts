@@ -285,6 +285,10 @@ export function grantDonationListener(
   },
   refs: Record<string, Ref>
 ) {
+  let timoutManager = 0;
+  const eachSaveTime = 400;
+  const processingSet = new Set();
+
   const listener = async (
     grantId: BigNumberish,
     tokenIn: string,
@@ -292,16 +296,26 @@ export function grantDonationListener(
     grantRounds: string[],
     event: Event
   ) => {
-    // console.log(name, grantId, tokenIn, donationAmount, rounds);
+    const tx = await event.getTransaction();
+
+    const wait = (timeout: number) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          return resolve(`Waited: ${timeout}ms`);
+        }, timeout);
+      });
+    };
+    timoutManager += eachSaveTime;
+    await wait(timoutManager - eachSaveTime + Math.floor(Math.random() * (eachSaveTime / 2)));
+    if (processingSet.has(`${tx.hash}-${grantId}`)) {
+      return;
+    }
+    processingSet.add(`${tx.hash}-${grantId}`);
+
     const blockNumber = await provider.value.getBlockNumber();
     // get tx details to pull contributor details from
-    const tx = await event.getTransaction();
     // log the new contribution
-    console.log('New contribution: ', {
-      grantId: BigNumber.from(grantId).toNumber(),
-      donationAmount: parseFloat(formatUnits(donationAmount, args.donationToken.decimals)),
-      from: tx.from,
-    });
+
     // store the new contribution
     const contributions = await syncStorage(
       contributionsKey,
@@ -336,6 +350,9 @@ export function grantDonationListener(
         refs.contributions.value = Object.values(_lsContributions).sort((a: Contribution, b: Contribution) =>
           (a?.blockNumber || 0) > (b?.blockNumber || 0) ? -1 : a?.blockNumber == b?.blockNumber ? 0 : 1
         ) as Contribution[];
+
+        timoutManager -= eachSaveTime;
+        processingSet.delete(`${tx.hash}-${grantId}`);
 
         return {
           contributions: refs.contributions.value,
