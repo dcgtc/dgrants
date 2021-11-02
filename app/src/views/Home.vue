@@ -241,7 +241,7 @@ export default defineComponent({
     // --- GrantRound Filter nav ---
     const selectedTab = ref<number>(0);
     // status tabs
-    const statusTab = ['Active', 'Upcoming', 'Complete'];
+    const statusTab = ['Active', 'Upcoming', 'Completed'];
     // filter and sort each of the status tabs
     const filteredLists = statusTab.map((status) =>
       computed(() => {
