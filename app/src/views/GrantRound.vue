@@ -201,23 +201,24 @@ function useGrantRoundDetail() {
   const txHash = ref<string>();
 
   // --- BaseHeader Navigation ---
-  const breadcrumb = computed(
-    () =>
-      <Breadcrumb[]>[
-        {
-          displayName: 'dgrants',
-          routeTarget: { name: 'Home' },
-        },
-        {
-          displayName: 'rounds',
-          routeTarget: { name: 'dgrants-rounds-list' },
-        },
-        {
-          displayName: `#${formatAddress(grantRoundAddress.value.toString())}`,
-          routeTarget: { name: 'dgrants-round', params: { address: grantRoundAddress.value } },
-        },
-      ]
-  );
+  const breadcrumb = computed(() => {
+    return <Breadcrumb[]>[
+      {
+        displayName: 'dgrants',
+        routeTarget: { name: 'Home' },
+      },
+      {
+        displayName: 'rounds',
+        routeTarget: { name: 'dgrants-rounds-list' },
+      },
+      {
+        displayName: grantRoundMetadata.value?.name
+          ? grantRoundMetadata.value?.name
+          : formatAddress(grantRoundAddress.value.toString()),
+        routeTarget: { name: 'dgrants-round', params: { address: grantRoundAddress.value } },
+      },
+    ];
+  });
 
   // get a single grantRound or an empty/error object (TODO: should the typings be modified to account for an empty object?)
   const grantRound = computed(() => {
