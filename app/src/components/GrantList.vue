@@ -9,6 +9,8 @@
           :name="(grantMetadata && grantMetadata[grant.metaPtr]?.name) || '...'"
           :ownerAddress="grant.owner"
           :imgurl="(grantMetadata && grantMetadata[grant.metaPtr]?.logoURI) || '/placeholder_grant.svg'"
+          :roundAddress="roundAddress"
+          :roundName="roundName"
         />
       </li>
     </ul>
@@ -103,6 +105,8 @@ export default defineComponent({
     grants: { type: Array as PropType<Grant[]>, required: true },
     grantMetadata: { type: Object as PropType<Record<string, GrantMetadataResolution>>, required: true },
     button: { type: Object as PropType<FilterNavButton>, required: false },
+    roundAddress: { type: String, default: '' },
+    roundName: { type: String, default: '' },
   },
   setup(props) {
     const { addToCart, isInCart, removeFromCart } = useCartStore();

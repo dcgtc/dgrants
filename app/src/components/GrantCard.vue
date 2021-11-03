@@ -1,7 +1,16 @@
 <!-- GrantCard -->
 
 <template>
-  <figure class="group cursor-pointer" @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })">
+  <figure
+    class="group cursor-pointer"
+    @click="
+      pushRoute({
+        name: 'dgrants-id',
+        params: { id: id.toString() },
+        query: roundAddress && roundName ? { roundAddress: roundAddress, roundName: roundName } : {},
+      })
+    "
+  >
     <!--img-->
     <div class="relative">
       <!--img-->
@@ -70,6 +79,8 @@ export default defineComponent({
     name: { type: String, required: true },
     imgurl: { type: String, required: true },
     ownerAddress: { type: String, required: true },
+    roundAddress: { type: String, default: '' },
+    roundName: { type: String, default: '' },
   },
   components: { CartIcon },
   setup(props) {

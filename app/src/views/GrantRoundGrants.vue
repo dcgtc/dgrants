@@ -2,7 +2,14 @@
   <template v-if="hasLoadedHeader">
     <BaseHeader :name="title" :breadcrumbContent="breadcrumb" />
     <!-- General filters -->
-    <GrantList v-if="hasLoadedGrants" :button="filterNavButton" :grants="grants" :grantMetadata="grantMetadata" />
+    <GrantList
+      v-if="hasLoadedGrants"
+      :button="filterNavButton"
+      :grants="grants"
+      :grantMetadata="grantMetadata"
+      :roundAddress="grantRound?.address"
+      :roundName="grantRoundMetadata?.name"
+    />
   </template>
 
   <LoadingSpinner v-else />
@@ -72,6 +79,10 @@ function useGrantRoundDetail() {
           routeTarget: { name: 'Home' },
         },
         {
+          displayName: 'rounds',
+          routeTarget: { name: 'dgrants-rounds-list' },
+        },
+        {
           displayName: grantRoundMetadata.value?.name,
           routeTarget: { name: 'dgrants-round', params: { address: grantRound.value?.address } },
         },
@@ -91,6 +102,7 @@ function useGrantRoundDetail() {
     filterNavButton,
     title,
     grants,
+    grantRound,
     grantMetadata,
     grantRoundMetadata,
     hasLoadedHeader,
