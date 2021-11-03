@@ -376,22 +376,40 @@ function useGrantDetail() {
   );
 
   // --- BaseHeader Navigation ---
-  const breadcrumb = computed(
-    () =>
-      <Breadcrumb[]>[
-        {
-          displayName: 'dgrants',
-          routeTarget: { name: 'Home' },
-        },
-        {
-          displayName: 'registry',
-          routeTarget: { name: 'dgrants' },
-        },
-        {
-          displayName: `#${grantId.value}`,
-          routeTarget: { name: 'dgrants-id', params: { id: grantId.value } },
-        },
-      ]
+  const breadcrumb = computed(() =>
+    route.query.roundName && route.query.roundAddress
+      ? <Breadcrumb[]>[
+          {
+            displayName: 'dgrants',
+            routeTarget: { name: 'Home' },
+          },
+          {
+            displayName: 'rounds',
+            routeTarget: { name: 'dgrants-rounds-list' },
+          },
+          {
+            displayName: route.query.roundName,
+            routeTarget: { name: 'dgrants-round', params: { address: route.query.roundAddress } },
+          },
+          {
+            displayName: `#${grantId.value}`,
+            routeTarget: { name: 'dgrants-id', params: { id: grantId.value } },
+          },
+        ]
+      : <Breadcrumb[]>[
+          {
+            displayName: 'dgrants',
+            routeTarget: { name: 'Home' },
+          },
+          {
+            displayName: 'registry',
+            routeTarget: { name: 'dgrants' },
+          },
+          {
+            displayName: `#${grantId.value}`,
+            routeTarget: { name: 'dgrants-id', params: { id: grantId.value } },
+          },
+        ]
   );
   const getGrantTargetFor = (grantid: number) => {
     if (!grants.value) return undefined; // array type unsupported
