@@ -149,11 +149,9 @@ export type GrantsDistribution = {
  * @field {contributions}
  * @field {trustBonusMetaPtr} trust bonus scores meta Ptr
  * @field {trustBonusScores} : pass in the trustBonusScore directly
- * @field {trustBonusSource} : rely on source to fetch
  */
 export type CLRArgs = {
   contributions: GrantRoundContributions;
   trustBonusMetaPtr?: string;
   trustBonusScores?: TrustBonusScore[];
-  trustBonusSource?: string;
 };

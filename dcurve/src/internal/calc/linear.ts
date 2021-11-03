@@ -1,6 +1,6 @@
 import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantsDistribution, TrustBonusScore } from '../../types';
 import { GrantRoundContributions } from '@dgrants/types';
-import { fetchTrustBonusScore, uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
+import { uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
 import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/data/ipfs';
 
 /**
@@ -54,11 +54,6 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
       // fetch trust bonus scores from metaPtr
       const url = getMetaPtr({ cid: clrArgs.trustBonusMetaPtr });
       trustBonusScores = await resolveMetaPtr(url);
-    } else if (clrArgs.trustBonusSource == 'gitcoin') {
-      // fetch trust bonus scores from gitcoin API
-      const { data, status } = await fetchTrustBonusScore([...contributionAddresses]);
-      if (!status.ok) console.error(status.message);
-      trustBonusScores = data;
     }
 
     // upload trust bonus to IPFS and store hash
