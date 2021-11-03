@@ -213,7 +213,7 @@ export default defineComponent({
     );
 
     const {
-      grants: _grants,
+      approvedGrants: _grants,
       grantMetadata: _grantMetadata,
       grantRounds: _grantRounds,
       grantRoundMetadata: _grantRoundMetadata,

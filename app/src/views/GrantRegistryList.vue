@@ -53,10 +53,10 @@ export default defineComponent({
   name: 'GrantRegistryList',
   components: { BaseHeader, GrantList, LoadingSpinner },
   setup() {
-    const { grants, grantMetadata } = useDataStore();
+    const { approvedGrants, grantMetadata } = useDataStore();
 
     return {
-      grants,
+      grants: approvedGrants,
       grantMetadata,
       ...useGrantRegistryList(),
     };
