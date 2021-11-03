@@ -25,7 +25,12 @@ import { pushRoute } from 'src/utils/utils';
 import { Breadcrumb, FilterNavButton, Grant, GrantRound } from '@dgrants/types';
 
 function useGrantRoundDetail() {
-  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grants: allGrants, grantMetadata } = useDataStore();
+  const { 
+    grantRounds,
+    grantRoundMetadata: _grantRoundMetadata,
+    approvedGrants: allGrants,
+    grantMetadata
+  } = useDataStore();
   const route = useRoute();
 
   // get a single grantRound or an empty/error object (TODO: should the typings be modified to account for an empty object?)

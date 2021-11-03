@@ -33,6 +33,7 @@ import {
   GRANT_ROUND_MANAGER_ADDRESS,
   SUPPORTED_TOKENS_MAPPING,
   DEFAULT_PROVIDER,
+  DGRANTS_CHAIN_ID,
 } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
@@ -46,6 +47,7 @@ const lastBlockNumber = ref<number>(0);
 
 const grants = ref<Grant[]>();
 const grantContributions = ref<Contribution[]>();
+const approvedGrants = ref<Grant[]>();
 const grantMetadata = ref<Record<string, GrantMetadataResolution>>({});
 
 const grantRounds = ref<GrantRound[]>();
@@ -111,6 +113,9 @@ export default function useDataStore() {
 
       return grants;
     }, {});
+
+
+    const approvedGrantsList = await getApprovedGrants(grantsData.grants);
 
     // Pull state from each GrantRound
     const roundAddresses = grantRoundData.roundAddresses || [];
@@ -190,6 +195,7 @@ export default function useDataStore() {
 
     // Save off data
     grants.value = grantsList as Grant[];
+    approvedGrants.value = approvedGrantsList as Grant[];
     grantContributions.value = contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
@@ -286,6 +292,24 @@ export default function useDataStore() {
   }
 
   /**
+   * @notice helper function to filter approved grants
+   *
+   * @param grants Grant[]
+   */
+   async function getApprovedGrants(grants: Grant[]) {
+    const uniqueStr = '?unique=' + Date.now();
+
+    const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
+    if (whitelistUrl) {
+      const url = whitelistUrl + uniqueStr;
+      const json = await fetch(url).then((res) => res.json());
+      grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
+    }
+
+    return grants;
+  }
+  
+  /**
    * @notice Call this method to poll now, then poll on each new block
    */
   async function startPolling() {
@@ -318,6 +342,7 @@ export default function useDataStore() {
     // Data
     lastBlockNumber: computed(() => lastBlockNumber.value || 0),
     grants: computed(() => grants.value),
+    approvedGrants: computed(() => approvedGrants.value),
     grantRounds: computed(() => grantRounds.value),
     grantMetadata: computed(() => grantMetadata.value),
     grantContributions: computed(() => grantContributions.value),

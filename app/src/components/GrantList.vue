@@ -16,7 +16,7 @@
 </template>
 
 <script lang="ts">
-import { watch, computed, defineComponent, onMounted, onUnmounted, PropType, ComputedRef, ref } from 'vue';
+import { watch, computed, defineComponent, onUnmounted, PropType, ComputedRef, ref } from 'vue';
 // --- App Imports ---
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantCard from 'src/components/GrantCard.vue';
@@ -24,8 +24,6 @@ import GrantCard from 'src/components/GrantCard.vue';
 import useCartStore from 'src/store/cart';
 // --- Types ---
 import { FilterNavButton, FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
-// --- Data ---
-import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
@@ -111,16 +109,6 @@ export default defineComponent({
     const grantList = computed(() =>
       grantIdList.value?.length > 0 ? createCustomGrantList(props.grants) : props.grants
     );
-
-    onMounted(async () => {
-      const uniqueStr = '?unique=' + Date.now();
-      const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
-      if (whitelistUrl) {
-        const url = whitelistUrl + uniqueStr;
-        const json = await fetch(url).then((res) => res.json());
-        grantIdList.value = json[DGRANTS_CHAIN_ID];
-      }
-    });
 
     onUnmounted(() => {
       grantsSortingMode.value = defaultSortingMode;
