@@ -25,11 +25,12 @@
 
 import fs from 'fs';
 import readline from 'readline';
+import axios from 'axios';
 import { task, types } from 'hardhat/config';
 import { BigNumberish } from 'ethers';
 import { GrantRound } from '../typechain';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
-import { Contribution } from '@dgrants/types';
+import { Contribution, ContributionSubgraph } from '@dgrants/types';
 
 const blocksToWait = 10; // number of blocks to wait after each transaction (for re-org protection)
 
@@ -38,6 +39,13 @@ task('payouts-setup', 'Configures the match payouts for the specified round')
   .addOptionalParam('block', 'Block to fetch data at', 'latest', types.string)
   .addOptionalParam('ids', 'Array of grant IDs to include in matching calcuations', '', types.string)
   .addOptionalParam('trustbonus', 'Trust bonus data', __filename, types.inputFile)
+  .addOptionalParam(
+    'subgraphurl',
+    'Subgraph URL',
+    'https://api.thegraph.com/subgraphs/name/dcgtc/dc-gitcoin-grants-matic',
+    types.string
+  )
+  .addOptionalParam('fromblock', 'From block', 19834043, types.int)
   .setAction(async (taskArgs, { ethers, network }) => {
     // --- Setup ---
     // Parse input arguments
@@ -46,6 +54,8 @@ task('payouts-setup', 'Configures the match payouts for the specified round')
     const _ids = taskArgs.ids ? taskArgs.ids.split(',').map((id: string) => id.trim()) : [];
     const trustBonus =
       taskArgs.trustbonus === __filename ? {} : JSON.parse(fs.readFileSync(taskArgs.trustbonus, 'utf-8'));
+    const subgraphUrl = taskArgs.subgraphurl;
+    const fromBlock = taskArgs.fromblock;
 
     // Verify the signer match the payout admin's address when not on Hardhat. If we are on Hardhat, we instead
     // impersonate the payout admin's account
@@ -77,8 +87,32 @@ task('payouts-setup', 'Configures the match payouts for the specified round')
     });
 
     // Fetch contributions using subgraph
-    const contributions: Contribution[] = []; // TODO
+    const res = await axios.post(
+      subgraphUrl,
+      {
+        query: `{
+          grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}}) {
+            grantId
+            tokenIn
+            donationAmount
+            from
+            hash
+            rounds
+            lastUpdatedBlockNumber
+          }
+        }`,
+      },
+      { headers: { 'Content-Type': 'application/json' } }
+    );
 
+    const contributions:ContributionSubgraph[] = res.data.data.grantDonations;
+    const parsedContributions: Contribution[] = contributions.map((contribution) => {
+      return {
+        ...contribution,
+        amount: ethers.utils.formatUnits(contribution.donationAmount, matchingTokenDecimals),
+      };
+    });
+    console.log({ contributions });
     // --- Compute match amounts ---
     const clr = new CLR({ calcAlgo: linear, includePayouts: true } as InitArgs);
     const distribution = await clr.calculate(
@@ -90,6 +124,7 @@ task('payouts-setup', 'Configures the match payouts for the specified round')
       },
       { trustBonusScores: trustBonusScores }
     );
+    console.log(distribution);
     const merkleRoot = distribution.merkle?.merkleRoot;
     if (!merkleRoot) throw new Error('Merkle root could not be calculated');
 

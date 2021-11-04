@@ -1,4 +1,3 @@
-require('dotenv').config();
 import { fetchJson } from '@ethersproject/web';
 import { TrustBonusScore } from '@dgrants/types';
 import { Status } from '../types';
@@ -9,8 +8,18 @@ type TrustBonusScoreAPI = {
   status: Status;
 };
 
-if (!process.env.FLEEK_STORAGE_API_KEY) throw new Error('Please set the FLEEK_STORAGE_API_KEY environment variable');
-const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY);
+// Some hacky config so this can be used in both node and the browser
+let FLEEK_STORAGE_API_KEY: string;
+if (typeof process !== 'object') {
+  // in browser
+  FLEEK_STORAGE_API_KEY = (process as { env: any }).env.FLEEK_STORAGE_API_KEY as string;
+} else {
+  // in node, use process.env format
+  require('dotenv').config();
+  if (!process.env.FLEEK_STORAGE_API_KEY) throw new Error('Please set the FLEEK_STORAGE_API_KEY environment variable');
+  FLEEK_STORAGE_API_KEY = process.env.FLEEK_STORAGE_API_KEY as string;
+}
+const ipfs = createIpfs(FLEEK_STORAGE_API_KEY);
 
 /**
  * @notice fetches the trust bonus score for a list of addresses

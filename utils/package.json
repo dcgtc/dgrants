@@ -20,6 +20,7 @@
   "dependencies": {
     "@dgrants/types": "^0.0.15-2183c99.0",
     "@types/ethereumjs-util": "^6.1.0",
+    "dotenv": "^10.0.0",
     "ethereumjs-util": "^7.1.0",
     "ethers": "^5.4.6"
   },

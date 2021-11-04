@@ -78,7 +78,7 @@ export const handle = async (clrArgs: CLRArgs): Promise<GrantsDistribution> => {
     }
 
     // upload trust bonus to IPFS and store hash
-    if (!trustBonusMetaPtr && trustBonusScores) {
+    if (!trustBonusMetaPtr && trustBonusScores.length) {
       trustBonusMetaPtr = (await uploadTrustBonusScores(trustBonusScores)).toString();
     }
   }
