@@ -3,9 +3,7 @@
 import { Contract } from 'ethers';
 import { GrantRoundFetchArgs } from '../../src/types';
 import { GrantRoundContributions, Contribution } from '@dgrants/types';
-import { abi as GRANT_REGISTRY_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRegistry.sol/GrantRegistry.json';
-import { abi as GRANT_ROUND_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRound.sol/GrantRound.json';
-import { abi as GRANT_ROUND_MANAGER_ABI } from '@dgrants/contracts/artifacts/contracts/GrantRoundManager.sol/GrantRoundManager.json';
+import { GRANT_REGISTRY_ABI, GRANT_ROUND_ABI, GRANT_ROUND_MANAGER_ABI } from './constants';
 import { formatUnits } from 'ethers/lib/utils';
 
 const ERC20_ABI = ['function balanceOf(address) view returns (uint)'];

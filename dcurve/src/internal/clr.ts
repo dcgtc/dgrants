@@ -12,10 +12,12 @@ import {
 import { generateMerkle, getMerkleRoot } from './merkle';
 import { addAnonymousContribution, getGrantMatch } from './utils';
 
-// polyfill Buffer for use in browser
-import { Buffer } from 'buffer/';
-// set to window (TODO: make this work in vite.config.ts)
-Object.defineProperty(global, 'Buffer', { value: Buffer });
+// polyfill Buffer for use in browser, but don't polyfill for node
+if (typeof process !== 'object') {
+  const Buffer = require('buffer/').Buffer; // note: the trailing slash is important!
+  // set to window (TODO: make this work in vite.config.ts)
+  Object.defineProperty(global, 'Buffer', { value: Buffer });
+}
 
 export class CLR {
   _options: InitArgs;
@@ -57,7 +59,7 @@ export class CLR {
           // get the current set of grantIds
           const currentGrantIds = payoutObj[grantMatch.address].grantIds;
           // add the set of grantIds to the arr and dedupe
-          grantIds = [...new Set(grantIds.concat(currentGrantIds))];
+          grantIds = Array.from(new Set(grantIds.concat(currentGrantIds)));
         }
         // ensure the payout address has a match to claim
         if (grantMatch.match) {

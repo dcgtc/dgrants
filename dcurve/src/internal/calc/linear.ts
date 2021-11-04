@@ -1,7 +1,28 @@
-import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantsDistribution, TrustBonusScore } from '../../types';
-import { GrantRoundContributions } from '@dgrants/types';
+import { fetchJson } from '@ethersproject/web';
+import { CLRArgs, ContributionsByGrantId, GrantMatch, GrantsDistribution } from '../../types';
+import { GrantRoundContributions, TrustBonusScore } from '@dgrants/types';
 import { uploadTrustBonusScores } from '@dgrants/utils/src/trustBonus';
-import { getMetaPtr, resolveMetaPtr } from '@dgrants/app/src/utils/data/ipfs';
+
+const retrievalEndpoint = 'https://ipfs.fleek.co/ipfs';
+
+/**
+ * Creates a url for a MetaPtr
+ * @param obj
+ * @param obj.cid CID of the grant
+ * @returns string
+ */
+export const getMetaPtr = ({ cid }: { cid: string }) => {
+  return `${retrievalEndpoint}/${cid}`;
+};
+
+/**
+ * Resolves a metaPtr via fetch
+ * @param url URL of metaPtr
+ * @returns Object
+ */
+export const resolveMetaPtr = (url: string) => {
+  return fetchJson(url).then((res: any) => res.json());
+};
 
 /**
  * @notice Contains the logic to determine the distribution using linear QF formula.

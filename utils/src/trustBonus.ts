@@ -1,11 +1,16 @@
-import { ipfs } from '@dgrants/app/src/utils/data/ipfs';
-import { TrustBonusScore } from '@dgrants/dcurve/src/types';
+require('dotenv').config();
+import { fetchJson } from '@ethersproject/web';
+import { TrustBonusScore } from '@dgrants/types';
 import { Status } from '../types';
+import { createIpfs } from './ipfs';
 
 type TrustBonusScoreAPI = {
   data: TrustBonusScore[];
   status: Status;
 };
+
+if (!process.env.FLEEK_STORAGE_API_KEY) throw new Error('Please set the FLEEK_STORAGE_API_KEY environment variable');
+const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY);
 
 /**
  * @notice fetches the trust bonus score for a list of addresses
@@ -32,7 +37,7 @@ export const fetchTrustBonusScore = async (addresses: string[]): Promise<TrustBo
   const url = `https://gitcoin.co/grants/v1/api/trust-bonus?addresses=${addresses.join(',')}`;
 
   try {
-    const response = await fetch(url);
+    const response = await fetchJson(url);
     const trustBonusScores = await response.json();
     result.data = trustBonusScores;
     return result;

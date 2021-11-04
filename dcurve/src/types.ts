@@ -77,16 +77,6 @@ export type GrantMatch = {
 };
 
 /**
- * Individual address trust bonus score
- * @field {address} address
- * @field {score} trust bonus score
- */
-export type TrustBonusScore = {
-  address: string;
-  score: number;
-};
-
-/**
  * Options fed into CLR class
  * @type InitArgs
  * @field {calcAlgo} command handle to use for calulation
