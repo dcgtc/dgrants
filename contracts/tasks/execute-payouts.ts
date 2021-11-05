@@ -28,7 +28,6 @@
 
 import readline from 'readline';
 import { task } from 'hardhat/config';
-import { GrantRound } from '../typechain';
 
 task('execute-payouts', 'Configures the match payouts for the specified round')
   .addParam('name', 'payout-data file containing the data to use, e.g. `poc` to use payout-data/poc.data.ts')
@@ -48,7 +47,7 @@ task('execute-payouts', 'Configures the match payouts for the specified round')
     // Verify the signer match the payout admin's address when not on Hardhat. If we are on Hardhat, we instead
     // impersonate the payout admin's account and connect it to the round instance
     let [signer] = await ethers.getSigners();
-    let round = <GrantRound>await ethers.getContractAt('GrantRound', roundAddress, signer);
+    let round = await ethers.getContractAt('GrantRound', roundAddress, signer);
     const [payoutAdmin, matchingTokenAddr] = await Promise.all([round.payoutAdmin(), round.matchingToken()]);
 
     if (network.name === 'hardhat') {
