@@ -1,140 +1,102 @@
 /**
- * @notice Automates the match payout flow of:
- *   1. Generating payout data
- *   2. Deploying the Merkle Distributor based on the payout data's merkle root
- *   3. Transfers funds to the Merkle Distributor
- *   4. Calls the bulk payout function on the distributor
+ * @notice Given a data file with contribution data and merkle tree data, this script automates
+ * the match payout flow of:
+ *   1. Deploying the Merkle Distributor based on the payout data's merkle root
+ *   2. Transferring the match funds to the Merkle Distributor
+ *   3. Calling the bulk payout function on the distributor
  *
- * ****************************** WARNING ******************************
- *     THIS SCRIPT IS A WORK IN PROGRESS. DO NOT USE ON MAINNET YET
- *     Search 'TODO' in this file to see what is left to be done
- * *********************************************************************
+ * To use this, create a file in the `payout-data` folder called <dataName>.data.ts, and pass
+ * the name of the data set as an argument when calling this script. See sample usage for the
+ * dGrants POC round below.
  *
- * @dev Sample usages are below
+ * @dev Sample usages
  * WARNING: Do not use a network other than hardhat until you are ready to send real transactions
+ *
  * NOTE: Currently you'll need to replace `19443600` with `20913000` in hardhat.config.ts to ensure
- *       the fork occurs at the correct block when running locally
+ * the fork occurs at the correct block when running locally
  *
- *   Run locally against a forked Polygon (TODO get this working)
- *       HARDHAT_FORK_NETWORK=polygon yarn hardhat payouts-setup --round 0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4
+ * NOTE: This script must be run by a round's `payoutAdmin` as the signer, unless running against a
+ * local network
+ *
+ *   Run locally against a forked Polygon (remember to change the block in the hardhat config as explained above)
+ *       HARDHAT_FORK_NETWORK=polygon yarn hardhat payouts-setup --name poc
+ *
  *   Run against polygon mainnet
- *       yarn hardhat payouts-setup --round 0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4 --network polygon
- *
- * @dev This script must be run by a round's `payoutAdmin` as the signer
+ *       yarn hardhat payouts-setup --name poc --network polygon
  */
 
-import fs from 'fs';
 import readline from 'readline';
-import axios from 'axios';
-import { task, types } from 'hardhat/config';
-import { BigNumberish } from 'ethers';
+import { task } from 'hardhat/config';
 import { GrantRound } from '../typechain';
-import { CLR, linear, InitArgs } from '@dgrants/dcurve';
-import { Contribution, ContributionSubgraph } from '@dgrants/types';
-
-const blocksToWait = 10; // number of blocks to wait after each transaction (for re-org protection)
 
 task('payouts-setup', 'Configures the match payouts for the specified round')
-  .addParam('round', 'Address of the grant round compute payouts for', undefined, types.string, false)
-  .addOptionalParam('block', 'Block to fetch data at', 'latest', types.string)
-  .addOptionalParam('ids', 'Array of grant IDs to include in matching calcuations', '', types.string)
-  .addOptionalParam('trustbonus', 'Trust bonus data', __filename, types.inputFile)
-  .addOptionalParam(
-    'subgraphurl',
-    'Subgraph URL',
-    'https://api.thegraph.com/subgraphs/name/dcgtc/dc-gitcoin-grants-matic',
-    types.string
-  )
-  .addOptionalParam('fromblock', 'From block', 19834043, types.int)
+  .addParam('name', 'payout-data file containing the data to use, e.g. `poc` to use payout-data/poc.data.ts')
   .setAction(async (taskArgs, { ethers, network }) => {
     // --- Setup ---
-    // Parse input arguments
-    const roundAddress = ethers.utils.getAddress(taskArgs.round);
-    const _blockNumber = taskArgs.block === 'latest' ? 'latest' : parseInt(taskArgs.block);
-    const _ids = taskArgs.ids ? taskArgs.ids.split(',').map((id: string) => id.trim()) : [];
-    const trustBonus =
-      taskArgs.trustbonus === __filename ? {} : JSON.parse(fs.readFileSync(taskArgs.trustbonus, 'utf-8'));
-    const subgraphUrl = taskArgs.subgraphurl;
-    const fromBlock = taskArgs.fromblock;
+    // Pull out some utils
+    const { formatUnits, isHexString } = ethers.utils;
+
+    // Import the match data
+    const dataPath = `./payout-data/${String(taskArgs.name)}.data.ts`;
+    const { round: roundAddress, data: distributionData } = await import(dataPath);
+
+    // If hardhat, don't wait any extra blocks after sending transaction.
+    // If not hardhat, wait 10 blocks for re-org protection
+    const blocksToWait = network.name === 'hardhat' ? undefined : 10;
 
     // Verify the signer match the payout admin's address when not on Hardhat. If we are on Hardhat, we instead
-    // impersonate the payout admin's account
+    // impersonate the payout admin's account and connect it to the round instance
     let [signer] = await ethers.getSigners();
-    const round = <GrantRound>await ethers.getContractAt('GrantRound', roundAddress, signer);
+    let round = <GrantRound>await ethers.getContractAt('GrantRound', roundAddress, signer);
     const [payoutAdmin, matchingTokenAddr] = await Promise.all([round.payoutAdmin(), round.matchingToken()]);
 
     if (network.name === 'hardhat') {
       await network.provider.request({ method: 'hardhat_impersonateAccount', params: [payoutAdmin] });
       signer = await ethers.getSigner(payoutAdmin);
+      round = round.connect(signer);
     } else if (signer.address !== payoutAdmin) {
       throw new Error(`Signer's address of ${signer.address} did not match the round's payout admin address of ${payoutAdmin}`); // prettier-ignore
     }
 
-    // --- Fetch data ---
+    // --- Fetch and format data ---
+    // Token data
     const erc20Abi = [
-      'function balanceOf(address owner) public view returns (uint256 balance)',
-      'function decimals() public view returns (uint8)',
+      'function balanceOf(address owner) external view returns (uint256 balance)',
+      'function decimals() external view returns (uint8)',
+      'function symbol() external view returns (string)',
     ];
     const matchingToken = new ethers.Contract(matchingTokenAddr, erc20Abi, ethers.provider);
-    const [matchingTokenDecimals, totalPot] = await Promise.all([
+    const [matchingTokenDecimals, matchingTokenSymbol, totalPot] = await Promise.all([
       matchingToken.decimals(),
+      matchingToken.symbol(),
       matchingToken.balanceOf(roundAddress),
     ]);
 
-    // Trust bonus scores are to be presented in an array
-    const trustBonusScores = Object.keys(trustBonus).map((address) => {
-      return { address: address, score: trustBonus[address] };
-    });
+    // Verify we have a valid merkle root
+    const merkleRoot = distributionData.merkle.merkleRoot;
+    if (!merkleRoot || merkleRoot.length !== 66 || !isHexString(merkleRoot)) {
+      throw new Error('Merkle root could not be found');
+    }
 
-    // Fetch contributions using subgraph
-    const res = await axios.post(
-      subgraphUrl,
-      {
-        query: `{
-           grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}}) {
-             grantId
-             tokenIn
-             donationAmount
-             from
-             hash
-             rounds
-             lastUpdatedBlockNumber
-           }
-         }`,
-      },
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-
-    const contributions: ContributionSubgraph[] = res.data.data.grantDonations;
-    const parsedContributions: Contribution[] = contributions.map((contribution) => {
+    // Reshape claims into an array for batch claiming funds
+    const claims = Object.keys(distributionData.merkle.claims).map((key) => {
       return {
-        ...contribution,
-        amount: ethers.utils.formatUnits(contribution.donationAmount, matchingTokenDecimals),
+        index: distributionData.merkle.claims[key].index,
+        payee: key,
+        amount: distributionData.merkle.claims[key].amount,
+        merkleProof: distributionData.merkle.claims[key].proof,
       };
     });
-    console.log({ contributions });
-    // --- Compute match amounts ---
-    const clr = new CLR({ calcAlgo: linear, includePayouts: true } as InitArgs);
-    const distribution = await clr.calculate(
-      {
-        grantRound: roundAddress,
-        totalPot: totalPot,
-        matchingTokenDecimals: matchingTokenDecimals,
-        contributions: contributions,
-      },
-      { trustBonusScores: trustBonusScores }
-    );
-    console.log(distribution);
-    const merkleRoot = distribution.merkle?.merkleRoot;
-    if (!merkleRoot) throw new Error('Merkle root could not be calculated');
 
     // --- Prompt user to verify data before continuing ---
-    // TODO other data to show here?
     await confirmContinue({
-      'network                  ': network.name,
-      'round address            ': round.address,
-      'payout admin             ': payoutAdmin,
-      'round match balance      ': totalPot.toString(),
+      'network                            ': network.name,
+      'round address                      ': round.address,
+      'payout admin (should match signer) ': payoutAdmin,
+      'signer address                     ': signer.address,
+      'round match balance                ': `${formatUnits(totalPot, matchingTokenDecimals)} ${matchingTokenSymbol}`,
+      'merkle root                        ': merkleRoot,
+      'number of claims                   ': claims.length,
     });
 
     // --- Deploy the Merkle Distributor ---
@@ -148,21 +110,27 @@ task('payouts-setup', 'Configures the match payouts for the specified round')
     const transferTx = await round.payoutGrants(merklePayout.address);
     console.log('Transferring funds to the Merkle Distributor...');
     await transferTx.wait(blocksToWait);
+
+    // Verify transfer worked as expected
+    const merkleBalance = await matchingToken.balanceOf(merklePayout.address);
+    if (!merkleBalance.eq(totalPot)) {
+      console.log('\n******************** WARNING ********************');
+      console.log('Balance of Merkle distributor does not match original Grant Round match balance.');
+      console.log('Review the details below and decide if you want to continue this script.');
+      console.log('Balances are shown in raw units to ensure values are accurately printed.');
+      await confirmContinue({
+        'Original match balance             ': `${totalPot.toString()} ${matchingTokenSymbol}`,
+        'Current Merkle distributor balance ': `${merkleBalance.toString()} ${matchingTokenSymbol}`,
+      });
+    }
+
     console.log('✅ Funds transferred');
 
     // --- Initiate batch payout ---
-    // TODO verify current balance of Merkle Distributor matches what the token balance of the GrantRound
-    // was before we initiated the token transfer with the `payoutGrants` method
-    type Claim = {
-      index: BigNumberish;
-      payee: string;
-      amount: BigNumberish;
-      merkleProof: string[];
-    };
-    const claims: Claim[] = []; // TODO generate the claim inputs
-    console.log('Distributing the match payouts...');
-    await merklePayout.batchClaim(claims);
-    console.log('✅ Payouts distributed!');
+    const claimTx = await merklePayout.batchClaim(claims);
+    console.log('Executing batch claim on behalf of all match recipients...');
+    await claimTx.wait(blocksToWait);
+    console.log('✅ Payouts distributed');
 
     console.log('✅ Done!');
   });
@@ -180,10 +148,10 @@ async function waitForInput(query: string): Promise<unknown> {
 }
 
 async function confirmContinue(params: Record<string, unknown>) {
-  console.log('\nDEPLOYMENT PARAMETERS');
+  console.log('\nPARAMETERS');
   console.table(params);
 
-  const response = await waitForInput('\nDo you want to continue with deployment? y/N\n');
-  if (response !== 'y') throw new Error('Aborting deploy: User chose to cancel deployment');
+  const response = await waitForInput('\nDo you want to continue? y/N\n');
+  if (response !== 'y') throw new Error('Aborting script: User chose to exit script');
   console.log('\n');
 }
