@@ -27,6 +27,7 @@
                 <img
                   class="w-full h-full object-center object-cover group-hover:opacity-90"
                   :src="'/placeholder_grant.svg'"
+                  loading="lazy"
                 />
               </figure>
             </div>
