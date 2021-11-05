@@ -6,7 +6,7 @@ import 'solidity-coverage';
 
 import './tasks/accounts';
 import './tasks/clean';
-import './tasks/payouts-setup';
+import './tasks/execute-payouts';
 
 import { resolve } from 'path';
 
