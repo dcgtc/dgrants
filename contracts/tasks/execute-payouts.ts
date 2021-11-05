@@ -13,23 +13,24 @@
  * WARNING: Do not use a network other than hardhat until you are ready to send real transactions
  *
  * NOTE: Currently you'll need to replace `19443600` with `20913000` in hardhat.config.ts to ensure
- * the fork occurs at the correct block when running locally
+ * the fork occurs at the correct block when running locally. If you do not do this, you'll get a
+ * `CALL_EXCEPTION` error because the grant round was not deployed until after block 19443600
  *
  * NOTE: This script must be run by a round's `payoutAdmin` as the signer, unless running against a
  * local network
  *
  *   Run locally against a forked Polygon (remember to change the block in the hardhat config as explained above)
- *       HARDHAT_FORK_NETWORK=polygon yarn hardhat payouts-setup --name poc
+ *       HARDHAT_FORK_NETWORK=polygon yarn hardhat execute-payouts --name poc
  *
  *   Run against polygon mainnet
- *       yarn hardhat payouts-setup --name poc --network polygon
+ *       yarn hardhat execute-payouts --name poc --network polygon
  */
 
 import readline from 'readline';
 import { task } from 'hardhat/config';
 import { GrantRound } from '../typechain';
 
-task('payouts-setup', 'Configures the match payouts for the specified round')
+task('execute-payouts', 'Configures the match payouts for the specified round')
   .addParam('name', 'payout-data file containing the data to use, e.g. `poc` to use payout-data/poc.data.ts')
   .setAction(async (taskArgs, { ethers, network }) => {
     // --- Setup ---
