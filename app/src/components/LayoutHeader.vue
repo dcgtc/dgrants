@@ -109,7 +109,7 @@
           </button>
           <button
             v-if="userAddress"
-            @click="myContributions(userAddress)"
+            @click="myContributions"
             class="cursor-pointer hover:text-grey-500 flex no-underline uppercase font-medium"
           >
             my contributions
@@ -164,11 +164,10 @@ export default defineComponent({
     const emitEvent = (eventName: string) => context.emit(eventName);
     const router = useRouter();
 
-    function myContributions(userId: string) {
+    function myContributions() {
       //TODO: further check that the userId is defined and valid?
       router.push({
         name: 'contribution',
-        params: { id: userId },
       });
     }
 

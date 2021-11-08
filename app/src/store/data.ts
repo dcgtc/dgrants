@@ -114,7 +114,6 @@ export default function useDataStore() {
       return grants;
     }, {});
 
-
     const approvedGrantsList = await getApprovedGrants(grantsData.grants);
 
     // Pull state from each GrantRound
@@ -296,7 +295,7 @@ export default function useDataStore() {
    *
    * @param grants Grant[]
    */
-   async function getApprovedGrants(grants: Grant[]) {
+  async function getApprovedGrants(grants: Grant[]) {
     const uniqueStr = '?unique=' + Date.now();
 
     const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
@@ -308,7 +307,7 @@ export default function useDataStore() {
 
     return grants;
   }
-  
+
   /**
    * @notice Call this method to poll now, then poll on each new block
    */

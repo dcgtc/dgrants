@@ -30,15 +30,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/GrantRoundGrants.vue'),
   },
   {
-    path: '/contribution/:id',
-    name: 'contribution', //TODO: will add more child routes as time progresses
+    path: '/contribution/donations',
+    name: 'contribution',
     component: () => import('../views/Contribution.vue'),
-    children: [
-      {
-        path: '',
-        component: () => import('../components/ContributionDetail.vue'),
-      },
-    ],
   },
 
   // Fallback route for handling 404s

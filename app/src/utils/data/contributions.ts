@@ -365,3 +365,17 @@ export function grantDonationListener(
     off: () => grantRoundManager.value.off(filter, listener),
   };
 }
+
+/**
+ * @notice given a userAddress and the contributions, return only the contributions for that address
+ * @param userAddress
+ * @param contributions
+ */
+export function filterContributionsByUserAddress(userAddress: string, contributions: Contribution[]) {
+  if (contributions && userAddress) {
+    return contributions.filter((contribution: Contribution) => {
+      return contribution.address === userAddress;
+    });
+  }
+  return undefined;
+}
