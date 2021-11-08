@@ -107,6 +107,13 @@
           >
             disconnect wallet
           </button>
+          <button
+            v-if="userAddress"
+            @click="myContributions(userAddress)"
+            class="cursor-pointer hover:text-grey-500 flex no-underline uppercase font-medium"
+          >
+            my contributions
+          </button>
         </div>
       </div>
     </div>
@@ -132,7 +139,7 @@ import Jazzicon from 'src/components/Jazzicon.vue';
 // --- Store ---
 import useWalletStore from 'src/store/wallet';
 import useCartStore from 'src/store/cart';
-
+import { useRouter } from 'vue-router';
 // Header menu bar items
 const navigation = [
   { label: 'Home', name: 'Home' },
@@ -155,10 +162,21 @@ export default defineComponent({
   setup(_props, context) {
     const { cartItemsCount } = useCartStore();
     const emitEvent = (eventName: string) => context.emit(eventName);
+    const router = useRouter();
+
+    function myContributions(userId: string) {
+      //TODO: further check that the userId is defined and valid?
+      router.push({
+        name: 'contribution',
+        params: { id: userId },
+      });
+    }
+
     return {
       cartItemsCount,
       navigation,
       emitEvent,
+      myContributions,
       ...useWalletConnection(),
     };
   },
