@@ -34,7 +34,7 @@
  *          }, '', "0x443b2765cf0b2fdc2054ac818f2b44ed0f125684798d1ba3aea4d8d39668ee40"));
  *
  *   3. Edit the return statement of `getContributions` in `contributions.ts` to only include
- *      contributions from block 20836866 or earlier, since this is the closes block to the
+ *      contributions from block 20836866 or earlier, since this is the closest block to the
  *      round's end time. This block has a timestamp of 1635724798, and the round's endTime
  *      is 1635724799
  *
