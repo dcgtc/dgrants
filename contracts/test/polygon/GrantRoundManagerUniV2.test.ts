@@ -89,7 +89,7 @@ describe('GrantRoundManagerUniV2', () => {
     const payoutAdmin = randomAddress();
     const startTime = '50000000000000'; // random timestamp far in the future
     const endTime = '60000000000000'; // random timestamp far in the future
-    const metaPtr = 'https://metadata-pointer.com';
+    const metaPtr = { protocol: 1, pointer: 'QmPMERYmqZtbHmqd2UzRhX9F4cixnMQU2GFa2hYAsQ6J3D' }; // dummy data
 
     beforeEach(async () => {
       mockMatchingToken = await deployMockContract(user, ['function totalSupply() returns(uint256)']);
@@ -123,7 +123,10 @@ describe('GrantRoundManagerUniV2', () => {
       expect(await grantRound.matchingToken()).to.equal(mockMatchingToken.address);
       expect(await grantRound.startTime()).to.equal(startTime);
       expect(await grantRound.endTime()).to.equal(endTime);
-      expect(await grantRound.metaPtr()).to.equal(metaPtr);
+
+      const roundMetaPtr = await grantRound.metaPtr();
+      expect(roundMetaPtr.protocol).to.equal(metaPtr.protocol);
+      expect(roundMetaPtr.pointer).to.equal(metaPtr.pointer);
     });
 
     it('reverts when creating a round with an invalid matching token', async () => {

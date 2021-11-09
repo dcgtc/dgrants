@@ -13,8 +13,9 @@ import { expectEqualGrants } from './utils';
 const { deployContract } = waffle;
 const { isAddress } = ethers.utils;
 const randomAddress = () => ethers.Wallet.createRandom().address;
-const randomPtr = () => String(Math.random()); // doesn't need to be a valid URL for testing
+const randomPtr = () => ({ protocol: Math.floor(100 * Math.random()), pointer: String(Math.random()) }); // doesn't need to be a valid values for testing
 const BN = (x: BigNumberish) => BigNumber.from(x);
+type MetaPtr = { protocol: BigNumberish; pointer: string };
 
 // --- GrantRegistry tests ---
 describe('GrantRegistry', function () {
@@ -22,7 +23,7 @@ describe('GrantRegistry', function () {
   let registry: GrantRegistry;
 
   // Helper method to create a grant and return the data used to create it
-  async function createGrant(owner: string, payee: string, metaPtr: string, user?: SignerWithAddress) {
+  async function createGrant(owner: string, payee: string, metaPtr: MetaPtr, user?: SignerWithAddress) {
     user = user ? user : deployer; // if a signer, `user`, is not specified we use the `deployer` account
     await registry.connect(user).createGrant(owner, payee, metaPtr);
     return { owner, payee, metaPtr };
@@ -72,7 +73,7 @@ describe('GrantRegistry', function () {
       const [owner, payee, metaPtr] = [user1.address, randomAddress(), randomPtr()];
       await expect(registry.createGrant(owner, payee, metaPtr))
         .to.emit(registry, 'GrantCreated')
-        .withArgs(0, owner, payee, metaPtr);
+        .withArgs(0, owner, payee, [metaPtr.protocol, metaPtr.pointer]);
     });
   });
 
@@ -104,7 +105,9 @@ describe('GrantRegistry', function () {
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantOwner(id, newOwner);
       expectEqualGrants(await registry.grants(0), { id, owner: newOwner, payee, metaPtr });
-      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, newOwner, payee, metaPtr);
+      await expect(tx)
+        .to.emit(registry, 'GrantUpdated')
+        .withArgs(id, newOwner, payee, [metaPtr.protocol, metaPtr.pointer]);
     });
 
     it('lets owner update payee', async () => {
@@ -112,7 +115,9 @@ describe('GrantRegistry', function () {
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantPayee(id, newPayee);
       expectEqualGrants(await registry.grants(0), { id, owner, payee: newPayee, metaPtr });
-      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, owner, newPayee, metaPtr);
+      await expect(tx)
+        .to.emit(registry, 'GrantUpdated')
+        .withArgs(id, owner, newPayee, [metaPtr.protocol, metaPtr.pointer]);
     });
 
     it('lets owner update metadata pointer', async () => {
@@ -120,7 +125,9 @@ describe('GrantRegistry', function () {
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantMetaPtr(id, newMetaPtr);
       expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr: newMetaPtr });
-      await expect(tx).to.emit(registry, 'GrantUpdated').withArgs(id, owner, payee, newMetaPtr);
+      await expect(tx)
+        .to.emit(registry, 'GrantUpdated')
+        .withArgs(id, owner, payee, [newMetaPtr.protocol, newMetaPtr.pointer]);
     });
 
     it('lets owner update all grant fields at once', async () => {
@@ -130,7 +137,7 @@ describe('GrantRegistry', function () {
       expectEqualGrants(await registry.grants(0), newGrant);
       await expect(tx)
         .to.emit(registry, 'GrantUpdated')
-        .withArgs(newGrant.id, newGrant.owner, newGrant.payee, newGrant.metaPtr);
+        .withArgs(newGrant.id, newGrant.owner, newGrant.payee, [newGrant.metaPtr.protocol, newGrant.metaPtr.pointer]);
     });
   });
 

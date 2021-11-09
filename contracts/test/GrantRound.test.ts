@@ -17,7 +17,7 @@ const { MaxUint256 } = ethers.constants;
 const { isAddress } = ethers.utils;
 
 describe('GrantRound', function () {
-  const mockUrl: string = 'https://test.url';
+  const mockMetaPtr = { protocol: 1, pointer: 'QmPMERYmqZtbHmqd2UzRhX9F4cixnMQU2GFa2hYAsQ6J3D' }; // dummy data
   let deployer: SignerWithAddress,
     payoutAdmin: SignerWithAddress,
     donor: SignerWithAddress,
@@ -50,7 +50,7 @@ describe('GrantRound', function () {
     registry = <GrantRegistry>await deployContract(deployer, grantRegistryArtifact);
 
     // Create an example grant
-    await registry.connect(deployer).createGrant(deployer.address, grantPayee.address, mockUrl);
+    await registry.connect(deployer).createGrant(deployer.address, grantPayee.address, mockMetaPtr);
 
     const grantRoundArtifact: Artifact = await artifacts.readArtifact('GrantRound');
     roundContractFactory = new ethers.ContractFactory(grantRoundArtifact.abi, grantRoundArtifact.bytecode, deployer);
@@ -66,7 +66,7 @@ describe('GrantRound', function () {
       mockMatchingERC20.address,
       startTime,
       endTime,
-      mockUrl
+      mockMetaPtr
     );
 
     return { mockMatchingERC20, mockDonationERC20, roundContract };
@@ -138,7 +138,7 @@ describe('GrantRound', function () {
           mockERC20.address,
           startTime,
           endTime,
-          mockUrl
+          mockMetaPtr
         )
       ).to.be.reverted;
     });
@@ -167,17 +167,17 @@ describe('GrantRound', function () {
   describe('updateMetadataPtr - updates metadata pointer string', () => {
     it('updates the pointer and emits an event', async function () {
       const { roundContract } = await loadFixture(setup);
-      const newPtr = 'https://new.com';
+      const newPtr = { protocol: 1, pointer: 'QmPMERYmqZtbHmqd2UzRhX9F4cixnMQU2GFa2hYAsQ6J3D' }; // dummy data
       const oldPtr = await roundContract.metaPtr();
 
       await expect(roundContract.connect(deployer).updateMetadataPtr(newPtr))
         .to.emit(roundContract, 'MetadataUpdated')
-        .withArgs(oldPtr, newPtr);
+        .withArgs([oldPtr.protocol, oldPtr.pointer], [newPtr.protocol, oldPtr.pointer]);
     });
 
     it('reverts if not the grant round metadata admin', async function () {
       const { roundContract } = await loadFixture(setup);
-      await expect(roundContract.connect(mpUser).updateMetadataPtr('test')).to.be.revertedWith(
+      await expect(roundContract.connect(mpUser).updateMetadataPtr({ protocol: 1, pointer: 'x' })).to.be.revertedWith(
         'GrantRound: Action can be perfomed only by metadataAdmin'
       );
     });

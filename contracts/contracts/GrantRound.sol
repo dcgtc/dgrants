@@ -1,7 +1,9 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 pragma solidity ^0.7.6;
+pragma abicoder v2;
 
 import "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
+import "./interfaces/IMetadataPointer.sol";
 import "./GrantRegistry.sol";
 
 contract GrantRound {
@@ -30,14 +32,14 @@ contract GrantRound {
   IERC20 public immutable matchingToken;
 
   /// @notice URL pointing to grant round metadata (for off-chain use)
-  string public metaPtr;
+  MetaPtr public metaPtr;
 
   /// @notice Set to true if grant round has ended and payouts have been released
   bool public hasPaidOut;
 
   // --- Events ---
   /// @notice Emitted when a grant round metadata pointer is updated
-  event MetadataUpdated(string oldMetaPtr, string indexed newMetaPtr);
+  event MetadataUpdated(MetaPtr oldMetaPtr, MetaPtr newMetaPtr);
 
   /// @notice Emitted when a contributor adds funds using the matching pool token
   event AddMatchingFunds(uint256 amount, address indexed contributor);
@@ -65,7 +67,7 @@ contract GrantRound {
     IERC20 _matchingToken,
     uint256 _startTime,
     uint256 _endTime,
-    string memory _metaPtr
+    MetaPtr memory _metaPtr
   ) {
     require(_donationToken.totalSupply() > 0, "GrantRound: Invalid donation token");
     require(_matchingToken.totalSupply() > 0, "GrantRound: Invalid matching token");
@@ -110,7 +112,7 @@ contract GrantRound {
    * @notice Updates the metadata pointer to a new location
    * @param _newMetaPtr A string where the updated metadata is stored
    */
-  function updateMetadataPtr(string calldata _newMetaPtr) external {
+  function updateMetadataPtr(MetaPtr calldata _newMetaPtr) external {
     require(msg.sender == metadataAdmin, "GrantRound: Action can be perfomed only by metadataAdmin");
     emit MetadataUpdated(metaPtr, _newMetaPtr);
     metaPtr = _newMetaPtr;
