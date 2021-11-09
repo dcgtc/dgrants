@@ -86,7 +86,7 @@ contract GrantRoundManager is SwapRouter {
     IERC20 _matchingToken,
     uint256 _startTime,
     uint256 _endTime,
-    string memory _metaPtr
+    MetaPtr calldata _metaPtr
   ) external {
     require(_matchingToken.totalSupply() > 0, "GrantRoundManager: Invalid matching token");
     GrantRound _grantRound = new GrantRound(
