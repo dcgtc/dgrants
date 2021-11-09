@@ -113,7 +113,7 @@ contract GrantRound {
    * @param _newMetaPtr A string where the updated metadata is stored
    */
   function updateMetadataPtr(MetaPtr calldata _newMetaPtr) external {
-    require(msg.sender == metadataAdmin, "GrantRound: Action can be perfomed only by metadataAdmin");
+    require(msg.sender == metadataAdmin, "GrantRound: Action can be performed only by metadataAdmin");
     emit MetadataUpdated(metaPtr, _newMetaPtr);
     metaPtr = _newMetaPtr;
   }
