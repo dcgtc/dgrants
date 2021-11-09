@@ -83,6 +83,7 @@ task('execute-payouts', 'Configures the match payouts for the specified round')
         merkleProof: distributionData.merkle.claims[key].proof,
       };
     });
+    const totalClaimAmount = claims.reduce((acc, claim) => acc.add(claim.amount), ethers.BigNumber.from(0));
 
     // --- Prompt user to verify data before continuing ---
     await confirmContinue({
@@ -91,6 +92,7 @@ task('execute-payouts', 'Configures the match payouts for the specified round')
       'payout admin (should match signer) ': payoutAdmin,
       'signer address                     ': signer.address,
       'round match balance                ': `${formatUnits(totalPot, matchingTokenDecimals)} ${matchingTokenSymbol}`,
+      'total claims (should match above)  ': `${formatUnits(totalClaimAmount, matchingTokenDecimals)} ${matchingTokenSymbol}`, // prettier-ignore
       'merkle root                        ': merkleRoot,
       'number of claims                   ': claims.length,
     });
