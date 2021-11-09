@@ -12,10 +12,6 @@
  * @dev Sample usages
  * WARNING: Do not use a network other than hardhat until you are ready to send real transactions
  *
- * NOTE: Currently you'll need to replace `19443600` with `20913000` in hardhat.config.ts to ensure
- * the fork occurs at the correct block when running locally. If you do not do this, you'll get a
- * `CALL_EXCEPTION` error because the grant round was not deployed until after block 19443600
- *
  * NOTE: This script must be run by a round's `payoutAdmin` as the signer, unless running against a
  * local network
  *
