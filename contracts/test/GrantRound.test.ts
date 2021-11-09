@@ -178,7 +178,7 @@ describe('GrantRound', function () {
     it('reverts if not the grant round metadata admin', async function () {
       const { roundContract } = await loadFixture(setup);
       await expect(roundContract.connect(mpUser).updateMetadataPtr({ protocol: 1, pointer: 'x' })).to.be.revertedWith(
-        'GrantRound: Action can be perfomed only by metadataAdmin'
+        'GrantRound: Action can be performed only by metadataAdmin'
       );
     });
   });
