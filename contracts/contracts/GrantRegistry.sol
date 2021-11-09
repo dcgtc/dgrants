@@ -2,6 +2,8 @@
 pragma solidity ^0.7.6;
 pragma abicoder v2;
 
+import "./interfaces/IMetadataPointer.sol";
+
 /**
  * @notice The Gitcoin GrantRegistry contract keeps track of all grants that have been created.
  * It is designed to be a singleton, i.e. there is only one instance of a GrantRegistry which
@@ -20,7 +22,7 @@ contract GrantRegistry {
     uint96 id; // grant ID, as uint96 to pack into same slot as owner (this implies a max of 2^96-1 = 7.9e28 grants)
     address owner; // grant owner (has permissions to modify grant information)
     address payee; // address that receives funds donated to this grant
-    string metaPtr; // URL pointing to grant metadata (for off-chain use)
+    MetaPtr metaPtr; // metadata pointer
   }
 
   // TODO use an array instead with ID to index it? Which is better?
@@ -30,22 +32,22 @@ contract GrantRegistry {
 
   // --- Events ---
   /// @notice Emitted when a new grant is created
-  event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, string metaPtr);
+  event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr);
 
   /// @notice Emitted when a grant's owner is changed
-  event GrantUpdated(uint96 indexed id, address indexed owner, address indexed payee, string metaPtr);
+  event GrantUpdated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr);
 
   // --- Core methods ---
   /**
    * @notice Create a new grant in the registry
    * @param _owner Grant owner (has permissions to modify grant information)
    * @param _payee Address that receives funds donated to this grant
-   * @param _metaPtr URL pointing to grant metadata (for off-chain use)
+   * @param _metaPtr metadata pointer
    */
   function createGrant(
     address _owner,
     address _payee,
-    string calldata _metaPtr
+    MetaPtr calldata _metaPtr
   ) external {
     uint96 _id = grantCount;
     grants[_id] = Grant(_id, _owner, _payee, _metaPtr);
@@ -82,7 +84,7 @@ contract GrantRegistry {
    * @param _id ID of grant to update
    * @param _metaPtr New URL that points to grant metadata
    */
-  function updateGrantMetaPtr(uint96 _id, string calldata _metaPtr) external {
+  function updateGrantMetaPtr(uint96 _id, MetaPtr calldata _metaPtr) external {
     Grant storage grant = grants[_id];
     require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.metaPtr = _metaPtr;
@@ -101,7 +103,7 @@ contract GrantRegistry {
     uint96 _id,
     address _owner,
     address _payee,
-    string calldata _metaPtr
+    MetaPtr calldata _metaPtr
   ) external {
     require(msg.sender == grants[_id].owner, "GrantRegistry: Not authorized");
     grants[_id] = Grant({id: _id, owner: _owner, payee: _payee, metaPtr: _metaPtr});
