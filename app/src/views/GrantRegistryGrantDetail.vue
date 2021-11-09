@@ -649,6 +649,13 @@ function useGrantDetail() {
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';
   }
 
+  /**
+   * @notice auto open if URL has query edits
+   */
+  if (route.query && route.query.edit && isOwner) {
+    enableEdit();
+  }
+
   return {
     donationToken,
     updateLogo,

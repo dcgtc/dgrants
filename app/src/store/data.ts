@@ -55,6 +55,7 @@ const grantRounds = ref<GrantRound[]>();
 const grantRoundMetadata = ref<Record<string, GrantRoundMetadataResolution>>({});
 const grantRoundsCLRData = ref<Record<string, GrantRoundCLR>>({});
 const grantRoundsDonationToken = ref<TokenInfo>();
+const approvedGrantsPk = ref<number[]>();
 
 const timeout = ref<ReturnType<typeof setTimeout> | undefined>();
 
@@ -115,7 +116,8 @@ export default function useDataStore() {
       return grants;
     }, {});
 
-    const approvedGrantsList = await getApprovedGrants(grantsData.grants);
+    const approvedGrantsData = await getApprovedGrants(grantsData.grants);
+    const approvedGrantsList = approvedGrantsData.grants;
 
     // Pull state from each GrantRound
     const roundAddresses = grantRoundData.roundAddresses || [];
@@ -198,6 +200,7 @@ export default function useDataStore() {
     grantContributions.value = contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
     grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
+    approvedGrantsPk.value = approvedGrantsData.approvedGrantsPk;
 
     // Set up refs to pass into listeners
     const refs: Record<string, Ref> = {
@@ -294,18 +297,24 @@ export default function useDataStore() {
    * @notice helper function to filter approved grants
    *
    * @param grants Grant[]
+   * @param approvedList []
    */
   async function getApprovedGrants(grants: Grant[]) {
     const uniqueStr = '?unique=' + Date.now();
+    let approvedGrantsPk = [];
 
     const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
     if (whitelistUrl) {
       const url = whitelistUrl + uniqueStr;
       const json = await fetch(url).then((res) => res.json());
+      approvedGrantsPk = json[DGRANTS_CHAIN_ID];
       grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
     }
 
-    return grants;
+    return {
+      grants: grants,
+      approvedGrantsPk: approvedGrantsPk,
+    };
   }
 
   /**
@@ -348,5 +357,6 @@ export default function useDataStore() {
     grantRoundsCLRData: computed(() => grantRoundsCLRData.value),
     grantRoundMetadata: computed(() => grantRoundMetadata.value),
     grantRoundsDonationToken: computed(() => grantRoundsDonationToken.value),
+    approvedGrantsPk: computed(() => approvedGrantsPk.value),
   };
 }

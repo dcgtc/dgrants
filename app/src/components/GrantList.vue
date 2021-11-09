@@ -105,6 +105,8 @@ export default defineComponent({
     // --- Required props ---
     grants: { type: Array as PropType<Grant[]>, required: true },
     grantMetadata: { type: Object as PropType<Record<string, GrantMetadataResolution>>, required: true },
+
+    // --- Optional props ---
     button: { type: Object as PropType<FilterNavButton>, required: false },
     roundAddress: { type: String, default: '' },
     roundName: { type: String, default: '' },

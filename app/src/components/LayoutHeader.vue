@@ -93,6 +93,20 @@
           "
         >
           <div>{{ userDisplayName }}</div>
+
+          <div class="border-b border-grey-400 my-4"></div>
+
+          <router-link
+            v-for="link in myNavigation"
+            :key="link.name"
+            :to="{ name: link.name }"
+            active-class="font-medium text-grey-500"
+            exact
+            class="hover:text-grey-500"
+          >
+            {{ link.label }}
+          </router-link>
+
           <div class="border-b border-grey-400 my-4"></div>
 
           <button
@@ -140,6 +154,9 @@ const navigation = [
   { label: 'Grants', name: 'dgrants' },
 ];
 
+// Header menu bar items
+const myNavigation = [{ label: 'My Grants', name: 'dgrants-my-grants' }];
+
 // Composition function for wallet management in the header. All reading/writing related to the user's wallet
 // is managed in this composition function, which reads/writes to/from src/store/wallet.ts store
 function useWalletConnection() {
@@ -158,6 +175,7 @@ export default defineComponent({
     return {
       cartItemsCount,
       navigation,
+      myNavigation,
       emitEvent,
       ...useWalletConnection(),
     };

@@ -208,4 +208,9 @@
     @apply px-4 md:px-12 py-12 grid gap-x-12 gap-y-12;
     @apply grid-cols-1 lg:grid-cols-2;
   }
+
+  .base-grid-large {
+    @apply px-4 md:px-12 py-12 grid gap-x-12 gap-y-12;
+    @apply grid-cols-1 lg:grid-cols-1;
+  }
 }
