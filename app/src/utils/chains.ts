@@ -139,7 +139,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     grantRoundManager: '0xB40a90fdB0163cA5C82D1959dB7e56B50A0dC016',
     grantRoundManagerAbi: GRANT_ROUND_MANAGER_ABI_UNI_V3_ABI,
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
-    rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
+    rpcUrl: 'http://127.0.0.1:8545/',
     subgraphUrl: false,
     startBlock: 13186294,
     filterBlockLimit: -1,
