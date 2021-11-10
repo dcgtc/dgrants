@@ -14,7 +14,7 @@ import { LocalForageData } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { BigNumber, BigNumberish, Contract, Event } from 'ethers';
 import { formatUnits, getAddress } from 'ethers/lib/utils';
-import { formatNumber, callMulticallContract, batchFilterCall, metadataId } from '../utils';
+import { formatNumber, callMulticallContract, batchFilterCall, metadataId, recursiveGraphFetch } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
@@ -58,22 +58,21 @@ export async function getAllGrantRounds(forceRefresh = false) {
         if (SUBGRAPH_URL) {
           try {
             // make the request
-            const res = await fetch(SUBGRAPH_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: `{
-                  grantRounds(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}) {
-                    address
-                    lastUpdatedBlockNumber
-                  }
-                }`,
-              }),
-            });
-            // resolve the json
-            const json = await res.json();
+            const grantRounds = await recursiveGraphFetch(
+              SUBGRAPH_URL,
+              'grantRounds',
+              (page: number) => `{
+              grantRounds(
+                first: 100, skip: ${page * 100}, 
+                where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}
+              ) {
+                address
+                lastUpdatedBlockNumber
+              }
+            }`
+            );
             // update each of the grants
-            json.data.grantRounds.forEach((grantRound: GrantRoundSubgraph) => {
+            grantRounds.forEach((grantRound: GrantRoundSubgraph) => {
               // collate grantRoundAddresses
               _lsRoundAddresses.add(getAddress(grantRound.address));
             });

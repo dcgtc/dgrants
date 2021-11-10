@@ -413,3 +413,41 @@ export const shuffle = (unshuffled: Grant[] | GrantRound[]) => {
 
   return shuffled;
 };
+
+/**
+ * @notice Recursively grab every page of results
+ *
+ * @param {string} url the url we will recursively fetch from
+ * @param {string} key the key in the response object which holds results
+ * @param {function} query a function which will return the query string (with the page in place)
+ * @param {array} before the current array of objects
+ * @param {number} page the page we want to fetch
+ */
+export const recursiveGraphFetch = async (
+  url: string,
+  key: string,
+  query: (page: number) => string,
+  before: any[] = [],
+  page = 0
+): Promise<any[]> => {
+  // fetch this page of results
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      query: query(page),
+    }),
+  });
+
+  // resolve the json
+  const json = await res.json();
+
+  // if there was results on this page then check the next
+  if (!json.data[key].length) {
+    // return the full result
+    return [...before];
+  } else {
+    // return the result combined with the next page
+    return await recursiveGraphFetch(url, key, query, [...before, ...json.data[key]], page + 1);
+  }
+};

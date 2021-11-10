@@ -12,7 +12,7 @@ import { contributionsKey, trustBonusKey } from 'src/utils/constants';
 import { GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall } from '../utils';
+import { batchFilterCall, recursiveGraphFetch } from '../utils';
 import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
@@ -53,27 +53,26 @@ export async function getContributions(
           if (SUBGRAPH_URL) {
             try {
               // make the request
-              const res = await fetch(SUBGRAPH_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  query: `{
-                    grantDonations(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}) {
-                      grantId
-                      tokenIn
-                      donationAmount
-                      from
-                      hash
-                      rounds
-                      lastUpdatedBlockNumber
-                    }
-                  }`,
-                }),
-              });
-              // resolve the json
-              const json = await res.json();
+              const grantDonations = await recursiveGraphFetch(
+                SUBGRAPH_URL,
+                'grantDonations',
+                (page: number) => `{
+                grantDonations(
+                  first: 100, skip: ${page * 100}, 
+                  where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}
+                ) {
+                  grantId
+                  tokenIn
+                  donationAmount
+                  from
+                  hash
+                  rounds
+                  lastUpdatedBlockNumber
+                }
+              }`
+              );
               // update each of the grants
-              json.data.grantDonations.forEach((contribution: ContributionSubgraph) => {
+              grantDonations.forEach((contribution: ContributionSubgraph) => {
                 const grantId = BigNumber.from(contribution.grantId).toNumber();
                 _lsContributions[`${contribution.hash}-${grantId}`] = {
                   grantId: grantId,

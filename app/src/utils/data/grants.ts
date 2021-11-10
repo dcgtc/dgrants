@@ -9,7 +9,7 @@ import { allGrantsKey } from 'src/utils/constants';
 import { START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall } from '../utils';
+import { batchFilterCall, recursiveGraphFetch } from '../utils';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
 import { getMetadata } from './ipfs';
@@ -44,25 +44,24 @@ export async function getAllGrants(forceRefresh = false) {
         if (SUBGRAPH_URL) {
           try {
             // make the request
-            const res = await fetch(SUBGRAPH_URL, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                query: `{
-                  grants(where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}) {
-                    id
-                    owner
-                    payee
-                    metaPtr
-                    lastUpdatedBlockNumber
-                  }
-                }`,
-              }),
-            });
-            // resolve the json
-            const json = await res.json();
+            const grants = await recursiveGraphFetch(
+              SUBGRAPH_URL,
+              'grants',
+              (page: number) => `{
+              grants(
+                first: 100, skip: ${page * 100}, 
+                where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}
+              ) {
+                id
+                owner
+                payee
+                metaPtr
+                lastUpdatedBlockNumber
+              }
+            }`
+            );
             // update each of the grants
-            json.data.grants.forEach((grant: GrantSubgraph) => {
+            grants.forEach((grant: GrantSubgraph) => {
               const grantId = BigNumber.from(grant.id).toNumber();
               _lsGrants[grantId] = {
                 id: grantId,
