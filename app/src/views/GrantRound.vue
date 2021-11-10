@@ -169,14 +169,15 @@ import useWalletStore from 'src/store/wallet';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 import { BigNumber, BigNumberish, Contract, getAddress, MaxUint256, parseUnits } from 'src/utils/ethers';
 import {
+  assertSufficientBalance,
+  checkAllowance,
   daysAgo,
   formatAddress,
-  isValidUrl,
-  checkAllowance,
   getApproval,
   hasStatus,
   isDefined,
-  assertSufficientBalance,
+  isValidUrl,
+  metadataId,
   watchTransaction,
 } from 'src/utils/utils';
 
@@ -276,7 +277,9 @@ function useGrantRoundDetail() {
    * @notice Populate grant round metadata
    */
   const grantRoundMetadata = computed(() =>
-    _grantRoundMetadata.value ? (_grantRoundMetadata.value[grantRound.value?.metaPtr] as GrantRoundMetadata) : null
+    _grantRoundMetadata.value
+      ? (_grantRoundMetadata.value[metadataId(grantRound.value?.metaPtr)] as GrantRoundMetadata)
+      : null
   );
 
   // --- Contribution capabilities ---

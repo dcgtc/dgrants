@@ -1,6 +1,7 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
-import { GrantMetadata } from '@dgrants/types';
-import { getStorageKey, setStorageKey } from './utils';
+import { GrantMetadata, MetaPtr } from '@dgrants/types';
+import { getStorageKey, setStorageKey } from 'src/utils/data/utils';
+import { metadataId } from 'src/utils/utils';
 import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
@@ -36,6 +37,18 @@ export const getMetaPtr = ({ cid }: { cid: string }) => {
 };
 
 /**
+ * Given a CID, formats the metadata pointer for compatibility with the contracts
+ * @param cid CID of the grant
+ * @returns string
+ */
+export const formatMetaPtr = (cid: string): MetaPtr => {
+  return {
+    protocol: 1, // IPFS has a protocol ID of 1
+    pointer: cid,
+  };
+};
+
+/**
  * Resolves a metaPtr via fetch
  * @param url URL of metaPtr
  * @returns Object
@@ -47,13 +60,16 @@ export const resolveMetaPtr = (url: string) => {
 /**
  * @notice Helper method that fetches metadata for a Grant or GrantRound, and saves the data
  * to the state as soon as it's received
- * @param metaPtrs Array of URLs to resolve
+ * @param metaPtrs Array of IPFS MetaPtrs to resolve
  * @param metadata Name of the store's ref to assign resolve metadata to
  */
-export const fetchMetaPtrs = async (metaPtrs: string[], metadata: Ref) => {
+export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
+  const urls = metaPtrs.map((ptr) => getMetaPtr({ cid: ptr.pointer }));
   // check for any missing entries
-  const newMetadata = metaPtrs
-    .filter((metaPtr) => !metadata.value[metaPtr] || metadata.value[metaPtr].status === 'error')
+  const newMetadata = urls
+    .filter(
+      (_, i) => !metadata.value[metadataId(metaPtrs[i])] || metadata.value[metadataId(metaPtrs[i])].status === 'error'
+    )
     .reduce((prev, cur) => {
       return {
         ...prev,

@@ -11,7 +11,7 @@ import { CartItem, CartItemOptions, CartPrediction, CartPredictions } from 'src/
 import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
-import { assertSufficientBalance } from 'src/utils/utils';
+import { assertSufficientBalance, metadataId } from 'src/utils/utils';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 import { getPredictedMatchingForAmount } from '@dgrants/dcurve';
@@ -386,7 +386,7 @@ export default function useCartStore() {
     return cart.value
       .map((item) =>
         (grantRounds.value || []).reduce((inRound: boolean, round) => {
-          return inRound || grantRoundMetadata.value[round.metaPtr].grants?.includes(item.grantId) || false;
+          return inRound || grantRoundMetadata.value[metadataId(round.metaPtr)].grants?.includes(item.grantId) || false;
         }, false)
       )
       .reduce((inRound, isInRound) => inRound || isInRound, false);
@@ -403,7 +403,7 @@ export default function useCartStore() {
       // collect the matching values for each grant in each round
       _predictions[item.grantId] = (grantRounds.value || []).map((round) => {
         let matching: number | boolean = false;
-        const metadata = grantRoundMetadata.value[round.metaPtr];
+        const metadata = grantRoundMetadata.value[metadataId(round.metaPtr)];
         if (metadata && metadata.grants?.includes(item.grantId)) {
           // all calculations are denominated in the rounds donationToken
           const roundToken = round.donationToken;

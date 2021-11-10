@@ -37,6 +37,7 @@ import {
 } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
+import { metadataId } from 'src/utils/utils';
 
 // --- Parameters required ---
 const { provider, grantRoundManager, network } = useWalletStore();
@@ -157,7 +158,7 @@ export default function useDataStore() {
         // only do predictions once after resolving all grantRounds
         const gotAllMetadata = !grantRoundsList
           .map((grantRound: GrantRound) => {
-            return grantRoundMetadata.value[grantRound.metaPtr].status === 'resolved';
+            return grantRoundMetadata.value[metadataId(grantRound.metaPtr)].status === 'resolved';
           })
           .includes(false);
         // calculate predictions after we've got all rounds metadata

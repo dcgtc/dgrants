@@ -237,7 +237,7 @@ function useNewGrant() {
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, logoURI, properties })
-      .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
+      .then((cid) => ipfs.formatMetaPtr(cid.toString()));
 
     // watch the transaction to check for any replacements/cancellations and update txHash accordingly
     const tx = await watchTransaction(() => grantRegistry.value.createGrant(owner, payee, metaPtr), txHash);

@@ -15,9 +15,9 @@
                 :id="index"
                 :ptr="grantRound.metaPtr"
                 :address="grantRound.address"
-                :name="grantRoundMetadata[grantRound.metaPtr].name ?? ''"
-                :imgurl="grantRoundMetadata[grantRound.metaPtr].logoURI ?? '/placeholder_round.svg'"
-                :grantsTotal="grantRoundMetadata[grantRound.metaPtr].grants?.length ?? 0"
+                :name="grantRoundMetadata[metadataId(grantRound.metaPtr)].name ?? ''"
+                :imgurl="grantRoundMetadata[metadataId(grantRound.metaPtr)].logoURI ?? '/placeholder_round.svg'"
+                :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)].grants?.length ?? 0"
                 :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
               />
             </li>
@@ -46,10 +46,11 @@ import {
   daysAgo,
   formatAddress,
   formatNumber,
-  pushRoute,
-  unixToLocaleString,
   hasStatus,
+  metadataId,
+  pushRoute,
   sortByStartTime,
+  unixToLocaleString,
 } from 'src/utils/utils';
 // --- Data and Methods ---
 import useDataStore from 'src/store/data';
@@ -131,6 +132,7 @@ export default defineComponent({
       grantRoundMetadata,
       grantRoundsNav,
       hasStatus,
+      metadataId,
       pushRoute,
       selectedTab,
       unixToLocaleString,
