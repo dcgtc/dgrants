@@ -74,8 +74,6 @@ export async function getContributions(
               const json = await res.json();
               // update each of the grants
               json.data.grantDonations.forEach((contribution: ContributionSubgraph) => {
-                // update to most recent block collected
-                fromBlock = Math.max(fromBlock, contribution.lastUpdatedBlockNumber);
                 const grantId = BigNumber.from(contribution.grantId).toNumber();
                 _lsContributions[`${contribution.hash}-${grantId}`] = {
                   grantId: grantId,
@@ -89,6 +87,8 @@ export async function getContributions(
                   blockNumber: contribution.lastUpdatedBlockNumber,
                 };
               });
+              // update to most recent block collected
+              fromBlock = blockNumber;
             } catch {
               console.log('dGrants: Data fetch error - Subgraph request failed');
             }

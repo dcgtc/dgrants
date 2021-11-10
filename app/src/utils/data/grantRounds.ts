@@ -73,11 +73,11 @@ export async function getAllGrantRounds(forceRefresh = false) {
             const json = await res.json();
             // update each of the grants
             json.data.grantRounds.forEach((grantRound: GrantRoundSubgraph) => {
-              // update to most recent block collected
-              fromBlock = Math.max(fromBlock, grantRound.lastUpdatedBlockNumber);
               // collate grantRoundAddresses
               _lsRoundAddresses.add(getAddress(grantRound.address));
             });
+            // update to most recent block collected
+            fromBlock = latestBlockNumber;
           } catch {
             console.log('dGrants: Data fetch error - Subgraph request failed');
           }
