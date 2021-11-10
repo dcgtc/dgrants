@@ -7,7 +7,7 @@ import { Event } from 'ethers';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress, Logger } from 'src/utils/ethers';
 import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
-import { Grant, GrantRound } from '@dgrants/types';
+import { Grant, GrantRound, MetaPtr } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
 import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
@@ -69,6 +69,12 @@ export function urlFromTwitterHandle(handle: string) {
 // Clean twitter url and return the handle
 export function cleanTwitterUrl(url: string | undefined) {
   return url ? url.replace('https://twitter.com/', '') : undefined;
+}
+
+// Given a metadata pointer object, return a stringified version that can be used as an object key
+export function metadataId(metaPtr: MetaPtr) {
+  const keys = Object.keys(metaPtr).sort(); // ensure deterministic ordering of keys
+  return keys.map((key) => metaPtr[<keyof typeof metaPtr>key].toString()).join('-'); // stringify and join all values
 }
 
 // --- Validation ---

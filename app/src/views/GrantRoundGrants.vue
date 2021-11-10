@@ -27,16 +27,16 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { getAddress } from 'src/utils/ethers';
-import { pushRoute } from 'src/utils/utils';
+import { metadataId, pushRoute } from 'src/utils/utils';
 // --- Types ---
 import { Breadcrumb, FilterNavButton, Grant, GrantRound } from '@dgrants/types';
 
 function useGrantRoundDetail() {
-  const { 
+  const {
     grantRounds,
     grantRoundMetadata: _grantRoundMetadata,
     approvedGrants: allGrants,
-    grantMetadata
+    grantMetadata,
   } = useDataStore();
   const route = useRoute();
 
@@ -67,7 +67,7 @@ function useGrantRoundDetail() {
   });
 
   const grantRoundMetadata = computed(() =>
-    grantRound.value ? _grantRoundMetadata.value[grantRound.value.metaPtr] : null
+    grantRound.value ? _grantRoundMetadata.value[metadataId(grantRound.value.metaPtr)] : null
   );
 
   const title = computed(() => `${grantRoundMetadata.value?.name} Grants`);

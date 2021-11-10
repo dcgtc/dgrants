@@ -13,10 +13,11 @@ import { LocalForageData } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { BigNumber, BigNumberish, Contract, Event } from 'ethers';
 import { formatUnits, getAddress } from 'ethers/lib/utils';
-import { formatNumber, callMulticallContract, batchFilterCall } from '../utils';
+import { formatNumber, callMulticallContract, batchFilterCall, metadataId } from '../utils';
 import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
+import { getMetadata } from './ipfs';
 // --- Constants ---
 import { START_BLOCK, SUPPORTED_TOKENS_MAPPING, GRANT_REGISTRY_ADDRESS, SUBGRAPH_URL } from 'src/utils/chains';
 import {
@@ -27,7 +28,6 @@ import {
   grantRoundsCLRDataKeyPrefix,
 } from 'src/utils/constants';
 import { Ref } from 'vue';
-import { getMetadata } from './ipfs';
 
 const { grantRoundManager, provider } = useWalletStore();
 
@@ -310,7 +310,7 @@ export async function getGrantRoundGrantData(
         (LocalForageData && (LocalForageData.blockNumber || START_BLOCK) < blockNumber)
       ) {
         // get the rounds metadata
-        const metadata = grantRoundMetadata[grantRound.metaPtr];
+        const metadata = grantRoundMetadata[metadataId(grantRound.metaPtr)];
         // total the number of contributions being considered in the current prediction
         const oldDonationCount = _lsGrantDonations.length;
         // fetch contributions
@@ -410,7 +410,7 @@ export function getGrantsGrantRoundDetails(
 
   return rounds
     .map((round) => {
-      const metadata = roundsMetadata[round.metaPtr];
+      const metadata = roundsMetadata[metadataId(round.metaPtr)];
       if (metadata && metadata.grants?.includes(grantId)) {
         // get the predictions for this grant in this round
         const predictions = getPredictionsForGrantInRound(grantId, grantRoundsCLRData[round.address]);

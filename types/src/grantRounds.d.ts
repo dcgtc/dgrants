@@ -1,6 +1,6 @@
 import { BigNumberish } from 'ethers';
 import { TokenInfo } from '@uniswap/token-lists';
-import { Contribution, GrantPrediction } from './grants';
+import { Contribution, GrantPrediction, MetaPtr } from './grants';
 
 /**
  * Data types for entity being pulled from the subgraph
@@ -28,7 +28,7 @@ export type GrantRoundSubgraph = {
  * @field {status} The current status of the round (Active|Upcoming|Complete)
  * @field {startTime} The start time of the round (unix)
  * @field {endTime} The end time of the round (unix)
- * @field {metaPtr} The ipfs metaPtr associated with the round
+ * @field {metaPtr} The metaPtr associated with the round
  * @field {hasPaidOut} Marked when the round matching has been paid out
  * @field {error} Optional error string
  */
@@ -43,7 +43,7 @@ export type GrantRound = {
   status: string;
   startTime: BigNumberish;
   endTime: BigNumberish;
-  metaPtr: string;
+  metaPtr: MetaPtr;
   hasPaidOut: boolean;
   error: string | undefined;
 };
