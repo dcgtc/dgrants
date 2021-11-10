@@ -286,7 +286,19 @@ import useWalletStore from 'src/store/wallet';
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
-import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isValidLogo, isDefined, formatNumber, urlFromTwitterHandle, cleanTwitterUrl, watchTransaction} from 'src/utils/utils'; // prettier-ignore
+import {
+  cleanTwitterUrl,
+  formatNumber,
+  isDefined,
+  isValidAddress,
+  isValidGithub,
+  isValidLogo,
+  isValidTwitter,
+  isValidWebsite,
+  metadataId,
+  urlFromTwitterHandle,
+  watchTransaction,
+} from 'src/utils/utils';
 import * as ipfs from 'src/utils/data/ipfs';
 import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
@@ -330,7 +342,7 @@ function useGrantDetail() {
     return grants.value[grantId.value];
   });
   const grantId = computed(() => Number(route.params.id));
-  const grantMetadata = computed(() => (grant.value ? metadata.value[grant.value.metaPtr] : null));
+  const grantMetadata = computed(() => (grant.value ? metadata.value[metadataId(grant.value.metaPtr)] : null));
 
   // --- expose Grant/round details ---
   const loading = ref(true);
@@ -590,7 +602,7 @@ function useGrantDetail() {
       const properties = { websiteURI: website, githubURI: github, twitterURI };
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description, logoURI, properties })
-        .then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }));
+        .then((cid) => ipfs.formatMetaPtr(cid.toString()));
     }
 
     if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {

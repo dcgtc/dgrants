@@ -5,9 +5,9 @@
       <li v-for="grant in sortedGrants" :key="grant.id.toString()">
         <GrantCard
           :id="grant.id"
-          :name="(grantMetadata && grantMetadata[grant.metaPtr]?.name) || '...'"
+          :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
-          :imgurl="(grantMetadata && grantMetadata[grant.metaPtr]?.logoURI) || '/placeholder_grant.svg'"
+          :imgurl="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoURI) || '/placeholder_grant.svg'"
         />
       </li>
     </ul>
@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { watch, computed, defineComponent, onMounted, onUnmounted, PropType, ComputedRef, ref } from 'vue';
-// --- App Imports ---
+// --- Components ---
 import GrantCard from 'src/components/GrantCard.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
@@ -24,6 +24,7 @@ import useCartStore from 'src/store/cart';
 import { FilterNavItem, Grant, GrantMetadataResolution } from '@dgrants/types';
 // --- Utils ---
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
+import { metadataId } from 'src/utils/utils';
 
 type SortingMode = 'newest' | 'oldest' | 'shuffle';
 
@@ -122,9 +123,10 @@ export default defineComponent({
 
     return {
       ...useSortedGrants(grantList),
-      isInCart,
       addToCart,
+      isInCart,
       removeFromCart,
+      metadataId,
     };
   },
 });
