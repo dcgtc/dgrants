@@ -72,9 +72,14 @@ export function cleanTwitterUrl(url: string | undefined) {
 }
 
 // Given a metadata pointer object, return a stringified version that can be used as an object key
-export function metadataId(metaPtr: MetaPtr) {
-  const keys = Object.keys(metaPtr).sort(); // ensure deterministic ordering of keys
-  return keys.map((key) => metaPtr[<keyof typeof metaPtr>key].toString()).join('-'); // stringify and join all values
+export function metadataId(metaPtr: MetaPtr): string {
+  return `${BigNumber.from(metaPtr.protocol).toString()}-${metaPtr.pointer}`;
+}
+
+// Given a metadata ID, decode it back to the original metadata pointer object
+export function decodeMetadataId(id: string): MetaPtr {
+  const parts = id.split('-');
+  return { protocol: parts[0], pointer: parts[1] };
 }
 
 // --- Validation ---
@@ -294,10 +299,13 @@ export const decodeMulticallReturnData = (
   calls.forEach((call) =>
     flatMap.push(
       ...call.fns.map((fn) => {
-        return call.contract.interface.decodeFunctionResult(
+        const data = call.contract.interface.decodeFunctionResult(
           typeof fn === 'string' ? fn : fn.fn,
           returnData[flatPtr++].returnData
-        )[0];
+        );
+        // If the call returned one element, just get rid of the array wrapper and return the data directly.
+        // If the call returned multiple elements (i.e. metaPtr returns an object), we want to preserve that structure
+        return data.length === 1 ? data[0] : data;
       })
     )
   );

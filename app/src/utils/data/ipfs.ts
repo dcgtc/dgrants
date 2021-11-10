@@ -1,7 +1,7 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { GrantMetadata, MetaPtr } from '@dgrants/types';
 import { getStorageKey, setStorageKey } from 'src/utils/data/utils';
-import { metadataId } from 'src/utils/utils';
+import { decodeMetadataId, metadataId } from 'src/utils/utils';
 import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
@@ -64,16 +64,15 @@ export const resolveMetaPtr = (url: string) => {
  * @param metadata Name of the store's ref to assign resolve metadata to
  */
 export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
-  const urls = metaPtrs.map((ptr) => getMetaPtr({ cid: ptr.pointer }));
   // check for any missing entries
-  const newMetadata = urls
-    .filter(
-      (_, i) => !metadata.value[metadataId(metaPtrs[i])] || metadata.value[metadataId(metaPtrs[i])].status === 'error'
-    )
+  const newMetadata = metaPtrs
+    .filter((_, i) => {
+      return !metadata.value[metadataId(metaPtrs[i])] || metadata.value[metadataId(metaPtrs[i])].status === 'error';
+    })
     .reduce((prev, cur) => {
       return {
         ...prev,
-        [cur]: { status: 'pending' },
+        [metadataId(cur)]: { status: 'pending' },
       };
     }, {});
   // when there is new metadata to load...
@@ -81,7 +80,7 @@ export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
     // save these pending metadata objects to state
     metadata.value = { ...metadata.value, ...newMetadata };
     // resolve metadata via metaPtr and update state
-    void (await Promise.all(Object.keys(newMetadata).map(async (url) => getMetadata(url, metadata))));
+    void (await Promise.all(Object.keys(newMetadata).map(async (metadataId) => getMetadata(metadataId, metadata))));
   }
 
   return metadata;
@@ -90,22 +89,27 @@ export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
 /**
  * @notice Helper method that fetches and or returns metadata for a Grant or GrantRound, and saves the data
  * to the state as soon as it's received
- * @param url String URL to resolve
+ * @param metadataId metadataId, which is the output of metdataId(metaPtr)
  * @param metadata Ref store's ref to assign resolved metadata to
  */
-export const getMetadata = async (url: string, metadata: Ref) => {
+export const getMetadata = async (metadataId: string, metadata: Ref) => {
+  const metaPtr = decodeMetadataId(metadataId);
+  const protocolId = metaPtr.protocol.toString();
+  if (protocolId !== '1') throw new Error(`Unsupported metadata protocol ID of ${protocolId}`);
+
   try {
     // save each individual ipfs result into storage
-    let data = await getStorageKey('ipfs-' + url);
+    let data = await getStorageKey('ipfs-' + metadataId);
     if (!data) {
+      const url = getMetaPtr({ cid: metaPtr.pointer });
       data = await resolveMetaPtr(url);
-      await setStorageKey('ipfs-' + url, data as LocalForageData);
+      await setStorageKey('ipfs-' + metadataId, data as LocalForageData);
     }
-    metadata.value[url] = { status: 'resolved', ...data };
+    metadata.value[metadataId] = { status: 'resolved', ...data };
   } catch (e) {
-    metadata.value[url] = { status: 'error' };
+    metadata.value[metadataId] = { status: 'error' };
     console.error(e);
   }
 
-  return metadata.value[url];
+  return metadata.value[metadataId];
 };
