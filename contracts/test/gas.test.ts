@@ -103,6 +103,13 @@ describe('dGrants gas tests', () => {
     it('updateGrantMetaPtr', async () => {
       await snapshotGasCost(registry.updateGrant(0, addr2, addr2, metaPtr2));
     });
+
+    it('getGrantPayee', async () => {
+      const abi = ['function getGrantPayee(uint96 _id) external returns (address)'];
+      const [signer] = await ethers.getSigners();
+      const _registry = new ethers.Contract(registry.address, abi, signer);
+      await snapshotGasCost(_registry.getGrantPayee(0));
+    });
   });
 
   // --- GrantRoundManager snapshot tests ---
