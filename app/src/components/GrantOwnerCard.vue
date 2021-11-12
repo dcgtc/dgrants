@@ -1,35 +1,23 @@
 <template>
-  <!-- grid sm:1col md:2col -->
-  <section class="pb-12 border-b border-grey-100 grid grid-cols-1 md:grid-cols-2">
-    <!--grid:left (img)-->
-    <figure
-      class="aspect-w-16 aspect-h-9 shadow-light"
-      @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })"
-    >
-      <img class="w-full h-full object-center object-cover" :src="imgurl || '/placeholder_grant.svg'" />
-    </figure>
+  <section class="border-b border-grey-100">
+    <!--------- GRANT IMAGE + GRANT DATA + STATUS -------->
+    <article class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+      <!--grid:left (img)-->
+      <figure
+        class="aspect-w-16 aspect-h-9 shadow-light cursor-pointer"
+        @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })"
+      >
+        <img class="w-full h-full object-center object-cover" :src="imgurl || '/placeholder_grant.svg'" />
+      </figure>
 
-    <!--grid:right (txt)-->
-    <div class="px-4 md:px-8">
-      <article>
-        <!-- Grant Name -->
-        <div class="font-medium mb-10" @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })">
-          {{ name }}
+      <!--grid:right (txt)-->
+      <div>
+        <!-- Name -->
+        <div class="font-medium mb-4" @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })">
+          <span class="cursor-pointer">{{ name }}</span>
         </div>
 
-        <!-- Grant Creation Date -->
-        <!-- <div class="mb-2">
-          <span class="text-grey-400">Submitted:</span>
-          <span class="ml-1">TODO</span>
-        </div> -->
-
-        <!-- Last Updated Date -->
-        <!-- <div class="mb-2">
-          <span class="text-grey-400">Last Update:</span>
-          <span class="ml-1">TODO</span>
-        </div> -->
-
-        <!-- Total Funds Raised -->
+        <!-- Funds Raised -->
         <div class="mb-2">
           <span class="text-grey-400">Funds Raised:</span>
           <span class="ml-1">{{ grantInfo.raised }}</span>
@@ -47,27 +35,51 @@
           </div> -->
         </div>
 
-        <!-- Total Donation Count -->
+        <!-- Donation Count -->
         <div class="mb-2">
           <span class="text-grey-400">Donations:</span>
-          <span class="ml-1">{{ grantInfo.contributionCount }}</span>
+          <span @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })" class="ml-1 link">{{
+            grantInfo.contributionCount
+          }}</span>
         </div>
 
         <!-- Status -->
         <div class="mt-10">
-          <button v-if="status == 'pending'" class="btn bg-grey-200">Pending</button>
-          <button v-else-if="status == 'approved'" class="btn btn-success">Approved</button>
-        </div>
-      </article>
+          <!-- pending (grey)-->
+          <div v-if="status == 'pending'">
+            <span class="px-8 py-4 font-medium bg-grey-100">Pending</span>
+          </div>
 
-      <div
-        @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() }, query: { edit: 'true' } })"
-        class="flex float-right items-center gap-x-2 cursor-pointer mt-10"
-      >
-        <EditIcon class="icon icon-primary icon-small" />
-        <span class="text-grey-400 group-hover:text-grey-500">Edit</span>
+          <!-- request (yellow)-->
+          <div v-if="status == 'request'">
+            <span class="px-8 py-4 font-medium bg-yellow">Request</span>
+          </div>
+
+          <!-- approved (green)-->
+          <div v-if="status == 'approved'">
+            <span class="px-8 py-4 font-medium bg-teal">Approved</span>
+          </div>
+
+          <!-- denied (red)-->
+          <div v-if="status == 'denied'">
+            <span class="px-8 py-4 font-medium bg-pink">Denied</span>
+          </div>
+        </div>
       </div>
-    </div>
+    </article>
+
+    <!--------- INTERACTION BAR - FOR EDIT, CLAIM, HIDE, ETC ... ---------->
+    <article class="py-8 mt-8">
+      <div class="flex flex-wrap gap-x-10 gap-y-4 justify-end">
+        <!--EDIT-->
+        <div @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() }, query: { edit: 'true' } })">
+          <div class="flex items-center gap-x-2 cursor-pointer group">
+            <EditIcon class="icon icon-primary icon-small" />
+            <span class="text-grey-400 group-hover:text-grey-500">Edit</span>
+          </div>
+        </div>
+      </div>
+    </article>
   </section>
 </template>
 
