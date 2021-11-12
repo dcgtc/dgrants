@@ -52,7 +52,13 @@ contract GrantRoundManager is SwapRouter {
   event GrantRoundCreated(address grantRound);
 
   /// @notice Emitted when a donation has been made
-  event GrantDonation(uint96 indexed grantId, IERC20 indexed tokenIn, uint256 donationAmount, GrantRound[] rounds);
+  event GrantDonation(
+    uint96 indexed grantId,
+    IERC20 indexed tokenIn,
+    uint256 donationAmount,
+    GrantRound[] rounds,
+    uint256 time
+  );
 
   // --- Constructor ---
   constructor(
@@ -208,7 +214,7 @@ contract GrantRoundManager is SwapRouter {
       require(_donationAmount > 0, "GrantRoundManager: Donation amount must be greater than zero"); // verifies that swap and donation inputs are consistent
 
       // Execute transfer
-      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds);
+      emit GrantDonation(_grantId, _tokenIn, _donationAmount, _rounds, block.timestamp);
       address _payee = registry.getGrantPayee(_grantId);
       if (_tokenIn == donationToken) {
         _tokenIn.safeTransferFrom(msg.sender, _payee, _donationAmount); // transfer token directly from caller
