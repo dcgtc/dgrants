@@ -151,7 +151,7 @@ contract GrantRegistry {
    */
   function getGrantPayee(uint96 _id) public view returns (address) {
     require(_id < grantCount, "GrantRegistry: Grant does not exist");
-    Grant storage grant = grants[_id];
+    Grant memory grant = grants[_id];
     return grant.payee;
   }
 }
