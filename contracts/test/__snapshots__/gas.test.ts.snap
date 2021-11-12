@@ -2,6 +2,8 @@
 
 exports[`dGrants gas tests GrantRegistry createGrant 1`] = `167340`;
 
+exports[`dGrants gas tests GrantRegistry getGrantPayee 1`] = `26022`;
+
 exports[`dGrants gas tests GrantRegistry updateGrantMetaPtr 1`] = `50428`;
 
 exports[`dGrants gas tests GrantRegistry updateGrantMetaPtr 2`] = `55388`;
