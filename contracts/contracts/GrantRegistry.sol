@@ -19,23 +19,28 @@ contract GrantRegistry {
 
   /// @notice Grant object
   struct Grant {
-    uint96 id; // grant ID, as uint96 to pack into same slot as owner (this implies a max of 2^96-1 = 7.9e28 grants)
+    // Slot 1 (within this struct)
+    // Using a uint96 for the grant ID means a max of 2^96-1 = 7.9e28 grants
+    uint96 id; // grant ID, as
     address owner; // grant owner (has permissions to modify grant information)
+    // Slot 2
+    // Using uint48 for timestamps means a maximum timestamp of 2^48-1 = 281474976710655 = year 8.9 million
+    uint48 createdAt; // timestamp the grant was created, uint48
+    uint48 lastUpdated; // timestamp the grant data was last updated in this registry
     address payee; // address that receives funds donated to this grant
+    // Slots 3+
     MetaPtr metaPtr; // metadata pointer
   }
 
-  // TODO use an array instead with ID to index it? Which is better?
-  // TODO Will array copy full array to memory in `getAllGrants`?
   /// @notice Mapping from Grant ID to grant data
   mapping(uint96 => Grant) public grants;
 
   // --- Events ---
   /// @notice Emitted when a new grant is created
-  event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr);
+  event GrantCreated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr, uint256 time);
 
   /// @notice Emitted when a grant's owner is changed
-  event GrantUpdated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr);
+  event GrantUpdated(uint96 indexed id, address indexed owner, address indexed payee, MetaPtr metaPtr, uint256 time);
 
   // --- Core methods ---
   /**
@@ -50,8 +55,8 @@ contract GrantRegistry {
     MetaPtr calldata _metaPtr
   ) external {
     uint96 _id = grantCount;
-    grants[_id] = Grant(_id, _owner, _payee, _metaPtr);
-    emit GrantCreated(_id, _owner, _payee, _metaPtr);
+    grants[_id] = Grant(_id, _owner, uint48(block.timestamp), uint48(block.timestamp), _payee, _metaPtr);
+    emit GrantCreated(_id, _owner, _payee, _metaPtr, block.timestamp);
     grantCount += 1;
   }
 
@@ -64,7 +69,8 @@ contract GrantRegistry {
     Grant storage grant = grants[_id];
     require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.owner = _owner;
-    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+    grant.lastUpdated = uint48(block.timestamp);
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr, block.timestamp);
   }
 
   /**
@@ -76,7 +82,8 @@ contract GrantRegistry {
     Grant storage grant = grants[_id];
     require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.payee = _payee;
-    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+    grant.lastUpdated = uint48(block.timestamp);
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr, block.timestamp);
   }
 
   /**
@@ -88,7 +95,8 @@ contract GrantRegistry {
     Grant storage grant = grants[_id];
     require(msg.sender == grant.owner, "GrantRegistry: Not authorized");
     grant.metaPtr = _metaPtr;
-    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr);
+    grant.lastUpdated = uint48(block.timestamp);
+    emit GrantUpdated(grant.id, grant.owner, grant.payee, grant.metaPtr, block.timestamp);
   }
 
   /**
@@ -105,9 +113,10 @@ contract GrantRegistry {
     address _payee,
     MetaPtr calldata _metaPtr
   ) external {
-    require(msg.sender == grants[_id].owner, "GrantRegistry: Not authorized");
-    grants[_id] = Grant({id: _id, owner: _owner, payee: _payee, metaPtr: _metaPtr});
-    emit GrantUpdated(_id, _owner, _payee, _metaPtr);
+    Grant memory _grant = grants[_id];
+    require(msg.sender == _grant.owner, "GrantRegistry: Not authorized");
+    grants[_id] = Grant(_id, _owner, _grant.createdAt, uint48(block.timestamp), _payee, _metaPtr);
+    emit GrantUpdated(_id, _owner, _payee, _metaPtr, block.timestamp);
   }
 
   // --- View functions ---
