@@ -5,9 +5,9 @@
       <li v-for="grant in grants" :key="grant.id.toString()">
         <GrantOwnerCard
           :id="grant.id"
-          :name="(grantMetadata && grantMetadata[grant.metaPtr]?.name) || '...'"
+          :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
-          :imgurl="(grantMetadata && grantMetadata[grant.metaPtr]?.logoURI) || '/placeholder_grant.svg'"
+          :imgurl="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoURI) || '/placeholder_grant.svg'"
         />
       </li>
     </ul>
@@ -25,6 +25,8 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
+
+import { metadataId } from 'src/utils/utils';
 
 const { grantMetadata } = useDataStore();
 
@@ -49,6 +51,7 @@ export default defineComponent({
 
   setup() {
     return {
+      metadataId,
       grantMetadata,
       ...filterMyGrants(),
     };

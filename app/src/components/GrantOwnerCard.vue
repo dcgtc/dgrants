@@ -23,18 +23,6 @@
           <span class="ml-1">{{ grantInfo.raised }}</span>
         </div>
 
-        <!-- Matching Funds Raised -->
-        <div class="mb-2">
-          <span class="text-grey-400">Matching Funds:</span>
-          <span class="ml-1">TODO</span>
-          <!--
-          <div v-for="(round, index) in roundDetails" :key="index" class="mt-2">
-            <span class="text-grey-400 mr-4">Matching:</span>
-            <span>{{ round.matching || '...' }} {{ round.matchingToken.symbol }}</span>
-            <span>, {{ round.name }}</span>
-          </div> -->
-        </div>
-
         <!-- Donation Count -->
         <div class="mb-2">
           <span class="text-grey-400">Donations:</span>
@@ -45,24 +33,15 @@
 
         <!-- Status -->
         <div class="mt-10">
-          <!-- pending (grey)-->
-          <div v-if="status == 'pending'">
-            <span class="px-8 py-4 font-medium bg-grey-100">Pending</span>
-          </div>
-
-          <!-- request (yellow)-->
-          <div v-if="status == 'request'">
-            <span class="px-8 py-4 font-medium bg-yellow">Request</span>
-          </div>
 
           <!-- approved (green)-->
           <div v-if="status == 'approved'">
             <span class="px-8 py-4 font-medium bg-teal">Approved</span>
           </div>
 
-          <!-- denied (red)-->
-          <div v-if="status == 'denied'">
-            <span class="px-8 py-4 font-medium bg-pink">Denied</span>
+          <!-- pending (grey)-->
+          <div v-else>
+            <span class="px-8 py-4 font-medium bg-grey-100">Pending</span>
           </div>
         </div>
       </div>
