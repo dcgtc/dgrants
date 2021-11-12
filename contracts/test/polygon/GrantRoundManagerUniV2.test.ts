@@ -311,9 +311,10 @@ describe('GrantRoundManagerUniV2', () => {
         const tx = await manager.donate([{ ...swap, path: [tokens.dai.address], amountIn }], deadline, [
           { ...donation, token: tokens.dai.address },
         ]);
+        const now = (await ethers.provider.getBlock('latest')).timestamp;
         await expect(tx)
           .to.emit(manager, 'GrantDonation')
-          .withArgs('0', tokens.dai.address, amountIn, [mockRound.address]);
+          .withArgs('0', tokens.dai.address, amountIn, [mockRound.address], now);
       });
     });
 
@@ -434,9 +435,10 @@ describe('GrantRoundManagerUniV2', () => {
         const receipt = await ethers.provider.getTransactionReceipt(tx.hash);
         const amountOut = getSwapAmountOut(receipt.logs);
         const expectedBalancePayee2 = amountOut.mul(donations[1].ratio).div(WAD);
+        const now = (await ethers.provider.getBlock('latest')).timestamp;
         await expect(tx)
           .to.emit(manager, 'GrantDonation')
-          .withArgs('1', tokens.weth.address, expectedBalancePayee2, [mockRound.address]);
+          .withArgs('1', tokens.weth.address, expectedBalancePayee2, [mockRound.address], now);
 
         // Also verify number of GrantDonation events
         const grantDonationTopic = manager.interface.getEventTopic('GrantDonation');
