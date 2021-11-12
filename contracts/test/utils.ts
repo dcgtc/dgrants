@@ -48,6 +48,8 @@ export function expectEqualGrants(grant1: GrantEthers, grant2: GrantEthers): voi
   expect(grant1.payee).to.equal(grant2.payee);
   expect(grant1.metaPtr.protocol).to.equal(grant2.metaPtr.protocol);
   expect(grant1.metaPtr.pointer).to.equal(grant2.metaPtr.pointer);
+  expect(grant1.createdAt).to.equal(grant2.createdAt);
+  expect(grant1.lastUpdated).to.equal(grant2.lastUpdated);
 }
 
 // --- Time manipulation ---

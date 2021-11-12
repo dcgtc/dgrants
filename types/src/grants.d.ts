@@ -6,14 +6,19 @@ import { TokenInfo } from '@uniswap/token-lists';
 // handling the Grant struct as done below
 export type MetaPtr = { protocol: BigNumberish; pointer: string };
 
-export type GrantEthersArray = [BigNumber, string, string, string];
+export type GrantEthersArray = [BigNumber, string, number, number, string, [BigNumber, string]];
+
 export type GrantEthersObject = {
   id: BigNumber;
   owner: string;
+  createdAt: number;
+  lastUpdated: number;
   payee: string;
   metaPtr: MetaPtr;
 };
+
 export type GrantEthers = GrantEthersObject | (GrantEthersArray & GrantEthersObject);
+
 // When pulled from the subgraph a grant will have the following properties
 export type GrantSubgraph = {
   id: BigNumberish;
@@ -21,6 +26,8 @@ export type GrantSubgraph = {
   payee: string;
   metaPtr: MetaPtr;
   lastUpdatedBlockNumber: number;
+  createdAt: BigNumber;
+  lastUpdated: BigNumber;
 };
 // internally we cast id:BigNumber from GrantEthers to a number for Grant
 export type Grant = {
@@ -28,6 +35,8 @@ export type Grant = {
   owner: string;
   payee: string;
   metaPtr: MetaPtr;
+  createdAt: BigNumber;
+  lastUpdated: BigNumber;
 };
 
 // Metadata resolve from a grant's metadata pointer URL
