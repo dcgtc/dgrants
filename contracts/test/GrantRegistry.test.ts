@@ -22,6 +22,13 @@ describe('GrantRegistry', function () {
   let deployer: SignerWithAddress, user1: SignerWithAddress, user2: SignerWithAddress;
   let registry: GrantRegistry;
 
+  // This is the current block timestamp, which we use to verify timestamps in storage/event logs.
+  // By default with Hardhat, each non-view contract call (1) mines a block, and (2) that block has
+  // a timestamp 1 greater than the previous block timestamp. Therefore throughout these tests
+  // you'll see `now + 1` and `now + 2` often used, depending on how many transactions were sent
+  // before the assertion check
+  let now: number; // current/expected block timestamp
+
   // Helper method to create a grant and return the data used to create it
   async function createGrant(owner: string, payee: string, metaPtr: MetaPtr, user?: SignerWithAddress) {
     user = user ? user : deployer; // if a signer, `user`, is not specified we use the `deployer` account
@@ -34,6 +41,7 @@ describe('GrantRegistry', function () {
 
     const grantRegistryArtifact: Artifact = await artifacts.readArtifact('GrantRegistry');
     registry = <GrantRegistry>await deployContract(deployer, grantRegistryArtifact);
+    now = (await ethers.provider.getBlock('latest')).timestamp;
   });
 
   describe('Initialization', () => {
@@ -49,18 +57,18 @@ describe('GrantRegistry', function () {
       const { owner, payee, metaPtr } = await createGrant(user1.address, randomAddress(), randomPtr());
       const grantData = await registry.grants(0); // this is the first grant so has ID of 0
       expect(await registry.grantCount()).to.equal('1'); // 1 total grant
-      expectEqualGrants(grantData, { id: BN(0), owner, payee, metaPtr });
+      expectEqualGrants(grantData, { id: BN(0), owner, payee, metaPtr, createdAt: now + 1, lastUpdated: now + 1 });
 
       // Test more grants
       const { owner: o1, payee: p1, metaPtr: m1 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o2, payee: p2, metaPtr: m2 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o3, payee: p3, metaPtr: m3 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       expect(await registry.grantCount()).to.equal('4');
-      // Verify data for each
+
       const grants = [
-        { id: BN(1), owner: o1, payee: p1, metaPtr: m1 },
-        { id: BN(2), owner: o2, payee: p2, metaPtr: m2 },
-        { id: BN(3), owner: o3, payee: p3, metaPtr: m3 },
+        { id: BN(1), owner: o1, payee: p1, metaPtr: m1, createdAt: now + 2, lastUpdated: now + 2 },
+        { id: BN(2), owner: o2, payee: p2, metaPtr: m2, createdAt: now + 3, lastUpdated: now + 3 },
+        { id: BN(3), owner: o3, payee: p3, metaPtr: m3, createdAt: now + 4, lastUpdated: now + 4 },
       ];
       await Promise.all(
         grants.map(async (grant) => {
@@ -73,7 +81,7 @@ describe('GrantRegistry', function () {
       const [owner, payee, metaPtr] = [user1.address, randomAddress(), randomPtr()];
       await expect(registry.createGrant(owner, payee, metaPtr))
         .to.emit(registry, 'GrantCreated')
-        .withArgs(0, owner, payee, [metaPtr.protocol, metaPtr.pointer]);
+        .withArgs(0, owner, payee, [metaPtr.protocol, metaPtr.pointer], now + 1);
     });
   });
 
@@ -88,7 +96,8 @@ describe('GrantRegistry', function () {
       // Create grant with user1
       owner = user1.address;
       await createGrant(owner, payee, metaPtr, user1);
-      expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr });
+      now = (await ethers.provider.getBlock('latest')).timestamp;
+      expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr, createdAt: now, lastUpdated: now });
     });
 
     it('reverts if unauthorized user tries to edit a grant', async () => {
@@ -104,40 +113,68 @@ describe('GrantRegistry', function () {
       const newOwner = randomAddress();
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantOwner(id, newOwner);
-      expectEqualGrants(await registry.grants(0), { id, owner: newOwner, payee, metaPtr });
+      expectEqualGrants(await registry.grants(0), {
+        id,
+        owner: newOwner,
+        payee,
+        metaPtr,
+        createdAt: now,
+        lastUpdated: now + 1,
+      });
       await expect(tx)
         .to.emit(registry, 'GrantUpdated')
-        .withArgs(id, newOwner, payee, [metaPtr.protocol, metaPtr.pointer]);
+        .withArgs(id, newOwner, payee, [metaPtr.protocol, metaPtr.pointer], now + 1);
     });
 
     it('lets owner update payee', async () => {
       const newPayee = randomAddress();
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantPayee(id, newPayee);
-      expectEqualGrants(await registry.grants(0), { id, owner, payee: newPayee, metaPtr });
+
+      expectEqualGrants(await registry.grants(0), {
+        id,
+        owner,
+        payee: newPayee,
+        metaPtr,
+        createdAt: now,
+        lastUpdated: now + 1,
+      });
       await expect(tx)
         .to.emit(registry, 'GrantUpdated')
-        .withArgs(id, owner, newPayee, [metaPtr.protocol, metaPtr.pointer]);
+        .withArgs(id, owner, newPayee, [metaPtr.protocol, metaPtr.pointer], now + 1);
     });
 
     it('lets owner update metadata pointer', async () => {
       const newMetaPtr = randomPtr();
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrantMetaPtr(id, newMetaPtr);
-      expectEqualGrants(await registry.grants(0), { id, owner, payee, metaPtr: newMetaPtr });
+      expectEqualGrants(await registry.grants(0), {
+        id,
+        owner,
+        payee,
+        metaPtr: newMetaPtr,
+        createdAt: now,
+        lastUpdated: now + 1,
+      });
       await expect(tx)
         .to.emit(registry, 'GrantUpdated')
-        .withArgs(id, owner, payee, [newMetaPtr.protocol, newMetaPtr.pointer]);
+        .withArgs(id, owner, payee, [newMetaPtr.protocol, newMetaPtr.pointer], now + 1);
     });
 
     it('lets owner update all grant fields at once', async () => {
       const newGrant = { id: BN(0), owner: randomAddress(), payee: randomAddress(), metaPtr: randomPtr() };
       const registryUser = await registry.connect(user1); // instance of registry contract with `user1` as signer
       const tx = await registryUser.updateGrant(id, newGrant.owner, newGrant.payee, newGrant.metaPtr);
-      expectEqualGrants(await registry.grants(0), newGrant);
+      expectEqualGrants(await registry.grants(0), { ...newGrant, createdAt: now, lastUpdated: now + 1 });
       await expect(tx)
         .to.emit(registry, 'GrantUpdated')
-        .withArgs(newGrant.id, newGrant.owner, newGrant.payee, [newGrant.metaPtr.protocol, newGrant.metaPtr.pointer]);
+        .withArgs(
+          newGrant.id,
+          newGrant.owner,
+          newGrant.payee,
+          [newGrant.metaPtr.protocol, newGrant.metaPtr.pointer],
+          now + 1
+        );
     });
   });
 
@@ -153,6 +190,7 @@ describe('GrantRegistry', function () {
       expect(await registry.getAllGrants()).to.have.length(0);
 
       // Create some grants
+      const now = (await ethers.provider.getBlock('latest')).timestamp;
       const { owner: o1, payee: p1, metaPtr: m1 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o2, payee: p2, metaPtr: m2 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o3, payee: p3, metaPtr: m3 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
@@ -161,9 +199,9 @@ describe('GrantRegistry', function () {
 
       // Verify data for each
       const data = [
-        { id: BN(0), owner: o1, payee: p1, metaPtr: m1 },
-        { id: BN(1), owner: o2, payee: p2, metaPtr: m2 },
-        { id: BN(2), owner: o3, payee: p3, metaPtr: m3 },
+        { id: BN(0), owner: o1, payee: p1, metaPtr: m1, createdAt: now + 1, lastUpdated: now + 1 },
+        { id: BN(1), owner: o2, payee: p2, metaPtr: m2, createdAt: now + 2, lastUpdated: now + 2 },
+        { id: BN(2), owner: o3, payee: p3, metaPtr: m3, createdAt: now + 3, lastUpdated: now + 3 },
       ];
       grants.map((grant, index) => {
         expectEqualGrants(grant, data[index]);
@@ -175,13 +213,14 @@ describe('GrantRegistry', function () {
       expect(await registry.getGrants(0, 0)).to.have.length(0);
 
       // Create some grants
+      const now = (await ethers.provider.getBlock('latest')).timestamp;
       const { owner: o1, payee: p1, metaPtr: m1 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o2, payee: p2, metaPtr: m2 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const { owner: o3, payee: p3, metaPtr: m3 } = await createGrant(randomAddress(), randomAddress(), randomPtr());
       const data = [
-        { id: BN(0), owner: o1, payee: p1, metaPtr: m1 },
-        { id: BN(1), owner: o2, payee: p2, metaPtr: m2 },
-        { id: BN(2), owner: o3, payee: p3, metaPtr: m3 },
+        { id: BN(0), owner: o1, payee: p1, metaPtr: m1, createdAt: now + 1, lastUpdated: now + 1 },
+        { id: BN(1), owner: o2, payee: p2, metaPtr: m2, createdAt: now + 2, lastUpdated: now + 2 },
+        { id: BN(2), owner: o3, payee: p3, metaPtr: m3, createdAt: now + 3, lastUpdated: now + 3 },
       ];
 
       // Re-check pathological case
