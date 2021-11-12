@@ -81,6 +81,27 @@
       </div>
     </div>
   </section>
+
+  <!-- pagination container -->
+  <section class="px-4 md:px-12">
+    <div class="py-12 border-b border-grey-100">
+      <!-- pagination 
+      please add class "disabled" + no @clickEvent to li's that should be disabled by logic.
+      class : optional - will disapear on mobile to save space
+      class : disabled - will act as nonclickable item
+      -->
+
+      <nav>
+        <ul>
+          <li class="optional disabled">first</li>
+          <li class="disabled">&lt;</li>
+          <li class="disabled">1 of 4</li>
+          <li class="">&gt;</li>
+          <li class="optional">last</li>
+        </ul>
+      </nav>
+    </div>
+  </section>
 </template>
 
 <script lang="ts">
@@ -106,3 +127,30 @@ export default defineComponent({
   },
 });
 </script>
+
+<!-- pagination styles -->
+
+<style scoped>
+nav {
+  @apply flex justify-center;
+}
+
+nav ul {
+  @apply flex gap-4 justify-end;
+  @apply uppercase;
+}
+
+nav li {
+  @apply border border-grey-400 text-grey-400 cursor-pointer;
+  @apply hover:border-grey-500 hover:text-grey-500;
+  @apply px-8 py-4;
+}
+
+nav li.disabled {
+  @apply border-grey-100 text-grey-300 cursor-default;
+}
+
+nav li.optional {
+  @apply hidden md:block;
+}
+</style>
