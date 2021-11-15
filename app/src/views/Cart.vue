@@ -66,7 +66,7 @@
                 <figure class="aspect-w-16 aspect-h-9 shadow-light">
                   <img
                     class="w-full h-full object-center object-cover group-hover:opacity-90"
-                    :src="grantMetadata[metadataId(item.metaPtr)]?.logoURI || '/placeholder_grant.svg'"
+                    :src="ptrToURI(grantMetadata[metadataId(item.metaPtr)]?.logoPtr) || '/placeholder_grant.svg'"
                   />
                 </figure>
               </div>
@@ -230,7 +230,7 @@ import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { BigNumber } from 'src/utils/ethers';
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
-import { formatNumber, isValidAmount, metadataId, pushRoute, watchTransaction } from 'src/utils/utils';
+import { formatNumber, isValidAmount, metadataId, ptrToURI, pushRoute, watchTransaction } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 function useCart() {
@@ -371,7 +371,7 @@ export default defineComponent({
   },
   setup() {
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber, metadataId };
+    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber, metadataId, ptrToURI };
   },
 });
 </script>

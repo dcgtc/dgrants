@@ -82,7 +82,7 @@
                 :ptr="grantRound.metaPtr"
                 :address="grantRound.address"
                 :name="grantRoundMetadata[metadataId(grantRound.metaPtr)].name ?? ''"
-                :imgurl="grantRoundMetadata[metadataId(grantRound.metaPtr)].logoURI ?? '/placeholder_round.svg'"
+                :logoPtr="grantRoundMetadata[metadataId(grantRound.metaPtr)].logoPtr"
                 :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)].grants?.length ?? 0"
                 :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
               />

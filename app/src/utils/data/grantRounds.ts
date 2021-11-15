@@ -1,12 +1,13 @@
 // --- Types ---
 import {
-  GrantRound,
   Contribution,
+  GrantRound,
   GrantRoundCLR,
   GrantsRoundDetails,
   GrantRoundMetadataResolution,
   GrantPrediction,
   GrantRoundSubgraph,
+  MetaPtr,
 } from '@dgrants/types';
 import { LocalForageData } from 'src/types';
 // --- Methods and Data ---
@@ -575,7 +576,7 @@ export function metadataUpdatedListener(
   },
   refs: Record<string, Ref>
 ) {
-  const listener = async (oldMetaPtr: string, newMetaPtr: string) => {
+  const listener = async (oldMetaPtr: MetaPtr, newMetaPtr: MetaPtr) => {
     console.log('Updating GrantRounds MetaPtr: ', oldMetaPtr, newMetaPtr);
     // update the grants metadata
     void (await getMetadata(newMetaPtr, refs.grantRoundMetadata));

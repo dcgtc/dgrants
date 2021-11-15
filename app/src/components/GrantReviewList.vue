@@ -7,7 +7,7 @@
           :id="grant.id"
           :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
-          :imgurl="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoURI) || '/placeholder_grant.svg'"
+          :logoPtr="grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoPtr"
         />
       </li>
     </ul>

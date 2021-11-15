@@ -3,7 +3,7 @@
   <section class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2">
     <!--grid:left (img)-->
     <figure class="aspect-w-16 aspect-h-9 shadow-light">
-      <img class="w-full h-full object-center object-cover" :src="logoURI || '/placeholder_grant.svg'" />
+      <img class="w-full h-full object-center object-cover" :src="ptrToURI(logoPtr) || '/placeholder_grant.svg'" />
     </figure>
 
     <!--grid:right (txt)-->
@@ -70,9 +70,9 @@ import { defineComponent, PropType } from 'vue';
 // --- Data ---
 import useCartStore from 'src/store/cart';
 // --- Types ---
-import { Grant, GrantsRoundDetails } from '@dgrants/types';
+import { Grant, GrantsRoundDetails, MetaPtr } from '@dgrants/types';
 // --- Utils/helper ---
-import { formatAddress, getEtherscanUrl } from 'src/utils/utils';
+import { formatAddress, getEtherscanUrl, ptrToURI } from 'src/utils/utils';
 // --- Components/icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
@@ -82,13 +82,13 @@ export default defineComponent({
   props: {
     grant: { type: Object as PropType<Grant>, required: true },
     roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: true },
-    logoURI: { type: String, required: false, default: undefined },
+    logoPtr: { type: Object as PropType<MetaPtr> | undefined, required: false, default: undefined },
     payoutAddress: { type: String, required: false, default: '0x0' },
     totalRaised: { type: String, required: false, default: '0' },
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl };
+    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl, ptrToURI };
   },
 });
 </script>
