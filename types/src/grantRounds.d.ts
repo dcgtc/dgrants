@@ -57,7 +57,7 @@ export type GrantRounds = Array<GrantRound>;
  * @field {description} The grantRounds description
  * @field {grants} An array of grants in this grantRound
  * @field {matchingAlgorithm} The matching algo to use for calculations (linear)
- * @field {logoURI} The ipfs uri to pull the grantRounds logo from
+ * @field {logoPtr} Pointer to the grant round's image
  * --- optional ---
  * @field {properties.websiteURI} The grantRounds website
  * @field {properties.governanceURI} The grantRounds governanceURI
@@ -70,7 +70,7 @@ export type GrantRoundMetadata = {
   description: string;
   grants: BigNumberish[];
   matchingAlgorithm: string;
-  logoURI: string;
+  logoPtr: MetaPtr;
   properties?: {
     websiteURI?: string;
     governanceURI?: string;
