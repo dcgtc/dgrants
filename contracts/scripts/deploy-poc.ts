@@ -71,7 +71,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
     logger.recordAction('PublishGrantRoundLogo', logoCid);
 
     // 2. Update the metadata to include the logo metaPtr
-    metadata['logoURI'] = `${networkParams.ipfsRetrievalEndpoint}/${logoCid}`;
+    metadata.logoPtr = { protocol: 1, pointer: logoCid };
 
     // 3. Upload the metadata
     const metadataResult = await ipfs.add(JSON.stringify(metadata));

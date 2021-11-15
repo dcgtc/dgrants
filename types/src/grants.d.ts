@@ -43,7 +43,7 @@ export type Grant = {
 export type GrantMetadata = {
   name: string;
   description: string;
-  logoURI?: string;
+  logoPtr?: MetaPtr;
   properties?: {
     websiteURI?: string;
     githubURI?: string;
