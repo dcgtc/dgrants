@@ -55,8 +55,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
     logger.recordAction('PublishGrantRoundMetadata', metadataCid);
 
     // Update the round metaptr
-    const metadataPtr = `${networkParams.ipfsRetrievalEndpoint}/${metadataCid}`;
-    const updateTx = await round.updateMetadataPtr(metadataPtr);
+    const updateTx = await round.updateMetadataPtr({ protocol: 1, pointer: metadataCid });
     await updateTx.wait();
     logger.recordAction('UpdateRoundMetaPtr', updateTx.hash);
   } catch (error) {

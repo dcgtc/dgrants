@@ -79,15 +79,13 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
     logger.recordAction('PublishGrantRoundMetadata', metadataCid);
 
     // Create the GrantRound
-    const metadataPtr = `${networkParams.ipfsRetrievalEndpoint}/${metadataCid}`;
     const createGrantRoundTxReceipt = await roundManager.createGrantRound(
       networkParams.metadataAdmin,
       networkParams.payoutAdmin,
       networkParams.matchingToken,
       networkParams.roundStartTime,
       networkParams.roundEndTime,
-      metadataPtr,
-      { gasLimit: 1000000 }
+      { protocol: 1, pointer: metadataCid }
     );
     await createGrantRoundTxReceipt.wait();
     logger.recordAction('CreateGrantGround', createGrantRoundTxReceipt.hash);
