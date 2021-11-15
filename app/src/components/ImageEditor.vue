@@ -1,15 +1,15 @@
 <template>
   <div
-    id="image-container"
+    :id="`image-container@${imageId}`"
     :class="`relative border overflow-hidden border-current ${isGrabbing ? 'cursor-move' : ''}`"
     :style="`width: 640px; height: ${640 / desiredRatio}px`"
   >
-    <img id="selected-image" :src="selectedImage" class="max-w-none absolute" />
+    <img :id="`selected-image@${imageId}`" :src="selectedImage" class="max-w-none absolute" />
   </div>
   <hr />
   <button type="button" @click="draw">Crop</button>
   <button class="mx-2" type="button" @click="discard">Discard</button>
-  <div id="canvas-container"></div>
+  <div :id="`canvas-container@${imageId}`"></div>
 </template>
 
 <script lang="ts">
@@ -22,6 +22,7 @@ import {
   findMoveMouseCursor,
   getRatioDirection,
   diffPoints,
+  dataURItoBlob,
 } from '../utils/image-processing';
 
 export default defineComponent({
@@ -39,6 +40,14 @@ export default defineComponent({
     mimeType: {
       type: String,
     },
+    imageId: {
+      type: Number,
+      default: 0,
+    },
+    imageName: {
+      type: String,
+      default: 'none',
+    },
   },
 
   setup(props, context) {
@@ -51,8 +60,10 @@ export default defineComponent({
         // Currently it only works with 1920 x 1080 - 16 x 9
         const { mimeType } = props;
 
-        var container = <HTMLDivElement>document.getElementById('image-container');
-        var c = <HTMLImageElement>document.getElementById('selected-image');
+        console.log('nothing here');
+
+        var container = <HTMLDivElement>document.getElementById(`image-container@${props.imageId}`);
+        var c = <HTMLImageElement>document.getElementById(`selected-image@${props.imageId}`);
 
         var image = new Image();
         image.src = props.selectedImage;
@@ -85,6 +96,7 @@ export default defineComponent({
         //  const findMouseCursor = findMoveMouseCursor(container);
 
         c.addEventListener('mousedown', (e) => {
+          console.log('hearing mouse down?');
           e.preventDefault();
           isGrabbing.value = true;
           grabbinStartPoints = findMoveMouseCursor(container)(e);
@@ -241,12 +253,12 @@ export default defineComponent({
       };
 
       var existedCanvas = <HTMLCanvasElement>document.getElementById('imagemask');
-      var container = <HTMLDivElement>document.getElementById('image-container');
-      var canvasContainer = <HTMLDivElement>document.getElementById('canvas-container');
+      var container = <HTMLDivElement>document.getElementById(`image-container@${props.imageId}`);
+      var canvasContainer = <HTMLDivElement>document.getElementById(`canvas-container@${props.imageId}`);
       if (existedCanvas) {
         canvasContainer.removeChild(existedCanvas);
       }
-      var c = <HTMLImageElement>document.getElementById('selected-image');
+      var c = <HTMLImageElement>document.getElementById(`selected-image@${props.imageId}`);
       var image = new Image();
       image.src = props.selectedImage;
       image.onload = () => {
@@ -272,7 +284,7 @@ export default defineComponent({
           canvas.height = (image.width / props.desiredRatio) * zoomRatio;
         }
 
-        canvas.id = 'imagemask';
+        canvas.id = `imagemask@${props.imageId}`;
         canvas.style.display = 'none';
         canvasContainer.appendChild(canvas);
         {
@@ -284,13 +296,15 @@ export default defineComponent({
             ctx.drawImage(image, 0, 0, image.width, image.height, offsetLeft, offsetTop, image.width, image.height);
 
             var img = canvas.toDataURL('image/jpeg', 1);
-            context.emit('cropped', img);
+            const croppedFile = new File([dataURItoBlob(img)], props.imageName);
+            context.emit('cropped', croppedFile);
           }
         }
       };
     };
 
     const discard = () => {
+      console.log('discarding');
       context.emit('discard');
     };
 
