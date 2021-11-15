@@ -15,7 +15,10 @@
     <div class="relative">
       <!--img-->
       <div class="aspect-w-16 aspect-h-9 shadow-light">
-        <img class="w-full h-full object-center object-cover group-hover:opacity-90" :src="imgurl" />
+        <img
+          class="w-full h-full object-center object-cover group-hover:opacity-90"
+          :src="ptrToURI(logoPtr) || '/placeholder_round.svg'"
+        />
       </div>
 
       <!--cart button-->
@@ -52,13 +55,14 @@
 </template>
 
 <script lang="ts">
-import { ref, defineComponent, computed } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
+import { MetaPtr } from '@dgrants/types';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
-import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
+import { formatNumber, formatAddress, getEtherscanUrl, ptrToURI, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
@@ -77,7 +81,7 @@ export default defineComponent({
   props: {
     id: { type: Number, required: true },
     name: { type: String, required: true },
-    imgurl: { type: String, required: true },
+    logoPtr: { type: Object as PropType<MetaPtr>, required: false },
     ownerAddress: { type: String, required: true },
     roundAddress: { type: String, default: '' },
     roundName: { type: String, default: '' },
@@ -94,6 +98,7 @@ export default defineComponent({
       isInCart,
       formatAddress,
       getEtherscanUrl,
+      ptrToURI,
       pushRoute,
       raised,
     };

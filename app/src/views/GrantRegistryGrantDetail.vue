@@ -20,9 +20,7 @@
       <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
-        :logoURI="
-          grantMetadata?.logoURI ? grantMetadata?.logoURI.replace('https://ipfs-dev', 'https://ipfs') : undefined
-        "
+        :logoPtr="grantMetadata?.logoPtr ? grantMetadata.logoPtr : undefined"
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
         :roundDetails="grantContributionsByRound"
@@ -303,7 +301,7 @@ import * as ipfs from 'src/utils/data/ipfs';
 import { getGrantsGrantRoundDetails } from 'src/utils/data/grantRounds';
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
 // --- Types ---
-import { Breadcrumb, FilterNavItem, GrantsRoundDetails } from '@dgrants/types';
+import { Breadcrumb, FilterNavItem, GrantsRoundDetails, MetaPtr } from '@dgrants/types';
 // --- Components ---
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseImageUpload from 'src/components/BaseImageUpload.vue';
@@ -544,7 +542,7 @@ function useGrantDetail() {
       website !== grantMetadata.value?.properties?.websiteURI ||
       github !== grantMetadata.value?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) ||
-      logoURI !== grantMetadata.value?.logoURI;
+      logoURI !== ipfs.getMetaPtr({ cid: (grantMetadata.value?.logoPtr as MetaPtr).pointer });
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -592,7 +590,7 @@ function useGrantDetail() {
     const isMetaPtrUpdated =
       name !== gMetadata?.name ||
       description !== gMetadata?.description ||
-      logoURI !== gMetadata?.logoURI ||
+      logoURI !== ipfs.getMetaPtr({ cid: (gMetadata?.logoPtr as MetaPtr).pointer }) ||
       website !== gMetadata?.properties?.websiteURI ||
       github !== gMetadata?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(gMetadata?.properties?.twitterURI);
@@ -600,8 +598,9 @@ function useGrantDetail() {
     if (isMetaPtrUpdated) {
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
+      const cid = (gMetadata?.logoPtr as MetaPtr).pointer;
       metaPtr = await ipfs
-        .uploadGrantMetadata({ name, description, logoURI, properties })
+        .uploadGrantMetadata({ name, description, logoPtr: ipfs.formatMetaPtr(cid), properties })
         .then((cid) => ipfs.formatMetaPtr(cid.toString()));
     }
 
@@ -637,11 +636,15 @@ function useGrantDetail() {
    * @notice util function which prefills edit form
    */
   function prefillEditForm() {
+    // TOOD probably shouldn't assume logoURI is defined since the type definition makes it optional, but our UI
+    // requires a logo, so maybe this is fine for now. Also don't know why TS makes me cast like this, but the
+    // type inference hints from VSCode indicate the casting shouldn't be necessary
+    const splitLogoURI = (grantMetadata.value as unknown as { logoURI: string }).logoURI.split('/');
     form.value.owner = grant.value?.owner || '';
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.logoURI = grantMetadata.value?.logoURI || undefined;
+    form.value.logoURI = ipfs.getMetaPtr({ cid: splitLogoURI[splitLogoURI.length - 1] }) || undefined;
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';

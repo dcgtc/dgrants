@@ -11,6 +11,7 @@ import { Grant, GrantRound, MetaPtr } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
 import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
+import { getMetaPtr } from 'src/utils/data/ipfs';
 import { Ref } from 'vue';
 
 // --- Formatters ---
@@ -80,6 +81,14 @@ export function metadataId(metaPtr: MetaPtr): string {
 export function decodeMetadataId(id: string): MetaPtr {
   const parts = id.split('-');
   return { protocol: parts[0], pointer: parts[1] };
+}
+
+// Given a logoPtr, resolve it to a URI that we can fetch
+export function ptrToURI(logoPtr: MetaPtr | undefined | null) {
+  if (!logoPtr) return null;
+  const { protocol, pointer } = logoPtr;
+  if (protocol === 1) return getMetaPtr({ cid: pointer });
+  throw new Error(`Unsupported protocol ID ${protocol}`);
 }
 
 // --- Validation ---

@@ -4,7 +4,7 @@
     <figure class="aspect-w-16 aspect-h-9 shadow-light">
       <img
         class="w-full h-full object-center object-cover"
-        :src="grantRoundMetadata?.logoURI || '/placeholder_grant.svg'"
+        :src="ptrToURI(grantRoundMetadata?.logoPtr) || '/placeholder_grant.svg'"
       />
     </figure>
 
@@ -96,7 +96,7 @@ import { defineComponent, PropType } from 'vue';
 // --- Types ---
 import { GrantRound, GrantRoundMetadata } from '@dgrants/types';
 // --- Utils/helper ---
-import { pushRoute, formatAddress, getEtherscanUrl } from 'src/utils/utils';
+import { pushRoute, formatAddress, getEtherscanUrl, ptrToURI } from 'src/utils/utils';
 // --- Methods ---
 import { BigNumber } from 'src/utils/ethers';
 
@@ -107,7 +107,7 @@ export default defineComponent({
     grantRoundMetadata: { type: Object as PropType<GrantRoundMetadata>, required: true },
   },
   setup() {
-    return { BigNumber, pushRoute, formatAddress, getEtherscanUrl };
+    return { BigNumber, pushRoute, formatAddress, getEtherscanUrl, ptrToURI };
   },
 });
 </script>

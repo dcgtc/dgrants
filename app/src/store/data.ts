@@ -123,7 +123,6 @@ export default function useDataStore() {
       await Promise.all(
         roundAddresses.map(async (grantRoundAddress: string) => {
           const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
-
           return data?.grantRound;
         })
       )
