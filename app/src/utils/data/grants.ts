@@ -54,6 +54,8 @@ export async function getAllGrants(forceRefresh = false) {
                     owner
                     payee
                     metaPtr
+                    createdAt
+                    updatedAt
                     lastUpdatedBlockNumber
                   }
                 }`,
@@ -69,6 +71,8 @@ export async function getAllGrants(forceRefresh = false) {
                 owner: getAddress(grant.owner),
                 payee: getAddress(grant.payee),
                 metaPtr: grant.metaPtr,
+                createdAt: grant.createdAt,
+                lastUpdated: grant.lastUpdated,
               } as Grant;
             });
             // update to most recent block collected
@@ -108,6 +112,8 @@ export async function getAllGrants(forceRefresh = false) {
                 owner: getAddress(tx.args?.owner),
                 payee: getAddress(tx.args?.payee),
                 metaPtr: tx.args?.metaPtr,
+                createdAt: tx.args?.createdAt,
+                lastUpdated: tx.args?.lastUpdated,
               } as Grant;
             })
             .forEach((grant) => {

@@ -14,21 +14,29 @@ import { WETH_ADDRESS, UNISWAP_FACTORY, tokens, setBalance, approve, setNextBloc
 import { parseUnits } from 'ethers/lib/utils';
 
 const fixtureGrants = async (deployer: SignerWithAddress) => {
+  const now = (await ethers.provider.getBlock('latest')).timestamp;
+
   // Define grants to create (addresses are random)
   const grants = [
     {
       owner: '0x34f4E532a33EB545941e914B25Efe348Aea31f0A',
       payee: '0x06c94663E5884BE4cCe85F0869e95C7712d34803',
+      createdAt: now,
+      lastUpdated: now,
       metaPtr: { protocol: 1, pointer: 'QmaHTgor7GhetW3nmev3UqabjrzbKJCe7q1v8Wfg3aZyV4' },
     },
     {
       owner: '0x58E52440F56f2A5307772Ec881BCEf2c15e988Ab',
       payee: '0x6f02c37ea174DD05f20aC118da725ffa6A40B990',
+      createdAt: now,
+      lastUpdated: now,
       metaPtr: { protocol: 1, pointer: 'Qma9gnPTmdZ65UVjJd9nkM6S8etti8qtNBD1ta6vVpSSVS' },
     },
     {
       owner: '0x1fB6C46e6aDD95698352707D7f93a31030c80a0B',
       payee: '0x834e659c6757E250db500fe869877311Bb552966',
+      createdAt: now,
+      lastUpdated: now,
       metaPtr: { protocol: 1, pointer: 'QmTQMgoxDRj8gfNn5Cvznt5CoEE6cz9MQeZrQsNb36BMdm' },
     },
   ];
