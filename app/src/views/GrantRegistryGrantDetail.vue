@@ -639,12 +639,11 @@ function useGrantDetail() {
     // TOOD probably shouldn't assume logoURI is defined since the type definition makes it optional, but our UI
     // requires a logo, so maybe this is fine for now. Also don't know why TS makes me cast like this, but the
     // type inference hints from VSCode indicate the casting shouldn't be necessary
-    const splitLogoURI = (grantMetadata.value as unknown as { logoURI: string }).logoURI.split('/');
     form.value.owner = grant.value?.owner || '';
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.logoURI = ipfs.getMetaPtr({ cid: splitLogoURI[splitLogoURI.length - 1] }) || undefined;
+    form.value.logoURI = ipfs.getMetaPtr({ cid: grantMetadata.value?.logoPtr?.pointer }) || undefined;
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';

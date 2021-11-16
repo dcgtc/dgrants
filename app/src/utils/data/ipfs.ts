@@ -30,8 +30,7 @@ export const uploadFile = async (file: File) => {
  */
 export const uploadGrantMetadata = async ({ name, description, logoPtr, properties }: GrantMetadata) => {
   assertIPFSPointer(logoPtr);
-  const logoURI = getMetaPtr({ cid: (logoPtr as MetaPtr).pointer });
-  const res = await ipfs.add(JSON.stringify({ name, description, logoURI, properties }));
+  const res = await ipfs.add(JSON.stringify({ name, description, logoPtr, properties }));
   return res.cid;
 };
 
@@ -41,7 +40,7 @@ export const uploadGrantMetadata = async ({ name, description, logoPtr, properti
  * @param obj.cid CID of the grant
  * @returns string
  */
-export const getMetaPtr = ({ cid }: { cid: string }) => {
+export const getMetaPtr = ({ cid }: { cid: string | undefined }) => {
   return `${retrievalEndpoint}/${cid}`;
 };
 
