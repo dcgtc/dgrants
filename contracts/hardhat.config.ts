@@ -97,7 +97,7 @@ const config: HardhatUserConfig = {
     polygon: {
       accounts: [deployPrivateKey],
       chainId: chainIds.polygon,
-      url: `https://polygon-mainnet.g.alchemy.com/v2/${alchemyApiKey}`,
+      url: `https://polygon-rpc.com/`,
     },
   },
   paths: {
