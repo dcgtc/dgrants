@@ -24,7 +24,7 @@ const fixtureGrants = async (deployer: SignerWithAddress) => {
     {
       owner: '0x58E52440F56f2A5307772Ec881BCEf2c15e988Ab',
       payee: '0x6f02c37ea174DD05f20aC118da725ffa6A40B990',
-      metaPtr: { protocol: 1, pointer: 'Qma9gnPTmdZ65UVjJd9nkM6S8etti8qtNBD1ta6vVpSSVS' },
+      metaPtr: { protocol: 1, pointer: 'bafybeiene52k4ctcjlnh3276jxbsy4xyk2rjpr35ymjc4kd3d7i63ewi7y' },
     },
     {
       owner: '0x1fB6C46e6aDD95698352707D7f93a31030c80a0B',
@@ -67,7 +67,7 @@ const fixtureRound = async (registry: Contract, manager: Contract) => {
   const metadataAdmin = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
   const payoutAdmin = '0x06c94663E5884BE4cCe85F0869e95C7712d34803';
   const matchingToken = tokens.dai.address;
-  const metaPtr = { protocol: 1, pointer: 'bafybeib5r75zbrzavbskwywct42alawcwo7d4dlyipimvnjy23hfkqhham' };
+  const metaPtr = { protocol: 1, pointer: 'bafybeibrfxmcvka475clbkezeajp2gzk7ocfkmkrhodlpbknq345spyo2y' };
 
   const tx = await manager.createGrantRound(
     metadataAdmin,
