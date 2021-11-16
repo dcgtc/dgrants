@@ -1,20 +1,44 @@
 <template>
-  <div v-if="isUploading">Uploading ...</div>
-  <div v-if="!isUploading">Uploaded</div>
-  <div v-if="needEdit">
+  <div v-if="needEdit || isEdit">
     <!-- We should put editor here -->
     <ImageEditor
       :imageName="imageController.images.raw.name"
       @cropped="onCrop"
+      @cancel="cancelEdit"
+      @discard="discard"
       :desiredRatio="desiredRatio"
       :selectedImage="selectedImage"
       :imageId="imageController.id"
+      :isEdit="isEdit"
     />
   </div>
-  <div v-if="!needEdit">
-    <!-- We should put finalized editor here -->
+  <div v-if="!needEdit && !isEdit">
+    <!--We should put finalized editor here  -->
+    <div class="flex items-center" v-if="isUploading">
+      <div class="flex items-center">
+        <div class="inline-block">
+          <img :src="thumbImage" class="w-40 opacity-30" />
+        </div>
+        <div class="m-8 inline-block">Uploading - {{ imageController.images.raw.name }}</div>
+      </div>
+      <div class="flex items-center">
+        <button v-on:click="discard">Delete</button>
+      </div>
+    </div>
+    <div v-if="!isUploading" class="flex">
+      <div class="flex items-center">
+        <div class="inline-block">
+          <img :src="thumbImage" class="w-40" />
+        </div>
+        <div class="m-8 inline-block">
+          {{ imageController.images.raw.name }}
+        </div>
+      </div>
+      <div class="flex items-center">
+        <button v-on:click="changeEdit">Edit</button>
+      </div>
+    </div>
   </div>
-  <button @click="discard">Discard Image</button>
 </template>
 
 <script lang="ts">
@@ -45,20 +69,26 @@ export default defineComponent({
     const isUploading = ref<boolean>(props.imageController.isUploading);
     const needEdit = ref<boolean>(props.imageController.needEdit);
     const selectedImage = ref<any>('');
+    const isEdit = ref<boolean>(false);
+    const thumbImage = ref<string | null>('');
 
     props.imageController?.addEventListener('changed', async () => {
       const { imageController } = props;
-      // console.log('something has changed');
       isUploading.value = imageController.isUploading;
-
-      console.log(imageController);
-
       needEdit.value = imageController.needEdit;
       getImageUrlFromFile(imageController.images.raw)
         .then((imageUrl) => {
           selectedImage.value = imageUrl;
         })
         .catch((err) => console.log(err));
+
+      if (imageController.images.processed) {
+        getImageUrlFromFile(imageController.images.processed)
+          .then((imageUrl) => {
+            thumbImage.value = imageUrl;
+          })
+          .catch((err) => console.log(err));
+      }
     });
 
     const onCrop = (image: File) => {
@@ -71,9 +101,15 @@ export default defineComponent({
 */
     const discard = () => {
       const { imageController } = props;
-
-      console.log(props.index);
       context.emit('discard', imageController.id);
+    };
+
+    const changeEdit = () => {
+      isEdit.value = !isEdit.value;
+    };
+
+    const cancelEdit = () => {
+      isEdit.value = false;
     };
 
     return {
@@ -82,6 +118,10 @@ export default defineComponent({
       selectedImage,
       discard,
       onCrop,
+      isEdit,
+      thumbImage,
+      changeEdit,
+      cancelEdit,
     };
   },
 });

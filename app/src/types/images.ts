@@ -47,7 +47,6 @@ export class ControlledImage extends EventTarget {
   }
 
   uploadRaw() {
-    console.log('Uploading Raw ...');
     this.isUploading = true;
     this.dispatchEvent(new Event('changed'));
     ipfs
@@ -65,7 +64,6 @@ export class ControlledImage extends EventTarget {
 
   process(targetImage?: File) {
     const target = targetImage ? targetImage : this.images.raw;
-    console.log(target);
     getImageUrlFromFile(target)
       .then((url) => getRatio(url))
       .then((rat) => {
@@ -73,7 +71,6 @@ export class ControlledImage extends EventTarget {
           this.needEdit = true;
           this.dispatchEvent(new Event('changed'));
         } else {
-          console.log('here');
           this.needEdit = false;
           // TODO we still need to manage image size
           // TODO also need to manage thumbnail

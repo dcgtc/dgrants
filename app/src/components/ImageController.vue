@@ -5,10 +5,11 @@
       <ImageRow :index="index" @discard="discardImage" :imageController="item" :desiredRatio="desiredRatio" />
     </template>
   </InputRow>
-  <InputRow>
-    <template v-slot:label>Logo:</template>
+
+  <InputRow v-if="controllerList.length < limit">
+    <template v-slot:label>{{ title }}:</template>
     <template v-slot:input>
-      <BaseImageUpload v-on:addImage="addImage" />
+      <ImageDropZone v-on:addImage="addImage" />
     </template>
   </InputRow>
 </template>
@@ -19,7 +20,7 @@ import { defineComponent, PropType, ref } from 'vue';
 import { ImageEditorVariant, ControlledImage } from '../types/images';
 
 import ImageRow from './ImageRow.vue';
-import BaseImageUpload from './BaseImageUpload.vue';
+import ImageDropZone from './ImageDropZone.vue';
 import InputRow from './InputRow.vue';
 
 export default defineComponent({
@@ -45,10 +46,14 @@ export default defineComponent({
       type: Number,
       default: 16 / 9,
     },
+    title: {
+      type: String,
+      required: true,
+    },
   },
   components: {
     ImageRow,
-    BaseImageUpload,
+    ImageDropZone,
     InputRow,
   },
   setup(props) {

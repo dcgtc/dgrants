@@ -18,6 +18,13 @@ export const findMoveMouseCursor = (container: HTMLElement) => (e: MouseEvent) =
   return { x, y };
 };
 
+export const findTouchCursor = (container: HTMLElement) => (e: TouchEvent) => {
+  const rect = container.getBoundingClientRect();
+  const x = e.touches[0].clientX - rect.left;
+  const y = e.touches[0].clientY - rect.top;
+  return { x, y };
+};
+
 export const diffPoints = (p1: Point, p2: Point) => {
   return { x: p2.x - p1.x, y: p2.y - p1.y };
 };

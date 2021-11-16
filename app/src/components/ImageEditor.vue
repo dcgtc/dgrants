@@ -8,7 +8,11 @@
   </div>
   <hr />
   <button type="button" @click="draw">Crop</button>
-  <button class="mx-2" type="button" @click="discard">Discard</button>
+  <button class="mx-8" type="button" @click="discard">Discard</button>
+  <button class="mx-8" type="button" @click="cancel">Cancel</button>
+  <button class="mx-8" type="button" @click="zoomIn">Zoom In</button>
+  <div>Zoom Ratio: {{ zoomRatio.toFixed(1) }}x</div>
+  <button class="mx-8" type="button" @click="zoomOut">Zoom Out</button>
   <div :id="`canvas-container@${imageId}`"></div>
 </template>
 
@@ -23,6 +27,7 @@ import {
   getRatioDirection,
   diffPoints,
   dataURItoBlob,
+  findTouchCursor,
 } from '../utils/image-processing';
 
 export default defineComponent({
@@ -48,19 +53,21 @@ export default defineComponent({
       type: String,
       default: 'none',
     },
+    isEdit: {
+      type: Boolean,
+      default: false,
+    },
   },
 
   setup(props, context) {
     const isGrabbing = ref(false);
+    const zoomRatio = ref(1);
 
-    watch(
-      () => props.selectedImage,
-      async () => {
+    const initialRender = async () => (
+      setTimeout(() => {
         // TODO need to implement a more flexible ratio selection for the component
         // Currently it only works with 1920 x 1080 - 16 x 9
         const { mimeType } = props;
-
-        console.log('nothing here');
 
         var container = <HTMLDivElement>document.getElementById(`image-container@${props.imageId}`);
         var c = <HTMLImageElement>document.getElementById(`selected-image@${props.imageId}`);
@@ -96,13 +103,25 @@ export default defineComponent({
         //  const findMouseCursor = findMoveMouseCursor(container);
 
         c.addEventListener('mousedown', (e) => {
-          console.log('hearing mouse down?');
           e.preventDefault();
           isGrabbing.value = true;
           grabbinStartPoints = findMoveMouseCursor(container)(e);
         });
 
         c.addEventListener('mouseup', () => {
+          if (isGrabbing.value) {
+            isGrabbing.value = false;
+            grabbinStartPoints = null;
+          }
+        });
+
+        c.addEventListener('touchstart', (e) => {
+          e.preventDefault();
+          isGrabbing.value = true;
+          grabbinStartPoints = findTouchCursor(container)(e);
+        });
+
+        c.addEventListener('touchend', () => {
           if (isGrabbing.value) {
             isGrabbing.value = false;
             grabbinStartPoints = null;
@@ -150,7 +169,28 @@ export default defineComponent({
           lastMovePoint = findMoveMouseCursor(c)(e);
         });
 
+        c.addEventListener('touchmove', (e) => {
+          e.preventDefault();
+
+          if (isGrabbing.value && grabbinStartPoints) {
+            if (lastMovePoint) {
+              const relativeCursor = findTouchCursor(c)(e);
+              const diff = diffPoints(relativeCursor, lastMovePoint);
+
+              relativeMover(c, container)(diff);
+            }
+          }
+          lastMovePoint = findTouchCursor(c)(e);
+        });
+
         c.addEventListener('mouseout', () => {
+          if (isGrabbing.value) {
+            isGrabbing.value = false;
+            grabbinStartPoints = null;
+          }
+        });
+
+        c.addEventListener('touchcancel', () => {
           if (isGrabbing.value) {
             isGrabbing.value = false;
             grabbinStartPoints = null;
@@ -159,7 +199,7 @@ export default defineComponent({
 
         const relativeRenderer =
           (source: HTMLImageElement, image: HTMLImageElement, container: HTMLDivElement, desiredRatio: number) =>
-          (center: Point, insideWidth: number, insideHeight: number) => {
+          (center: Point | null, insideWidth: number, insideHeight: number) => {
             const ratioDirection = getRatioDirection(source, desiredRatio);
 
             //   const ImageHeight = image.height;
@@ -185,27 +225,76 @@ export default defineComponent({
 
             const relativeRatio = image.width / ImageWidth;
 
-            const computedOffsetLeft = -1 * (center.x * relativeRatio - containerWidth / 2);
-            const computedOffsetTop = -1 * (center.y * relativeRatio - containerHeight / 2);
-            const computedOffsetRight = -1 * (image.width - containerWidth + computedOffsetLeft);
-            const computedOffsetBottom = -1 * (image.height - containerHeight + computedOffsetTop);
+            if (center) {
+              const computedOffsetLeft = -1 * (center.x * relativeRatio - containerWidth / 2);
+              const computedOffsetTop = -1 * (center.y * relativeRatio - containerHeight / 2);
+              const computedOffsetRight = -1 * (image.width - containerWidth + computedOffsetLeft);
+              const computedOffsetBottom = -1 * (image.height - containerHeight + computedOffsetTop);
 
-            if ((computedOffsetLeft < 0 && computedOffsetRight < 0) || mimeType === 'image/png') {
-              c.style.left = `${computedOffsetLeft}px`;
-            } else if (computedOffsetLeft >= 0) {
-              c.style.left = `${0}px`;
-            } else {
-              c.style.left = `${containerWidth - image.width}px`;
-            }
+              if ((computedOffsetLeft < 0 && computedOffsetRight < 0) || mimeType === 'image/png') {
+                c.style.left = `${computedOffsetLeft}px`;
+              } else if (computedOffsetLeft >= 0) {
+                c.style.left = `${0}px`;
+              } else {
+                c.style.left = `${containerWidth - image.width}px`;
+              }
 
-            if ((computedOffsetTop < 0 && computedOffsetBottom < 0) || mimeType === 'image/png') {
-              c.style.top = `${computedOffsetTop}px`;
-            } else if (computedOffsetTop >= 0) {
-              c.style.top = `${0}px`;
+              if ((computedOffsetTop < 0 && computedOffsetBottom < 0) || mimeType === 'image/png') {
+                c.style.top = `${computedOffsetTop}px`;
+              } else if (computedOffsetTop >= 0) {
+                c.style.top = `${0}px`;
+              } else {
+                c.style.top = `${containerHeight - image.height}px`;
+              }
             } else {
-              c.style.top = `${containerHeight - image.height}px`;
+              const center = {
+                x: -1 * c.offsetLeft + containerWidth / 2,
+                y: -1 * c.offsetTop + containerHeight / 2,
+              };
+              const computedOffsetLeft = -1 * (center.x * relativeRatio - containerWidth / 2);
+              const computedOffsetTop = -1 * (center.y * relativeRatio - containerHeight / 2);
+              const computedOffsetRight = -1 * (image.width - containerWidth + computedOffsetLeft);
+              const computedOffsetBottom = -1 * (image.height - containerHeight + computedOffsetTop);
+
+              if ((computedOffsetLeft < 0 && computedOffsetRight < 0) || mimeType === 'image/png') {
+                c.style.left = `${computedOffsetLeft}px`;
+              } else if (computedOffsetLeft >= 0) {
+                c.style.left = `${0}px`;
+              } else {
+                c.style.left = `${containerWidth - image.width}px`;
+              }
+
+              if ((computedOffsetTop < 0 && computedOffsetBottom < 0) || mimeType === 'image/png') {
+                c.style.top = `${computedOffsetTop}px`;
+              } else if (computedOffsetTop >= 0) {
+                c.style.top = `${0}px`;
+              } else {
+                c.style.top = `${containerHeight - image.height}px`;
+              }
             }
           };
+
+        container.addEventListener('zoom-in', () => {
+          if (zoomRatio.value < 4) {
+            relativeRenderer(
+              image,
+              c,
+              container,
+              props.desiredRatio
+            )(null, container.offsetWidth * 0.75, container.offsetHeight * 0.75);
+          }
+          zoomRatio.value = c.width / image.width;
+        });
+
+        container.addEventListener('zoom-out', () => {
+          relativeRenderer(
+            image,
+            c,
+            container,
+            props.desiredRatio
+          )(null, container.offsetWidth / 0.75, container.offsetHeight / 0.75);
+          zoomRatio.value = c.width / image.width;
+        });
 
         container.addEventListener('wheel', (e) => {
           // TODO
@@ -216,7 +305,7 @@ export default defineComponent({
 
           const relativeCursor = findMoveMouseCursor(c)(e);
 
-          if (isZoomIn) {
+          if (isZoomIn && zoomRatio.value < 4) {
             relativeRenderer(
               image,
               c,
@@ -239,9 +328,29 @@ export default defineComponent({
               container.offsetHeight / 0.75
             );
           }
+          zoomRatio.value = c.width / image.width;
         });
-      }
+      }),
+      100
     );
+
+    initialRender();
+
+    watch(() => props.selectedImage, initialRender);
+
+    const zoomIn = () => {
+      var container = <HTMLDivElement>document.getElementById(`image-container@${props.imageId}`);
+
+      const zoomInEvent = new CustomEvent('zoom-in');
+      container.dispatchEvent(zoomInEvent);
+    };
+
+    const zoomOut = () => {
+      var container = <HTMLDivElement>document.getElementById(`image-container@${props.imageId}`);
+
+      const zoomInEvent = new CustomEvent('zoom-out');
+      container.dispatchEvent(zoomInEvent);
+    };
 
     const draw = () => {
       const findUnRelativeOffsets = (source: HTMLImageElement, image: HTMLImageElement) => {
@@ -304,11 +413,14 @@ export default defineComponent({
     };
 
     const discard = () => {
-      console.log('discarding');
       context.emit('discard');
     };
 
-    return { draw, isGrabbing, discard };
+    const cancel = () => {
+      context.emit('cancel');
+    };
+
+    return { draw, isGrabbing, discard, zoomIn, zoomOut, zoomRatio, cancel };
   },
 });
 </script>

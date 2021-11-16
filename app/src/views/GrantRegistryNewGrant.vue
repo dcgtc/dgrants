@@ -137,7 +137,7 @@
         </template>
       </InputRow>-->
 
-      <ImageController :ratio="16 / 9" />
+      <ImageController :ratio="16 / 9" title="Something Title" limit="5" />
 
       <!-- Submit button -->
       <div class="px-4 md:px-12 py-12">
