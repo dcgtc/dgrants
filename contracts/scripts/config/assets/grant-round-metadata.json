@@ -1,5 +1,5 @@
 {
-  "name": "Moonshot Collective",
-  "description": "The Moonshot Collective is a Gitcoin DAO workstream focused on rapid protoyping. This round is a collection of grants created by and supporting the Moonshot Collective team and projects.",
-  "grants": [4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18]
+  "name": "Grants Round 12",
+  "description": "dGrants Round 12",
+  "grants": [0, 1, 2, 3, 4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18]
 }

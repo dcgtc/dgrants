@@ -2,7 +2,7 @@ import fs from 'fs';
 import hre from 'hardhat';
 import { createIpfs } from '@dgrants/utils/src/ipfs';
 import { ScriptLogger } from './ScriptLogger';
-import params from './config/deploy-poc.config';
+import params from './config/deploy-gr12.config';
 
 const { ethers } = hre;
 
@@ -12,7 +12,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
 (async function () {
   const network = hre.network.name;
   // Polygon gas price is predictable and often overestimated, so just hardcode a price for simplicity
-  const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('2', 'gwei') } : {};
+  const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('250', 'gwei') } : {};
 
   const logger = new ScriptLogger('poc', network);
 
