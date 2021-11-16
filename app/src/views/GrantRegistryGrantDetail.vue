@@ -20,7 +20,7 @@
       <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
-        :logoPtr="grantMetadata?.logoPtr ? grantMetadata.logoPtr : undefined"
+        :logoPtr="grantMetadata?.logoURI ? grantMetadata.logoURI : undefined"
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
         :roundDetails="grantContributionsByRound"
