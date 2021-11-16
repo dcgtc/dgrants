@@ -155,11 +155,9 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
         grantId = BigNumber.from(grantId).toNumber();
 
         // update the grants metadata
-        const areMetaPtrsEqual = (x: MetaPtr, y: MetaPtr) => {
-          if (BigNumber.from(x.protocol).toString() !== BigNumber.from(y.protocol).toString()) return false;
-          if (x.protocol !== y.protocol) return false;
-          return true;
-        };
+        const areMetaPtrsEqual = (x: MetaPtr, y: MetaPtr) =>
+          BigNumber.from(x.protocol).toString() === BigNumber.from(y.protocol).toString() && x.protocol === y.protocol;
+
         if (_lsGrants[grantId] && !areMetaPtrsEqual(_lsGrants[grantId].metaPtr, metaPtr)) {
           void (await getMetadata(metaPtr, refs.grantMetadata));
         }
