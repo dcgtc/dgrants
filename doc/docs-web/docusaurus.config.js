@@ -81,7 +81,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
               },
               {
                 label: 'Twitter',
-                href: 'https://twitter.com/gitcoin',
+                href: 'https://twitter.com/gitcoindao',
               },
             ],
           },
