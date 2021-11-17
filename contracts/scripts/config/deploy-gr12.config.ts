@@ -29,7 +29,7 @@ const params: DeployParams = {
     matchingToken: '0xDe30da39c46104798bB5aA3fe8B9e0e1F348163F', // GTC
     roundStartTime: 1661990400, // Thursday, September 1, 2022 12:00:00 AM GMT
     roundEndTime: 1663200000, // Thursday, September 15, 2022 12:00:00 AM GMT
-    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://scopelift.b-cdn.net/ipfs/<cid>/',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -42,7 +42,7 @@ const params: DeployParams = {
     matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
     roundStartTime: 1637154000,
     roundEndTime: 1641072061,
-    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://scopelift.b-cdn.net/ipfs/<cid>/',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
@@ -55,7 +55,7 @@ const params: DeployParams = {
     matchingToken: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa', // DAI
     roundStartTime: 1637154000, // set start time to time in the future
     roundEndTime: 1641072061,
-    ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
+    ipfsRetrievalEndpoint: 'https://scopelift.b-cdn.net/ipfs/<cid>/',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
   },
