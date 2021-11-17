@@ -13,5 +13,6 @@ interface ImportMeta {
     VITE_FLEEK_STORAGE_API_KEY: string;
     VITE_DGRANTS_CHAIN_ID: string;
     VITE_GRANT_WHITELIST_URI: string;
+    VITE_MAINTENANCE_MODE: string;
   };
 }
