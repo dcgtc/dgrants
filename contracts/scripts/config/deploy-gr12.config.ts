@@ -40,8 +40,8 @@ const params: DeployParams = {
     metadataAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     payoutAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
-    roundStartTime: 1637097661, 
-    roundEndTime: 1641072061, 
+    roundStartTime: 1637154000,
+    roundEndTime: 1641072061,
     ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
@@ -53,7 +53,7 @@ const params: DeployParams = {
     metadataAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     payoutAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     matchingToken: '0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa', // DAI
-    roundStartTime: 1637097661, // set start time to time in the future
+    roundStartTime: 1637154000, // set start time to time in the future
     roundEndTime: 1641072061,
     ipfsRetrievalEndpoint: 'https://ipfs.fleek.co/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',

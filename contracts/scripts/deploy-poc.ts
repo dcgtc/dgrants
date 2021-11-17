@@ -12,7 +12,7 @@ const ipfs = createIpfs(process.env.FLEEK_STORAGE_API_KEY!); // eslint-disable-l
 (async function () {
   const network = hre.network.name;
   // Polygon gas price is predictable and often overestimated, so just hardcode a price for simplicity
-  const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('250', 'gwei') } : {};
+  const overrides = network === 'polygon' ? { gasPrice: hre.ethers.utils.parseUnits('300', 'gwei') } : {};
 
   const logger = new ScriptLogger('poc', network);
 
