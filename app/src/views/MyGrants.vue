@@ -1,18 +1,32 @@
 <template>
   <template v-if="grants && grantMetadata">
     <BaseHeader name="My Grants" />
-    <ul class="base-grid-large">
+
+    <!-- No Grants -->
+    <div v-if="grants.length == 0">
+      <div class="mt-10">
+        <router-link :to="{ name: 'dgrants-new' }">
+          <button class="btn mx-auto">create grant</button>
+        </router-link>
+      </div>
+
+      <img style="max-height: 10rem" class="mx-auto" src="/placeholder_grant.svg" />
+      <p class="mt-4 text-center">No Grants created</p>
+    </div>
+    <!-- My Grants -->
+    <ul v-else class="base-grid-large">
       <li v-for="grant in grants" :key="grant.id.toString()">
         <GrantOwnerCard
           :id="grant.id"
           :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
-          :imgurl="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoURI) || '/placeholder_grant.svg'"
+          :imgurl="(grantMetadata && ptrToURI(grantMetadata[metadataId(grant.metaPtr)]?.logoPtr)) || '/placeholder_grant.svg'"
         />
       </li>
     </ul>
   </template>
 
+  <!-- Loading Screen -->
   <LoadingSpinner v-else />
 </template>
 
@@ -26,7 +40,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 
-import { metadataId } from 'src/utils/utils';
+import { metadataId, ptrToURI } from 'src/utils/utils';
 
 const { grantMetadata } = useDataStore();
 
@@ -53,6 +67,7 @@ export default defineComponent({
     return {
       metadataId,
       grantMetadata,
+      ptrToURI,
       ...filterMyGrants(),
     };
   },
