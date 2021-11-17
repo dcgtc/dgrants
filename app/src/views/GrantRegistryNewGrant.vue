@@ -122,7 +122,7 @@
       </InputRow>
 
       <!-- Grant logo -->
-      <!--<InputRow>
+      <InputRow>
         <template v-slot:label>Logo:</template>
         <template v-slot:input>
           <BaseImageUpload
@@ -135,9 +135,7 @@
             @update:modelValue="updateLogo"
           />
         </template>
-      </InputRow>-->
-
-      <ImageController :ratio="16 / 9" title="Something Title" limit="5" />
+      </InputRow>
 
       <!-- Submit button -->
       <div class="px-4 md:px-12 py-12">
@@ -163,7 +161,7 @@ import InputRow from 'src/components/InputRow.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import BaseTextarea from 'src/components/BaseTextarea.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
-import ImageController from 'src/components/ImageController.vue';
+import BaseImageUpload from 'src/components/BaseImageUpload.vue';
 // --- Store ---
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
@@ -276,7 +274,7 @@ export default defineComponent({
     BaseTextarea,
     InputRow,
     TransactionStatus,
-    ImageController,
+    BaseImageUpload,
   },
   setup() {
     return { ...useNewGrant() };
