@@ -6,7 +6,7 @@ import { BigNumber } from 'src/utils/ethers';
 import { LocalForageData } from 'src/types';
 import { Ref } from 'vue';
 
-const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs/<cid>/';
+const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs';
 
 function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
   if (!logoPtr) throw new Error('assertIPFSPointer: logoPtr is undefined');
