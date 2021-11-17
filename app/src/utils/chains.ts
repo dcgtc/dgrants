@@ -141,7 +141,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: 'http://127.0.0.1:8545/',
     subgraphUrl: false,
-    startBlock: 13186294,
+    startBlock: 13634090,
     filterBlockLimit: -1,
   },
   [SupportedChainId.MAINNET]: {
@@ -157,7 +157,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-mainnet.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     subgraphUrl: false,
-    startBlock: 13285176,
+    startBlock: 13634090,
     filterBlockLimit: -1,
   },
   [SupportedChainId.POLYGON]: {
@@ -175,7 +175,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0xd3BB9902C9ae1ECbDB9cCAdbD009F827699185Cb',
     rpcUrl: 'https://polygon-rpc.com/',
     subgraphUrl: false,
-    startBlock: 19834043,
+    startBlock: 21463653,
     filterBlockLimit: 25000,
   },
   [SupportedChainId.RINKEBY]: {
@@ -191,7 +191,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     multicall: '0x5BA1e12693Dc8F9c48aAD8770482f4739bEeD696',
     rpcUrl: `https://eth-rinkeby.alchemyapi.io/v2/${ALCHEMY_API_KEY}`,
     subgraphUrl: false,
-    startBlock: 9306030,
+    startBlock: 9656091,
     filterBlockLimit: -1,
   },
 };
