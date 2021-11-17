@@ -1,0 +1,33 @@
+{
+  "deployer": "0xD2553382a60F121d9b1e35cFC9EBF4870FbCC96F",
+  "config": {
+    "donationToken": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
+    "uniswapFactory": "0x1F98431c8aD98523631AE4a59f267346ea31F984",
+    "weth": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+    "metadataAdmin": "0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B",
+    "payoutAdmin": "0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B",
+    "matchingToken": "0x5592EC0cfb4dbc12D3aB100b257153436a1f0FEa",
+    "roundStartTime": 1637154000,
+    "roundEndTime": 1641072061,
+    "ipfsRetrievalEndpoint": "https://ipfs.fleek.co/ipfs",
+    "roundLogoPath": "./scripts/config/assets/dgrants-placeholder.png",
+    "metadataJson": {
+      "name": "Grants Round 12",
+      "description": "dGrants Round 12",
+      "grants": [0, 1, 2, 3, 4, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18],
+      "logoPtr": {
+        "protocol": 1,
+        "pointer": "QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F"
+      }
+    }
+  },
+  "contracts": {
+    "GrantRegistry": "0x1FA4BDCD618BA694351CE26b483E8F8705Fa840A",
+    "GrantRoundManager": "0x948b0C24BF58D43993484Da4ecfBE881216DB956"
+  },
+  "actions": {
+    "PublishGrantRoundLogo": "QmYMXFkv1LU2YzQPe8LEDR7NrtL1rgNXV5un9Fn9hH765F",
+    "PublishGrantRoundMetadata": "QmRQiQ5AiNwmHyhdFoXphCkFXSrNShS2n9ypianBc1441z",
+    "CreateGrantGround": "0x0b89a07f71a6d0d60b7172050944a59d6e6fd2485267f0ba66794921252764c5"
+  }
+}
