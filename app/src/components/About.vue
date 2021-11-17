@@ -47,7 +47,7 @@
             </button></a
           >
 
-          <a href="https://twitter.com/gitcoin" target="_blank" rel="noreferrer noopener">
+          <a href="https://twitter.com/gitcoindao" target="_blank" rel="noreferrer noopener">
             <button class="btn">
               <TwitterIcon />
               <span>Twitter</span>
