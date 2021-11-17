@@ -296,8 +296,7 @@ export default function useDataStore() {
   /**
    * @notice helper function to filter approved grants
    *
-   * @param grants Grant[]
-   * @param approvedList []
+   * @param grants Grant[] list of all grants
    */
   async function getApprovedGrants(grants: Grant[]) {
     const uniqueStr = '?unique=' + Date.now();

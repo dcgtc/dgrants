@@ -274,7 +274,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 // --- Store ---
 import useCartStore from 'src/store/cart';
@@ -649,12 +649,14 @@ function useGrantDetail() {
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';
   }
 
-  /**
-   * @notice auto open if URL has query edits
-   */
-  if (route.query && route.query.edit && isOwner) {
-    enableEdit();
-  }
+  onMounted(() => {
+    /**
+     * @notice auto open if URL has query edits
+     */
+    if (route.query && route.query.edit && isOwner) {
+      enableEdit();
+    }
+  });
 
   return {
     donationToken,

@@ -33,7 +33,6 @@
 
         <!-- Status -->
         <div class="mt-10">
-
           <!-- approved (green)-->
           <div v-if="status == 'approved'">
             <span class="px-8 py-4 font-medium bg-teal">Approved</span>
@@ -66,8 +65,6 @@
 import { computed, defineComponent, ref } from 'vue';
 // --- Methods and Data ---
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
-
-// --- Utils/helper ---
 import { formatNumber, pushRoute } from 'src/utils/utils';
 
 // --- Components/icons ---
@@ -100,7 +97,7 @@ function useGrantInfo(id: number) {
 
   const grantInfo = computed(() => getGrantInfo(grantId.value));
 
-  return { status: status, grantInfo };
+  return { status, grantInfo };
 }
 
 export default defineComponent({
