@@ -176,7 +176,7 @@ export const ALL_CHAIN_INFO: ChainInfo = {
     rpcUrl: 'https://polygon-rpc.com/',
     subgraphUrl: false,
     startBlock: 21463653,
-    filterBlockLimit: 25000,
+    filterBlockLimit: 10000,
   },
   [SupportedChainId.RINKEBY]: {
     explorer: 'https://rinkeby.etherscan.io',
