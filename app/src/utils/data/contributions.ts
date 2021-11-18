@@ -17,7 +17,7 @@ import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
 // --- pull in the registry contract
-const { provider, grantRoundManager } = useWalletStore();
+const { default_provider, grantRoundManager } = useWalletStore();
 
 /**
  * @notice Get/Refresh all contributions
@@ -270,7 +270,7 @@ export function grantDonationListener(
     event: Event
   ) => {
     // console.log(name, grantId, tokenIn, donationAmount, rounds);
-    const blockNumber = await provider.value.getBlockNumber();
+    const blockNumber = await default_provider.value.getBlockNumber();
     // get tx details to pull contributor details from
     const tx = await event.getTransaction();
     // log the new contribution

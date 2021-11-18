@@ -78,12 +78,12 @@ function useTransactionStatus(hash: Ref, context: SetupContext<'onReceipt'[]>) {
   const etherscanUrl = computed(() => getEtherscanUrl(hash.value));
 
   // watch for new tx hashes then fetch receipt and wait for it to be mined, finally emit event with receipt status once mined
-  const { provider } = useWalletStore();
+  const { default_provider } = useWalletStore();
   // if the props.hash changes then we need to await the new tx
   watch(
     () => hash.value,
     async () => {
-      const receipt = await provider.value.waitForTransaction(hash.value);
+      const receipt = await default_provider.value.waitForTransaction(hash.value);
       status.value = receipt.status === 1 ? 'success' : 'failed';
       emitTxReceipt(Boolean(receipt.status));
     },

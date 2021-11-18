@@ -15,7 +15,7 @@ import { getAddress } from '../ethers';
 import { getMetadata } from './ipfs';
 
 // --- pull in the registry contract
-const { grantRegistry, provider } = useWalletStore();
+const { grantRegistry, default_provider } = useWalletStore();
 
 /**
  * @notice Get/Refresh all Grants
@@ -24,7 +24,7 @@ const { grantRegistry, provider } = useWalletStore();
  */
 
 export async function getAllGrants(forceRefresh = false) {
-  const latestBlockNumber = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
+  const latestBlockNumber = BigNumber.from(await default_provider.value.getBlockNumber()).toNumber();
 
   return await syncStorage(
     allGrantsKey,
@@ -142,7 +142,7 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
     void (await syncStorage(
       allGrantsKey,
       {
-        blockNumber: await provider.value.getBlockNumber(),
+        blockNumber: await default_provider.value.getBlockNumber(),
       },
       async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
         // pull the indexed grants data from localStorage

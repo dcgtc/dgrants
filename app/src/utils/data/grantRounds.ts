@@ -30,7 +30,7 @@ import {
 } from 'src/utils/constants';
 import { Ref } from 'vue';
 
-const { grantRoundManager, provider } = useWalletStore();
+const { grantRoundManager, default_provider, provider } = useWalletStore();
 
 /**
  * @notice Get/Refresh all GrantRound addresses
@@ -38,7 +38,7 @@ const { grantRoundManager, provider } = useWalletStore();
  * @param {boolean} forceRefresh Force the cache to refresh
  */
 export async function getAllGrantRounds(forceRefresh = false) {
-  const latestBlockNumber = BigNumber.from(await provider.value.getBlockNumber()).toNumber();
+  const latestBlockNumber = BigNumber.from(await default_provider.value.getBlockNumber()).toNumber();
 
   return await syncStorage(
     allGrantRoundsKey,
@@ -146,7 +146,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         donationTokenAddress,
       } = LocalForageData?.data?.grantRound || {};
       // no contract deployed here...
-      if ((await provider.value.getCode(grantRoundAddress)) === '0x') {
+      if ((await default_provider.value.getCode(grantRoundAddress)) === '0x') {
         // return empty state
         return (
           LocalForageData || {
@@ -155,11 +155,11 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         );
       } else {
         // open the rounds contract
-        const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
+        const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, default_provider.value);
         // collect the donationToken & matchingToken before promise.all'ing everything
         const matchingTokenAddress = matchingToken?.address || (await roundContract.matchingToken());
         // use matchingTokenContract to get balance
-        const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, provider.value);
+        const matchingTokenContract = new Contract(matchingTokenAddress, ERC20_ABI, default_provider.value);
         // full update of stored data
         if (forceRefresh || !LocalForageData) {
           // Define calls to be read using multicall

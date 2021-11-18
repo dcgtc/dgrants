@@ -331,7 +331,7 @@ function useGrantDetail() {
     grantContributions: allContributions,
     grantRoundsDonationToken: donationToken,
   } = useDataStore();
-  const { signer, provider, userAddress, grantRegistry, isCorrectNetwork } = useWalletStore();
+  const { signer, default_provider, userAddress, grantRegistry, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
 
   // --- expose grant data ---
@@ -352,12 +352,12 @@ function useGrantDetail() {
   const txHash = ref<string>();
 
   watch(
-    () => [grant.value, grantId.value, rounds.value, roundsCLRData.value, provider.value],
+    () => [grant.value, grantId.value, rounds.value, roundsCLRData.value, default_provider.value],
     () => {
       // enter loading state between loads
       loading.value = true;
       // ensure the computed props are ready before fetching data
-      if (donationToken.value && rounds.value && roundsCLRData.value && provider.value) {
+      if (donationToken.value && rounds.value && roundsCLRData.value && default_provider.value) {
         // get all contributions for this grant
         const contributions = filterContributionsByGrantId(grantId.value, allContributions?.value || []);
         // sum all contributions made against this grant
