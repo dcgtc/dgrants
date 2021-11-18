@@ -61,15 +61,13 @@ export async function getAllGrantRounds(forceRefresh = false) {
             const grantRounds = await recursiveGraphFetch(
               SUBGRAPH_URL,
               'grantRounds',
-              (page: number) => `{
-              grantRounds(
-                first: 100, skip: ${page * 100}, 
-                where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}
-              ) {
-                address
-                lastUpdatedBlockNumber
-              }
-            }`
+              (filter: string) => `{
+                grantRounds(${filter}) {
+                  id
+                  address
+                  lastUpdatedBlockNumber
+                }
+              }`
             );
             // update each of the grants
             grantRounds.forEach((grantRound: GrantRoundSubgraph) => {

@@ -47,18 +47,15 @@ export async function getAllGrants(forceRefresh = false) {
             const grants = await recursiveGraphFetch(
               SUBGRAPH_URL,
               'grants',
-              (page: number) => `{
-              grants(
-                first: 100, skip: ${page * 100}, 
-                where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${latestBlockNumber}}
-              ) {
-                id
-                owner
-                payee
-                metaPtr
-                lastUpdatedBlockNumber
-              }
-            }`
+              (filter: string) => `{
+                grants(${filter}) {
+                  id
+                  owner
+                  payee
+                  metaPtr
+                  lastUpdatedBlockNumber
+                }
+              }`
             );
             // update each of the grants
             grants.forEach((grant: GrantSubgraph) => {

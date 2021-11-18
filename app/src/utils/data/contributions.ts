@@ -56,20 +56,18 @@ export async function getContributions(
               const grantDonations = await recursiveGraphFetch(
                 SUBGRAPH_URL,
                 'grantDonations',
-                (page: number) => `{
-                grantDonations(
-                  first: 100, skip: ${page * 100}, 
-                  where: {lastUpdatedBlockNumber_gte: ${fromBlock}, lastUpdatedBlockNumber_lte: ${blockNumber}}
-                ) {
-                  grantId
-                  tokenIn
-                  donationAmount
-                  from
-                  hash
-                  rounds
-                  lastUpdatedBlockNumber
-                }
-              }`
+                (filter: string) => `{
+                  grantDonations(${filter}) {
+                    id
+                    grantId
+                    tokenIn
+                    donationAmount
+                    from
+                    hash
+                    rounds
+                    lastUpdatedBlockNumber
+                  }
+                }`
               );
               // update each of the grants
               grantDonations.forEach((contribution: ContributionSubgraph) => {
