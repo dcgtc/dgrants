@@ -1,5 +1,5 @@
 <template>
-  <template v-if="myGrantContributions">
+  <template v-if="contributions">
     <!-- this is a header for a the route "/contributions" what show ALL contributions.
       other pages already have a header, so its not needed there. -->
     <BaseHeader :name="title" />
@@ -13,7 +13,7 @@
     i added a v-for loop with some dummy data for {{name}} just to test how this looks
     you can delete this of cause ...
     -->
-    <ContributionDetail :contributions="myGrantContributions" />
+    <ContributionDetail :contributions="contributions" />
   </template>
 
   <LoadingSpinner v-else />
@@ -28,13 +28,32 @@ import { computed, defineComponent } from 'vue';
 import useWalletStore from 'src/store/wallet';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { useRoute } from 'vue-router';
-import { filterContributionsByUserAddress } from 'src/utils/data/contributions';
+import { filterContributionGrantData } from 'src/utils/data/contributions';
 
-const { grantContributions: contributions } = useDataStore();
+const {
+  grantContributions: contributions,
+  grants,
+  grantMetadata: metadata,
+  grantRounds: rounds,
+  grantRoundMetadata: grantRoundMetadata,
+} = useDataStore();
+
 const { userAddress } = useWalletStore();
 
 function setTitle(route: string | symbol | null | undefined) {
   return route === '/contribution/donations' ? 'My Contributions' : 'Contributions';
+}
+
+function contributionDetails() {
+  // const userAddressTest = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
+  return filterContributionGrantData(
+    userAddress.value,
+    contributions?.value,
+    grants.value,
+    metadata.value,
+    rounds.value,
+    grantRoundMetadata.value
+  );
 }
 
 export default defineComponent({
@@ -42,14 +61,11 @@ export default defineComponent({
   components: { LoadingSpinner, ContributionDetail, BaseHeader, SectionHeader },
   setup() {
     const route = useRoute();
-    //   TODO: testing const userAddressTest = '0x4A87a2A017Be7feA0F37f03F3379d43665486Ff8';
-    const myGrantContributions = computed(() =>
-      filterContributionsByUserAddress(userAddress.value, contributions?.value)
-    );
+    const contributions = computed(() => contributionDetails());
     const title = setTitle(route.path);
     return {
       title,
-      myGrantContributions,
+      contributions,
     };
   },
 });
