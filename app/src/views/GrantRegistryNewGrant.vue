@@ -240,8 +240,11 @@ function useNewGrant() {
     const properties = { websiteURI: website, githubURI: github, twitterURI };
     if (!signer.value) throw new Error('Please connect a wallet');
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
-    const splitLogoURI = (logoURI as string).split('/');
-    const cid = splitLogoURI[splitLogoURI.length - 1];
+    let cid = '';
+    if (logoURI) {
+      const splitLogoURI = (logoURI as string).split('/');
+      cid = splitLogoURI[splitLogoURI.length - 1];
+    }
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, logoPtr: ipfs.formatMetaPtr(cid), properties })
       .then((cid) => ipfs.formatMetaPtr(cid.toString()));
