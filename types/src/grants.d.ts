@@ -84,6 +84,34 @@ export type Contribution = {
   blockNumber?: number;
 };
 
+/***
+ * Object for an individual Contribution Detail View
+ *
+ * @type ContributionDetail
+ * @field {grantId} grant id in the registry to which the contribution was made
+ * @field {grantAddress} grants payee address
+ * @field {grantName} name of the grant the contribution is associated with
+ * @field {amount} contribution amount
+ * --- optional ---
+ * @field {inRounds} rounds that the contributions counts towards
+ * @field {txHash} contributions transaction hash
+ * @field {blockNumber} blockNumber that mined the transaction
+ */
+export type ContributionDetail = {
+  grantId: number;
+  grantAddress: string;
+  grantName: string;
+  grantLogoURI?: string;
+  address: string;
+  amount: number;
+  tokenIn: string;
+  // these help to identify the contribution but are optional
+  inRounds?: string[];
+  roundName?: string;
+  txHash?: string;
+  blockNumber?: number;
+};
+
 /**
  * Object for an individual Contribution as supplied by the subgraph
  *

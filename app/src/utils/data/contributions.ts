@@ -1,5 +1,13 @@
 // --- Types ---
-import { Contribution, ContributionSubgraph, GrantRound } from '@dgrants/types';
+import {
+  Contribution,
+  ContributionDetail,
+  ContributionSubgraph,
+  Grant,
+  GrantMetadata,
+  GrantRound,
+  GrantRoundMetadata,
+} from '@dgrants/types';
 import { LocalForageAnyObj } from 'src/types';
 import { TokenInfo } from '@uniswap/token-lists';
 // --- Utils ---
@@ -12,7 +20,7 @@ import { contributionsKey, trustBonusKey } from 'src/utils/constants';
 import { GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall } from '../utils';
+import { batchFilterCall, metadataId } from '../utils';
 import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
@@ -378,4 +386,79 @@ export function filterContributionsByUserAddress(userAddress: string, contributi
     });
   }
   return undefined;
+}
+
+/**
+ * @notice filters through the grantrounds and returns the necessary attributes for  contribution detail screens
+ * @param grantRounds
+ * @param grantId
+ * @param grantRoundMeta
+ */
+function filterGrantRoundsForContributions(
+  grantRounds: GrantRound[],
+  grantId: number,
+  grantRoundMeta: GrantRoundMetadata[]
+) {
+  let roundName = '...';
+
+  grantRounds.find((grantRound) => {
+    const metadata = grantRoundMeta[<never>metadataId(grantRound.metaPtr)];
+    if (metadata && metadata.grants?.includes(grantId)) {
+      roundName = metadata.name;
+    }
+    return roundName;
+  });
+
+  return roundName;
+}
+
+/***
+ * @notice
+ * @param userAddress
+ * @param contributions
+ * @param grants
+ * @param grantMetaData
+ * @param grantRounds
+ * @param grantRoundsMetaData
+ */
+export function filterContributionGrantData(
+  userAddress: string,
+  contributions: Contribution[],
+  grants: Grant[],
+  grantMetaData: GrantMetadata[],
+  grantRounds: GrantRound[],
+  grantRoundsMetaData: GrantRoundMetadata[]
+): ContributionDetail[] {
+  const myContributions = filterContributionsByUserAddress(userAddress, contributions);
+  if (myContributions?.length === 0 || !myContributions) {
+    return [];
+  }
+  const fullContributionDetail = myContributions?.map((contribution) => {
+    let grantLogo = '/placeholder_grant.svg';
+    let grantName = '...';
+
+    const grantData = grants.find((grant) => grant.id === contribution.grantId);
+    if (grantData) {
+      grantLogo = grantMetaData[<never>metadataId(grantData.metaPtr)].logoURI ?? '';
+      grantName = grantMetaData[<never>metadataId(grantData.metaPtr)].name ?? '...';
+    }
+
+    const roundData = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
+
+    return {
+      grantId: contribution.grantId,
+      grantAddress: contribution.grantAddress,
+      grantName: grantName,
+      grantLogoURI: grantLogo,
+      address: contribution.address,
+      amount: contribution.amount,
+      tokenIn: contribution.tokenIn,
+      inRounds: contribution.inRounds,
+      roundName: roundData,
+      txHash: contribution.txHash,
+      blockNumber: contribution.blockNumber,
+    } as ContributionDetail;
+  });
+
+  return fullContributionDetail;
 }
