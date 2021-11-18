@@ -417,19 +417,20 @@ export const shuffle = (unshuffled: Grant[] | GrantRound[]) => {
 /**
  * @notice Recursively grab every page of results
  *
- * @param {string} url the url we will recursively fetch from
- * @param {string} key the key in the response object which holds results
- * @param {function} query a function which will return the query string (with the page in place)
- * @param {array} before the current array of objects
- * @param {number} page the page we want to fetch
+ * @param string url the url we will recursively fetch from
+ * @param string key the key in the response object which holds results
+ * @param function query a function which will return the query string (with the page in place)
+ * @param array before the current array of objects
+ * @param number page the page we want to fetch
  */
 export const recursiveGraphFetch = async (
   url: string,
   key: string,
   query: (page: number) => string,
-  before: any[] = [],
+  before: any[] = [], // eslint-disable-line @typescript-eslint/no-explicit-any
   page = 0
-): Promise<any[]> => {
+): // eslint-disable-next-line @typescript-eslint/no-explicit-any
+Promise<any[]> => {
   // fetch this page of results
   const res = await fetch(url, {
     method: 'POST',
