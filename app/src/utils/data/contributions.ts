@@ -9,7 +9,7 @@ import { BigNumber, BigNumberish, Event, EventFilter } from 'ethers';
 import { syncStorage } from 'src/utils/data/utils';
 // --- Constants ---
 import { contributionsKey, trustBonusKey } from 'src/utils/constants';
-import { GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
+import { DEFAULT_PROVIDER, GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 import { batchFilterCall, recursiveGraphFetch } from '../utils';
@@ -17,7 +17,7 @@ import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
 // --- pull in the registry contract
-const { default_provider, grantRoundManager } = useWalletStore();
+const { grantRoundManager } = useWalletStore();
 
 /**
  * @notice Get/Refresh all contributions
@@ -270,7 +270,7 @@ export function grantDonationListener(
     event: Event
   ) => {
     // console.log(name, grantId, tokenIn, donationAmount, rounds);
-    const blockNumber = await default_provider.value.getBlockNumber();
+    const blockNumber = await DEFAULT_PROVIDER.getBlockNumber();
     // get tx details to pull contributor details from
     const tx = await event.getTransaction();
     // log the new contribution

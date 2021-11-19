@@ -6,7 +6,7 @@ import { syncStorage } from 'src/utils/data/utils';
 import { BigNumber, BigNumberish, Event } from 'ethers';
 // --- Constants ---
 import { allGrantsKey } from 'src/utils/constants';
-import { START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
+import { DEFAULT_PROVIDER, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
 import { batchFilterCall, recursiveGraphFetch } from '../utils';
@@ -15,7 +15,7 @@ import { getAddress } from '../ethers';
 import { getMetadata } from './ipfs';
 
 // --- pull in the registry contract
-const { grantRegistry, default_provider } = useWalletStore();
+const { grantRegistry } = useWalletStore();
 
 /**
  * @notice Get/Refresh all Grants
@@ -24,7 +24,7 @@ const { grantRegistry, default_provider } = useWalletStore();
  */
 
 export async function getAllGrants(forceRefresh = false) {
-  const latestBlockNumber = BigNumber.from(await default_provider.value.getBlockNumber()).toNumber();
+  const latestBlockNumber = BigNumber.from(await DEFAULT_PROVIDER.getBlockNumber()).toNumber();
 
   return await syncStorage(
     allGrantsKey,
@@ -142,7 +142,7 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
     void (await syncStorage(
       allGrantsKey,
       {
-        blockNumber: await default_provider.value.getBlockNumber(),
+        blockNumber: await DEFAULT_PROVIDER.getBlockNumber(),
       },
       async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
         // pull the indexed grants data from localStorage

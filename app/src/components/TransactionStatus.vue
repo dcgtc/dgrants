@@ -50,7 +50,7 @@
 <script lang="ts">
 import { computed, defineComponent, Ref, ref, SetupContext, watch } from 'vue';
 import { getEtherscanUrl } from 'src/utils/utils';
-import useWalletStore from 'src/store/wallet';
+import { DEFAULT_PROVIDER } from 'src/utils/chains';
 
 const emittedEventName = 'onReceipt'; // emitted once we receive the transaction receipt
 
@@ -78,12 +78,11 @@ function useTransactionStatus(hash: Ref, context: SetupContext<'onReceipt'[]>) {
   const etherscanUrl = computed(() => getEtherscanUrl(hash.value));
 
   // watch for new tx hashes then fetch receipt and wait for it to be mined, finally emit event with receipt status once mined
-  const { default_provider } = useWalletStore();
   // if the props.hash changes then we need to await the new tx
   watch(
     () => hash.value,
     async () => {
-      const receipt = await default_provider.value.waitForTransaction(hash.value);
+      const receipt = await DEFAULT_PROVIDER.waitForTransaction(hash.value);
       status.value = receipt.status === 1 ? 'success' : 'failed';
       emitTxReceipt(Boolean(receipt.status));
     },

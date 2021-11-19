@@ -32,7 +32,7 @@ import {
   GRANT_REGISTRY_ADDRESS,
   GRANT_ROUND_MANAGER_ADDRESS,
   SUPPORTED_TOKENS_MAPPING,
-  // DEFAULT_PROVIDER,
+  DEFAULT_PROVIDER,
   DGRANTS_CHAIN_ID,
 } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
@@ -40,7 +40,7 @@ import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
 import { metadataId } from 'src/utils/utils';
 
 // --- Parameters required ---
-const { default_provider, grantRoundManager, network } = useWalletStore();
+const { grantRoundManager, network } = useWalletStore();
 
 // --- State ---
 // Most recent data read is saved as state
@@ -84,8 +84,8 @@ export default function useDataStore() {
   async function rawInit(forceRefresh = false) {
     // Check contracts are available on the given provider (or default provider)
     const [isGrantRegistryDeployed, isGrantRoundManagerDeployed] = await Promise.all([
-      (await default_provider.value.getCode(GRANT_REGISTRY_ADDRESS)) !== '0x',
-      (await default_provider.value.getCode(GRANT_ROUND_MANAGER_ADDRESS)) !== '0x',
+      (await DEFAULT_PROVIDER.getCode(GRANT_REGISTRY_ADDRESS)) !== '0x',
+      (await DEFAULT_PROVIDER.getCode(GRANT_ROUND_MANAGER_ADDRESS)) !== '0x',
     ]);
 
     // This ensures we're only attempting to load data from contracts which exist
@@ -97,7 +97,7 @@ export default function useDataStore() {
     await removeAllListeners();
 
     // Get blockdata
-    lastBlockNumber.value = BigNumber.from(await default_provider.value.getBlockNumber()).toNumber();
+    lastBlockNumber.value = BigNumber.from(await DEFAULT_PROVIDER.getBlockNumber()).toNumber();
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
@@ -210,13 +210,9 @@ export default function useDataStore() {
     // Set up watchers on the grantRounds
     grantRoundsList.forEach(async (grantRound) => {
       // open the rounds contract
-      const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, default_provider.value);
+      const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
       // open the rounds contract
-      const matchingTokenContract = new Contract(
-        await roundContract.matchingToken(),
-        ERC20_ABI,
-        default_provider.value
-      );
+      const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
       // attach listeners to the rounds
       listeners.value.push(
         metadataUpdatedListener(
@@ -317,8 +313,7 @@ export default function useDataStore() {
    */
   async function startPolling() {
     // clear old wallet connections
-    default_provider.value.removeAllListeners(); // provider used when wallet is connected
-    // DEFAULT_PROVIDER.removeAllListeners(); // provider used when no wallet is connected
+    DEFAULT_PROVIDER.removeAllListeners();
 
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
