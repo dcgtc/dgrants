@@ -40,7 +40,7 @@ const {
 
 const { userAddress } = useWalletStore();
 
-function setTitle(route: string | symbol | null | undefined) {
+function setTitle(route: string) {
   return route === '/contribution/donations' ? 'My Contributions' : 'Contributions';
 }
 

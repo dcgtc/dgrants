@@ -106,6 +106,7 @@ export type ContributionDetail = {
   address: string;
   amount: number;
   tokenIn: string;
+  donationToken?: TokenInfo;
   // these help to identify the contribution but are optional
   inRounds?: string[];
   roundName?: string;
