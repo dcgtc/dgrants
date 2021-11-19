@@ -20,7 +20,7 @@ import { contributionsKey, trustBonusKey } from 'src/utils/constants';
 import { DEFAULT_PROVIDER, GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall, metadataId } from '../utils';
+import { batchFilterCall, metadataId, ptrToURI } from 'src/utils/utils';
 import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
