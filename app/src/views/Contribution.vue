@@ -1,5 +1,5 @@
 <template>
-  <template v-if="contributions">
+  <template v-if="fullContributions">
     <!-- this is a header for a the route "/contributions" what show ALL contributions.
       other pages already have a header, so its not needed there. -->
     <BaseHeader :name="title" />
@@ -13,7 +13,7 @@
     i added a v-for loop with some dummy data for {{name}} just to test how this looks
     you can delete this of cause ...
     -->
-    <ContributionDetail :contributions="contributions" />
+    <ContributionDetail :contributions="fullContributions" />
   </template>
 
   <LoadingSpinner v-else />
@@ -25,35 +25,58 @@ import SectionHeader from 'src/components/SectionHeader.vue';
 import ContributionDetail from 'src/components/ContributionDetail.vue';
 import useDataStore from 'src/store/data';
 import { computed, defineComponent } from 'vue';
-import useWalletStore from 'src/store/wallet';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
-import { useRoute } from 'vue-router';
 import { filterContributionGrantData } from 'src/utils/data/contributions';
-
-const {
-  grantContributions: contributions,
-  grants,
-  grantMetadata: metadata,
-  grantRounds: rounds,
-  grantRoundMetadata: grantRoundMetadata,
-} = useDataStore();
-
-const { userAddress } = useWalletStore();
+import useWalletStore from 'src/store/wallet';
+import { useRoute } from 'vue-router';
 
 function setTitle(route: string) {
   return route === '/contribution/donations' ? 'My Contributions' : 'Contributions';
 }
 
 function contributionDetails() {
-  // const userAddressTest = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
-  return filterContributionGrantData(
-    userAddress.value,
-    contributions?.value,
-    grants.value,
-    metadata.value,
-    rounds.value,
-    grantRoundMetadata.value
-  );
+  const { grantContributions, grants, grantMetadata, grantRounds, grantRoundMetadata } = useDataStore();
+  const { userAddress } = useWalletStore();
+
+  const allGrantRounds = computed(() => {
+    return grantRounds.value ? grantRounds.value : [];
+  });
+
+  const grantMetaData = computed(() => {
+    return grantMetadata.value ? grantMetadata.value : [];
+  });
+
+  const contributions = computed(() => {
+    return grantContributions.value ? grantContributions.value : [];
+  });
+
+  const allGrants = computed(() => {
+    return grants.value ? grants.value : [];
+  });
+
+  const userAddr = computed(() => {
+    return userAddress.value ? userAddress.value : '';
+  });
+
+  const getContributionDetails = function () {
+    // const userAddressTest = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
+    return filterContributionGrantData(
+      userAddr.value,
+      // userAddressTest,
+      contributions.value,
+      allGrants.value,
+      grantMetaData.value,
+      allGrantRounds.value,
+      grantRoundMetadata.value
+    );
+  };
+
+  const fullContributions = getContributionDetails();
+
+  return {
+    fullContributions,
+    contributions,
+  };
 }
 
 export default defineComponent({
@@ -61,11 +84,11 @@ export default defineComponent({
   components: { LoadingSpinner, ContributionDetail, BaseHeader, SectionHeader },
   setup() {
     const route = useRoute();
-    const contributions = computed(() => contributionDetails());
-    const title = setTitle(route.path);
+    // const contributions = computed(() => contributionDetails());
+    const title = setTitle(route?.path || 'contributions');
     return {
       title,
-      contributions,
+      ...contributionDetails(),
     };
   },
 });

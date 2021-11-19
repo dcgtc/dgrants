@@ -182,7 +182,6 @@ export default defineComponent({
     const router = useRouter();
 
     function myContributions() {
-      //TODO: further check that the userId is defined and valid?
       router.push({
         name: 'contribution',
       });

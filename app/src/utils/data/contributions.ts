@@ -402,7 +402,7 @@ function filterGrantRoundsForContributions(
   let roundName = '...';
 
   grantRounds.find((grantRound) => {
-    const metadata = grantRoundMeta[<never>metadataId(grantRound.metaPtr)];
+    const metadata = grantRoundMeta[metadataId(grantRound.metaPtr)];
     if (metadata && metadata.grants?.includes(grantId)) {
       roundName = metadata.name;
     }
@@ -425,15 +425,18 @@ export function filterContributionGrantData(
   userAddress: string,
   contributions: Contribution[],
   grants: Grant[],
-  grantMetaData: GrantMetadata[],
+  grantMetaData: Record<string, GrantMetadata>,
   grantRounds: GrantRound[],
-  grantRoundsMetaData: GrantRoundMetadata[]
+  grantRoundsMetaData: Record<string, GrantRoundMetadata[]>
 ): ContributionDetail[] {
+  if (!userAddress || !contributions) {
+    return [];
+  }
   const myContributions = filterContributionsByUserAddress(userAddress, contributions);
   if (myContributions?.length === 0 || !myContributions) {
     return [];
   }
-  const fullContributionDetail = myContributions?.map((contribution) => {
+  return myContributions?.map((contribution) => {
     let grantLogo = '/placeholder_grant.svg';
     let grantName = '...';
 
@@ -460,6 +463,4 @@ export function filterContributionGrantData(
       blockNumber: contribution.blockNumber,
     } as ContributionDetail;
   });
-
-  return fullContributionDetail;
 }
