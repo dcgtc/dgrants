@@ -41,9 +41,13 @@
                     <Jazzicon :address="contribution.address" :key="contribution.address" :width="48" />
                   </figure>
                   <div>
-                    <a :href="getEtherscanUrl(contribution.address, 'address')" class="link">{{
-                      formatAddress(contribution.address)
-                    }}</a>
+                    <a
+                      :href="getEtherscanUrl(contribution.address, 'address')"
+                      class="link"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      >{{ formatAddress(contribution.address) }}</a
+                    >
                   </div>
                 </div>
               </div>

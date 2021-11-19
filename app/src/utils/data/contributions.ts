@@ -454,6 +454,7 @@ export function filterContributionGrantData(
       amount: contribution.amount,
       tokenIn: contribution.tokenIn,
       inRounds: contribution.inRounds,
+      donationToken: contribution.donationToken,
       roundName: roundData,
       txHash: contribution.txHash,
       blockNumber: contribution.blockNumber,
