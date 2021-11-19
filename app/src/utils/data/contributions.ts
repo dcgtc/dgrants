@@ -67,7 +67,8 @@ export async function getContributions(
                     rounds
                     lastUpdatedBlockNumber
                   }
-                }`
+                }`,
+                fromBlock
               );
               // update each of the grants
               grantDonations.forEach((contribution: ContributionSubgraph) => {

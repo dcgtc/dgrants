@@ -67,7 +67,8 @@ export async function getAllGrantRounds(forceRefresh = false) {
                   address
                   lastUpdatedBlockNumber
                 }
-              }`
+              }`,
+              fromBlock
             );
             // update each of the grants
             grantRounds.forEach((grantRound: GrantRoundSubgraph) => {

@@ -55,7 +55,8 @@ export async function getAllGrants(forceRefresh = false) {
                   metaPtr
                   lastUpdatedBlockNumber
                 }
-              }`
+              }`,
+              fromBlock
             );
             // update each of the grants
             grants.forEach((grant: GrantSubgraph) => {
