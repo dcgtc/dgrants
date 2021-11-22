@@ -47,12 +47,20 @@
         <div class="flex justify-end pt-6">
           <button
             type="submit"
+            v-if="roundStatus === ''"
             class="btn btn-primary mr-5"
             :class="{ disabled: !isFormValid || !isCorrectNetwork }"
             :disabled="!isFormValid || !isCorrectNetwork"
           >
             Add Funds
           </button>
+          <div v-else class="flex gap-x-4 justify-end">
+            <div>
+              <div class="text-sm text-right">Transaction</div>
+              <div>{{ roundStatus }}</div>
+            </div>
+            <button class="btn disabled spinner float-right" disabled><Spinner1Icon /></button>
+          </div>
           <button @click.prevent="hideAddFunds" class="btn btn-outline">Cancel</button>
         </div>
       </form>
@@ -185,8 +193,7 @@ import {
 import { Breadcrumb, GrantRound, GrantRoundMetadata } from '@dgrants/types';
 
 // --- Icons ---
-import { TwitterIcon } from '@fusion-icons/vue/interface';
-import { DonateIcon } from '@fusion-icons/vue/interface';
+import { TwitterIcon, DonateIcon, Spinner1Icon } from '@fusion-icons/vue/interface';
 
 // --- Contract ---
 import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
@@ -200,6 +207,7 @@ function useGrantRoundDetail() {
 
   const grantRoundAddress = computed(() => route.params.address);
   const txHash = ref<string>();
+  const roundStatus = ref<string>('');
 
   // --- BaseHeader Navigation ---
   const breadcrumb = computed(() => {
@@ -318,6 +326,8 @@ function useGrantRoundDetail() {
     if (!signer.value) throw new Error('Please connect a wallet');
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
 
+    roundStatus.value = '1 of 1 pending';
+
     // Pull data from form
     const { amount } = form.value;
     const tokenAddress = grantRound.value.matchingToken.address;
@@ -368,6 +378,7 @@ function useGrantRoundDetail() {
     showAddFunds,
     hideAddFunds,
     addFunds,
+    roundStatus,
     prevGrantRound,
     nextGrantRound,
     isDefined,
@@ -386,6 +397,7 @@ export default defineComponent({
     SectionHeader,
     DonateIcon,
     TwitterIcon,
+    Spinner1Icon,
     TransactionStatus,
     LoadingSpinner,
   },
