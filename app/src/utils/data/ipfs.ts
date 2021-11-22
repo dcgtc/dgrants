@@ -10,6 +10,9 @@ const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs';
 
 function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
   if (!logoPtr) throw new Error('assertIPFSPointer: logoPtr is undefined');
+  if (typeof logoPtr == 'string') {
+    logoPtr = decodeMetadataId(logoPtr);
+  }
   const protocol = BigNumber.from(logoPtr.protocol).toString();
   if (protocol !== '1') throw new Error(`assertIPFSPointer: Expected protocol ID of 1, found ${protocol}`);
 }

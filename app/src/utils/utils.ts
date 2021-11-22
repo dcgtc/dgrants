@@ -80,6 +80,10 @@ export function cleanTwitterUrl(url: string | undefined) {
 
 // Given a metadata pointer object, return a stringified version that can be used as an object key
 export function metadataId(metaPtr: MetaPtr): string {
+  if (typeof metaPtr == 'string') {
+    metaPtr = decodeMetadataId(metaPtr);
+  }
+
   return `${BigNumber.from(metaPtr.protocol).toString()}-${metaPtr.pointer}`;
 }
 
