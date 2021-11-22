@@ -26,8 +26,8 @@ export type GrantSubgraph = {
   payee: string;
   metaPtr: MetaPtr;
   lastUpdatedBlockNumber: number;
-  createdAt: BigNumber;
-  lastUpdated: BigNumber;
+  createdAtTimestamp: BigNumber;
+  lastUpdatedTimestamp: BigNumber;
 };
 // internally we cast id:BigNumber from GrantEthers to a number for Grant
 export type Grant = {
@@ -81,6 +81,7 @@ export type Contribution = {
   inRounds?: string[];
   donationToken?: TokenInfo;
   txHash?: string;
+  createdAt?: BigNumber;
   blockNumber?: number;
 };
 
@@ -103,6 +104,7 @@ type ContributionSubgraph = {
   from: string;
   hash: string;
   rounds: string[];
+  createdAtTimestamp: BigNumber;
   lastUpdatedBlockNumber: number;
 };
 
