@@ -52,7 +52,10 @@ export async function getAllGrants(forceRefresh = false) {
                   id
                   owner
                   payee
-                  metaPtr
+                  metaPtr {
+                    protocol
+                    pointer
+                  }
                   createdAtTimestamp
                   lastUpdatedTimestamp
                   lastUpdatedBlockNumber
