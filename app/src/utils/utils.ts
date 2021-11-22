@@ -10,7 +10,13 @@ import useWalletStore from 'src/store/wallet';
 import { Grant, GrantRound, MetaPtr } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
-import { ETHERSCAN_BASE_URL, FILTER_BLOCK_LIMIT, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
+import {
+  DEFAULT_PROVIDER,
+  ETHERSCAN_BASE_URL,
+  FILTER_BLOCK_LIMIT,
+  SUPPORTED_TOKENS_MAPPING,
+  WETH_ADDRESS,
+} from 'src/utils/chains';
 import { getMetaPtr } from 'src/utils/data/ipfs';
 import { Ref } from 'vue';
 
@@ -180,13 +186,15 @@ export function getEtherscanUrl(hash: string, group: EtherscanGroup = 'tx') {
  * @returns True if the user has sufficient balance, or throws otherwise
  */
 export async function assertSufficientBalance(tokenAddress: string, requiredAmount: BigNumberish): Promise<boolean> {
-  const { provider, userAddress } = useWalletStore();
+  const { userAddress } = useWalletStore();
   if (!userAddress.value) return true; // exit early, don't want any errors thrown
   const isEth = tokenAddress === WETH_ADDRESS;
   tokenAddress = isEth ? ETH_ADDRESS : tokenAddress;
   const abi = ['function balanceOf(address) view returns (uint256)'];
-  const token = new Contract(tokenAddress, abi, provider.value);
-  const balance = isEth ? await provider.value.getBalance(userAddress.value) : await token.balanceOf(userAddress.value);
+  const token = new Contract(tokenAddress, abi, DEFAULT_PROVIDER);
+  const balance = isEth
+    ? await DEFAULT_PROVIDER.getBalance(userAddress.value)
+    : await token.balanceOf(userAddress.value);
   if (balance.lt(requiredAmount)) {
     const tokenInfo = SUPPORTED_TOKENS_MAPPING[tokenAddress];
     const { symbol, decimals } = tokenInfo;

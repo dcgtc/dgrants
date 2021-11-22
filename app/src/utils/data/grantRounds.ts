@@ -36,7 +36,7 @@ import {
 } from 'src/utils/constants';
 import { Ref } from 'vue';
 
-const { grantRoundManager, provider } = useWalletStore();
+const { grantRoundManager } = useWalletStore();
 
 /**
  * @notice Get/Refresh all GrantRound addresses
@@ -459,7 +459,7 @@ async function updateGrantRound(
   refs: Record<string, Ref>
 ) {
   // blockNumber from the provider
-  const blockNumber = await provider.value.getBlockNumber();
+  const blockNumber = await DEFAULT_PROVIDER.getBlockNumber();
   // update _lsRoundAddresses
   void (await syncStorage(
     allGrantRoundsKey,
@@ -529,9 +529,9 @@ export function grantRoundCreatedListener(
   const listener = async (grantRoundAddress: string) => {
     console.log('New GrantRound created: ', grantRoundAddress);
     // open the rounds contract
-    const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, provider.value);
+    const roundContract = new Contract(grantRoundAddress, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
     // open the rounds contract
-    const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, provider.value);
+    const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
     // update the grants round
     void updateGrantRound(grantRoundAddress, args, refs);
     // init and record the new listeners

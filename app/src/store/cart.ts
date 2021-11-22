@@ -8,7 +8,13 @@
 import { computed, ref } from 'vue';
 import { Donation, Grant, SwapSummary, SwapSummaryUniV2 } from '@dgrants/types';
 import { CartItem, CartItemOptions, CartPrediction, CartPredictions } from 'src/types';
-import { SupportedChainId, SUPPORTED_TOKENS, SUPPORTED_TOKENS_MAPPING, WETH_ADDRESS } from 'src/utils/chains';
+import {
+  DEFAULT_PROVIDER,
+  SupportedChainId,
+  SUPPORTED_TOKENS,
+  SUPPORTED_TOKENS_MAPPING,
+  WETH_ADDRESS,
+} from 'src/utils/chains';
 import { ERC20_ABI, ETH_ADDRESS, WAD } from 'src/utils/constants';
 import { BigNumber, BigNumberish, BytesLike, Contract, ContractTransaction, formatUnits, getAddress, hexDataSlice, isAddress, MaxUint256, parseUnits } from 'src/utils/ethers'; // prettier-ignore
 import { assertSufficientBalance, metadataId } from 'src/utils/utils';
@@ -535,18 +541,17 @@ function fixDonationRoundingErrors(donations: Donation[]) {
  * @param amountIn Swap input amount, as a full integer
  */
 async function quoteExactInput(path: BytesLike | string[], amountIn: BigNumberish): Promise<BigNumber> {
-  const { provider } = useWalletStore();
   let amountOut: BigNumber;
   if (Array.isArray(path)) {
     // Polygon mainnet, Uniswap V2 format
     const abi = ['function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts)']; // prettier-ignore
-    const router = new Contract('0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', abi, provider.value); // TODO hardcoded Polygon mainnet SushiSwap address
+    const router = new Contract('0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506', abi, DEFAULT_PROVIDER); // TODO hardcoded Polygon mainnet SushiSwap address
     const amountsOut = await router.getAmountsOut(amountIn, path);
     amountOut = amountsOut[amountsOut.length - 1];
   } else {
     // L1 mainnet, Uniswap V3 format
     const abi = ['function quoteExactInput(bytes memory path, uint256 amountIn) external view returns (uint256 amountOut)']; // prettier-ignore
-    const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, provider.value); // TODO hardcoded L1 mainnet Uniswap V3 address
+    const quoter = new Contract('0xb27308f9F90D607463bb33eA1BeBb41C27CE5AB6', abi, DEFAULT_PROVIDER); // TODO hardcoded L1 mainnet Uniswap V3 address
     amountOut = await quoter.quoteExactInput(path, amountIn);
   }
   return amountOut.mul(995).div(1000); // multiplying by 995/1000 is equivalent to 0.5% slippage

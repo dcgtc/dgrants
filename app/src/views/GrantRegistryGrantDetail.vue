@@ -283,7 +283,7 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
-import { DEFAULT_PROVIDER, DGRANTS_CHAIN_ID } from 'src/utils/chains';
+import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 import {
   cleanTwitterUrl,
   formatNumber,
@@ -352,12 +352,12 @@ function useGrantDetail() {
   const txHash = ref<string>();
 
   watch(
-    () => [grant.value, grantId.value, rounds.value, roundsCLRData.value, DEFAULT_PROVIDER],
+    () => [grant.value, grantId.value, rounds.value, roundsCLRData.value],
     () => {
       // enter loading state between loads
       loading.value = true;
       // ensure the computed props are ready before fetching data
-      if (donationToken.value && rounds.value && roundsCLRData.value && DEFAULT_PROVIDER) {
+      if (donationToken.value && rounds.value && roundsCLRData.value) {
         // get all contributions for this grant
         const contributions = filterContributionsByGrantId(grantId.value, allContributions?.value || []);
         // sum all contributions made against this grant
