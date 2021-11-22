@@ -29,6 +29,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { filterContributionGrantData } from 'src/utils/data/contributions';
 import useWalletStore from 'src/store/wallet';
 import { useRoute } from 'vue-router';
+import { GrantMetadata, GrantRoundMetadata } from '@dgrants/types';
 
 function setTitle(route: string) {
   return route === '/contribution/donations' ? 'My Contributions' : 'Contributions';
@@ -43,7 +44,11 @@ function contributionDetails() {
   });
 
   const grantMetaData = computed(() => {
-    return grantMetadata.value ? grantMetadata.value : [];
+    return grantMetadata.value as Record<string, GrantMetadata>;
+  });
+
+  const grantRoundsMetaData = computed(() => {
+    return grantRoundMetadata.value as Record<string, GrantRoundMetadata>;
   });
 
   const contributions = computed(() => {
@@ -65,9 +70,9 @@ function contributionDetails() {
       // userAddressTest,
       contributions.value,
       allGrants.value,
-      grantMetaData.value,
       allGrantRounds.value,
-      grantRoundMetadata.value
+      grantMetaData.value,
+      grantRoundsMetaData.value
     );
   };
 
@@ -84,7 +89,6 @@ export default defineComponent({
   components: { LoadingSpinner, ContributionDetail, BaseHeader, SectionHeader },
   setup() {
     const route = useRoute();
-    // const contributions = computed(() => contributionDetails());
     const title = setTitle(route?.path || 'contributions');
     return {
       title,

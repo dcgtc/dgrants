@@ -397,17 +397,19 @@ export function filterContributionsByUserAddress(userAddress: string, contributi
 function filterGrantRoundsForContributions(
   grantRounds: GrantRound[],
   grantId: number,
-  grantRoundMeta: GrantRoundMetadata[]
+  grantRoundMeta?: Record<string, GrantRoundMetadata>
 ) {
   let roundName = '...';
 
-  grantRounds.find((grantRound) => {
-    const metadata = grantRoundMeta[metadataId(grantRound.metaPtr)];
-    if (metadata && metadata.grants?.includes(grantId)) {
-      roundName = metadata.name;
-    }
-    return roundName;
-  });
+  if (grantRoundMeta) {
+    grantRounds.find((grantRound) => {
+      const metadata = grantRoundMeta[metadataId(grantRound.metaPtr)];
+      if (metadata && metadata.grants?.includes(grantId)) {
+        roundName = metadata.name;
+      }
+      return roundName;
+    });
+  }
 
   return roundName;
 }
@@ -425,9 +427,9 @@ export function filterContributionGrantData(
   userAddress: string,
   contributions: Contribution[],
   grants: Grant[],
-  grantMetaData: Record<string, GrantMetadata>,
   grantRounds: GrantRound[],
-  grantRoundsMetaData: Record<string, GrantRoundMetadata[]>
+  grantMetaData?: Record<string, GrantMetadata>,
+  grantRoundsMetaData?: Record<string, GrantRoundMetadata>
 ): ContributionDetail[] {
   if (!userAddress || !contributions) {
     return [];
@@ -446,7 +448,7 @@ export function filterContributionGrantData(
       grantName = grantMetaData[<never>metadataId(grantData.metaPtr)].name ?? '...';
     }
 
-    const roundData = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
+    const roundName = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
 
     return {
       grantId: contribution.grantId,
@@ -458,7 +460,7 @@ export function filterContributionGrantData(
       tokenIn: contribution.tokenIn,
       inRounds: contribution.inRounds,
       donationToken: contribution.donationToken,
-      roundName: roundData,
+      roundName: roundName,
       txHash: contribution.txHash,
       blockNumber: contribution.blockNumber,
     } as ContributionDetail;
