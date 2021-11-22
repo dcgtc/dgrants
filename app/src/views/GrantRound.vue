@@ -325,8 +325,6 @@ function useGrantRoundDetail() {
     if (!signer.value) throw new Error('Please connect a wallet');
     if (!isCorrectNetwork.value) throw new Error('Wrong network');
 
-    roundStatus.value = '1 of 1 pending';
-
     // Pull data from form
     const { amount } = form.value;
     const tokenAddress = grantRound.value.matchingToken.address;
@@ -338,14 +336,19 @@ function useGrantRoundDetail() {
     // contributionAmount must have the right number of decimals and be hexed
     const contributionAmount = parseUnits(amount, grantRound.value.matchingToken.decimals);
 
+    let txIndex = 1;
+    let txsNeeded = 1;
     // Check if contract is already approved as a spender
     const allowance = await checkAllowance(token, userAddress.value, grantRound.value.address);
     if (allowance.lt(contributionAmount)) {
+      txsNeeded++;
+      roundStatus.value = `${txIndex} of ${txsNeeded} pending`;
       await getApproval(token, grantRound.value.address, MaxUint256);
+      txIndex++;
     }
-
     assertSufficientBalance(tokenAddress, contributionAmount);
 
+    roundStatus.value = `${txIndex} of ${txsNeeded} pending`;
     // Invoke addMatchingFunds on the round contract
     await addMatchingFunds(round, contributionAmount);
 
