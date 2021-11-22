@@ -65,6 +65,7 @@ export async function getContributions(
                     from
                     hash
                     rounds
+                    createdAtTimestamp
                     lastUpdatedBlockNumber
                   }
                 }`,
@@ -82,6 +83,7 @@ export async function getContributions(
                   address: getAddress(contribution.from),
                   donationToken: donationToken,
                   txHash: contribution.hash,
+                  createdAt: contribution.createdAtTimestamp,
                   blockNumber: contribution.lastUpdatedBlockNumber,
                 };
               });
@@ -123,6 +125,7 @@ export async function getContributions(
                   tokenIn: getAddress(contribution?.args?.tokenIn),
                   donationToken: donationToken,
                   txHash: tx.hash,
+                  createdAt: contribution.args?.time,
                   blockNumber: tx.blockNumber,
                 };
               })
@@ -267,6 +270,7 @@ export function grantDonationListener(
     tokenIn: string,
     donationAmount: BigNumberish,
     grantRounds: string[],
+    time: BigNumber,
     event: Event
   ) => {
     // console.log(name, grantId, tokenIn, donationAmount, rounds);
@@ -301,6 +305,7 @@ export function grantDonationListener(
           tokenIn: tokenIn,
           txHash: tx.hash,
           blockNumber: tx.blockNumber,
+          createdAt: time,
         };
 
         if (save) {

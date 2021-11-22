@@ -53,11 +53,14 @@ export async function getAllGrants(forceRefresh = false) {
                   owner
                   payee
                   metaPtr
+                  createdAtTimestamp
+                  lastUpdatedTimestamp
                   lastUpdatedBlockNumber
                 }
               }`,
               fromBlock
             );
+            console.log(grants);
             // update each of the grants
             grants.forEach((grant: GrantSubgraph) => {
               const grantId = BigNumber.from(grant.id).toNumber();
@@ -66,6 +69,8 @@ export async function getAllGrants(forceRefresh = false) {
                 owner: getAddress(grant.owner),
                 payee: getAddress(grant.payee),
                 metaPtr: grant.metaPtr,
+                createdAt: grant.createdAtTimestamp,
+                lastUpdated: grant.lastUpdatedTimestamp,
               } as Grant;
             });
             // update to most recent block collected
@@ -100,11 +105,14 @@ export async function getAllGrants(forceRefresh = false) {
           // set the mapped entries into the indexed grants data
           [...newGrants, ...updatedGrants]
             .map((tx: Event) => {
+              const grantId = BigNumber.from(tx.args?.id).toNumber();
               return {
-                id: BigNumber.from(tx.args?.id).toNumber(),
+                id: grantId,
                 owner: getAddress(tx.args?.owner),
                 payee: getAddress(tx.args?.payee),
                 metaPtr: tx.args?.metaPtr,
+                createdAt: _lsGrants[grantId] ? _lsGrants[grantId].createdAt : tx.args?.time,
+                lastUpdated: tx.args?.time,
               } as Grant;
             })
             .forEach((grant) => {
@@ -137,7 +145,13 @@ export async function getAllGrants(forceRefresh = false) {
  * @notice Attach an event listener on grantRegistry->GrantCreated
  */
 export function grantListener(name: string, refs: Record<string, Ref>) {
-  const listener = async (grantId: BigNumberish, owner: string, payee: string, metaPtr: MetaPtr) => {
+  const listener = async (
+    grantId: BigNumberish,
+    owner: string,
+    payee: string,
+    metaPtr: MetaPtr,
+    time: BigNumberish
+  ) => {
     console.log(`New ${name} event: `, { grantId: BigNumber.from(grantId).toNumber() });
     void (await syncStorage(
       allGrantsKey,
@@ -165,6 +179,8 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
           owner: getAddress(owner),
           payee: getAddress(payee),
           metaPtr: metaPtr,
+          createdAt: _lsGrants[grantId] ? _lsGrants[grantId].createdAt : time,
+          lastUpdated: time,
         };
 
         // update the stored grants
