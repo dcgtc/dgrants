@@ -20,7 +20,7 @@
           :id="grant.id"
           :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
-          :imgurl="(grantMetadata && ptrToURI(grantMetadata[metadataId(grant.metaPtr)]?.logoPtr)) || '/placeholder_grant.svg'"
+          :logoPtr="grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoPtr"
         />
       </li>
     </ul>

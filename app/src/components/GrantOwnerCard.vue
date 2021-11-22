@@ -7,7 +7,7 @@
         class="aspect-w-16 aspect-h-9 shadow-light cursor-pointer"
         @click="pushRoute({ name: 'dgrants-id', params: { id: id.toString() } })"
       >
-        <img class="w-full h-full object-center object-cover" :src="imgurl || '/placeholder_grant.svg'" />
+        <img class="w-full h-full object-center object-cover" :src="ptrToURI(logoPtr) || '/placeholder_grant.svg'" />
       </figure>
 
       <!--grid:right (txt)-->
@@ -62,14 +62,15 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref } from 'vue';
+import { computed, defineComponent, PropType, ref } from 'vue';
 // --- Methods and Data ---
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
-import { formatNumber, pushRoute } from 'src/utils/utils';
+import { formatNumber, ptrToURI, pushRoute } from 'src/utils/utils';
 
 // --- Components/icons ---
 import useDataStore from 'src/store/data';
 import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
+import { MetaPtr } from '@dgrants/types';
 
 function useGrantInfo(id: number) {
   const { grantRounds, grantContributions, approvedGrantsPk } = useDataStore();
@@ -106,11 +107,11 @@ export default defineComponent({
   props: {
     id: { type: Number, required: true },
     name: { type: String, required: true },
-    imgurl: { type: String, required: true },
+    logoPtr: { type: Object as PropType<MetaPtr>, required: false },
     ownerAddress: { type: String, required: true },
   },
   setup(props) {
-    return { pushRoute, ...useGrantInfo(props.id) };
+    return { pushRoute, ptrToURI, ...useGrantInfo(props.id) };
   },
 });
 </script>
