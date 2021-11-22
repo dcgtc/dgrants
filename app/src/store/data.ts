@@ -306,7 +306,7 @@ export default function useDataStore() {
     if (whitelistUrl) {
       const url = whitelistUrl + uniqueStr;
       const json = await fetch(url).then((res) => res.json());
-      approvedGrantsPk = json[DGRANTS_CHAIN_ID];
+      if (!json) return grants;
       grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
     }
 
