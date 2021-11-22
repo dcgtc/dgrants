@@ -1,12 +1,12 @@
 <template>
-  <template v-if="fullContributions">
+  <template v-if="fullContributions && !loading">
     <!-- this is a header for a the route "/contributions" what show ALL contributions.
       other pages already have a header, so its not needed there. -->
     <BaseHeader :name="title" />
 
     <!-- btw in this component was a "cursor-pointer" for some reason. i removed it as this is
     not something clickable. just for final PR this component could need that update too-->
-    <SectionHeader title="Contributions (444)" />
+    <SectionHeader :title="`Contributions (${contributionTotal})`" />
 
     <!-- a single contribution ( right now this would be the "ContributionRow.vue" what we maybe
     not even wana keep - depends on the architecture you wana do ...
@@ -24,7 +24,7 @@ import BaseHeader from 'src/components/BaseHeader.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import ContributionDetail from 'src/components/ContributionDetail.vue';
 import useDataStore from 'src/store/data';
-import { computed, defineComponent } from 'vue';
+import { computed, defineComponent, ref, watch } from 'vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { filterContributionGrantData } from 'src/utils/data/contributions';
 import useWalletStore from 'src/store/wallet';
@@ -38,6 +38,10 @@ function setTitle(route: string) {
 function contributionDetails() {
   const { grantContributions, grants, grantMetadata, grantRounds, grantRoundMetadata } = useDataStore();
   const { userAddress } = useWalletStore();
+
+  const fullContributions = ref();
+  const contributionTotal = ref(0);
+  const loading = ref(true);
 
   const allGrantRounds = computed(() => {
     return grantRounds.value ? grantRounds.value : [];
@@ -63,24 +67,45 @@ function contributionDetails() {
     return userAddress.value ? userAddress.value : '';
   });
 
-  const getContributionDetails = function () {
-    // const userAddressTest = '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65';
-    return filterContributionGrantData(
-      userAddr.value,
-      // userAddressTest,
+  watch(
+    () => [
       contributions.value,
-      allGrants.value,
       allGrantRounds.value,
-      grantMetaData.value,
-      grantRoundsMetaData.value
-    );
-  };
+      grantRounds.value,
+      grantMetadata.value,
+      grantRoundsMetaData.value,
+    ],
+    () => {
+      // ensure state is still loading
+      loading.value = true;
+      if (
+        contributions.value &&
+        userAddr.value &&
+        allGrantRounds.value &&
+        grantRoundMetadata.value &&
+        grantMetadata.value
+      ) {
+        fullContributions.value = filterContributionGrantData(
+          userAddr.value,
+          contributions.value,
+          allGrants.value,
+          allGrantRounds.value,
+          grantMetaData.value,
+          grantRoundsMetaData.value
+        );
 
-  const fullContributions = getContributionDetails();
+        contributionTotal.value = fullContributions.value.length;
+        loading.value = false;
+      }
+    },
+    { immediate: true }
+  );
 
   return {
     fullContributions,
     contributions,
+    contributionTotal,
+    loading,
   };
 }
 

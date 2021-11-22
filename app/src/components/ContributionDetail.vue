@@ -68,7 +68,7 @@
               <!-- utc-time -->
               <div class="text-grey-400">2021-11-01 13:20:41</div>
               <!-- tx-hash -->
-              <div class="">
+              <div class="truncate">
                 <a :href="getEtherscanUrl(contribution.txHash || '', 'tx')" class="link">{{ contribution.txHash }} </a>
               </div>
             </div>
