@@ -20,7 +20,7 @@ import { contributionsKey, trustBonusKey } from 'src/utils/constants';
 import { DEFAULT_PROVIDER, GRANT_ROUND_MANAGER_ADDRESS, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall, metadataId, ptrToURI } from 'src/utils/utils';
+import { batchFilterCall, metadataId, ptrToURI, recursiveGraphFetch } from 'src/utils/utils';
 import { Ref } from 'vue';
 import { getGrantRoundGrantData } from './grantRounds';
 
@@ -80,7 +80,7 @@ export async function getContributions(
                 fromBlock
               );
               // update each of the grants
-              json.data.grantDonations.forEach((contribution: ContributionSubgraph) => {
+              grantDonations.forEach((contribution: ContributionSubgraph) => {
                 const grantId = BigNumber.from(contribution.grantId).toNumber();
                 _lsContributions[`${contribution.hash}-${grantId}`] = {
                   grantId: grantId,
@@ -161,7 +161,6 @@ export async function getContributions(
     )) || {}
   );
 }
-
 /**
  * @notice Get/Refresh all TrustBonus scores
  *
@@ -443,9 +442,10 @@ export function filterContributionGrantData(
     let grantName = '...';
 
     const grantData = grants.find((grant) => grant.id === contribution.grantId);
-    if (grantData) {
-      grantLogo = grantMetaData[<never>metadataId(grantData.metaPtr)].logoUR ?? '';
-      grantName = grantMetaData[<never>metadataId(grantData.metaPtr)].name ?? '...';
+    if (grantData && grantMetaData) {
+      const metaDataVersionId = metadataId(grantData.metaPtr);
+      grantLogo = ptrToURI(grantMetaData[metaDataVersionId].logoPtr) ?? '';
+      grantName = grantMetaData[metaDataVersionId].name ?? '...';
     }
 
     const roundName = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
