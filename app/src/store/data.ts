@@ -305,9 +305,13 @@ export default function useDataStore() {
     const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
     if (whitelistUrl) {
       const url = whitelistUrl + uniqueStr;
-      const json = await fetch(url).then((res) => res.json());
-      if (!json) return grants;
-      grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
+      try {
+        const json = await fetch(url).then((res) => res.json());
+        if (!json) return grants;
+        grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
+      } catch (err) {
+        return grants;
+      }
     }
 
     return {
