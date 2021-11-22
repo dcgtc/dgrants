@@ -305,12 +305,31 @@ export default function useDataStore() {
     const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
     if (whitelistUrl) {
       const url = whitelistUrl + uniqueStr;
+
+      const filterWhiteListed = (whiteList: Record<number, [number]>) =>
+        grants.filter((grant) => whiteList[DGRANTS_CHAIN_ID].includes(grant.id));
+
+      const fallback = async () => {
+        const cachedWhiteList: any = await getStorageKey('whitelist');
+        if (cachedWhiteList) {
+          grants = filterWhiteListed(cachedWhiteList);
+          console.log('loading from cached');
+          return grants;
+        } else {
+          throw new Error("Failed to load whitelist and couldn't find a cached");
+        }
+      };
+
       try {
         const json = await fetch(url).then((res) => res.json());
-        if (!json) return grants;
-        grants = grants.filter((grant) => json[DGRANTS_CHAIN_ID].includes(grant.id));
+        if (!json) {
+          return await fallback();
+        } else {
+          await setStorageKey('whitelist', json);
+          grants = filterWhiteListed(json);
+        }
       } catch (err) {
-        return grants;
+        return await fallback();
       }
     }
 
