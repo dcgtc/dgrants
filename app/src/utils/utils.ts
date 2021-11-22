@@ -421,17 +421,18 @@ export const shuffle = (unshuffled: Grant[] | GrantRound[]) => {
  * @param string key the key in the response object which holds results
  * @param function query a function which will return the query string (with the page in place)
  * @param array before the current array of objects
- * @param number page the page we want to fetch
  */
 export const recursiveGraphFetch = async (
   url: string,
   key: string,
   query: (filter: string) => string,
   fromBlock: number,
-  before: any[] = [], // eslint-disable-line @typescript-eslint/no-explicit-any
-  lastId = ''
+  before: any[] = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 ): // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Promise<any[]> => {
+  // retrieve the last ID we collected to use as the starting point for this query
+  const fromId = before.length ? before[before.length - 1].id : false;
+
   // fetch this 'page' of results - please note that the query MUST return an ID
   const res = await fetch(url, {
     method: 'POST',
@@ -440,7 +441,7 @@ Promise<any[]> => {
       query: query(`
         first: 1000, 
         where: {
-          ${lastId ? `id_gt: "${lastId}",` : ''}
+          ${fromId ? `id_gt: "${fromId}",` : ''}
           ${fromBlock ? `lastUpdatedBlockNumber_gte: "${fromBlock}",` : ''}
         }
       `),
@@ -450,15 +451,12 @@ Promise<any[]> => {
   // resolve the json
   const json = await res.json();
 
-  // store the last ID we collected for the next recursion
-  lastId = json.data[key].length ? json.data[key][json.data[key].length - 1].id : lastId;
-
   // if there were results on this page then check the next
   if (!json.data[key].length) {
     // return the full result
     return [...before];
   } else {
     // return the result combined with the next page
-    return await recursiveGraphFetch(url, key, query, fromBlock, [...before, ...json.data[key]], lastId);
+    return await recursiveGraphFetch(url, key, query, fromBlock, [...before, ...json.data[key]]);
   }
 };
