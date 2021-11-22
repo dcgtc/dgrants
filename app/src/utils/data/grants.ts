@@ -60,7 +60,6 @@ export async function getAllGrants(forceRefresh = false) {
               }`,
               fromBlock
             );
-            console.log(grants);
             // update each of the grants
             grants.forEach((grant: GrantSubgraph) => {
               const grantId = BigNumber.from(grant.id).toNumber();
