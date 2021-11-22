@@ -351,7 +351,11 @@ function useGrantRoundDetail() {
     await addMatchingFunds(round, contributionAmount);
 
     // After successful transaction, clear the form data
-    form.value.amount = '';
+    if (txHash.value) {
+      form.value.amount = '';
+    } else {
+      roundStatus.value = '';
+    }
   }
 
   /**
