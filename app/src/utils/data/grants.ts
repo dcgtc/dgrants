@@ -41,7 +41,7 @@ export async function getAllGrants(forceRefresh = false) {
         // get the most recent block we collected
         let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
         // attempt to use the subgraph first
-        if (SUBGRAPH_URL) {
+        if (false) {
           try {
             // make the request
             const grants = await recursiveGraphFetch(

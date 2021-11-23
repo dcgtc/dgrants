@@ -50,7 +50,7 @@ export async function getContributions(
 
         // every block
         if (forceRefresh || !LocalForageData || (LocalForageData && fromBlock < blockNumber)) {
-          if (SUBGRAPH_URL) {
+          if (false) {
             try {
               // make the request
               const grantDonations = await recursiveGraphFetch(

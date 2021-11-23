@@ -38,17 +38,17 @@ export async function syncStorage(
   // - `callback` may call `save` and pass in an alternative object to save into localStorage
   data = await callback(LocalForageData, (saveData?) => ((shouldSave = true), (altData = saveData)));
   // save new state
-  if (shouldSave) {
-    // merge data with meta and store into storage mechanism (localStorage)
-    await setStorageKey(
-      key,
-      {
-        ...meta,
-        data: altData || data,
-      },
-      useStorage
-    );
-  }
+  // if (shouldSave) {
+  //   // merge data with meta and store into storage mechanism (localStorage)
+  //   await setStorageKey(
+  //     key,
+  //     {
+  //       ...meta,
+  //       data: altData || data,
+  //     },
+  //     useStorage
+  //   );
+  // }
 
   // returns the response from callback
   return data;

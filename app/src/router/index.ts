@@ -11,6 +11,7 @@ import Home from '../views/Home.vue';
 
 const routes: Array<RouteRecordRaw> = [
   { path: '/', name: 'Home', component: Home },
+  { path: '/benchmark', name: 'Benchmark', component: () => import('../views/Benchmark.vue') },
   { path: '/cart', name: 'Cart', component: () => import('../views/Cart.vue') },
   { path: '/cart/contribution-success', name: 'post-checkout', component: () => import('../views/PostCheckout.vue') },
   { path: '/dgrants', name: 'dgrants', component: () => import('../views/GrantRegistryList.vue') },

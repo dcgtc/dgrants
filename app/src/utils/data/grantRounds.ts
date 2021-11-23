@@ -61,7 +61,7 @@ export async function getAllGrantRounds(forceRefresh = false) {
       // every block
       if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < latestBlockNumber)) {
         // attempt to use the subgraph first
-        if (SUBGRAPH_URL) {
+        if (false) {
           try {
             // make the request
             const grantRounds = await recursiveGraphFetch(
