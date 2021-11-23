@@ -63,8 +63,8 @@ export function daysAgo(val = 0) {
 }
 
 // Convert unix ts to DD-MM-YYYY
-export function formatDate(dateStr: string): string {
-  const date = new Date(Date(dateStr));
+export function formatDate(dateStr: BigNumber): string {
+  const date = new Date(Date(dateStr.toString()));
   return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
 }
 
