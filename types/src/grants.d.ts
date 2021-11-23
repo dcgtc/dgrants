@@ -108,6 +108,7 @@ export type ContributionDetail = {
   tokenIn: string;
   donationToken?: TokenInfo;
   // these help to identify the contribution but are optional
+  createdAt?: string;
   inRounds?: string[];
   roundName?: string;
   txHash?: string;

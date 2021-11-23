@@ -66,7 +66,7 @@
             <!-- subgrid -->
             <div class="flex justify-between lg:block lg:text-right">
               <!-- utc-time -->
-              <div class="text-grey-400">2021-11-01 13:20:41</div>
+              <div class="text-grey-400">{{ contribution.createdAt }}</div>
               <!-- tx-hash -->
               <div class="truncate">
                 <a :href="getEtherscanUrl(contribution.txHash || '', 'tx')" class="link">{{ contribution.txHash }} </a>
