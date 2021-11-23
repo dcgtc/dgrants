@@ -43,8 +43,15 @@
           </template>
         </InputRow>
 
+        <div v-if="roundStatus" class="flex gap-x-4 justify-end">
+          <div>
+            <div class="text-sm text-right">Transaction</div>
+            <div>{{ roundStatus }}</div>
+          </div>
+          <button class="btn disabled spinner float-right" disabled><Spinner1Icon /></button>
+        </div>
         <!-- Submit and cancel buttons -->
-        <div v-if="roundStatus === ''" class="flex justify-end pt-6">
+        <div v-else class="flex justify-end pt-6">
           <button
             type="submit"
             class="btn btn-primary mr-5"
@@ -54,13 +61,6 @@
             Add Funds
           </button>
           <button @click.prevent="hideAddFunds" class="btn btn-outline">Cancel</button>
-        </div>
-        <div v-else class="flex gap-x-4 justify-end">
-          <div>
-            <div class="text-sm text-right">Transaction</div>
-            <div>{{ roundStatus }}</div>
-          </div>
-          <button class="btn disabled spinner float-right" disabled><Spinner1Icon /></button>
         </div>
       </form>
     </div>
