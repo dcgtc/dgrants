@@ -9,7 +9,17 @@ import useWalletStore from "./wallet";
 
 const { grantRoundManager } = useWalletStore();
 
-export const average = (arr: any[]) => arr.reduce((a,b) => a + b, 0) / arr.length;
+const average = (arr: any[]) => arr.reduce((a,b) => a + b, 0) / arr.length;
+
+const median = (numbers: any[]) => {
+  const sorted = numbers.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+
+  if (sorted.length % 2 === 0) {
+    return (sorted[middle - 1] + sorted[middle]) / 2;
+  }
+  return sorted[middle];
+}
 
 function getSummary(times: any[]) {
 
@@ -30,34 +40,45 @@ function getSummary(times: any[]) {
 
 
   let avg_summary = {
-    'fetchCodeTimeAvg': average(fetchCodeTimes),
-    'fetchAllGrantAndGrantRoundsTimeAvg': average(fetchAllGrantAndGrantRoundsTimes),
-    'fetchContributionsTimeAvg': average(fetchContributionsTimes),
-    'fetchGrantRoundTimesAvg': average(fetchGrantRoundTimes),
-    'fetchLastBlockNumberTimesAvg': average(fetchLastBlockNumberTimes),
+    'fetchCodeTimeAvg': average(fetchCodeTimes).toFixed(2),
+    'fetchAllGrantAndGrantRoundsTimeAvg': average(fetchAllGrantAndGrantRoundsTimes).toFixed(2),
+    'fetchContributionsTimeAvg': average(fetchContributionsTimes).toFixed(2),
+    'fetchGrantRoundTimesAvg': average(fetchGrantRoundTimes).toFixed(2),
+    'fetchLastBlockNumberTimesAvg': average(fetchLastBlockNumberTimes).toFixed(2),
   } 
 
   let fastest_summary = {
-    'fetchCodeTimeAvg': Math.min(...fetchCodeTimes),
-    'fetchAllGrantAndGrantRoundsTimeAvg':  Math.min(...fetchAllGrantAndGrantRoundsTimes),
-    'fetchContributionsTimeAvg':  Math.min(...fetchContributionsTimes),
-    'fetchGrantRoundTimesAvg':  Math.min(...fetchGrantRoundTimes),
-    'fetchLastBlockNumberTimesAvg':  Math.min(...fetchLastBlockNumberTimes),
+    'fetchCodeTime': Math.min(...fetchCodeTimes).toFixed(2),
+    'fetchAllGrantAndGrantRoundsTime':  Math.min(...fetchAllGrantAndGrantRoundsTimes).toFixed(2),
+    'fetchContributionsTime':  Math.min(...fetchContributionsTimes).toFixed(2),
+    'fetchGrantRoundTime':  Math.min(...fetchGrantRoundTimes).toFixed(2),
+    'fetchLastBlockNumberTime':  Math.min(...fetchLastBlockNumberTimes).toFixed(2),
   } 
   
 
   let slowest_summary = {
-    'fetchCodeTimeAvg': Math.max(...fetchCodeTimes),
-    'fetchAllGrantAndGrantRoundsTimeAvg':  Math.max(...fetchAllGrantAndGrantRoundsTimes),
-    'fetchContributionsTimeAvg':  Math.max(...fetchContributionsTimes),
-    'fetchGrantRoundTimesAvg':  Math.max(...fetchGrantRoundTimes),
-    'fetchLastBlockNumberTimesAvg':  Math.max(...fetchLastBlockNumberTimes),
+    'fetchCodeTime': Math.max(...fetchCodeTimes),
+    'fetchAllGrantAndGrantRoundsTime':  Math.max(...fetchAllGrantAndGrantRoundsTimes).toFixed(2),
+    'fetchContributionsTime':  Math.max(...fetchContributionsTimes).toFixed(2),
+    'fetchGrantRoundTime':  Math.max(...fetchGrantRoundTimes).toFixed(2),
+    'fetchLastBlockNumberTime':  Math.max(...fetchLastBlockNumberTimes).toFixed(2),
   } 
+
+
+  let median_summary = {
+    'fetchCodeTimeMedian': median(fetchCodeTimes),
+    'fetchAllGrantAndGrantRoundsTimeMedian':  median(fetchAllGrantAndGrantRoundsTimes).toFixed(2),
+    'fetchContributionsTimeMedian':  median(fetchContributionsTimes).toFixed(2),
+    'fetchGrantRoundTimeMedian':  median(fetchGrantRoundTimes).toFixed(2),
+    'fetchLastBlockNumberTimeMedian':  median(fetchLastBlockNumberTimes).toFixed(2),
+  } 
+
 
   return {
     'slowest': slowest_summary,
     'fastest': fastest_summary,
-    'avg': avg_summary
+    'avg': avg_summary,
+    'median': median_summary
   }
 }
 
@@ -66,6 +87,8 @@ async function stressTest(func: Function, count: number) {
   let times = []
 
   for(let i = 0 ; i < count; i++) {
+    console.log("Count -> ", i);
+    
     const time = await func();
     times.push(time);
   }

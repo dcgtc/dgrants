@@ -24,7 +24,7 @@
 import { initStress } from 'src/store/stress';
 import { defineComponent} from 'vue';
 
-const stressCount = 1;
+const stressCount = 50;
 const alchemy_rpc = 'https://polygon-mainnet.g.alchemy.com/v2/EDGl6ZSI39a9rlwQwfxlWcLsgYkac02v';
 const moralis_rpc = 'https://speedy-nodes-nyc.moralis.io/a2586e6a4965d7035a097eaf/polygon/mainnet';
 
