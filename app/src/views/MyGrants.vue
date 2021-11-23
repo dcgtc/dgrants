@@ -21,6 +21,8 @@
           :name="(grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.name) || '...'"
           :ownerAddress="grant.owner"
           :logoPtr="grantMetadata && grantMetadata[metadataId(grant.metaPtr)]?.logoPtr"
+          :createdAt="formatDate(grant.createdAt)"
+          :lastUpdated="formatDate(grant.lastUpdated)"
         />
       </li>
     </ul>
@@ -40,7 +42,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 
-import { metadataId, ptrToURI } from 'src/utils/utils';
+import { formatDate, metadataId, ptrToURI } from 'src/utils/utils';
 
 const { grantMetadata } = useDataStore();
 
@@ -68,6 +70,7 @@ export default defineComponent({
       metadataId,
       grantMetadata,
       ptrToURI,
+      formatDate,
       ...filterMyGrants(),
     };
   },

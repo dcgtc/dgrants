@@ -31,6 +31,18 @@
           }}</span>
         </div>
 
+        <!-- Created -->
+        <div class="mb-2">
+          <span class="text-grey-400">Created On:</span>
+          <span class="ml-1">{{ createdAt }}</span>
+        </div>
+
+        <!-- Last Updated -->
+        <div class="mb-2">
+          <span class="text-grey-400">Last updated:</span>
+          <span class="ml-1">{{ lastUpdated }}</span>
+        </div>
+
         <!-- Status -->
         <div class="mt-10">
           <!-- approved (green)-->
@@ -109,6 +121,8 @@ export default defineComponent({
     name: { type: String, required: true },
     logoPtr: { type: Object as PropType<MetaPtr>, required: false },
     ownerAddress: { type: String, required: true },
+    createdAt: { type: String, requred: true },
+    lastUpdated: { type: String, requred: true },
   },
   setup(props) {
     return { pushRoute, ptrToURI, ...useGrantInfo(props.id) };

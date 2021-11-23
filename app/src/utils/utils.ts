@@ -62,6 +62,12 @@ export function daysAgo(val = 0) {
   return formatter.format(Math.round(deltaDays), 'days');
 }
 
+// Convert unix ts to DD-MM-YYYY
+export function formatDate(dateStr: string): string {
+  const date = new Date(Date(dateStr));
+  return `${date.getDate()}-${date.getMonth()}-${date.getFullYear()}`;
+}
+
 // Convert a unix ts to a toLocaleString
 export function unixToLocaleString(time: BigNumberish) {
   return new Date(BigNumber.from(time).toNumber() * 1000).toLocaleString();
