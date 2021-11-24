@@ -165,9 +165,9 @@ import {
   sortByStartTime,
   unixToLocaleString,
 } from 'src/utils/utils';
+import { getApprovedGrants } from 'src/utils/data/grants';
 // --- Data ---
 import useDataStore from 'src/store/data';
-import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 // --- Components ---
 import BaseFilterNav from 'src/components/BaseFilterNav.vue';
 import GrantRoundCard from 'src/components/GrantRoundCard.vue';
@@ -199,20 +199,6 @@ export default defineComponent({
   },
 
   setup() {
-    watch(
-      () => [],
-      async () => {
-        const uniqueStr = '?unique=' + Date.now();
-        const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
-        if (whitelistUrl) {
-          const url = whitelistUrl + uniqueStr;
-          const json = await fetch(url).then((res) => res.json());
-          validGrantsCount.value = json[DGRANTS_CHAIN_ID]?.length;
-        }
-      },
-      { immediate: true }
-    );
-
     const {
       approvedGrants: _grants,
       grantMetadata: _grantMetadata,
@@ -220,6 +206,21 @@ export default defineComponent({
       grantRoundMetadata: _grantRoundMetadata,
       grantContributions: _grantContributions,
     } = useDataStore();
+
+    watch(
+      () => _grants.value,
+      async () => {
+        if (_grants.value) {
+          const grantsProxyArray = Object.assign({}, _grants.value);
+          const grantsArray = Object.values(grantsProxyArray).map((item) => Object.assign({}, item));
+          const approvedCount = (await getApprovedGrants(grantsArray)).length;
+          validGrantsCount.value = approvedCount;
+        } else {
+          validGrantsCount.value = 0;
+        }
+      },
+      { immediate: true }
+    );
 
     // --- Data sources ---
     const grants = computed(() => (_grants?.value ? shuffle(_grants?.value).slice(0, 8) : _grants?.value) as Grant[]);

@@ -37,3 +37,6 @@ export type FilterNavButton = {
   label: string; // label to display in the button
   action?: (payload: MouseEvent) => void; // action to take when we click the button
 };
+
+// For the whitelist object we're getting
+export type Whitelist = Record<number, number[]>
