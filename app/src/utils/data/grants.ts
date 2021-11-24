@@ -1,15 +1,16 @@
 // --- Types ---
-import { Grant, GrantSubgraph, MetaPtr } from '@dgrants/types';
+import { Grant, GrantSubgraph, Whitelist } from '@dgrants/types';
 import { LocalForageData, LocalForageAnyObj } from 'src/types';
 // --- Utils ---
-import { syncStorage } from 'src/utils/data/utils';
+import { syncStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { BigNumber, BigNumberish, Event } from 'ethers';
 // --- Constants ---
 import { allGrantsKey } from 'src/utils/constants';
 import { DEFAULT_PROVIDER, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall, recursiveGraphFetch } from '../utils';
+import { batchFilterCall } from '../utils';
+import { DGRANTS_CHAIN_ID } from '../chains';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
 import { getMetadata } from './ipfs';
@@ -208,4 +209,40 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
   return {
     off: () => grantRegistry.value.off(name, listener),
   };
+}
+
+export async function getApprovedGrants(grants: Grant[]) {
+  const uniqueStr = '?unique=' + Date.now();
+
+  const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
+  if (whitelistUrl) {
+    const url = whitelistUrl + uniqueStr;
+
+    const filterWhiteListed = (whiteList: Whitelist) =>
+      grants.filter((grant) => whiteList[DGRANTS_CHAIN_ID].includes(grant.id));
+
+    const fallback = async () => {
+      const cachedWhiteList: any = await getStorageKey('whitelist');
+      if (cachedWhiteList) {
+        grants = filterWhiteListed(cachedWhiteList);
+        return grants;
+      } else {
+        throw new Error("Failed to load whitelist and couldn't find a cached");
+      }
+    };
+
+    try {
+      const json = await fetch(url).then((res) => res.json());
+      if (!json) {
+        return await fallback();
+      } else {
+        await setStorageKey('whitelist', json);
+        grants = filterWhiteListed(json);
+      }
+    } catch (err) {
+      return await fallback();
+    }
+  }
+
+  return grants;
 }

@@ -8,7 +8,7 @@ import { computed, Ref, ref, watch } from 'vue';
 // --- Our imports ---
 import { BigNumber, Contract } from 'src/utils/ethers';
 import useWalletStore from 'src/store/wallet';
-import { getAllGrants, grantListener } from 'src/utils/data/grants';
+import { getAllGrants, grantListener, getApprovedGrants } from 'src/utils/data/grants';
 import { getContributions, getTrustBonusScores, grantDonationListener } from 'src/utils/data/contributions';
 import {
   getAllGrantRounds,
@@ -33,7 +33,6 @@ import {
   GRANT_ROUND_MANAGER_ADDRESS,
   SUPPORTED_TOKENS_MAPPING,
   DEFAULT_PROVIDER,
-  DGRANTS_CHAIN_ID,
 } from 'src/utils/chains';
 import { DefaultStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { GRANT_ROUND_ABI, ERC20_ABI } from 'src/utils/constants';
@@ -298,46 +297,6 @@ export default function useDataStore() {
    *
    * @param grants Grant[] list of all grants
    */
-  async function getApprovedGrants(grants: Grant[]) {
-    const uniqueStr = '?unique=' + Date.now();
-    let approvedGrantsPk = [];
-
-    const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
-    if (whitelistUrl) {
-      const url = whitelistUrl + uniqueStr;
-
-      const filterWhiteListed = (whiteList: Record<number, [number]>) =>
-        grants.filter((grant) => whiteList[DGRANTS_CHAIN_ID].includes(grant.id));
-
-      const fallback = async () => {
-        const cachedWhiteList: any = await getStorageKey('whitelist');
-        if (cachedWhiteList) {
-          grants = filterWhiteListed(cachedWhiteList);
-          console.log('loading from cached');
-          return grants;
-        } else {
-          throw new Error("Failed to load whitelist and couldn't find a cached");
-        }
-      };
-
-      try {
-        const json = await fetch(url).then((res) => res.json());
-        if (!json) {
-          return await fallback();
-        } else {
-          await setStorageKey('whitelist', json);
-          grants = filterWhiteListed(json);
-        }
-      } catch (err) {
-        return await fallback();
-      }
-    }
-
-    return {
-      grants: grants,
-      approvedGrantsPk: approvedGrantsPk,
-    };
-  }
 
   /**
    * @notice Call this method to poll now, then poll on each new block
