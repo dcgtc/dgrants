@@ -65,7 +65,7 @@ export function daysAgo(val = 0) {
 // Convert unix ts to DD-MM-YYYY
 export function formatDate(dateStr: BigNumber): string {
   const date = new Date(BigNumber.from(dateStr).toNumber() * 1000);
-  return `${date.getDate()}-${date.getMonth()+1}-${date.getFullYear()}`;
+  return `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 }
 
 // Convert a unix ts to a toLocaleString
