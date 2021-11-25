@@ -213,7 +213,7 @@ export default defineComponent({
         if (_grants.value) {
           const grantsProxyArray = Object.assign({}, _grants.value);
           const grantsArray = Object.values(grantsProxyArray).map((item) => Object.assign({}, item));
-          const approvedCount = (await getApprovedGrants(grantsArray)).length;
+          const approvedCount = (await getApprovedGrants(grantsArray)).grants.length;
           validGrantsCount.value = approvedCount;
         } else {
           validGrantsCount.value = 0;
