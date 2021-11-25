@@ -39,4 +39,4 @@ export type FilterNavButton = {
 };
 
 // For the whitelist object we're getting
-export type Whitelist = Record<number, number[]>
+export type Whitelist = Record<number, number[]>;
