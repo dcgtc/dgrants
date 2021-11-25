@@ -1,5 +1,5 @@
 // --- Types ---
-import { Grant, GrantSubgraph, Whitelist } from '@dgrants/types';
+import { Grant, GrantSubgraph, Whitelist, MetaPtr } from '@dgrants/types';
 import { LocalForageData, LocalForageAnyObj } from 'src/types';
 // --- Utils ---
 import { syncStorage, getStorageKey, setStorageKey } from 'src/utils/data/utils';
@@ -9,7 +9,7 @@ import { allGrantsKey } from 'src/utils/constants';
 import { DEFAULT_PROVIDER, START_BLOCK, SUBGRAPH_URL } from 'src/utils/chains';
 // --- Data ---
 import useWalletStore from 'src/store/wallet';
-import { batchFilterCall } from '../utils';
+import { batchFilterCall, recursiveGraphFetch } from '../utils';
 import { DGRANTS_CHAIN_ID } from '../chains';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
@@ -213,6 +213,7 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
 
 export async function getApprovedGrants(grants: Grant[]) {
   const uniqueStr = '?unique=' + Date.now();
+  let approvedGrantsPk = [];
 
   const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
   if (whitelistUrl) {
@@ -224,8 +225,8 @@ export async function getApprovedGrants(grants: Grant[]) {
     const fallback = async () => {
       const cachedWhiteList: any = await getStorageKey('whitelist');
       if (cachedWhiteList) {
+        approvedGrantsPk = cachedWhiteList[DGRANTS_CHAIN_ID];
         grants = filterWhiteListed(cachedWhiteList);
-        return grants;
       } else {
         throw new Error("Failed to load whitelist and couldn't find a cached");
       }
@@ -234,15 +235,19 @@ export async function getApprovedGrants(grants: Grant[]) {
     try {
       const json = await fetch(url).then((res) => res.json());
       if (!json) {
-        return await fallback();
+        await fallback();
       } else {
         await setStorageKey('whitelist', json);
+        approvedGrantsPk = json[DGRANTS_CHAIN_ID];
         grants = filterWhiteListed(json);
       }
     } catch (err) {
-      return await fallback();
+      await fallback();
     }
   }
 
-  return grants;
+  return {
+    grants: grants,
+    approvedGrantsPk: approvedGrantsPk,
+  };
 }
