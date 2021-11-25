@@ -293,12 +293,6 @@ export default function useDataStore() {
   }
 
   /**
-   * @notice helper function to filter approved grants
-   *
-   * @param grants Grant[] list of all grants
-   */
-
-  /**
    * @notice Call this method to poll now, then poll on each new block
    */
   async function startPolling() {
