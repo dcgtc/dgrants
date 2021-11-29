@@ -40,8 +40,8 @@ const params: DeployParams = {
     metadataAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     payoutAdmin: '0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B',
     matchingToken: '0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063', // DAI
-    roundStartTime: 1637154000,
-    roundEndTime: 1641072061,
+    roundStartTime: 1638370800, // Wed Dec 01 2021 15:00:00 GMT+0000
+    roundEndTime: 1639699200, // Fri Dec 17 2021 00:00:00 GMT+0000
     ipfsRetrievalEndpoint: 'https://scopelift.b-cdn.net/ipfs',
     roundLogoPath: './scripts/config/assets/dgrants-placeholder.png',
     metadataJson,
