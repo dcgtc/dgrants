@@ -17,13 +17,13 @@
                   />
                 </figure>
               </div>
-              <!-- text -->
-              <div class="col-span-4 lg:col-span-3">
+              <div class="col-span-4 lg:col-span-3" v-if="contribution.grantName && contribution.roundName">
                 <a href="#" class="link">{{ contribution.grantName }}</a>
-                <!-- if this tx was via a matching round show round -->
                 <br /><span class="mr-2">via</span>
                 <a href="#" class="link">{{ contribution.roundName }}</a>
-                <!-- end if -->
+              </div>
+              <div class="col-span-4 lg:col-span-3" v-else>
+                <a href="#" class="link">{{ contribution.grantName }}</a>
               </div>
             </div>
           </article>
