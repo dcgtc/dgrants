@@ -83,14 +83,24 @@ export default function useDataStore() {
    * @notice Check if a given contract has been deployed on the default provider
    */
   async function checkIsDeployed(name: string, address: string) {
-    // get the current donationToken
-    let check = await getStorageKey(name);
-    // set if absent
-    if (!check) {
-      await setStorageKey(name, (check = { data: { isDeployed: (await DEFAULT_PROVIDER.getCode(address)) !== '0x' } }));
+    // we only need to make these checks on dev
+    if (process.env.NODE_ENV === 'development') {
+      // get the current donationToken
+      let check = await getStorageKey(name);
+      // set if absent
+      if (!check) {
+        await setStorageKey(
+          name,
+          (check = { data: { isDeployed: (await DEFAULT_PROVIDER.getCode(address)) !== '0x' } })
+        );
+      }
+
+      // is this contract deployed?
+      return check.data.isDeployed as boolean;
+    } else {
+      // always deployed in prod
+      return true;
     }
-    // resolve the token address
-    return check.data.isDeployed as boolean;
   }
 
   /**
