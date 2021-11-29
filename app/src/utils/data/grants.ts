@@ -24,9 +24,7 @@ const { grantRegistry } = useWalletStore();
  * @param {boolean} forceRefresh Force the cache to refresh
  */
 
-export async function getAllGrants(forceRefresh = false) {
-  const latestBlockNumber = BigNumber.from(await DEFAULT_PROVIDER.getBlockNumber()).toNumber();
-
+export async function getAllGrants(forceRefresh = false, latestBlockNumber: number) {
   return await syncStorage(
     allGrantsKey,
     {
