@@ -5,7 +5,7 @@
     <div class="aspect-w-16 aspect-h-9 shadow-light">
       <img
         class="w-full h-full object-center object-cover group-hover:opacity-90"
-        :src="ptrToURI(logoPtr) || '/placeholder_round.svg'"
+        :src="(logoPtr?.protocol !== 0 && ptrToURI(logoPtr)) || '/placeholder_round.svg'"
       />
     </div>
 
