@@ -14,8 +14,8 @@ function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
     logoPtr = decodeMetadataId(logoPtr);
   }
   const protocol = BigNumber.from(logoPtr.protocol).toString();
-  if (protocol !== '0' && protocol !== '1')
-    throw new Error(`assertIPFSPointer: Expected protocol ID of 0 or 1, found ${protocol}`);
+  if (!['0', '1'].includes(protocol))
+    throw new Error(`assertIPFSPointer: Expected protocol ID of 1, found ${protocol}`);
 }
 
 export const ipfs = createIpfs(import.meta.env.VITE_FLEEK_STORAGE_API_KEY);
@@ -55,7 +55,7 @@ export const getMetaPtr = ({ cid }: { cid: string | undefined }) => {
  */
 export const formatMetaPtr = (cid: string): MetaPtr => {
   return {
-    protocol: cid ? 1 : 0, // IPFS has a protocol ID of 1
+    protocol: 1, // IPFS has a protocol ID of 1
     pointer: cid,
   };
 };

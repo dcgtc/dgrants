@@ -603,10 +603,10 @@ function useGrantDetail() {
     if (isMetaPtrUpdated) {
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
-      let cid = '';
-      if (logoURI) cid = (gMetadata?.logoPtr as MetaPtr).pointer;
+      const cid = logoURI ? (gMetadata?.logoPtr as MetaPtr).pointer : '';
+      const logoPtr = cid ? ipfs.formatMetaPtr(cid) : { protocol: 0, pointer: '' };
       metaPtr = await ipfs
-        .uploadGrantMetadata({ name, description, logoPtr: ipfs.formatMetaPtr(cid), properties })
+        .uploadGrantMetadata({ name, description, logoPtr, properties })
         .then((cid) => ipfs.formatMetaPtr(cid.toString()));
     }
 

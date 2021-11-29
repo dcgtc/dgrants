@@ -245,8 +245,9 @@ function useNewGrant() {
       const splitLogoURI = (logoURI as string).split('/');
       cid = splitLogoURI[splitLogoURI.length - 1];
     }
+    const logoPtr = cid ? ipfs.formatMetaPtr(cid) : { protocol: 0, pointer: '' };
     const metaPtr = await ipfs
-      .uploadGrantMetadata({ name, description, logoPtr: ipfs.formatMetaPtr(cid), properties })
+      .uploadGrantMetadata({ name, description, logoPtr, properties })
       .then((cid) => ipfs.formatMetaPtr(cid.toString()));
 
     // watch the transaction to check for any replacements/cancellations and update txHash accordingly

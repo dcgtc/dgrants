@@ -103,8 +103,11 @@ export function decodeMetadataId(id: string): MetaPtr {
 export function ptrToURI(logoPtr: MetaPtr | undefined | null) {
   if (!logoPtr) return null;
   const { protocol, pointer } = logoPtr;
-  if (protocol === 0) return 'placeholder_grant.svg';
-  if (protocol === 1) return getMetaPtr({ cid: pointer });
+  if (protocol === 1) {
+    return getMetaPtr({ cid: pointer });
+  } else {
+    return 'placeholder_grant.svg';
+  }
   throw new Error(`Unsupported protocol ID ${protocol}`);
 }
 
