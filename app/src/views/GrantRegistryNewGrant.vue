@@ -219,10 +219,15 @@ function useNewGrant() {
     isLogoValid.value = await isValidLogo(logo);
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
     if (isLogoValid.value) isUploadingLogo.value = true;
-    form.value.logoURI = logo
-      ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
-      : '';
-    isUploadingLogo.value = false;
+    try {
+      form.value.logoURI = logo
+        ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
+        : '';
+      isUploadingLogo.value = false;
+    } catch (err) {
+      isUploadingLogo.value = false;
+      throw err;
+    }
   }
 
   /**
