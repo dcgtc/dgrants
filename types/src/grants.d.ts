@@ -88,7 +88,7 @@ export type Contribution = {
 /***
  * Object for an individual Contribution Detail View
  *
- * @type ContributionDetail
+ * @type ContributionsDetail
  * @field {grantId} grant id in the registry to which the contribution was made
  * @field {grantAddress} grants payee address
  * @field {grantName} name of the grant the contribution is associated with
@@ -98,7 +98,7 @@ export type Contribution = {
  * @field {txHash} contributions transaction hash
  * @field {blockNumber} blockNumber that mined the transaction
  */
-export type ContributionDetail = {
+export type ContributionsDetail = {
   grantId: number;
   grantAddress: string;
   grantName: string;

@@ -1,7 +1,7 @@
 <template>
-  <template v-if="fullContributions && !loading">
+  <template v-if="fullContributions">
     <BaseHeader :name="title" />
-    <SectionHeader :title="`Contributions (${contributionTotal})`" />
+    <SectionHeader :title="`Contributions (${fullContributions?.length})`" />
     <ContributionDetail :contributions="fullContributions" />
   </template>
   <LoadingSpinner v-else />
@@ -12,89 +12,37 @@ import BaseHeader from 'src/components/BaseHeader.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import ContributionDetail from 'src/components/ContributionDetail.vue';
 import useDataStore from 'src/store/data';
-import { computed, defineComponent, ref, watch } from 'vue';
+import { computed, defineComponent } from 'vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { filterContributionGrantData } from 'src/utils/data/contributions';
 import useWalletStore from 'src/store/wallet';
 import { useRoute } from 'vue-router';
 import { GrantMetadata, GrantRoundMetadata } from '@dgrants/types';
 
+const { grantContributions, grants, grantMetadata, grantRounds, grantRoundMetadata } = useDataStore();
+const { userAddress } = useWalletStore();
+
 function setTitle(route: string) {
   return route === '/contribution/donations' ? 'My Contributions' : 'Contributions';
 }
 
-function contributionDetails() {
-  const { grantContributions, grants, grantMetadata, grantRounds, grantRoundMetadata } = useDataStore();
-  const { userAddress } = useWalletStore();
+function getFullContributionDetails() {
+  if (!userAddress.value || !grantContributions.value || !grants.value || !grantRounds.value) {
+    return null;
+  }
+  const grantMeta = grantMetadata.value ? (grantMetadata.value as Record<string, GrantMetadata>) : undefined;
+  const grantRoundMeta = grantRoundMetadata.value
+    ? (grantRoundMetadata.value as Record<string, GrantRoundMetadata>)
+    : undefined;
 
-  const fullContributions = ref();
-  const contributionTotal = ref(0);
-  const loading = ref(true);
-
-  const allGrantRounds = computed(() => {
-    return grantRounds.value ? grantRounds.value : [];
-  });
-
-  const grantMetaData = computed(() => {
-    return grantMetadata.value as Record<string, GrantMetadata>;
-  });
-
-  const grantRoundsMetaData = computed(() => {
-    return grantRoundMetadata.value as Record<string, GrantRoundMetadata>;
-  });
-
-  const contributions = computed(() => {
-    return grantContributions.value ? grantContributions.value : [];
-  });
-
-  const allGrants = computed(() => {
-    return grants.value ? grants.value : [];
-  });
-
-  const userAddr = computed(() => {
-    return userAddress.value ? userAddress.value : '';
-  });
-
-  watch(
-    () => [
-      contributions.value,
-      allGrantRounds.value,
-      grantRounds.value,
-      grantMetadata.value,
-      grantRoundsMetaData.value,
-    ],
-    () => {
-      // ensure state is still loading
-      loading.value = true;
-      if (
-        contributions.value &&
-        userAddr.value &&
-        allGrantRounds.value &&
-        grantRoundMetadata.value &&
-        grantMetadata.value
-      ) {
-        fullContributions.value = filterContributionGrantData(
-          userAddr.value,
-          contributions.value,
-          allGrants.value,
-          allGrantRounds.value,
-          grantMetaData.value,
-          grantRoundsMetaData.value
-        );
-
-        contributionTotal.value = fullContributions.value.length;
-        loading.value = false;
-      }
-    },
-    { immediate: true }
+  return filterContributionGrantData(
+    userAddress.value,
+    grantContributions.value,
+    grants.value,
+    grantRounds.value,
+    grantMeta,
+    grantRoundMeta
   );
-
-  return {
-    fullContributions,
-    contributions,
-    contributionTotal,
-    loading,
-  };
 }
 
 export default defineComponent({
@@ -103,9 +51,10 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const title = setTitle(route?.path || 'contributions');
+    const fullContributions = computed(() => getFullContributionDetails());
     return {
       title,
-      ...contributionDetails(),
+      fullContributions,
     };
   },
 });
