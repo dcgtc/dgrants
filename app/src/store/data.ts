@@ -55,6 +55,7 @@ const grantRoundMetadata = ref<Record<string, GrantRoundMetadataResolution>>({})
 const grantRoundsCLRData = ref<Record<string, GrantRoundCLR>>({});
 const grantRoundsDonationToken = ref<TokenInfo>();
 const approvedGrantsPk = ref<number[]>();
+const trustBonusScores = ref<Record<string, number>>({});
 
 const timeout = ref<ReturnType<typeof setTimeout> | undefined>();
 
@@ -178,13 +179,21 @@ export default function useDataStore() {
         )
       )?.contributions || {};
 
+    // Save off data
+    grants.value = grantsList as Grant[];
+    approvedGrants.value = approvedGrantsList as Grant[];
+    grantContributions.value = contributions as Contribution[];
+    grantRounds.value = grantRoundsList as GrantRound[];
+    grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress as string] as TokenInfo;
+    approvedGrantsPk.value = approvedGrantsData.approvedGrantsPk;
+
     // Pull all trust scores from gitcoin api (depends on the contributions from getContributions)
-    const trustBonusScores =
+    trustBonusScores.value =
       (await getTrustBonusScores(lastBlockNumber.value, contributions || [], forceRefresh))?.trustBonus || {};
 
     // Set up a watch so that we only update calculations when every rounds metadata is present
     watch(
-      () => [grantRoundMetadata.value],
+      () => [grantRoundMetadata.value, trustBonusScores.value],
       async () => {
         // only do predictions once after resolving all grantRounds
         const gotAllMetadata = !grantRoundsList
@@ -200,7 +209,7 @@ export default function useDataStore() {
               const data = await getGrantRoundGrantData(
                 lastBlockNumber.value,
                 contributions || [],
-                trustBonusScores || {},
+                trustBonusScores.value || {},
                 grantRound,
                 grantRoundMetadata.value,
                 grantIds,
@@ -224,14 +233,6 @@ export default function useDataStore() {
       { immediate: true }
     );
 
-    // Save off data
-    grants.value = grantsList as Grant[];
-    approvedGrants.value = approvedGrantsList as Grant[];
-    grantContributions.value = contributions as Contribution[];
-    grantRounds.value = grantRoundsList as GrantRound[];
-    grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress as string] as TokenInfo;
-    approvedGrantsPk.value = approvedGrantsData.approvedGrantsPk;
-
     // Set up refs to pass into listeners
     const refs: Record<string, Ref> = {
       contributions: grantContributions,
@@ -240,39 +241,39 @@ export default function useDataStore() {
       grantRoundMetadata: grantRoundMetadata,
     };
 
+    // Set up watchers on the grantRounds
+    grantRoundsList.forEach(async (grantRound) => {
+      // open the rounds contract
+      const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
+      // open the rounds contract
+      const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
+      // attach listeners to the rounds
+      listeners.value.push(
+        metadataUpdatedListener(
+          {
+            grantRoundContract: roundContract,
+            grantRoundAddress: grantRound.address,
+            contributions: contributions,
+            grantIds: grantIds,
+            trustBonus: trustBonusScores.value,
+          },
+          refs
+        ),
+        matchingTokenListener(
+          {
+            matchingTokenContract: matchingTokenContract,
+            grantRoundAddress: grantRound.address,
+            contributions: contributions,
+            grantIds: grantIds,
+            trustBonus: trustBonusScores.value,
+          },
+          refs
+        )
+      );
+    });
+
     // init listeners but dont block execution
     setTimeout(() => {
-      // Set up watchers on the grantRounds
-      grantRoundsList.forEach(async (grantRound) => {
-        // open the rounds contract
-        const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
-        // open the rounds contract
-        const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
-        // attach listeners to the rounds
-        listeners.value.push(
-          metadataUpdatedListener(
-            {
-              grantRoundContract: roundContract,
-              grantRoundAddress: grantRound.address,
-              contributions: contributions,
-              grantIds: grantIds,
-              trustBonus: trustBonusScores,
-            },
-            refs
-          ),
-          matchingTokenListener(
-            {
-              matchingTokenContract: matchingTokenContract,
-              grantRoundAddress: grantRound.address,
-              contributions: contributions,
-              grantIds: grantIds,
-              trustBonus: trustBonusScores,
-            },
-            refs
-          )
-        );
-      });
-
       // Set up watchers for new grants/grantRounds/contributions
       listeners.value.push(
         // grantRoundCreatedListener watches for `GrantRoundCreated` events on the `grantRoundManager` and
@@ -284,7 +285,7 @@ export default function useDataStore() {
             listeners: listeners.value,
             grantIds: grantIds,
             contributions: contributions,
-            trustBonus: trustBonusScores,
+            trustBonus: trustBonusScores.value,
           },
           refs
         ),
@@ -301,7 +302,7 @@ export default function useDataStore() {
         grantDonationListener(
           {
             grantIds: grantIds,
-            trustBonus: trustBonusScores,
+            trustBonus: trustBonusScores.value,
             grantPayees: grantPayees,
             donationToken: grantRoundsDonationToken.value as TokenInfo,
           },

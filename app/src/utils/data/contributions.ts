@@ -325,9 +325,6 @@ export function grantDonationListener(
       }
     );
 
-    // trustBonus
-    await getTrustBonusScores(blockNumber, contributions);
-
     // getGrantRoundGrantData
     void (await Promise.all(
       grantRounds.map(async (grantRoundAddress: string) => {
