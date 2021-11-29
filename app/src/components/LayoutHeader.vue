@@ -121,13 +121,6 @@
           >
             disconnect wallet
           </button>
-          <button
-            v-if="userAddress"
-            @click="myContributions"
-            class="cursor-pointer hover:text-grey-500 flex no-underline uppercase font-medium"
-          >
-            my contributions
-          </button>
         </div>
       </div>
     </div>
@@ -153,7 +146,6 @@ import Jazzicon from 'src/components/Jazzicon.vue';
 // --- Store ---
 import useWalletStore from 'src/store/wallet';
 import useCartStore from 'src/store/cart';
-import { useRouter } from 'vue-router';
 // Header menu bar items
 const navigation = [
   { label: 'Home', name: 'Home' },
@@ -162,7 +154,10 @@ const navigation = [
 ];
 
 // Header menu bar items
-const myNavigation = [{ label: 'My Grants', name: 'dgrants-my-grants' }];
+const myNavigation = [
+  { label: 'My Grants', name: 'dgrants-my-grants' },
+  { label: 'My Contributions', name: 'contribution' },
+];
 
 // Composition function for wallet management in the header. All reading/writing related to the user's wallet
 // is managed in this composition function, which reads/writes to/from src/store/wallet.ts store
@@ -179,20 +174,12 @@ export default defineComponent({
   setup(_props, context) {
     const { cartItemsCount } = useCartStore();
     const emitEvent = (eventName: string) => context.emit(eventName);
-    const router = useRouter();
-
-    function myContributions() {
-      router.push({
-        name: 'contribution',
-      });
-    }
 
     return {
       cartItemsCount,
       navigation,
       myNavigation,
       emitEvent,
-      myContributions,
       ...useWalletConnection(),
     };
   },
