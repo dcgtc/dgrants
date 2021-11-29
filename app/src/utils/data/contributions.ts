@@ -1,7 +1,7 @@
 // --- Types ---
 import {
   Contribution,
-  ContributionDetail,
+  ContributionsDetail,
   ContributionSubgraph,
   Grant,
   GrantMetadata,
@@ -48,7 +48,7 @@ export async function getContributions(
         blockNumber: blockNumber,
       },
       async (LocalForageData?: LocalForageAnyObj | undefined, save?: (saveData?: LocalForageAnyObj) => void) => {
-        // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
+        // check how far out of sync we are from the cache and pull any events that happened between then and now
         const _lsBlockNumber = LocalForageData?.blockNumber || 0;
         // pick up contributions from the localStorage obj
         const _lsContributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
@@ -378,13 +378,13 @@ export function grantDonationListener(
  * @param userAddress
  * @param contributions
  */
-export function filterContributionsByUserAddress(userAddress: string, contributions: Contribution[]) {
-  if (contributions && userAddress) {
+function filterContributionsByUserAddress(userAddress: string, contributions: Contribution[]) {
+  if (contributions.length > 0 && userAddress) {
     return contributions.filter((contribution: Contribution) => {
       return contribution.address === userAddress;
     });
   }
-  return undefined;
+  return null;
 }
 
 /**
@@ -400,7 +400,7 @@ function filterGrantRoundsForContributions(
 ) {
   let roundName = '...';
 
-  if (grantRoundMeta) {
+  if (grantRoundMeta && Object.keys(grantRoundMeta).length > 0) {
     grantRounds.find((grantRound) => {
       const metadata = grantRoundMeta[metadataId(grantRound.metaPtr)];
       if (metadata && metadata.grants?.includes(grantId)) {
@@ -429,9 +429,9 @@ export function filterContributionGrantData(
   grantRounds: GrantRound[],
   grantMetaData?: Record<string, GrantMetadata>,
   grantRoundsMetaData?: Record<string, GrantRoundMetadata>
-): ContributionDetail[] {
-  if (!userAddress || !contributions) {
-    return [];
+): ContributionsDetail[] | null {
+  if (!userAddress || !contributions || contributions.length === 0) {
+    return null;
   }
   const myContributions = filterContributionsByUserAddress(userAddress, contributions);
   if (myContributions?.length === 0 || !myContributions) {
@@ -453,7 +453,7 @@ export function filterContributionGrantData(
     const date = contribution.createdAt
       ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000)
       : undefined;
-    const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : undefined;
+    const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
 
     return {
       grantId: contribution.grantId,
@@ -469,6 +469,6 @@ export function filterContributionGrantData(
       createdAt: contributionDate,
       txHash: contribution.txHash,
       blockNumber: contribution.blockNumber,
-    } as ContributionDetail;
+    } as ContributionsDetail;
   });
 }

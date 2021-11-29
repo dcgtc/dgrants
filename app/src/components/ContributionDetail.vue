@@ -17,7 +17,7 @@
                   />
                 </figure>
               </div>
-              <div class="col-span-4 lg:col-span-3" v-if="contribution.grantName && contribution.roundName">
+              <div v-if="contribution.grantName && contribution.roundName" class="col-span-4 lg:col-span-3">
                 <a href="#" class="link">{{ contribution.grantName }}</a>
                 <br /><span class="mr-2">via</span>
                 <a href="#" class="link">{{ contribution.roundName }}</a>
@@ -87,16 +87,16 @@
 </template>
 
 <script lang="ts">
-import { ContributionDetail } from '@dgrants/types';
 import { defineComponent, PropType } from 'vue';
 import { formatAddress, formatNumber, getEtherscanUrl } from 'src/utils/utils';
 import Jazzicon from 'src/components/Jazzicon.vue';
+import { ContributionsDetail } from '@dgrants/types/src/grants';
 
 export default defineComponent({
   name: 'ContributionDetail',
   props: {
     // -- Required props --
-    contributions: { type: Array as PropType<ContributionDetail[]>, required: true },
+    contributions: { type: Array as PropType<ContributionsDetail[]>, required: true },
   },
   components: { Jazzicon },
   setup() {
