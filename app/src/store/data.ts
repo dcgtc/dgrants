@@ -166,9 +166,6 @@ export default function useDataStore() {
     // Fetch Metadata
     const grantMetaPtrs = grantsList.map((grant: Grant) => grant.metaPtr);
     const grantRoundMetaPtrs = grantRoundsList.map((grantRound: GrantRound) => grantRound.metaPtr);
-    // Fetch asynchronously without awaiting the response
-    void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
-    void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
 
     // Get latest set of contributions
     const contributions =
@@ -312,6 +309,10 @@ export default function useDataStore() {
         )
       );
     });
+
+    // Fetch asynchronously without awaiting the response
+    void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
+    void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
 
     // init complete
     return true;

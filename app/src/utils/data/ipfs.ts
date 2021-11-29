@@ -92,8 +92,8 @@ export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
   if (Object.keys(newMetadata).length) {
     // save these pending metadata objects to state
     metadata.value = { ...metadata.value, ...newMetadata };
-    // resolve metadata via metaPtr and update state
-    void (await Promise.all(Object.keys(newMetadata).map(async (id) => getMetadata(decodeMetadataId(id), metadata))));
+    // resolve metadata via metaPtr and update state (no need to wait for resolution)
+    Object.keys(newMetadata).forEach((id) => getMetadata(decodeMetadataId(id), metadata));
   }
 
   return metadata;
