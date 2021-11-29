@@ -1,5 +1,5 @@
 <template>
-  <div v-if="Object.keys(grantRoundMetadata).length">
+  <div v-if="grantRounds">
     <!-- Simple breadcrumb pointing back to the landing -->
     <BaseHeader :breadcrumbContent="breadcrumb" name="Matching Rounds" />
 
@@ -15,9 +15,9 @@
                 :id="index"
                 :ptr="grantRound.metaPtr"
                 :address="grantRound.address"
-                :name="grantRoundMetadata[metadataId(grantRound.metaPtr)].name ?? ''"
+                :name="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.name || '...'"
                 :logoPtr="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.logoPtr"
-                :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)].grants?.length ?? 0"
+                :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.grants?.length || 0"
                 :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
               />
             </li>
@@ -128,6 +128,7 @@ export default defineComponent({
       daysAgo,
       formatAddress,
       formatNumber,
+      grantRounds,
       grantRoundLists,
       grantRoundMetadata,
       grantRoundsNav,
