@@ -167,7 +167,7 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 // --- Store ---
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
+import { LOREM_IPSOM_TEXT, NO_LOGO_OBJECT } from 'src/utils/constants';
 import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle, isValidLogo, watchTransaction } from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 
@@ -245,7 +245,7 @@ function useNewGrant() {
       const splitLogoURI = (logoURI as string).split('/');
       cid = splitLogoURI[splitLogoURI.length - 1];
     }
-    const logoPtr = cid ? ipfs.formatMetaPtr(cid) : { protocol: 0, pointer: '' };
+    const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, logoPtr, properties })
       .then((cid) => ipfs.formatMetaPtr(cid.toString()));

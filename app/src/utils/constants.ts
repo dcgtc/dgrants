@@ -53,3 +53,5 @@ export const trustBonusKey = 'TrustBonus';
 // LocalForage key-prefixes (partial key, we store an object for each instance)
 export const grantRoundKeyPrefix = 'GrantRound-';
 export const grantRoundsCLRDataKeyPrefix = 'GrantRoundsGrantData-';
+
+export const NO_LOGO_OBJECT = { protocol: 0, pointer: '' };

@@ -281,7 +281,7 @@ import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
-import { LOREM_IPSOM_TEXT } from 'src/utils/constants';
+import { LOREM_IPSOM_TEXT, NO_LOGO_OBJECT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
 import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 import {
@@ -604,7 +604,7 @@ function useGrantDetail() {
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
       const cid = logoURI ? (gMetadata?.logoPtr as MetaPtr).pointer : '';
-      const logoPtr = cid ? ipfs.formatMetaPtr(cid) : { protocol: 0, pointer: '' };
+      const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description, logoPtr, properties })
         .then((cid) => ipfs.formatMetaPtr(cid.toString()));
