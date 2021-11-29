@@ -221,10 +221,10 @@ export async function getApprovedGrants(grants: Grant[]) {
       grants.filter((grant) => whiteList[DGRANTS_CHAIN_ID].includes(grant.id));
 
     const fallback = async () => {
-      const cachedWhiteList: any = await getStorageKey('whitelist');
+      const cachedWhiteList = await getStorageKey('whitelist');
       if (cachedWhiteList) {
-        approvedGrantsPk = cachedWhiteList[DGRANTS_CHAIN_ID];
-        grants = filterWhiteListed(cachedWhiteList);
+        approvedGrantsPk = cachedWhiteList.data[DGRANTS_CHAIN_ID];
+        grants = filterWhiteListed(cachedWhiteList.data);
       } else {
         throw new Error("Failed to load whitelist and couldn't find a cached");
       }
@@ -235,7 +235,7 @@ export async function getApprovedGrants(grants: Grant[]) {
       if (!json) {
         await fallback();
       } else {
-        await setStorageKey('whitelist', json);
+        await setStorageKey('whitelist', { data: json });
         approvedGrantsPk = json[DGRANTS_CHAIN_ID];
         grants = filterWhiteListed(json);
       }
