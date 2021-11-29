@@ -77,7 +77,7 @@
                   class="link"
                   @click="pushRoute({ name: 'dgrants-id', params: { id: BigNumber.from(item.grantId).toString() } })"
                 >
-                  {{ grantMetadata[metadataId(item.metaPtr)]?.name }}
+                  {{ grantMetadata[metadataId(item.metaPtr)]?.name || '...' }}
                 </span>
               </div>
 
