@@ -69,7 +69,9 @@
               <div class="text-grey-400">{{ contribution.createdAt }}</div>
               <!-- tx-hash -->
               <div class="truncate">
-                <a :href="getEtherscanUrl(contribution.txHash || '', 'tx')" class="link">{{ contribution.txHash }} </a>
+                <a :href="getEtherscanUrl(contribution.txHash || '', 'tx')" class="link" target="_blank"
+                  >{{ contribution.txHash }}
+                </a>
               </div>
             </div>
           </article>
