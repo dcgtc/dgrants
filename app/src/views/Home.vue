@@ -1,5 +1,5 @@
 <template>
-  <div v-if="grantRoundMetadata && grantRounds && Object.keys(grantRoundMetadata).length == grantRounds.length">
+  <div v-if="grantRounds">
     <!--------------- INTRO --------------->
     <section class="px-4 md:px-12 py-20 border-b border-grey-100 text-center">
       <h1>Decentralized Grants</h1>
@@ -81,9 +81,9 @@
                 :id="index"
                 :ptr="grantRound.metaPtr"
                 :address="grantRound.address"
-                :name="grantRoundMetadata[metadataId(grantRound.metaPtr)].name ?? ''"
-                :logoPtr="grantRoundMetadata[metadataId(grantRound.metaPtr)].logoPtr"
-                :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)].grants?.length ?? 0"
+                :name="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.name || '...'"
+                :logoPtr="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.logoPtr"
+                :grantsTotal="grantRoundMetadata[metadataId(grantRound.metaPtr)]?.grants?.length || 0"
                 :funds="`${formatNumber(grantRound.funds, 2)} ${grantRound.matchingToken.symbol}`"
               />
             </li>
