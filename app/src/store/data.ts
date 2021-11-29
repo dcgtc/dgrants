@@ -79,13 +79,30 @@ async function removeAllListeners() {
 // --- Store methods and exports ---
 export default function useDataStore() {
   /**
+   * @notice Check if a given contract has been deployed on the default provider
+   */
+  async function checkIsDeployed(name: string, address: string) {
+    // get the current donationToken
+    let check = await getStorageKey(name);
+    // set if absent
+    if (!check) {
+      await setStorageKey(name, (check = { data: { isDeployed: (await DEFAULT_PROVIDER.getCode(address)) !== '0x' } }));
+    }
+    // resolve the token address
+    return check.data.isDeployed as boolean;
+  }
+
+  /**
    * @notice Called on init and network change - but can also be called on demand
    */
   async function rawInit(forceRefresh = false) {
+    // Remove all listeners
+    await removeAllListeners();
+
     // Check contracts are available on the given provider (or default provider)
     const [isGrantRegistryDeployed, isGrantRoundManagerDeployed] = await Promise.all([
-      (await DEFAULT_PROVIDER.getCode(GRANT_REGISTRY_ADDRESS)) !== '0x',
-      (await DEFAULT_PROVIDER.getCode(GRANT_ROUND_MANAGER_ADDRESS)) !== '0x',
+      checkIsDeployed('registryIsDeployed', GRANT_REGISTRY_ADDRESS),
+      checkIsDeployed('managerIsDeployed', GRANT_ROUND_MANAGER_ADDRESS),
     ]);
 
     // This ensures we're only attempting to load data from contracts which exist
@@ -93,17 +110,30 @@ export default function useDataStore() {
       return false;
     }
 
-    // Remove all listeners
-    await removeAllListeners();
-
-    // Get blockdata
+    // Get current blockNumber (pass this value in to methods to avoid additional rpc calls)
     lastBlockNumber.value = BigNumber.from(await DEFAULT_PROVIDER.getBlockNumber()).toNumber();
 
     // Get all grants and round data held in the registry/roundManager
     const [grantsData, grantRoundData, grantRoundDonationTokenAddress] = await Promise.all([
-      getAllGrants(forceRefresh),
-      getAllGrantRounds(forceRefresh),
-      grantRoundManager.value.donationToken(),
+      getAllGrants(forceRefresh, lastBlockNumber.value),
+      getAllGrantRounds(forceRefresh, lastBlockNumber.value),
+      // get the donationToken from storage/grantRoundManager
+      new Promise((resolve) => {
+        // get the current donationToken
+        getStorageKey('donationToken').then(async (storedDonationToken) => {
+          // set if absent
+          if (!storedDonationToken) {
+            await setStorageKey(
+              'donationToken',
+              (storedDonationToken = {
+                data: { donationToken: await grantRoundManager.value.donationToken() },
+              })
+            );
+          }
+          // resolves to the donation token address
+          resolve(storedDonationToken.data.donationToken as string);
+        });
+      }),
     ]);
 
     // Collect the grants into a grantId->payoutAddress obj
@@ -123,8 +153,12 @@ export default function useDataStore() {
     const grantRoundsList = (
       await Promise.all(
         roundAddresses.map(async (grantRoundAddress: string) => {
-          const data = await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh);
-          return data?.grantRound;
+          // check the grantRound is deployed
+          const isDeployed = await checkIsDeployed(`grantRoundIsDeployed-${grantRoundAddress}`, grantRoundAddress);
+          // only attempt to get the GrantRound data if it is deployed
+          if (isDeployed) {
+            return (await getGrantRound(lastBlockNumber.value, grantRoundAddress, forceRefresh))?.grantRound;
+          }
         })
       )
     ).filter((grantRound) => grantRound) as GrantRound[];
@@ -132,7 +166,7 @@ export default function useDataStore() {
     // Fetch Metadata
     const grantMetaPtrs = grantsList.map((grant: Grant) => grant.metaPtr);
     const grantRoundMetaPtrs = grantRoundsList.map((grantRound: GrantRound) => grantRound.metaPtr);
-    // Update Metadata synchronously
+    // Fetch asynchronously without awaiting the response
     void fetchMetaPtrs(grantMetaPtrs, grantMetadata);
     void fetchMetaPtrs(grantRoundMetaPtrs, grantRoundMetadata);
 
@@ -142,7 +176,7 @@ export default function useDataStore() {
         await getContributions(
           lastBlockNumber.value,
           grantPayees,
-          SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress],
+          SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress as string],
           forceRefresh
         )
       )?.contributions || {};
@@ -158,7 +192,7 @@ export default function useDataStore() {
         // only do predictions once after resolving all grantRounds
         const gotAllMetadata = !grantRoundsList
           .map((grantRound: GrantRound) => {
-            return grantRoundMetadata.value[metadataId(grantRound.metaPtr)].status === 'resolved';
+            return grantRoundMetadata.value[metadataId(grantRound.metaPtr)]?.status === 'resolved';
           })
           .includes(false);
         // calculate predictions after we've got all rounds metadata
@@ -198,7 +232,7 @@ export default function useDataStore() {
     approvedGrants.value = approvedGrantsList as Grant[];
     grantContributions.value = contributions as Contribution[];
     grantRounds.value = grantRoundsList as GrantRound[];
-    grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo;
+    grantRoundsDonationToken.value = SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress as string] as TokenInfo;
     approvedGrantsPk.value = approvedGrantsData.approvedGrantsPk;
 
     // Set up refs to pass into listeners
@@ -209,72 +243,75 @@ export default function useDataStore() {
       grantRoundMetadata: grantRoundMetadata,
     };
 
-    // Set up watchers on the grantRounds
-    grantRoundsList.forEach(async (grantRound) => {
-      // open the rounds contract
-      const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
-      // open the rounds contract
-      const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
-      // attach listeners to the rounds
+    // init listeners but dont block execution
+    setTimeout(() => {
+      // Set up watchers on the grantRounds
+      grantRoundsList.forEach(async (grantRound) => {
+        // open the rounds contract
+        const roundContract = new Contract(grantRound.address, GRANT_ROUND_ABI, DEFAULT_PROVIDER);
+        // open the rounds contract
+        const matchingTokenContract = new Contract(await roundContract.matchingToken(), ERC20_ABI, DEFAULT_PROVIDER);
+        // attach listeners to the rounds
+        listeners.value.push(
+          metadataUpdatedListener(
+            {
+              grantRoundContract: roundContract,
+              grantRoundAddress: grantRound.address,
+              contributions: contributions,
+              grantIds: grantIds,
+              trustBonus: trustBonusScores,
+            },
+            refs
+          ),
+          matchingTokenListener(
+            {
+              matchingTokenContract: matchingTokenContract,
+              grantRoundAddress: grantRound.address,
+              contributions: contributions,
+              grantIds: grantIds,
+              trustBonus: trustBonusScores,
+            },
+            refs
+          )
+        );
+      });
+
+      // Set up watchers for new grants/grantRounds/contributions
       listeners.value.push(
-        metadataUpdatedListener(
+        // grantRoundCreatedListener watches for `GrantRoundCreated` events on the `grantRoundManager` and
+        // then associates two new listeners:
+        // - grantRound.MetadataUpdated - pushed to listeners async - grantRound specific
+        // - matchingToken.Transfers - pushed to listeners async - grantRound specific
+        grantRoundCreatedListener(
           {
-            grantRoundContract: roundContract,
-            grantRoundAddress: grantRound.address,
-            contributions: contributions,
+            listeners: listeners.value,
             grantIds: grantIds,
+            contributions: contributions,
             trustBonus: trustBonusScores,
           },
           refs
         ),
-        matchingTokenListener(
+        // All grant details can be fetched from the grantRegistry
+        grantListener('GrantCreated', {
+          grants,
+          grantMetadata,
+        }),
+        grantListener('GrantUpdated', {
+          grants,
+          grantMetadata,
+        }),
+        // Contributions are routed through the grantRoundManager
+        grantDonationListener(
           {
-            matchingTokenContract: matchingTokenContract,
-            grantRoundAddress: grantRound.address,
-            contributions: contributions,
             grantIds: grantIds,
             trustBonus: trustBonusScores,
+            grantPayees: grantPayees,
+            donationToken: grantRoundsDonationToken.value as TokenInfo,
           },
           refs
         )
       );
     });
-
-    // Set up watchers for new grants/grantRounds/contributions
-    listeners.value.push(
-      // grantRoundCreatedListener watches for `GrantRoundCreated` events on the `grantRoundManager` and
-      // then associates two new listeners:
-      // - grantRound.MetadataUpdated - pushed to listeners async - grantRound specific
-      // - matchingToken.Transfers - pushed to listeners async - grantRound specific
-      grantRoundCreatedListener(
-        {
-          listeners: listeners.value,
-          grantIds: grantIds,
-          contributions: contributions,
-          trustBonus: trustBonusScores,
-        },
-        refs
-      ),
-      // All grant details can be fetched from the grantRegistry
-      grantListener('GrantCreated', {
-        grants,
-        grantMetadata,
-      }),
-      grantListener('GrantUpdated', {
-        grants,
-        grantMetadata,
-      }),
-      // Contributions are routed through the grantRoundManager
-      grantDonationListener(
-        {
-          grantIds: grantIds,
-          trustBonus: trustBonusScores,
-          grantPayees: grantPayees,
-          donationToken: SUPPORTED_TOKENS_MAPPING[grantRoundDonationTokenAddress] as TokenInfo,
-        },
-        refs
-      )
-    );
 
     // init complete
     return true;
@@ -312,6 +349,9 @@ export default function useDataStore() {
         }
         // update for next time
         await setStorageKey('network', { data: { chainId: network.value?.chainId } });
+      },
+      {
+        immediate: true,
       }
     );
     // init the current state
