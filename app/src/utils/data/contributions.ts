@@ -450,9 +450,7 @@ export function filterContributionGrantData(
 
     const roundName = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
 
-    const date = contribution.createdAt
-      ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000)
-      : undefined;
+    const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
     const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
 
     return {
