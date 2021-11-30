@@ -22,7 +22,7 @@
                 <br /><span class="mr-2">via</span>
                 <a href="#" class="link">{{ contribution.roundName }}</a>
               </div>
-              <div class="col-span-4 lg:col-span-3" v-else>
+              <div v-else class="col-span-4 lg:col-span-3">
                 <a href="#" class="link">{{ contribution.grantName }}</a>
               </div>
             </div>
