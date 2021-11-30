@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/types",
-  "version": "0.2.11-15c7cd6.0",
+  "version": "0.2.12-8645e89.0",
   "types": "src/index.d.ts",
   "scripts": {
     "build": "tsc -b .",
