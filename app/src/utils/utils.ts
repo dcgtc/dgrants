@@ -100,15 +100,18 @@ export function decodeMetadataId(id: string): MetaPtr {
 }
 
 // Given a logoPtr, resolve it to a URI that we can fetch
-export function ptrToURI(logoPtr: MetaPtr | undefined | null) {
-  if (!logoPtr) return null;
-  const { protocol, pointer } = logoPtr;
-  if (protocol === 1) {
-    return getMetaPtr({ cid: pointer });
-  } else {
-    return 'placeholder_grant.svg';
+export function ptrToURI(logoPtr: MetaPtr | undefined | null, fallbackURI = '/placeholder_grant.svg') {
+  // Handle the null and undefined cases
+  if (!logoPtr) {
+    console.warn(`Received empty logoPtr, using fallback URI of ${fallbackURI}`);
+    return fallbackURI;
   }
-  throw new Error(`Unsupported protocol ID ${protocol}`);
+
+  // Parse the pointer
+  const { protocol, pointer } = logoPtr;
+  if (protocol === 1) return getMetaPtr({ cid: pointer });
+  console.warn(`Unsupported protocol ID ${1}, using fallback URI of ${fallbackURI}`);
+  return fallbackURI;
 }
 
 // --- Validation ---
