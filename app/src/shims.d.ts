@@ -13,6 +13,11 @@ interface ImportMeta {
     VITE_FLEEK_STORAGE_API_KEY: string;
     VITE_DGRANTS_CHAIN_ID: string;
     VITE_GRANT_WHITELIST_URI: string;
-    VITE_MAINTENANCE_MODE: string;
+    VITE_MAINTENANCE_MODE?: string;
+    VITE_GRANT_REGISTRY?: string;
+    VITE_GRANT_ROUND_MANAGER?: string;
+    VITE_DEFAULT_RPC_URL?: string;
+    VITE_SUBGRAPH_URL?: string;
+    VITE_START_BLOCK?: string;
   };
 }
