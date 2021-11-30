@@ -203,7 +203,7 @@ const PRODUCTION_CHAIN_INFO: L1ChainInfo | L2ChainInfo = Object.assign(ALL_CHAIN
   grantRoundManager: import.meta.env.VITE_GRANT_ROUND_MANAGER || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['grantRoundManager'],
   rpcUrl: import.meta.env.VITE_DEFAULT_RPC_URL || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['rpcUrl'],
   subgraphUrl: import.meta.env.VITE_SUBGRAPH_URL || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['subgraphUrl'],
-  startBlock: Number(import.meta.env.VITE_START_BLOCK || 0) || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['startBlock'],
+  startBlock: Number(import.meta.env.VITE_START_BLOCK) || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['startBlock'],
 });
 
 // --- Chain-specific exports based on `VITE_DGRANTS_CHAIN_ID` ---
