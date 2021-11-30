@@ -196,8 +196,19 @@ export const ALL_CHAIN_INFO: ChainInfo = {
   },
 };
 
+// --- Override CHAIN_INFO for production environment
+const PRODUCTION_CHAIN_INFO: L1ChainInfo | L2ChainInfo = Object.assign(ALL_CHAIN_INFO[DGRANTS_CHAIN_ID], {
+  // these properties may be assigned by env variables
+  grantRegistry: import.meta.env.VITE_GRANT_REGISTRY || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['grantRegistry'],
+  grantRoundManager: import.meta.env.VITE_GRANT_ROUND_MANAGER || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['grantRoundManager'],
+  rpcUrl: import.meta.env.VITE_DEFAULT_RPC_URL || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['rpcUrl'],
+  subgraphUrl: import.meta.env.VITE_SUBGRAPH_URL || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['subgraphUrl'],
+  startBlock: Number(import.meta.env.VITE_START_BLOCK || 0) || ALL_CHAIN_INFO[DGRANTS_CHAIN_ID]['startBlock'],
+});
+
 // --- Chain-specific exports based on `VITE_DGRANTS_CHAIN_ID` ---
-export const CHAIN_INFO = ALL_CHAIN_INFO[DGRANTS_CHAIN_ID];
+export const CHAIN_INFO =
+  process.env.NODE_ENV === 'production' ? PRODUCTION_CHAIN_INFO : ALL_CHAIN_INFO[DGRANTS_CHAIN_ID];
 export const CHAIN_LABEL = CHAIN_INFO.label;
 export const ETHERSCAN_BASE_URL = CHAIN_INFO.explorer;
 export const SUPPORTED_TOKENS = CHAIN_INFO.tokens;
