@@ -442,10 +442,11 @@ export function filterContributionGrantData(
     let grantName = '...';
 
     const grantData = grants.find((grant) => grant.id === contribution.grantId);
-    if (grantData && grantMetaData) {
+    if (grantData && grantMetaData && Object.keys(grantMetaData).length) {
       const metaDataVersionId = metadataId(grantData.metaPtr);
-      grantLogo = ptrToURI(grantMetaData[metaDataVersionId].logoPtr) ?? '';
-      grantName = grantMetaData[metaDataVersionId].name ?? '...';
+      const { logoPtr, name } = grantMetaData[metaDataVersionId];
+      grantLogo = ptrToURI(logoPtr, grantLogo);
+      grantName = name || grantName;
     }
 
     const roundName = filterGrantRoundsForContributions(grantRounds, contribution.grantId, grantRoundsMetaData);
