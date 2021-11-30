@@ -70,7 +70,7 @@
               <!-- tx-hash -->
               <div class="truncate">
                 <a :href="getEtherscanUrl(contribution.txHash || '', 'tx')" class="link" target="_blank"
-                  >{{ contribution.txHash }}
+                  >{{ `${contribution.txHash.slice(0, 6)}...${contribution.txHash.slice(62)}` }}
                 </a>
               </div>
             </div>
