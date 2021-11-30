@@ -36,7 +36,7 @@
               <div>
                 <!-- subgrid -->
                 <div class="flex gap-4 items-center">
-                  <!-- do not forget to link the figure to the donors profile ^^ -->
+                  <!-- do not forget to link the figure to the donors profile  -->
                   <figure class="cursor-pointer">
                     <Jazzicon :address="contribution.address" :key="contribution.address" :width="48" />
                   </figure>
