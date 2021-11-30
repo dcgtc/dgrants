@@ -1,6 +1,6 @@
 <template>
   <template v-if="contributions.length > 0">
-    <section v-for="contribution in contributions" :key="contribution.grantName" class="px-4 md:px-12">
+    <section v-for="contribution in contributions" :key="contribution.txHash" class="px-4 md:px-12">
       <div class="py-4 md:py-6 lg:py-8 border-b border-grey-100">
         <div class="grid grid-cols-12 gap-x-8 gap-y-4 items-center">
           <!-- grand image + grant description + optional grant round -->
@@ -38,7 +38,7 @@
                 <div class="flex gap-4 items-center">
                   <!-- do not forget to link the figure to the donors profile  -->
                   <figure class="cursor-pointer">
-                    <Jazzicon :address="contribution.address" :key="contribution.address" :width="48" />
+                    <Jazzicon :address="contribution.address" :width="48" />
                   </figure>
                   <div>
                     <a
