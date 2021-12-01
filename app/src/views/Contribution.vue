@@ -28,7 +28,7 @@ function setTitle(route: string) {
 
 function getFullContributionDetails() {
   if (!userAddress.value || !grantContributions.value || !grants.value || !grantRounds.value) {
-    return null;
+    return [];
   }
   const grantMeta = grantMetadata.value ? (grantMetadata.value as Record<string, GrantMetadata>) : undefined;
   const grantRoundMeta = grantRoundMetadata.value
