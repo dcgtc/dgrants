@@ -146,7 +146,6 @@ export default function useDataStore() {
         });
       }),
     ]);
-
     // Collect the grants into a grantId->payoutAddress obj
     const grantsList = grantsData.grants || [];
     const grantIds = grantsList.map((grant: Grant) => grant.id);
@@ -303,10 +302,14 @@ export default function useDataStore() {
         grantListener('GrantCreated', {
           grants,
           grantMetadata,
+          approvedGrants,
+          approvedGrantsPk,
         }),
         grantListener('GrantUpdated', {
           grants,
           grantMetadata,
+          approvedGrants,
+          approvedGrantsPk,
         }),
         // Contributions are routed through the grantRoundManager
         grantDonationListener(

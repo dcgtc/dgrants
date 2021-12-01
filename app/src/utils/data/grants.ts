@@ -13,7 +13,7 @@ import { batchFilterCall, recursiveGraphFetch } from '../utils';
 import { DGRANTS_CHAIN_ID } from '../chains';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
-import { getMetadata } from './ipfs';
+import { getMetadata, fetchMetaPtrs } from './ipfs';
 
 // --- pull in the registry contract
 const { grantRegistry } = useWalletStore();
@@ -185,7 +185,14 @@ export function grantListener(name: string, refs: Record<string, Ref>) {
         };
 
         // update the stored grants
-        refs.grants.value = Object.values(_lsGrants) as Grant[];
+        const updatedGrants = Object.values(_lsGrants) as Grant[];
+        const grantMetaPtrs = updatedGrants.map((grant: Grant) => grant.metaPtr);
+        refs.grants.value = updatedGrants;
+        const updatedApprovedGrants = await getApprovedGrants(updatedGrants);
+        refs.approvedGrants.value = updatedApprovedGrants.grants as Grant[];
+        refs.approvedGrantsPk.value = updatedApprovedGrants.approvedGrantsPk;
+
+        void fetchMetaPtrs(grantMetaPtrs, refs.grantMetadata);
 
         // save into localstorage
         if (save) {
