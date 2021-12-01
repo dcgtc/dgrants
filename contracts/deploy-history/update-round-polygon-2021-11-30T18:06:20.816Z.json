@@ -1,0 +1,23 @@
+{
+  "deployer": "0x6BF1EBa9740441D0A8822EDa4E116a74f850d81B",
+  "config": {
+    "roundAddress": "0xa94E824ac0907c1Db5145F7fDb326A8bBfCa5599",
+    "ipfsRetrievalEndpoint": "https://scopelift.b-cdn.net/ipfs",
+    "roundLogoPath": "./scripts/config/assets/gr12_round.svg",
+    "metadataJson": {
+      "name": "Gitcoin Building Gitcoin",
+      "description": "Decentralized projects building for Gitcoin",
+      "grants": [0],
+      "logoPtr": {
+        "protocol": 1,
+        "pointer": "QmatTDPXR26H6wfyVshHVSgujHVVYgEpsHaufoX4CnSk1r"
+      }
+    }
+  },
+  "contracts": {},
+  "actions": {
+    "PublishGrantRoundLogo": "QmatTDPXR26H6wfyVshHVSgujHVVYgEpsHaufoX4CnSk1r",
+    "PublishGrantRoundMetadata": "QmRcScH8CqLPZvtkTeXqz1379S5mFtWCtcFeYvD5YTRGAW",
+    "UpdateRoundMetaPtr": "0x2390ffb7aa7876d8fa34f863b4e829bb1a0c0d32cac232a5d538ca91f478d2ce"
+  }
+}
