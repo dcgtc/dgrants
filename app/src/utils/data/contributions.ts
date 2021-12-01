@@ -431,7 +431,7 @@ export function filterContributionGrantData(
   grantRoundsMetaData?: Record<string, GrantRoundMetadata>
 ): ContributionsDetail[] | null {
   if (!userAddress || !contributions || contributions.length === 0) {
-    return null;
+    return [];
   }
   const myContributions = filterContributionsByUserAddress(userAddress, contributions);
   if (myContributions?.length === 0 || !myContributions) {
