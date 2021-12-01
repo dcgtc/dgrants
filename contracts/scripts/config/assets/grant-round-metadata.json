@@ -1,5 +1,5 @@
 {
   "name": "Gitcoin Building Gitcoin",
   "description": "The Gitcoin Building Gitcion round is an experimental Quadratic Funding round on the dGrants (Decentralized Grants) platform. This round’s theme is “Gitcoin Building Gitcoin” and is open to all grantees who meet the eligibility criteria. The dGrants protocol is a work in progress, as part of the effort to decentralize Gitcoin Grants. We believe the best way to get valuable feedback is to incentivize users to test the product, so Gitcoin is allocating $25k to the matching pool. Only donations during Grants Round 12 (December 1, 2021, at 4 pm UTC until December 16, 2021, at 11:59 pm UTC) will be counted towards the Quadratic funding distribution of the matching funds. We are excited to see what the community thinks of the new platform!",
-  "grants": [0, 1, 2, 3]
+  "grants": [0, 1, 2, 3, 4, 5, 7]
 }
