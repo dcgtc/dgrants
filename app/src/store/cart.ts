@@ -303,7 +303,8 @@ export default function useCartStore() {
       const { grantId, contributionAmount, contributionToken } = item;
       const isEth = contributionToken.address === ETH_ADDRESS;
       const tokenAddress = getAddress(isEth ? WETH_ADDRESS : contributionToken.address);
-      const rounds = grantRounds.value ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
+      const rounds =
+        grantRounds.value && grantRounds.value[0].status === 'Active' ? [grantRounds.value[0].address] : []; // TODO we're hardcoding the first round for now
       const decimals = isEth ? 18 : SUPPORTED_TOKENS_MAPPING[tokenAddress].decimals;
       const donationAmount = parseUnits(String(contributionAmount), decimals);
 
