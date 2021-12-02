@@ -305,13 +305,7 @@ function useGrantRoundDetail() {
 
   // get grantRound contributions
   const roundContributions = computed(() =>
-    filterContributionsForGrantRound(
-      grantRound.value,
-      grantContributions.value,
-      grants.value,
-      grantRounds.value,
-      grantMeta
-    )
+    filterContributionsForGrantRound(grantRound.value, grantContributions.value, grants.value, grantMeta)
   );
 
   // --- Contribution capabilities ---

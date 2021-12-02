@@ -424,12 +424,11 @@ function filterGrantRoundsForContributions(
  */
 export function filterContributionsForGrantRound(
   round: GrantRound,
-  contributions: Contribution[],
-  grants: Grant[],
-  grantRounds: GrantRound[],
+  contributions: Contribution[] | undefined,
+  grants: Grant[] | undefined,
   grantMetaData?: Record<string, GrantMetadata>
 ): ContributionsDetail[] | null {
-  if (!contributions || contributions.length === 0) {
+  if (!grants || !round || !contributions || contributions.length === 0) {
     return [];
   }
   const myContributions = filterContributionsByGrantRound(round, contributions);
