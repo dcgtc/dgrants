@@ -42,7 +42,7 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import useDataStore from 'src/store/data';
 import useWalletStore from 'src/store/wallet';
 
-import { formatDate, metadataId, ptrToURI } from 'src/utils/utils';
+import { formatDate, metadataId } from 'src/utils/utils';
 
 const { grantMetadata } = useDataStore();
 
@@ -69,7 +69,6 @@ export default defineComponent({
     return {
       metadataId,
       grantMetadata,
-      ptrToURI,
       formatDate,
       ...filterMyGrants(),
     };

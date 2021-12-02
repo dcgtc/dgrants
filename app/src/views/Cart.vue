@@ -64,9 +64,10 @@
               <!--image-->
               <div>
                 <figure class="aspect-w-16 aspect-h-9 shadow-light">
-                  <img
+                  <LogoPtrImage
                     class="w-full h-full object-center object-cover group-hover:opacity-90"
-                    :src="ptrToURI(grantMetadata[metadataId(item.metaPtr)]?.logoPtr) || '/placeholder_grant.svg'"
+                    :logoPtr="grantMetadata[metadataId(item.metaPtr)]?.logoPtr"
+                    placeholder="/placeholder_grant.svg"
                   />
                 </figure>
               </div>
@@ -224,13 +225,14 @@ import BaseInput from 'src/components/BaseInput.vue';
 import BaseSelect from 'src/components/BaseSelect.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
 import LoadingSpinner from 'src/components/LoadingSpinner.vue';
+import LogoPtrImage from 'src/components/LogoPtrImage.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { BigNumber } from 'src/utils/ethers';
 import { SUPPORTED_TOKENS } from 'src/utils/chains';
-import { formatNumber, isValidAmount, metadataId, ptrToURI, pushRoute, watchTransaction } from 'src/utils/utils';
+import { formatNumber, isValidAmount, metadataId, pushRoute, watchTransaction } from 'src/utils/utils';
 import useWalletStore from 'src/store/wallet';
 
 function useCart() {
@@ -363,6 +365,7 @@ export default defineComponent({
     BaseHeader,
     BaseInput,
     BaseSelect,
+    LogoPtrImage,
     LoadingSpinner,
     TransactionStatus,
     CloseIcon,
@@ -371,7 +374,7 @@ export default defineComponent({
   },
   setup() {
     const NOT_IMPLEMENTED = (msg: string) => window.alert(`NOT IMPLEMENTED: ${msg}`);
-    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber, metadataId, ptrToURI };
+    return { ...useCart(), pushRoute, SUPPORTED_TOKENS, NOT_IMPLEMENTED, formatNumber, metadataId };
   },
 });
 </script>

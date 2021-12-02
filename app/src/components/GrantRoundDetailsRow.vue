@@ -2,9 +2,10 @@
   <div class="border-b border-grey-100 grid grid-cols-1 md:grid-cols-2 gap-x-14">
     <!--grid:left (img)-->
     <figure class="aspect-w-16 aspect-h-9 shadow-light">
-      <img
+      <LogoPtrImage
         class="w-full h-full object-center object-cover"
-        :src="ptrToURI(grantRoundMetadata?.logoPtr) || '/placeholder_grant.svg'"
+        :logoPtr="grantRoundMetadata?.logoPtr"
+        placeholder="/placeholder_round.svg"
       />
     </figure>
 
@@ -96,18 +97,21 @@ import { defineComponent, PropType } from 'vue';
 // --- Types ---
 import { GrantRound, GrantRoundMetadata } from '@dgrants/types';
 // --- Utils/helper ---
-import { pushRoute, formatAddress, getEtherscanUrl, ptrToURI } from 'src/utils/utils';
+import { pushRoute, formatAddress, getEtherscanUrl } from 'src/utils/utils';
 // --- Methods ---
 import { BigNumber } from 'src/utils/ethers';
+// --- Components/icons ---
+import LogoPtrImage from 'src/components/LogoPtrImage.vue';
 
 export default defineComponent({
   name: 'GrantRoundDetailsRow',
+  components: { LogoPtrImage },
   props: {
     grantRound: { type: Object as PropType<GrantRound>, required: true },
     grantRoundMetadata: { type: Object as PropType<GrantRoundMetadata>, required: true },
   },
   setup() {
-    return { BigNumber, pushRoute, formatAddress, getEtherscanUrl, ptrToURI };
+    return { BigNumber, pushRoute, formatAddress, getEtherscanUrl };
   },
 });
 </script>
