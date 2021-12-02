@@ -2,7 +2,7 @@
   <template v-if="fullContributions">
     <BaseHeader :name="title" />
     <SectionHeader :title="`Contributions (${fullContributions?.length})`" />
-    <ContributionDetail :contributions="fullContributions" />
+    <ContributionDetail :contributions="fullContributions" :showRound="true" />
   </template>
   <LoadingSpinner v-else />
 </template>

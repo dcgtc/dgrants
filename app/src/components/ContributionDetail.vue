@@ -19,8 +19,10 @@
               </div>
               <div v-if="contribution.grantName && contribution.roundName" class="col-span-4 lg:col-span-3">
                 <a href="#" class="link">{{ contribution.grantName }}</a>
-                <br /><span class="mr-2">via</span>
-                <a href="#" class="link">{{ contribution.roundName }}</a>
+                <template v-if="showRound">
+                  <br /><span class="mr-2">via</span>
+                  <a href="#" class="link">{{ contribution.roundName }}</a>
+                </template>
               </div>
               <div v-else class="col-span-4 lg:col-span-3">
                 <a href="#" class="link">{{ contribution.grantName }}</a>
@@ -95,6 +97,7 @@ import { ContributionsDetail } from '@dgrants/types/src/grants';
 export default defineComponent({
   name: 'ContributionDetail',
   props: {
+    showRound: { type: Boolean },
     // -- Required props --
     contributions: { type: Array as PropType<ContributionsDetail[]>, required: true },
   },
