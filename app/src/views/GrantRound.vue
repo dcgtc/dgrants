@@ -67,7 +67,7 @@
   </div>
 
   <!-- Grant Round Details -->
-  <div v-else-if="grantRound.address && grantRoundMetadata">
+  <div v-else-if="grantRound.address && grantRoundMetadata && roundContributions">
     <BaseHeader
       :breadcrumbContent="breadcrumb"
       :name="grantRoundMetadata?.name"
@@ -192,10 +192,10 @@ import {
   watchTransaction,
 } from 'src/utils/utils';
 
-import { filterContributionsByGrantRound } from 'src/utils/data/contributions';
+import { filterContributionsForGrantRound } from 'src/utils/data/contributions';
 
 // --- Types ---
-import { Breadcrumb, GrantRound, GrantRoundMetadata } from '@dgrants/types';
+import { Breadcrumb, GrantRound, GrantMetadata, GrantRoundMetadata } from '@dgrants/types';
 
 // --- Icons ---
 import { TwitterIcon, DonateIcon, Spinner1Icon } from '@fusion-icons/vue/interface';
@@ -205,7 +205,13 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 
 // --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
-  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grantContributions } = useDataStore();
+  const {
+    grants,
+    grantRounds,
+    grantMetadata,
+    grantRoundMetadata: _grantRoundMetadata,
+    grantContributions,
+  } = useDataStore();
 
   const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -247,11 +253,6 @@ function useGrantRoundDetail() {
       return <GrantRound>{};
     }
   });
-
-  // get grantRound contributions
-  const roundContributions = computed(() =>
-    filterContributionsByGrantRound(grantRound.value, grantContributions.value)
-  );
 
   /**
    * @notice Link To Previous Grant Round
@@ -298,6 +299,19 @@ function useGrantRoundDetail() {
     _grantRoundMetadata.value
       ? (_grantRoundMetadata.value[metadataId(grantRound.value?.metaPtr)] as GrantRoundMetadata)
       : null
+  );
+
+  const grantMeta = grantMetadata.value ? (grantMetadata.value as Record<string, GrantMetadata>) : undefined;
+
+  // get grantRound contributions
+  const roundContributions = computed(() =>
+    filterContributionsForGrantRound(
+      grantRound.value,
+      grantContributions.value,
+      grants.value,
+      grantRounds.value,
+      grantMeta
+    )
   );
 
   // --- Contribution capabilities ---

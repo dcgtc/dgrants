@@ -415,6 +415,61 @@ function filterGrantRoundsForContributions(
 
 /***
  * @notice
+ * @param round
+ * @param contributions
+ * @param grants
+ * @param grantMetaData
+ * @param grantRounds
+ * @param grantRoundsMetaData
+ */
+export function filterContributionsForGrantRound(
+  round: GrantRound,
+  contributions: Contribution[],
+  grants: Grant[],
+  grantRounds: GrantRound[],
+  grantMetaData?: Record<string, GrantMetadata>
+): ContributionsDetail[] | null {
+  if (!contributions || contributions.length === 0) {
+    return [];
+  }
+  const myContributions = filterContributionsByGrantRound(round, contributions);
+  if (myContributions?.length === 0 || !myContributions) {
+    return [];
+  }
+  return myContributions?.map((contribution) => {
+    let grantLogo = '/placeholder_grant.svg';
+    let grantName = '...';
+
+    const grantData = grants.find((grant) => grant.id === contribution.grantId);
+    if (grantData && grantMetaData && Object.keys(grantMetaData).length) {
+      const metaDataVersionId = metadataId(grantData.metaPtr);
+      const { logoPtr, name } = grantMetaData[metaDataVersionId];
+      grantLogo = ptrToURI(logoPtr, grantLogo);
+      grantName = name || grantName;
+    }
+
+    const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
+    const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
+
+    return {
+      grantId: contribution.grantId,
+      grantAddress: contribution.grantAddress,
+      grantName: grantName,
+      grantLogoURI: grantLogo,
+      address: contribution.address,
+      amount: contribution.amount,
+      tokenIn: contribution.tokenIn,
+      inRounds: contribution.inRounds,
+      donationToken: contribution.donationToken,
+      createdAt: contributionDate,
+      txHash: contribution.txHash,
+      blockNumber: contribution.blockNumber,
+    } as ContributionsDetail;
+  });
+}
+
+/***
+ * @notice
  * @param userAddress
  * @param contributions
  * @param grants
