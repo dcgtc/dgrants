@@ -15,9 +15,10 @@
     <div class="relative">
       <!--img-->
       <div class="aspect-w-16 aspect-h-9 shadow-light">
-        <img
+        <LogoPtrImage
+          :logoPtr="logoPtr"
           class="w-full h-full object-center object-cover group-hover:opacity-90"
-          :src="(logoPtr?.protocol !== 0 && ptrToURI(logoPtr)) || '/placeholder_grant.svg'"
+          placeholder="/placeholder_grant.svg"
         />
       </div>
 
@@ -57,12 +58,14 @@
 <script lang="ts">
 import { computed, defineComponent, PropType, ref } from 'vue';
 import { MetaPtr } from '@dgrants/types';
+// --- Components ---
+import LogoPtrImage from 'src/components/LogoPtrImage.vue';
 // --- Store ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
 // --- Methods and Data ---
 import { filterContributionsByGrantId } from 'src/utils/data/contributions';
-import { formatNumber, formatAddress, getEtherscanUrl, ptrToURI, pushRoute } from 'src/utils/utils';
+import { formatNumber, formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
 // --- Icons ---
 import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
@@ -86,7 +89,7 @@ export default defineComponent({
     roundAddress: { type: String, default: '' },
     roundName: { type: String, default: '' },
   },
-  components: { CartIcon },
+  components: { CartIcon, LogoPtrImage },
   setup(props) {
     const grantId = ref<number>(props.id);
     const raised = computed(() => getTotalRaised(grantId.value));
@@ -98,7 +101,6 @@ export default defineComponent({
       isInCart,
       formatAddress,
       getEtherscanUrl,
-      ptrToURI,
       pushRoute,
       raised,
     };

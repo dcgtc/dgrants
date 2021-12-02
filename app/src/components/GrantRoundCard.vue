@@ -3,9 +3,10 @@
   <figure class="group cursor-pointer" @click="pushRoute({ name: 'dgrants-round', params: { address: address } })">
     <!--img-->
     <div class="aspect-w-16 aspect-h-9 shadow-light">
-      <img
+      <LogoPtrImage
         class="w-full h-full object-center object-cover group-hover:opacity-90"
-        :src="(logoPtr?.protocol !== 0 && ptrToURI(logoPtr)) || '/placeholder_round.svg'"
+        :logoPtr="logoPtr"
+        placeholder="/placeholder_round.svg"
       />
     </div>
 
@@ -42,11 +43,16 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { formatAddress, getEtherscanUrl, pushRoute, ptrToURI } from 'src/utils/utils';
+// --- Types ---
 import { MetaPtr } from '@dgrants/types';
+// --- Utils/helper ---
+import { formatAddress, getEtherscanUrl, pushRoute } from 'src/utils/utils';
+// --- Components/icons ---
+import LogoPtrImage from 'src/components/LogoPtrImage.vue';
 
 export default defineComponent({
   name: 'GrantRoundCard',
+  components: { LogoPtrImage },
   props: {
     id: { type: Number, required: true },
     name: { type: String, required: true },
@@ -56,7 +62,7 @@ export default defineComponent({
     grantsTotal: { type: Number, required: true },
   },
   setup() {
-    return { formatAddress, getEtherscanUrl, pushRoute, ptrToURI };
+    return { formatAddress, getEtherscanUrl, pushRoute };
   },
 });
 </script>

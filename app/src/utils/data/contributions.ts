@@ -445,7 +445,7 @@ export function filterContributionGrantData(
     if (grantData && grantMetaData && Object.keys(grantMetaData).length) {
       const metaDataVersionId = metadataId(grantData.metaPtr);
       const { logoPtr, name } = grantMetaData[metaDataVersionId];
-      grantLogo = ptrToURI(logoPtr, grantLogo);
+      grantLogo = (logoPtr && logoPtr.protocol === 1 ? ptrToURI(logoPtr) : false) || grantLogo;
       grantName = name || grantName;
     }
 
