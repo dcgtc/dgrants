@@ -33,7 +33,7 @@ import { GRANT_REGISTRY_ABI, MULTICALL_ABI } from 'src/utils/constants';
 import { GrantRegistry, GrantRoundManager } from '@dgrants/contracts';
 
 const { startPolling } = useDataStore();
-const { setLastWallet } = useSettingsStore();
+const { setLastWallet, clearLastWallet } = useSettingsStore();
 const defaultChainId = SupportedChainId.MAINNET;
 
 // State variables
@@ -118,6 +118,7 @@ export default function useWalletStore() {
 
     resetState();
     onboard.walletReset();
+    clearLastWallet();
   }
 
   /**
