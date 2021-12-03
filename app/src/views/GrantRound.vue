@@ -112,7 +112,6 @@
 
     <!-- Description -->
     <SectionHeader title="Description" />
-
     <div class="border-b border-grey-100">
       <div class="px-4 md:px-12 py-12 mx-auto max-w-6xl">
         <!-- the idea is to transform each CRLF / ENTER into a <p class="text-indent">text</p> 
@@ -145,6 +144,10 @@
         }}</a>
       </div>
     </div>
+
+    <!-- CONTRIBUTIONS -->
+    <SectionHeader title="Contributions" />
+    <ContributionDetail :contributions="roundContributions" />
   </div>
 
   <!-- No grant round selected -->
@@ -165,6 +168,7 @@ import { useRoute } from 'vue-router';
 import BaseHeader from 'src/components/BaseHeader.vue';
 import BaseInput from 'src/components/BaseInput.vue';
 import GrantRoundDetailsRow from 'src/components/GrantRoundDetailsRow.vue';
+import ContributionDetail from 'src/components/ContributionDetail.vue';
 import InputRow from 'src/components/InputRow.vue';
 import SectionHeader from 'src/components/SectionHeader.vue';
 import TransactionStatus from 'src/components/TransactionStatus.vue';
@@ -188,6 +192,8 @@ import {
   watchTransaction,
 } from 'src/utils/utils';
 
+import { filterContributionsByGrantRound } from 'src/utils/data/contributions';
+
 // --- Types ---
 import { Breadcrumb, GrantRound, GrantRoundMetadata } from '@dgrants/types';
 
@@ -199,7 +205,7 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 
 // --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
-  const { grantRounds, grantRoundMetadata: _grantRoundMetadata } = useDataStore();
+  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grantContributions } = useDataStore();
 
   const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -241,6 +247,11 @@ function useGrantRoundDetail() {
       return <GrantRound>{};
     }
   });
+
+  // get grantRound contributions
+  const roundContributions = computed(() =>
+    filterContributionsByGrantRound(grantRound.value, grantContributions.value)
+  );
 
   /**
    * @notice Link To Previous Grant Round
@@ -380,6 +391,7 @@ function useGrantRoundDetail() {
     isCorrectNetwork,
     grantRound,
     grantRoundMetadata,
+    roundContributions,
     form,
     showAddFunds,
     hideAddFunds,
@@ -399,6 +411,7 @@ export default defineComponent({
     BaseHeader,
     BaseInput,
     GrantRoundDetailsRow,
+    ContributionDetail,
     InputRow,
     SectionHeader,
     DonateIcon,
