@@ -1,5 +1,5 @@
 import { createIpfs } from '@dgrants/utils/src/ipfs';
-import { GrantMetadata, MetaPtr } from '@dgrants/types';
+import { GrantMetadata, GrantRoundMetadataResolution, MetaPtr } from '@dgrants/types';
 import { getStorageKey, setStorageKey } from 'src/utils/data/utils';
 import { decodeMetadataId, metadataId } from 'src/utils/utils';
 import { BigNumber } from 'src/utils/ethers';
@@ -109,6 +109,7 @@ export const fetchMetaPtrs = async (metaPtrs: MetaPtr[], metadata: Ref) => {
 export const getMetadata = async (metaPtr: MetaPtr, metadata: Ref) => {
   assertIPFSPointer(metaPtr);
   const id = metadataId(metaPtr);
+  const fillMetadata = {} as Record<string, GrantRoundMetadataResolution>;
   try {
     // save each individual ipfs result into storage
     let data = await getStorageKey('ipfs-' + id);
@@ -117,11 +118,13 @@ export const getMetadata = async (metaPtr: MetaPtr, metadata: Ref) => {
       data = await resolveMetaPtr(url);
       await setStorageKey('ipfs-' + id, data as LocalForageData);
     }
-    metadata.value[id] = { status: 'resolved', ...data };
+    fillMetadata[id] = { status: 'resolved', ...data };
   } catch (e) {
-    metadata.value[id] = { status: 'error' };
+    fillMetadata[id] = { status: 'error' };
     console.error(e);
   }
+  // place the metadata
+  metadata.value = { ...metadata.value, ...fillMetadata };
 
   return metadata.value[id];
 };
