@@ -5,6 +5,11 @@ import path from 'path';
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  build: {
+    commonjsOptions: {
+      transformMixedEsModules: true, // https://github.com/vitejs/vite/issues/4593
+    },
+  },
   resolve: {
     alias: {
       src: path.resolve(__dirname, 'src'),
