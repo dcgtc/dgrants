@@ -12,6 +12,7 @@ const settings = {
 // Helper methods to load save items from local storage
 const load = (key: string) => window.localStorage.getItem(key);
 const save = (key: string, value: any) => window.localStorage.setItem(key, value); // eslint-disable-line @typescript-eslint/no-explicit-any
+const clear = (key: string) => window.localStorage.removeItem(key);
 
 // Shared state
 const lastWallet = ref<string>(); // name of last wallet used
@@ -27,10 +28,15 @@ export default function useSettingsStore() {
     save(settings.lastWallet, walletName);
   }
 
+  function clearLastWallet() {
+    clear(settings.lastWallet);
+  }
+
   return {
     initializeSettings,
     // Wallet
     setLastWallet,
+    clearLastWallet,
     lastWallet: computed(() => lastWallet.value),
   };
 }
