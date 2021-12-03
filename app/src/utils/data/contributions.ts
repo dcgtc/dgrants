@@ -250,7 +250,7 @@ export function filterContributionsByGrantId(grantId: number, contributions: Con
  * @notice given a grantRound and the contributions return only contributions for the grantRound
  */
 export function filterContributionsByGrantRound(round: GrantRound, contributions: Contribution[]) {
-  // filter contributions that are for this grantId
+  // filter contributions that are for this grantRound
   return contributions.filter((contribution: Contribution) => {
     // check that the contribution is valid
     const forThisGrantRound = contribution.inRounds?.includes(round.address);
@@ -389,7 +389,7 @@ function filterContributionsByUserAddress(userAddress: string, contributions: Co
 }
 
 /**
- * @notice filters through the grantrounds and returns the necessary attributes for  contribution detail screens
+ * @notice filters through the grantrounds and returns the necessary attributes for contribution detail screens
  * @param grantRounds
  * @param grantId
  * @param grantRoundMeta
