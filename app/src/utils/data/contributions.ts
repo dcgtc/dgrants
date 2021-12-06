@@ -7,6 +7,7 @@ import {
   GrantMetadata,
   GrantRound,
   GrantRoundMetadata,
+  MetaPtr,
 } from '@dgrants/types';
 import { LocalForageAnyObj } from 'src/types';
 import { TokenInfo } from '@uniswap/token-lists';
@@ -412,6 +413,39 @@ function filterGrantRoundsForContributions(
   }
 
   return roundName;
+}
+
+export function filterMatchingPoolContributions(
+  round: GrantRound,
+  contributions: Contribution[] | undefined,
+  roundName: string | undefined,
+  roundLogoPtr: MetaPtr | undefined
+): ContributionsDetail[] {
+  if (!round || !contributions) return [];
+  const roundContributions = filterContributionsByGrantRound(round, contributions);
+  if (!roundContributions || roundContributions?.length === 0) return [];
+  return roundContributions?.map((contribution) => {
+    const logo =
+      (roundLogoPtr && roundLogoPtr.protocol === 1 ? ptrToURI(roundLogoPtr) : false) || '/placeholder_grant.svg';
+
+    const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
+    const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
+
+    return {
+      grantId: contribution.grantId,
+      grantAddress: contribution.grantAddress,
+      grantName: roundName,
+      grantLogoURI: logo,
+      address: contribution.address,
+      amount: contribution.amount,
+      tokenIn: contribution.tokenIn,
+      inRounds: contribution.inRounds,
+      donationToken: contribution.donationToken,
+      createdAt: contributionDate,
+      txHash: contribution.txHash,
+      blockNumber: contribution.blockNumber,
+    } as ContributionsDetail;
+  });
 }
 
 /***
