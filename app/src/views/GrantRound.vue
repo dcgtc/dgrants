@@ -192,7 +192,7 @@ import {
   watchTransaction,
 } from 'src/utils/utils';
 
-import { filterContributionsByGrantRound } from 'src/utils/data/contributions';
+import { filterMatchingPoolContributions } from 'src/utils/data/contributions';
 
 // --- Types ---
 import { Breadcrumb, GrantRound, GrantRoundMetadata } from '@dgrants/types';
@@ -248,11 +248,6 @@ function useGrantRoundDetail() {
     }
   });
 
-  // get grantRound contributions
-  const roundContributions = computed(() =>
-    filterContributionsByGrantRound(grantRound.value, grantContributions.value)
-  );
-
   /**
    * @notice Link To Previous Grant Round
    */
@@ -298,6 +293,16 @@ function useGrantRoundDetail() {
     _grantRoundMetadata.value
       ? (_grantRoundMetadata.value[metadataId(grantRound.value?.metaPtr)] as GrantRoundMetadata)
       : null
+  );
+
+  // get grantRound contributions
+  const roundContributions = computed(() =>
+    filterMatchingPoolContributions(
+      grantRound.value,
+      grantContributions.value,
+      grantRoundMetadata.value?.name,
+      grantRoundMetadata.value?.logoPtr
+    )
   );
 
   // --- Contribution capabilities ---
