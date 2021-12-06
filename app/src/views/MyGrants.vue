@@ -1,5 +1,10 @@
 <template>
-  <template v-if="grants && grantMetadata">
+  <template v-if="!userAddress">
+    <img style="max-height: 15rem" class="mx-auto" src="/placeholder_grant.svg" />
+    <p class="text-center">Connect wallet to view your grants</p>
+  </template>
+
+  <template v-else-if="grants && grantMetadata">
     <BaseHeader name="My Grants" />
 
     <!-- No Grants -->
@@ -58,7 +63,7 @@ function filterMyGrants() {
     }
   });
 
-  return { grants };
+  return { grants, userAddress };
 }
 
 export default defineComponent({
