@@ -21,15 +21,15 @@
         <div>
           <span class="text-grey-400 mr-4">Donation Address:</span>
           <a class="link" :href="getEtherscanUrl(payoutAddress, 'address')" target="_blank" rel="noopener noreferrer">{{
-            formatAddress(grant.owner)
+            formatAddress(payoutAddress)
           }}</a>
         </div>
 
         <!-- Owner -->
         <div>
           <span class="text-grey-400 mr-4">Owner:</span>
-          <a class="link" :href="getEtherscanUrl(payoutAddress, 'address')" target="_blank" rel="noopener noreferrer">{{
-            formatAddress(payoutAddress)
+          <a class="link" :href="getEtherscanUrl(grant.owner, 'address')" target="_blank" rel="noopener noreferrer">{{
+            formatAddress(grant.owner)
           }}</a>
         </div>
 
