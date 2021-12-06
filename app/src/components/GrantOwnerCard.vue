@@ -106,7 +106,7 @@ function useGrantInfo(id: number) {
   });
 
   function getGrantInfo(grantId: number) {
-    const contributions = filterContributionsByGrantId(grantId, grantContributions?.value || []);
+    const contributions = filterContributionsByGrantId(grantId, grantContributions.value);
     const contributionCount = contributions.length;
     const raised = `${formatNumber(
       contributions.reduce((total, contribution) => contribution?.amount + total, 0),

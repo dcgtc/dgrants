@@ -71,7 +71,7 @@ import { Cart2Icon as CartIcon } from '@fusion-icons/vue/interface';
 
 function getTotalRaised(grantId: number) {
   const { grantRounds, grantContributions } = useDataStore();
-  const contributions = filterContributionsByGrantId(grantId, grantContributions?.value || []);
+  const contributions = filterContributionsByGrantId(grantId, grantContributions.value);
   const raised = `${formatNumber(
     contributions.reduce((total, contribution) => contribution?.amount + total, 0),
     2

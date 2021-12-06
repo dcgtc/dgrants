@@ -359,7 +359,7 @@ function useGrantDetail() {
       // ensure the computed props are ready before fetching data
       if (donationToken.value && rounds.value && roundsCLRData.value) {
         // get all contributions for this grant
-        const contributions = filterContributionsByGrantId(grantId.value, allContributions?.value || []);
+        const contributions = filterContributionsByGrantId(grantId.value, allContributions.value);
         // sum all contributions made against this grant
         const contributionsTotal = `${formatNumber(
           contributions.reduce((total, contribution) => contribution?.amount + total, 0),

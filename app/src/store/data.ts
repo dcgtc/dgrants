@@ -383,7 +383,7 @@ export default function useDataStore() {
     approvedGrants: computed(() => approvedGrants.value),
     grantRounds: computed(() => grantRounds.value),
     grantMetadata: computed(() => grantMetadata.value),
-    grantContributions: computed(() => grantContributions.value),
+    grantContributions: computed(() => grantContributions.value || []),
     grantRoundsCLRData: computed(() => grantRoundsCLRData.value),
     grantRoundMetadata: computed(() => grantRoundMetadata.value),
     grantRoundsDonationToken: computed(() => grantRoundsDonationToken.value),
