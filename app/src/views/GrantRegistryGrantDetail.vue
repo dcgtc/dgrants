@@ -97,7 +97,7 @@
         <SectionHeader title="Contributions" />
         <div>
           <BaseFilterNav :active="selectedRound" :items="contributionsNav" />
-          <div v-if="selectedRound == 0">
+          <div v-if="selectedRound === 0">
             <div v-for="(contribution, index) in grantContributions" :key="Number(index)">
               <ContributionRow :contribution="contribution" :donationToken="donationToken" />
             </div>
@@ -119,7 +119,7 @@
       <BaseHeader name="Edit Grant" :tagline="grantMetadata?.name" />
       <BaseFilterNav :active="selectedEdit" :items="editNav" />
 
-      <div v-if="selectedEdit == 0" class="text-left">
+      <div v-if="selectedEdit === 0" class="text-left">
         <form class="space-y-5 mb-20" @submit.prevent="saveEdits">
           <!-- Grant name -->
           <InputRow>
@@ -285,7 +285,9 @@ import { LOREM_IPSOM_TEXT, NO_LOGO_OBJECT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
 import {
   cleanTwitterUrl,
+  formatMetaPtr,
   formatNumber,
+  getMetaPtr,
   isDefined,
   isValidAddress,
   isValidGithub,
@@ -540,7 +542,7 @@ function useGrantDetail() {
       website !== grantMetadata.value?.properties?.websiteURI ||
       github !== grantMetadata.value?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) ||
-      logoURI !== ipfs.getMetaPtr({ cid: (grantMetadata.value?.logoPtr as MetaPtr).pointer });
+      logoURI !== getMetaPtr({ cid: (grantMetadata.value?.logoPtr as MetaPtr).pointer });
 
     return areFieldsValid && areFieldsUpdated;
   });
@@ -550,9 +552,7 @@ function useGrantDetail() {
     if (isLogoValid.value) isUploadingLogo.value = true;
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
     try {
-      form.value.logoURI = logo
-        ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
-        : '';
+      form.value.logoURI = logo ? await ipfs.uploadFile(logo).then((cid) => getMetaPtr({ cid: cid.toString() })) : '';
       isUploadingLogo.value = false;
     } catch (err) {
       isUploadingLogo.value = false;
@@ -593,7 +593,7 @@ function useGrantDetail() {
     const isMetaPtrUpdated =
       name !== gMetadata?.name ||
       description !== gMetadata?.description ||
-      logoURI !== ipfs.getMetaPtr({ cid: (gMetadata?.logoPtr as MetaPtr).pointer }) ||
+      logoURI !== getMetaPtr({ cid: (gMetadata?.logoPtr as MetaPtr).pointer }) ||
       website !== gMetadata?.properties?.websiteURI ||
       github !== gMetadata?.properties?.githubURI ||
       twitter !== cleanTwitterUrl(gMetadata?.properties?.twitterURI);
@@ -609,7 +609,7 @@ function useGrantDetail() {
       const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description, logoPtr, properties })
-        .then((cid) => ipfs.formatMetaPtr(cid.toString()));
+        .then((cid) => formatMetaPtr(cid.toString()));
     }
 
     if (owner !== g.owner && payee === g.payee && !isMetaPtrUpdated) {
@@ -649,7 +649,7 @@ function useGrantDetail() {
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.logoURI = cid ? ipfs.getMetaPtr({ cid }) : 'placeholder_grant.svg';
+    form.value.logoURI = getMetaPtr({ cid }) : 'placeholder_grant.svg' 
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';

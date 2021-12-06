@@ -17,8 +17,10 @@ import {
   SUPPORTED_TOKENS_MAPPING,
   WETH_ADDRESS,
 } from 'src/utils/chains';
-import { getMetaPtr } from 'src/utils/data/ipfs';
 import { Ref } from 'vue';
+
+// --- Constants ---
+const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -477,4 +479,33 @@ Promise<any[]> => {
     // return the result combined with the next page
     return await recursiveGraphFetch(url, key, query, fromBlock, [...before, ...json.data[key]]);
   }
+};
+
+export function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
+  if (!logoPtr) throw new Error('assertIPFSPointer: logoPtr is undefined');
+  const protocol = BigNumber.from(logoPtr.protocol).toString();
+  if (!['0', '1'].includes(protocol))
+    throw new Error(`assertIPFSPointer: Expected protocol ID of 0 or 1, found ${protocol}`);
+}
+
+/**
+ * Creates a url for a MetaPtr
+ * @param obj
+ * @param obj.cid CID of the grant
+ * @returns string
+ */
+export const getMetaPtr = ({ cid }: { cid: string | undefined }) => {
+  return `${retrievalEndpoint}/${cid}`;
+};
+
+/**
+ * Given a CID, formats the metadata pointer for compatibility with the contracts
+ * @param cid CID of the grant
+ * @returns string
+ */
+export const formatMetaPtr = (cid: string): MetaPtr => {
+  return {
+    protocol: 1, // IPFS has a protocol ID of 1
+    pointer: cid,
+  };
 };

@@ -18,7 +18,7 @@ import { formatNumber, callMulticallContract, batchFilterCall, metadataId, recur
 import { syncStorage } from 'src/utils/data/utils';
 import { CLR, linear, InitArgs } from '@dgrants/dcurve';
 import { filterContributionsByGrantId, filterContributionsByGrantRound } from './contributions';
-import { getMetadata } from './ipfs';
+import { getMetadata } from './metaPtrs';
 // --- Constants ---
 import {
   START_BLOCK,

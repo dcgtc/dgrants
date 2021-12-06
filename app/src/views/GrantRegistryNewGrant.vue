@@ -168,7 +168,18 @@ import TransactionStatus from 'src/components/TransactionStatus.vue';
 import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT, NO_LOGO_OBJECT } from 'src/utils/constants';
-import { isValidAddress, isValidWebsite, isValidGithub, isValidTwitter, isDefined, pushRoute, urlFromTwitterHandle, isValidLogo, watchTransaction } from 'src/utils/utils'; // prettier-ignore
+import {
+  isValidAddress,
+  isValidWebsite,
+  isValidGithub,
+  isValidTwitter,
+  isDefined,
+  pushRoute,
+  urlFromTwitterHandle,
+  isValidLogo,
+  watchTransaction,
+  getMetaPtr, formatMetaPtr
+} from 'src/utils/utils'; // prettier-ignore
 import * as ipfs from 'src/utils/data/ipfs';
 
 function useNewGrant() {
@@ -220,9 +231,7 @@ function useNewGrant() {
     form.value.logo = logo && isLogoValid.value ? logo : undefined;
     if (isLogoValid.value) isUploadingLogo.value = true;
     try {
-      form.value.logoURI = logo
-        ? await ipfs.uploadFile(logo).then((cid) => ipfs.getMetaPtr({ cid: cid.toString() }))
-        : '';
+      form.value.logoURI = logo ? await ipfs.uploadFile(logo).then((cid) => getMetaPtr({ cid: cid.toString() })) : '';
       isUploadingLogo.value = false;
     } catch (err) {
       isUploadingLogo.value = false;
@@ -245,10 +254,10 @@ function useNewGrant() {
       const splitLogoURI = (logoURI as string).split('/');
       cid = splitLogoURI[splitLogoURI.length - 1];
     }
-    const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
+    const logoPtr = cid ? formatMetaPtr(cid) : NO_LOGO_OBJECT;
     const metaPtr = await ipfs
       .uploadGrantMetadata({ name, description, logoPtr, properties })
-      .then((cid) => ipfs.formatMetaPtr(cid.toString()));
+      .then((cid) => formatMetaPtr(cid.toString()));
 
     // watch the transaction to check for any replacements/cancellations and update txHash accordingly
     const tx = await watchTransaction(() => grantRegistry.value.createGrant(owner, payee, metaPtr), txHash);
