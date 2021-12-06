@@ -52,6 +52,8 @@
         <div v-for="(round, index) in roundDetails" :key="index" class="mt-2">
           <!--round-->
           <div>
+            <span class="text-grey-400 mr-4">Matching:</span>
+            <span>{{ round.matching || '...' }} {{ round.matchingToken.symbol }}</span>
             <span>, {{ round.name }}</span>
           </div>
 
