@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/app",
-  "version": "0.2.31-4add75c.0",
+  "version": "0.2.32-8a7e113.0",
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@dgrants/contracts": "^0.2.24-87d3139.0",
-    "@dgrants/dcurve": "^0.2.24-87d3139.0",
+    "@dgrants/dcurve": "^0.2.25-8a7e113.0",
     "@dgrants/types": "^0.2.24-87d3139.0",
     "@fusion-icons/vue": "^0.0.0",
     "@headlessui/vue": "^1.2.0",
