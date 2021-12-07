@@ -29,10 +29,13 @@ export const fetchTrustBonusScore = async (addresses: string[]): Promise<TrustBo
   // filter any falseys before making the fetch to prevent [undefined] returning a 400: Bad Request
   if (addresses.filter((v) => v).length == 0) return result;
 
-  const url = `https://gitcoin.co/grants/v1/api/trust-bonus?addresses=${addresses.join(',')}`;
-
   try {
-    const response = await fetch(url);
+    const response = await fetch('https://gitcoin.co/grants/v1/api/trust-bonus', {
+      method: 'POST',
+      body: JSON.stringify({
+        addresses: addresses,
+      }),
+    });
     const trustBonusScores = await response.json();
     result.data = trustBonusScores;
     return result;
