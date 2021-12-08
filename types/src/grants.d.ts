@@ -81,7 +81,7 @@ export type Contribution = {
   inRounds?: string[];
   donationToken?: TokenInfo;
   txHash?: string;
-  createdAt?: BigNumber;
+  createdAt?: BigNumberish;
   blockNumber?: number;
 };
 

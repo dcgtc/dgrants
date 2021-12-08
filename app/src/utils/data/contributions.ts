@@ -133,7 +133,7 @@ export async function getContributions(
                   tokenIn: getAddress(contribution?.args?.tokenIn),
                   donationToken: donationToken,
                   txHash: tx.hash,
-                  createdAt: contribution.args?.time,
+                  createdAt: contribution.args?.time.toNumber(),
                   blockNumber: tx.blockNumber,
                 };
               })
@@ -277,10 +277,10 @@ export function grantDonationListener(
     tokenIn: string,
     donationAmount: BigNumberish,
     grantRounds: string[],
-    time: BigNumber,
+    time: BigNumberish,
     event: Event
   ) => {
-    // console.log(name, grantId, tokenIn, donationAmount, rounds);
+    // capture the current blockNumber from the provider
     const blockNumber = await DEFAULT_PROVIDER.getBlockNumber();
     // get tx details to pull contributor details from
     const tx = await event.getTransaction();
@@ -300,6 +300,7 @@ export function grantDonationListener(
         // pull the contributions
         const _lsContributions: Record<string, Contribution> = LocalForageData?.data?.contributions || {};
         // check that the contribution is valid
+        time = BigNumber.from(time).toNumber();
         grantId = BigNumber.from(grantId).toNumber();
         // record the new transaction
         _lsContributions[`${tx.hash}-${grantId}`] = {
@@ -308,7 +309,7 @@ export function grantDonationListener(
           inRounds: grantRounds,
           grantAddress: args.grantPayees[grantId],
           address: tx.from,
-          donationToken: args.donationToken,
+          donationToken: { ...args.donationToken },
           tokenIn: tokenIn,
           txHash: tx.hash,
           blockNumber: tx.blockNumber,
@@ -361,7 +362,7 @@ export function grantDonationListener(
   // filter for every event by topic so that we can get to the event args too
   const filter = {
     address: GRANT_ROUND_MANAGER_ADDRESS,
-    topics: [id('GrantDonation(uint96,address,uint256,address[])')],
+    topics: [id('GrantDonation(uint96,address,uint256,address[],uint256)')],
   } as EventFilter;
 
   // attach listener
