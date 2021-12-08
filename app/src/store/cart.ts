@@ -393,7 +393,8 @@ export default function useCartStore() {
     return cart.value
       .map((item) =>
         (grantRounds.value || []).reduce((inRound: boolean, round) => {
-          return inRound || grantRoundMetadata.value[metadataId(round.metaPtr)].grants?.includes(item.grantId) || false;
+          const metadata = grantRoundMetadata.value[metadataId(round.metaPtr)];
+          return inRound || metadata?.grants?.includes(item.grantId) || false;
         }, false)
       )
       .reduce((inRound, isInRound) => inRound || isInRound, false);
