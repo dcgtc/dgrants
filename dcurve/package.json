@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/dcurve",
-  "version": "0.2.25-8a7e113.0",
+  "version": "0.2.26-3535cf9.0",
   "private": true,
   "description": "distribution generator for GrantCLR in dgrants",
   "keywords": [
@@ -29,7 +29,7 @@
     "extends": "../package.json"
   },
   "dependencies": {
-    "@dgrants/contracts": "^0.2.24-87d3139.0",
+    "@dgrants/contracts": "^0.2.25-3535cf9.0",
     "@dgrants/utils": "^0.2.15-8a7e113.0",
     "buffer": "^6.0.3",
     "ethers": "^5.4.6"
