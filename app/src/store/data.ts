@@ -376,15 +376,17 @@ export default function useDataStore() {
 
     // record the network value to detect changes
     const networkValue = (await getStorageKey('network'))?.data || network.value;
+
     // watch the network
     watch(
       () => [network.value],
       async () => {
         // clear storage and poll again for all network changes after first load
-        if (networkValue && networkValue.chainId !== network.value?.chainId) {
+        if (networkValue && network.value && networkValue.chainId !== network.value?.chainId) {
           void (await DefaultStorage.clear());
-          void (await init());
         }
+        // init on network change
+        void (await init());
         // update for next time
         await setStorageKey('network', { data: { chainId: network.value?.chainId } });
       },
@@ -392,8 +394,6 @@ export default function useDataStore() {
         immediate: true,
       }
     );
-    // init the current state
-    void (await init());
   }
 
   return {
