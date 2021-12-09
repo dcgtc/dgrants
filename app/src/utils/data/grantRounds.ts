@@ -295,7 +295,7 @@ export async function getGrantRoundDonations(
                 }
               }`,
               fromBlock,
-              // limit the results to just donations to this grant
+              // limit the results to just donations sent to this grantRound
               `round: "${grantRoundAddress}"`
             );
             // update each of the grants
