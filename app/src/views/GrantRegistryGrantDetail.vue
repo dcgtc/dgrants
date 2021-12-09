@@ -603,7 +603,11 @@ function useGrantDetail() {
     if (isMetaPtrUpdated) {
       const twitterURI = twitter === '' ? twitter : urlFromTwitterHandle(twitter);
       const properties = { websiteURI: website, githubURI: github, twitterURI };
-      const cid = logoURI ? (gMetadata?.logoPtr as MetaPtr).pointer : '';
+      let cid = '';
+      if (logoURI) {
+        const splitLogoURI = (logoURI as string).split('/');
+        cid = splitLogoURI[splitLogoURI.length - 1];
+      }
       const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description, logoPtr, properties })
@@ -642,14 +646,12 @@ function useGrantDetail() {
    * @notice util function which prefills edit form
    */
   function prefillEditForm() {
-    // TOOD probably shouldn't assume logoURI is defined since the type definition makes it optional, but our UI
-    // requires a logo, so maybe this is fine for now. Also don't know why TS makes me cast like this, but the
-    // type inference hints from VSCode indicate the casting shouldn't be necessary
+    const cid = grantMetadata.value?.logoPtr?.pointer;
     form.value.owner = grant.value?.owner || '';
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.logoURI = ipfs.getMetaPtr({ cid: grantMetadata.value?.logoPtr?.pointer }) || undefined;
+    form.value.logoURI = cid ? ipfs.getMetaPtr({ cid }) : 'placeholder_grant.svg';
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';
