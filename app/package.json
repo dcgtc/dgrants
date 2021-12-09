@@ -1,6 +1,6 @@
 {
   "name": "@dgrants/app",
-  "version": "0.2.33-7a451e7.0",
+  "version": "0.2.34-3535cf9.0",
   "private": true,
   "scripts": {
     "clean": "rimraf dist",
@@ -14,9 +14,9 @@
     "prettier": "prettier --write ."
   },
   "dependencies": {
-    "@dgrants/contracts": "^0.2.24-87d3139.0",
-    "@dgrants/dcurve": "^0.2.25-8a7e113.0",
-    "@dgrants/types": "^0.2.24-87d3139.0",
+    "@dgrants/contracts": "^0.2.25-3535cf9.0",
+    "@dgrants/dcurve": "^0.2.26-3535cf9.0",
+    "@dgrants/types": "^0.2.25-3535cf9.0",
     "@fusion-icons/vue": "^0.0.0",
     "@headlessui/vue": "^1.2.0",
     "@tailwindcss/aspect-ratio": "^0.2.1",
