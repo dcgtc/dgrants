@@ -3,15 +3,53 @@ import { TokenInfo } from '@uniswap/token-lists';
 import { Contribution, GrantPrediction, MetaPtr } from './grants';
 
 /**
- * Data types for entity being pulled from the subgraph
+ * Data types for GrantRound entity being pulled from the subgraph
  *
  * @type GrantRoundSubgraph
  * @field {address} grant round address
  * @field {lastUpdatedBlockNumber} the blockNumber on which this entity was lastUpdated
  */
 export type GrantRoundSubgraph = {
+  id: string;
   address: string;
   lastUpdatedBlockNumber: number;
+};
+
+/**
+ * Data types for GrantRoundDonations entity being pulled from the subgraph
+ *
+ * @type GrantRoundDonationSubgraph
+ * @field {contributor} the contributors address
+ * @field {amount} the amount being contributed
+ * @field {hash} the txHash associated with the transaction
+ * @field {createdAtTimestamp} the ts related to this contribution
+ * @field {lastUpdatedBlockNumber} the blockNumber on which this entity was created
+ */
+export type GrantRoundDonationSubgraph = {
+  id: string;
+  contributor: string;
+  amount: BigNumberish;
+  hash: string;
+  createdAtTimestamp: BigNumberish;
+  lastUpdatedBlockNumber: number;
+};
+
+/**
+ * Data types for GrantRoundDonations entity being pulled from storage
+ *
+ * @type GrantRoundDonations
+ * @field {contributor} the contributors address
+ * @field {amount} the amount being contributed
+ * @field {txHash} the txHash associated with the transaction
+ * @field {createdAt} the ts related to this contribution
+ * @field {blockNumber} the blockNumber on which this entity was created
+ */
+export type GrantRoundDonation = {
+  contributor: string;
+  amount: BigNumberish;
+  txHash: string;
+  createdAt: BigNumberish;
+  blockNumber: number;
 };
 
 /**
