@@ -8,6 +8,7 @@ import {
   GrantPrediction,
   GrantRoundSubgraph,
   MetaPtr,
+  GrantRoundDonationSubgraph,
 } from '@dgrants/types';
 import { LocalForageData } from 'src/types';
 // --- Methods and Data ---
@@ -32,6 +33,7 @@ import {
   ERC20_ABI,
   allGrantRoundsKey,
   grantRoundKeyPrefix,
+  grantRoundDonationsKeyPrefix,
   grantRoundsCLRDataKeyPrefix,
 } from 'src/utils/constants';
 import { Ref } from 'vue';
@@ -43,7 +45,7 @@ const { grantRoundManager } = useWalletStore();
  *
  * @param {boolean} forceRefresh Force the cache to refresh
  */
-export async function getAllGrantRounds(forceRefresh = false, latestBlockNumber: number) {
+export async function getAllGrantRounds(latestBlockNumber: number, forceRefresh = false) {
   return await syncStorage(
     allGrantRoundsKey,
     {
@@ -247,6 +249,111 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
 
       // return the GrantRound data
       return grantRound;
+    }
+  );
+}
+
+/**
+ * @notice Get/Refresh all GrantRound MatchingFund contributions
+ *
+ * @param {boolean} forceRefresh Force the cache to refresh
+ */
+export async function getGrantRoundDonations(
+  grantRoundAddress: string,
+  latestBlockNumber: number,
+  forceRefresh = false
+) {
+  return await syncStorage(
+    grantRoundDonationsKeyPrefix + grantRoundAddress,
+    {
+      blockNumber: latestBlockNumber,
+    },
+    async (LocalForageData?: LocalForageData | undefined, save?: () => void) => {
+      // check how far out of sync we are from the cache and pull any events that happened bwtween then and now
+      const _lsBlockNumber = LocalForageData?.blockNumber || 0;
+      // only update roundAddress if new ones are added...
+      let _lsGrantRoundDonations = [];
+      // get the most recent block we collected
+      let fromBlock = _lsBlockNumber ? _lsBlockNumber + 1 : START_BLOCK;
+      // every block
+      if (forceRefresh || !LocalForageData || (LocalForageData && _lsBlockNumber < latestBlockNumber)) {
+        // attempt to use the subgraph first
+        if (SUBGRAPH_URL) {
+          try {
+            // make the request
+            _lsGrantRoundDonations = await recursiveGraphFetch(
+              SUBGRAPH_URL,
+              'grantRoundDonations',
+              (filter: string) => `{
+                grantRoundDonations(${filter}) {
+                  id
+                  contributor
+                  amount
+                  hash
+                  lastUpdatedBlockNumber
+                  createdAtTimestamp
+                }
+              }`,
+              fromBlock,
+              // limit the results to just donations to this grant
+              `round: "${grantRoundAddress}"`
+            );
+            // update each of the grants
+            _lsGrantRoundDonations = _lsGrantRoundDonations.map((grantRoundDonation: GrantRoundDonationSubgraph) => {
+              return {
+                contributor: grantRoundDonation.contributor,
+                amount: grantRoundDonation.amount,
+                txHash: grantRoundDonation.hash,
+                blockNumber: grantRoundDonation.lastUpdatedBlockNumber,
+                createdAt: grantRoundDonation.createdAtTimestamp,
+              };
+            });
+            // update to most recent block collected
+            fromBlock = latestBlockNumber;
+          } catch {
+            console.log('dGrants: Data fetch error - Subgraph request failed');
+          }
+        }
+        // collect the remainder of the blocks
+        if (fromBlock < latestBlockNumber) {
+          _lsGrantRoundDonations = await Promise.all(
+            (
+              await batchFilterCall(
+                {
+                  contract: new Contract(grantRoundAddress, GRANT_ROUND_ABI, DEFAULT_PROVIDER),
+                  filter: 'AddMatchingFunds',
+                  args: [null],
+                },
+                fromBlock,
+                latestBlockNumber
+              )
+            ).map(async (e: Event) => {
+              // get the tx receipt to pull the blockNumber/timestamp
+              const tx = await e.getBlock();
+              // collate grantRound contributions
+              return {
+                contributor: e.args?.contributor,
+                amount: e.args?.amount,
+                txHash: e.transactionHash,
+                blockNumber: tx.number,
+                createdAt: tx.timestamp,
+              };
+            })
+          );
+        }
+      }
+
+      // hydrate/format roundAddresses for use
+      const grantRoundDonations = {
+        grantRoundDonations: [..._lsGrantRoundDonations],
+      };
+
+      // conditionally save the new roundAddresses
+      if (grantRoundDonations.grantRoundDonations.length && save) {
+        save();
+      }
+
+      return grantRoundDonations;
     }
   );
 }

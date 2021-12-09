@@ -445,6 +445,7 @@ export const recursiveGraphFetch = async (
   key: string,
   query: (filter: string) => string,
   fromBlock: number,
+  additionalFilter = '',
   before: any[] = [] // eslint-disable-line @typescript-eslint/no-explicit-any
 ): // eslint-disable-next-line @typescript-eslint/no-explicit-any
 Promise<any[]> => {
@@ -461,6 +462,7 @@ Promise<any[]> => {
         where: {
           ${fromId ? `id_gt: "${fromId}",` : ''}
           ${fromBlock ? `lastUpdatedBlockNumber_gte: "${fromBlock}",` : ''}
+          ${additionalFilter}
         }
       `),
     }),
@@ -475,6 +477,6 @@ Promise<any[]> => {
     return [...before];
   } else {
     // return the result combined with the next page
-    return await recursiveGraphFetch(url, key, query, fromBlock, [...before, ...json.data[key]]);
+    return await recursiveGraphFetch(url, key, query, fromBlock, additionalFilter, [...before, ...json.data[key]]);
   }
 };
