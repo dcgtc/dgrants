@@ -34,7 +34,11 @@
 
         <!-- ToDo. Link to the real dGrant grant -->
         <div class="mt-16 flex flex-wrap gap-4">
-          <router-link to="/dgrants/0" @click="emitEvent('toggleAbout')">
+          <router-link
+            v-if="dgrantsGrantID && dgrantsGrantID !== 'false'"
+            :to="`/dgrants/${dgrantsGrantID}`"
+            @click="emitEvent('toggleAbout')"
+          >
             <button class="btn">
               <span>donate to <span class="text-teal">d</span>grants</span>
             </button>
@@ -79,11 +83,16 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
+// --- Icons ---
 import { CloseIcon as XIcon } from '@fusion-icons/vue/interface';
 import { TwitterIcon as TwitterIcon } from '@fusion-icons/vue/interface';
 import { GithubIcon as GithubIcon } from '@fusion-icons/vue/interface';
 
+// package.json is used to inform the displayed version
 import packagejson from './../../package.json';
+
+// allow for the dgrants ID to be set in .env
+const dgrantsGrantID = import.meta.env.VITE_DGRANTS_GRANT_ID || false;
 
 function useContributors() {
   type Contributor = {
@@ -117,7 +126,7 @@ export default defineComponent({
   components: { XIcon, TwitterIcon, GithubIcon },
   setup(_props, context) {
     const emitEvent = (eventName: string) => context.emit(eventName);
-    return { emitEvent, packagejson, ...useContributors() };
+    return { dgrantsGrantID, emitEvent, packagejson, ...useContributors() };
   },
 });
 </script>

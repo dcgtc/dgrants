@@ -8,11 +8,12 @@ declare module '*.vue' {
 // Shims for environment variables
 interface ImportMeta {
   env: {
-    VITE_BLOCKNATIVE_API_KEY: string;
     VITE_ALCHEMY_API_KEY: string;
+    VITE_BLOCKNATIVE_API_KEY: string;
     VITE_FLEEK_STORAGE_API_KEY: string;
-    VITE_DGRANTS_CHAIN_ID: string;
     VITE_GRANT_WHITELIST_URI: string;
+    VITE_DGRANTS_CHAIN_ID: string;
+    VITE_DGRANTS_GRANT_ID?: string;
     VITE_MAINTENANCE_MODE?: string;
     VITE_GRANT_REGISTRY?: string;
     VITE_GRANT_ROUND_MANAGER?: string;
