@@ -20,6 +20,7 @@
       <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
+        :idList="grantIdList"
         :logoPtr="grantMetadata?.logoPtr"
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
@@ -671,6 +672,7 @@ function useGrantDetail() {
     updateLogo,
     loading,
     grantId,
+    grantIdList,
     rounds,
     isEditing,
     isOwner,

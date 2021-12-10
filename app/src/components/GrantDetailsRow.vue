@@ -35,13 +35,15 @@
 
         <!-- button -->
         <div class="mt-8">
-          <button v-if="isInCart(grant?.id)" @click="removeFromCart(grant?.id)" class="btn in-cart btn-primary">
-            <CartIcon class="icon-small" />Remove
-          </button>
+          <template v-if="idList.includes(grant?.id)">
+            <button v-if="isInCart(grant?.id)" @click="removeFromCart(grant?.id)" class="btn in-cart btn-primary">
+              <CartIcon class="icon-small" />Remove
+            </button>
 
-          <button v-else @click="addToCart(grant?.id)" class="btn btn-primary">
-            <CartIcon class="icon-small" />Add
-          </button>
+            <button v-else @click="addToCart(grant?.id)" class="btn btn-primary">
+              <CartIcon class="icon-small" />Add
+            </button>
+          </template>
         </div>
       </article>
 
@@ -86,6 +88,7 @@ export default defineComponent({
   components: { CartIcon, LogoPtrImage },
   props: {
     grant: { type: Object as PropType<Grant>, required: true },
+    idList: { type: Array as number, required: true },
     roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: true },
     logoPtr: { type: Object as PropType<MetaPtr> | undefined, required: false, default: undefined },
     payoutAddress: { type: String, required: false, default: '0x0' },
