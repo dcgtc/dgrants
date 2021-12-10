@@ -88,7 +88,7 @@ export default defineComponent({
   components: { CartIcon, LogoPtrImage },
   props: {
     grant: { type: Object as PropType<Grant>, required: true },
-    idList: { type: Array as number, required: true },
+    idList: { type: Array as PropType<number[]>, required: true },
     roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: true },
     logoPtr: { type: Object as PropType<MetaPtr> | undefined, required: false, default: undefined },
     payoutAddress: { type: String, required: false, default: '0x0' },
