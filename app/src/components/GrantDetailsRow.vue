@@ -35,7 +35,7 @@
 
         <!-- button -->
         <div class="mt-8">
-          <template v-if="idList.includes(grant?.id)">
+          <template v-if="idList && idList.includes(grant?.id)">
             <button v-if="isInCart(grant?.id)" @click="removeFromCart(grant?.id)" class="btn in-cart btn-primary">
               <CartIcon class="icon-small" />Remove
             </button>
@@ -72,7 +72,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType, computed } from 'vue';
+import { defineComponent, PropType } from 'vue';
 // --- Data ---
 import useCartStore from 'src/store/cart';
 import useDataStore from 'src/store/data';
@@ -96,8 +96,7 @@ export default defineComponent({
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    const { approvedGrantsPk } = useDataStore();
-    const idList = computed(() => approvedGrantsPk.value || []);
+    const { approvedGrantsPk: idList } = useDataStore();
     return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl, idList };
   },
 });
