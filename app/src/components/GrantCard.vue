@@ -24,13 +24,15 @@
 
       <!--cart button-->
       <div class="absolute bottom-0 right-0">
-        <button
-          class="btn opacity-100 md:opacity-0 group-hover:opacity-100"
-          :class="{ 'in-cart': isInCart(id) }"
-          @click.stop="isInCart(id) ? removeFromCart(id) : addToCart(id)"
-        >
-          <CartIcon />
-        </button>
+        <template v-if="idList.includes(id)">
+          <button
+            class="btn opacity-100 md:opacity-0 group-hover:opacity-100"
+            :class="{ 'in-cart': isInCart(id) }"
+            @click.stop="isInCart(id) ? removeFromCart(id) : addToCart(id)"
+          >
+            <CartIcon />
+          </button>
+        </template>
       </div>
     </div>
 
@@ -94,6 +96,8 @@ export default defineComponent({
     const grantId = ref<number>(props.id);
     const raised = computed(() => getTotalRaised(grantId.value));
     const { addToCart, isInCart, removeFromCart } = useCartStore();
+    const { approvedGrantsPk } = useDataStore();
+    const idList = computed(() => approvedGrantsPk.value || []);
 
     return {
       addToCart,
@@ -103,6 +107,7 @@ export default defineComponent({
       getEtherscanUrl,
       pushRoute,
       raised,
+      idList,
     };
   },
 });
