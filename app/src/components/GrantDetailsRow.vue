@@ -72,9 +72,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue';
+import { defineComponent, PropType, computed } from 'vue';
 // --- Data ---
 import useCartStore from 'src/store/cart';
+import useDataStore from 'src/store/data';
 // --- Types ---
 import { Grant, GrantsRoundDetails, MetaPtr } from '@dgrants/types';
 // --- Utils/helper ---
@@ -88,7 +89,6 @@ export default defineComponent({
   components: { CartIcon, LogoPtrImage },
   props: {
     grant: { type: Object as PropType<Grant>, required: true },
-    idList: { type: Array as PropType<number[]>, required: true },
     roundDetails: { type: Array as PropType<GrantsRoundDetails[]>, required: true },
     logoPtr: { type: Object as PropType<MetaPtr> | undefined, required: false, default: undefined },
     payoutAddress: { type: String, required: false, default: '0x0' },
@@ -96,7 +96,9 @@ export default defineComponent({
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl };
+    const { approvedGrantsPk } = useDataStore();
+    const idList = computed(() => approvedGrantsPk.value || []);
+    return { addToCart, isInCart, removeFromCart, formatAddress, getEtherscanUrl, idList };
   },
 });
 </script>
