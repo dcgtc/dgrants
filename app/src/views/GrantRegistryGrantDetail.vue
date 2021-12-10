@@ -20,7 +20,6 @@
       <!-- grant details row ( image + raised, address, in round, matchin, add to cart button ) -->
       <GrantDetailsRow
         :grant="grant"
-        :idList="grantIdList"
         :logoPtr="grantMetadata?.logoPtr"
         :payoutAddress="grant.payee"
         :totalRaised="grantContributionsTotal"
@@ -284,7 +283,6 @@ import useWalletStore from 'src/store/wallet';
 // --- Methods and Data ---
 import { LOREM_IPSOM_TEXT, NO_LOGO_OBJECT } from 'src/utils/constants';
 import { ContractTransaction } from 'src/utils/ethers';
-import { DGRANTS_CHAIN_ID } from 'src/utils/chains';
 import {
   cleanTwitterUrl,
   formatNumber,
@@ -319,8 +317,6 @@ import LoadingSpinner from 'src/components/LoadingSpinner.vue';
 import { TwitterIcon } from '@fusion-icons/vue/interface';
 import { Edit3Icon as EditIcon } from '@fusion-icons/vue/interface';
 
-const grantIdList = ref([]);
-
 function useGrantDetail() {
   // --- get current state ---
   const {
@@ -331,6 +327,7 @@ function useGrantDetail() {
     grantRoundsCLRData: roundsCLRData,
     grantContributions: allContributions,
     grantRoundsDonationToken: donationToken,
+    approvedGrantsPk: approvedIdList,
   } = useDataStore();
   const { signer, userAddress, grantRegistry, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -428,7 +425,7 @@ function useGrantDetail() {
   };
   const nextGrant = computed(() => {
     let nextIndex = grantId.value + 1;
-    const idList = grantIdList.value as Array<number>;
+    const idList = approvedIdList.value as Array<number>;
     const len = grants.value ? grants.value.length : 0;
     for (let i = 0; i < len; i++) {
       if (idList.includes(nextIndex)) {
@@ -440,7 +437,7 @@ function useGrantDetail() {
   });
   const lastGrant = computed(() => {
     let lastIndex = grantId.value - 1;
-    const idList = grantIdList.value as Array<number>;
+    const idList = approvedIdList.value as Array<number>;
     const len = grants.value ? grants.value.length : 0;
     for (let i = 0; i < len; i++) {
       if (idList.includes(lastIndex)) {
@@ -672,7 +669,6 @@ function useGrantDetail() {
     updateLogo,
     loading,
     grantId,
-    grantIdList,
     rounds,
     isEditing,
     isOwner,
@@ -726,21 +722,6 @@ export default defineComponent({
   },
   setup() {
     const { addToCart, isInCart, removeFromCart } = useCartStore();
-
-    watch(
-      () => [],
-      async () => {
-        const uniqueStr = '?unique=' + Date.now();
-        const whitelistUrl = import.meta.env.VITE_GRANT_WHITELIST_URI;
-        if (whitelistUrl) {
-          const url = whitelistUrl + uniqueStr;
-          const json = await fetch(url).then((res) => res.json());
-          grantIdList.value = json[DGRANTS_CHAIN_ID];
-        }
-      },
-      { immediate: true }
-    );
-
     return { isInCart, addToCart, removeFromCart, ...useGrantDetail() };
   },
 });
