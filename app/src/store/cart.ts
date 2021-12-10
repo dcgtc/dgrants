@@ -65,7 +65,7 @@ const SWAP_PATHS = {
   },
 };
 
-const { grants, grantRounds, grantRoundsCLRData, grantRoundMetadata } = useDataStore();
+const { grants, grantRounds, grantRoundsCLRData, grantRoundMetadata, approvedGrantsPk } = useDataStore();
 const { chainId } = useWalletStore();
 const toHex = (val: BigNumberish) => BigNumber.from(val).toHexString();
 
@@ -178,6 +178,8 @@ export default function useCartStore() {
    */
   function addToCart(grantId: number | undefined) {
     if (grantId === undefined) return;
+    const idList = approvedGrantsPk.value as Array<number>;
+    if (!idList.includes(grantId)) return;
 
     // Do nothing if this item is already in the cart
     const cartGrantIds = cart.value.map((grant) => grant.grantId);
