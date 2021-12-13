@@ -75,8 +75,8 @@ export function getPredictedMatchingForAmount(clrPredictions: GrantPrediction, a
   // predictions should be provided with the same axis
   const contributionsAxis = [0, 1, 10, 100, 1000, 10000];
   // get all predictions for this grant in this round
-  const clrPredictionCurve = clrPredictions?.predictions?.map((prediction, key) => {
-    return key == 0 ? prediction.predictedGrantMatch : prediction.predictionDiff;
+  const clrPredictionCurve = clrPredictions?.predictions?.map((prediction) => {
+    return prediction.predictionDiff;
   });
   // set up lerp input for more accurate predicted matching
   if (!clrPredictionCurve || !amount || isNaN(amount)) {
