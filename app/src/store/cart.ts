@@ -335,7 +335,7 @@ export default function useCartStore() {
     // TODO use multicall for better performance + fewer RPC requests
     const _quotes = await Promise.all(
       SUPPORTED_TOKENS.map(async (token) => {
-        if (token.symbol === 'DAI' || token.symbol === 'USDC') return { token, rate: 1 };
+        if (['DAI', 'USDC', 'USDT'].includes(token.symbol)) return { token, rate: 1 };
         const path = swapPaths.value[token.address as keyof typeof swapPaths.value];
         const amountIn = parseUnits('1', token.decimals); // for simplicity, use a value of 1 token for getting quotes
         const amountOut = await quoteExactInput(path, amountIn); // as raw BigNumber
