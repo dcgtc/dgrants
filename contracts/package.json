@@ -1,8 +1,8 @@
 {
   "name": "@dgrants/contracts",
-  "version": "0.2.27-3fff2ae.0",
+  "version": "0.2.28-fce703e.0",
   "devDependencies": {
-    "@dgrants/types": "^0.2.27-3fff2ae.0",
+    "@dgrants/types": "^0.2.28-fce703e.0",
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "3.4.1-solc-0.7-2",
