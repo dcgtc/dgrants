@@ -649,7 +649,7 @@ function useGrantDetail() {
     form.value.payee = grant.value?.payee || '';
     form.value.name = grantMetadata.value?.name || '';
     form.value.description = grantMetadata.value?.description || '';
-    form.value.logoURI = getMetaPtr({ cid }) : 'placeholder_grant.svg' 
+    form.value.logoURI = cid ? getMetaPtr({ cid }) : 'placeholder_grant.svg';
     form.value.website = grantMetadata.value?.properties?.websiteURI || '';
     form.value.github = grantMetadata.value?.properties?.githubURI || '';
     form.value.twitter = cleanTwitterUrl(grantMetadata.value?.properties?.twitterURI) || '';

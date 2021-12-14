@@ -9,7 +9,7 @@ import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { Grant, GrantRound, MetaPtr } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
-import { ETH_ADDRESS } from 'src/utils/constants';
+import { ETH_ADDRESS, retrievalEndpoint } from 'src/utils/constants';
 import {
   DEFAULT_PROVIDER,
   ETHERSCAN_BASE_URL,
@@ -18,9 +18,6 @@ import {
   WETH_ADDRESS,
 } from 'src/utils/chains';
 import { Ref } from 'vue';
-
-// --- Constants ---
-const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs';
 
 // --- Formatters ---
 // Returns an address with the following format: 0x1234…abcd
@@ -481,10 +478,14 @@ Promise<any[]> => {
   }
 };
 
+const supportedProtocols = ['1'];
+const isSupportedProtocol = (protocol: string) => supportedProtocols.includes(protocol);
+
 export function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
   if (!logoPtr) throw new Error('assertIPFSPointer: logoPtr is undefined');
   const protocol = BigNumber.from(logoPtr.protocol).toString();
-  if (!['0', '1'].includes(protocol))
+
+  if (!isSupportedProtocol(protocol))
     throw new Error(`assertIPFSPointer: Expected protocol ID of 0 or 1, found ${protocol}`);
 }
 

@@ -44,6 +44,9 @@ export const DefaultForageConfig: LocalForageConfig = {
   version: 3,
 };
 
+// --- Constants ---
+export const retrievalEndpoint = 'https://scopelift.b-cdn.net/ipfs';
+
 // LocalForage keys
 export const allGrantsKey = 'AllGrants';
 export const allGrantRoundsKey = 'AllGrantRounds';
