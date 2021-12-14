@@ -606,7 +606,7 @@ function useGrantDetail() {
         const splitLogoURI = (logoURI as string).split('/');
         cid = splitLogoURI[splitLogoURI.length - 1];
       }
-      const logoPtr = cid ? ipfs.formatMetaPtr(cid) : NO_LOGO_OBJECT;
+      const logoPtr = cid ? formatMetaPtr(cid) : NO_LOGO_OBJECT;
       metaPtr = await ipfs
         .uploadGrantMetadata({ name, description, logoPtr, properties })
         .then((cid) => formatMetaPtr(cid.toString()));
