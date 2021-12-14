@@ -7,10 +7,7 @@
     "metadataJson": {
       "name": "Gitcoin Building Gitcoin",
       "description": "The Gitcoin Building Gitcion round is an experimental Quadratic Funding round on the dGrants (Decentralized Grants) platform. This round’s theme is “Gitcoin Building Gitcoin” and is open to all grantees who meet the eligibility criteria. The dGrants protocol is a work in progress, as part of the effort to decentralize Gitcoin Grants. We believe the best way to get valuable feedback is to incentivize users to test the product, so Gitcoin is allocating $25k to the matching pool. Only donations during Grants Round 12 (December 1, 2021, at 4 pm UTC until December 16, 2021, at 11:59 pm UTC) will be counted towards the Quadratic funding distribution of the matching funds. We are excited to see what the community thinks of the new platform!",
-      "grants": [
-        0, 1, 2, 3, 4, 5, 7, 20, 26, 28, 30, 31, 34, 39, 41, 47, 49, 53, 55, 60,
-        62, 63, 64, 65, 67, 69
-      ],
+      "grants": [0, 1, 2, 3, 4, 5, 7, 20, 26, 28, 30, 31, 34, 39],
       "logoPtr": {
         "protocol": 1,
         "pointer": "QmatTDPXR26H6wfyVshHVSgujHVVYgEpsHaufoX4CnSk1r"
@@ -20,7 +17,7 @@
   "contracts": {},
   "actions": {
     "PublishGrantRoundLogo": "QmatTDPXR26H6wfyVshHVSgujHVVYgEpsHaufoX4CnSk1r",
-    "PublishGrantRoundMetadata": "QmTmCyR39WvLoqCzJBzuJAUBQSD8jYhovyBDndTtwH3k32",
-    "UpdateRoundMetaPtr": "0xf3f5448588a4bdf3adc3d2365e31311de9abf32e15c4f8dff95d0fe06150508d"
+    "PublishGrantRoundMetadata": "QmaP24u3rMtd8AysqgR4jz2yYw7XZyNXhde37r1hspetjT",
+    "UpdateRoundMetaPtr": "0x86e05df8fbc6c0167542006c268ac0f9e777a9a7f37d26827412c3c84af9b796"
   }
 }
