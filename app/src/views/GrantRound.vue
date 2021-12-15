@@ -298,7 +298,7 @@ function useGrantRoundDetail() {
   // get grantRound contributions
   const roundContributions = computed(() =>
     filterMatchingPoolContributions(
-      grantRound.value.address,
+      grantRound.value,
       grantRoundsDonations.value,
       grantRoundMetadata.value?.name,
       grantRoundMetadata.value?.logoPtr

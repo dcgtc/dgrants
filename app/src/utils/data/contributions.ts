@@ -417,12 +417,13 @@ function filterGrantRoundsForContributions(
 }
 
 export function filterMatchingPoolContributions(
-  roundAddress: string | undefined,
+  grantRound: GrantRound,
   roundDonations: Record<string, GrantRoundDonation[]>,
   roundName: string | undefined,
   roundLogoPtr: MetaPtr | undefined
 ): ContributionsDetail[] {
-  if (!roundAddress || !roundDonations) return [];
+  if (!grantRound || !roundDonations) return [];
+  const roundAddress = grantRound.address;
   const roundContributions = roundDonations[roundAddress];
   if (!roundContributions || roundContributions?.length === 0) return [];
   return roundContributions?.map((contribution: GrantRoundDonation) => {
@@ -431,13 +432,15 @@ export function filterMatchingPoolContributions(
 
     const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
     const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
+    const contributionAmount = Number(contribution.amount) / 10 ** grantRound.donationToken.decimals;
 
     return {
       grantAddress: roundAddress,
       grantName: roundName,
       grantLogoURI: logo,
       address: contribution.contributor,
-      amount: contribution.amount,
+      amount: contributionAmount,
+      donationToken: grantRound.donationToken,
       createdAt: contributionDate,
       txHash: contribution.txHash,
       blockNumber: contribution.blockNumber,
