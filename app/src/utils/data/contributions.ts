@@ -7,6 +7,7 @@ import {
   GrantMetadata,
   GrantRound,
   GrantRoundMetadata,
+  GrantRoundDonation,
   MetaPtr,
 } from '@dgrants/types';
 import { LocalForageAnyObj } from 'src/types';
@@ -416,15 +417,15 @@ function filterGrantRoundsForContributions(
 }
 
 export function filterMatchingPoolContributions(
-  round: GrantRound,
-  contributions: Contribution[] | undefined,
+  roundAddress: string | undefined,
+  roundDonations: Record<string, GrantRoundDonation[]>,
   roundName: string | undefined,
   roundLogoPtr: MetaPtr | undefined
 ): ContributionsDetail[] {
-  if (!round || !contributions) return [];
-  const roundContributions = filterContributionsByGrantRound(round, contributions);
+  if (!roundAddress || !roundDonations) return [];
+  const roundContributions = roundDonations[roundAddress];
   if (!roundContributions || roundContributions?.length === 0) return [];
-  return roundContributions?.map((contribution) => {
+  return roundContributions?.map((contribution: GrantRoundDonation) => {
     const logo =
       (roundLogoPtr && roundLogoPtr.protocol === 1 ? ptrToURI(roundLogoPtr) : false) || '/placeholder_grant.svg';
 
@@ -432,15 +433,11 @@ export function filterMatchingPoolContributions(
     const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
 
     return {
-      grantId: contribution.grantId,
-      grantAddress: contribution.grantAddress,
+      grantAddress: roundAddress,
       grantName: roundName,
       grantLogoURI: logo,
-      address: contribution.address,
+      address: contribution.contributor,
       amount: contribution.amount,
-      tokenIn: contribution.tokenIn,
-      inRounds: contribution.inRounds,
-      donationToken: contribution.donationToken,
       createdAt: contributionDate,
       txHash: contribution.txHash,
       blockNumber: contribution.blockNumber,

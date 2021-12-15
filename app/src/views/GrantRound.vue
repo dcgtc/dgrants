@@ -205,7 +205,7 @@ import { GrantRound as GrantRoundContract } from '@dgrants/contracts';
 
 // --- Filter by GrantRound ID ---
 function useGrantRoundDetail() {
-  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grantContributions } = useDataStore();
+  const { grantRounds, grantRoundMetadata: _grantRoundMetadata, grantRoundsDonations } = useDataStore();
 
   const { signer, userAddress, isCorrectNetwork } = useWalletStore();
   const route = useRoute();
@@ -298,8 +298,8 @@ function useGrantRoundDetail() {
   // get grantRound contributions
   const roundContributions = computed(() =>
     filterMatchingPoolContributions(
-      grantRound.value,
-      grantContributions.value,
+      grantRound.value.address,
+      grantRoundsDonations.value,
       grantRoundMetadata.value?.name,
       grantRoundMetadata.value?.logoPtr
     )
