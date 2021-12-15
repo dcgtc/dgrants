@@ -432,7 +432,7 @@ export function filterMatchingPoolContributions(
 
     const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
     const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
-    const contributionAmount = Number(contribution.amount) / 10 ** grantRound.donationToken.decimals;
+    const contributionAmount = Number(formatUnits(contribution.amount, grantRound.donationToken.decimals));
 
     return {
       grantAddress: roundAddress,
