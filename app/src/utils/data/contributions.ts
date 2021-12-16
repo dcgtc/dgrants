@@ -427,9 +427,7 @@ export function filterMatchingPoolContributions(
   const roundContributions = roundDonations[roundAddress];
   if (!roundContributions || roundContributions?.length === 0) return [];
   return roundContributions?.map((contribution: GrantRoundDonation) => {
-    const logo =
-      (roundLogoPtr && roundLogoPtr.protocol === 1 ? ptrToURI(roundLogoPtr) : false) || '/placeholder_grant.svg';
-
+    const logo = roundLogoPtr && ptrToURI(roundLogoPtr) ? ptrToURI(roundLogoPtr) : '/placeholder_grant.svg';
     const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
     const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
     const contributionAmount = Number(formatUnits(contribution.amount, grantRound.donationToken.decimals));
