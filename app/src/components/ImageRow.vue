@@ -1,50 +1,70 @@
 <template>
-  <div v-if="needEdit || isEdit">
-    <!-- We should put editor here -->
-    <ImageEditor
-      :imageName="imageController.images.raw.name"
-      @cropped="onCrop"
-      @cancel="cancelEdit"
-      @discard="discard"
-      :desiredRatio="desiredRatio"
-      :selectedImage="selectedImage"
-      :imageId="imageController.id"
-      :isEdit="isEdit"
-    />
-  </div>
-  <div v-if="!needEdit && !isEdit">
-    <!--We should put finalized editor here  -->
-    <div class="flex items-center" v-if="isUploading">
-      <div class="flex items-center">
-        <div class="inline-block">
-          <img :src="thumbImage" class="w-40 opacity-30" />
-        </div>
-        <div class="m-8 inline-block">Uploading - {{ imageController.images.raw.name }}</div>
+  <!-- EDIT -->
+
+  <section v-if="needEdit || isEdit" class="w-full">
+    <article class="flex items-center gap-8">
+      <div class="w-full">
+        <ImageEditor
+          :imageName="imageController.images.raw.name"
+          @cropped="onCrop"
+          @cancel="cancelEdit"
+          @discard="discard"
+          :desiredRatio="desiredRatio"
+          :selectedImage="selectedImage"
+          :imageId="imageController.id"
+          :isEdit="isEdit"
+        />
       </div>
-      <div class="flex items-center">
-        <button v-on:click="discard">Delete</button>
+
+      <div class="ml-auto">
+        <!-- @ajand : this button need trigger the CROP -->
+        <button>
+          <ExportIcon class="icon-small icon-primary" />
+        </button>
       </div>
-    </div>
-    <div v-if="!isUploading" class="flex">
-      <div class="flex items-center">
-        <div class="inline-block">
-          <img :src="thumbImage" class="w-40" />
-        </div>
-        <div class="m-8 inline-block">
-          {{ imageController.images.raw.name }}
-        </div>
+    </article>
+  </section>
+
+  <!-- IMG CARD -->
+
+  <section v-if="!needEdit && !isEdit" class="w-full">
+    <!-- IMAGE UPLOADING -->
+
+    <article v-if="isUploading" class="flex items-center">
+      <figure class="flex gap-8 items-center animate-pulse">
+        <img :src="thumbImage" class="w-16 md:w-32 lg:w-48" />
+        <figcaption>Uploading – {{ imageController.images.raw.name }}</figcaption>
+      </figure>
+
+      <div class="ml-auto">
+        <button v-on:click="discard">
+          <CloseIcon class="icon-small icon-primary" />
+        </button>
       </div>
-      <div class="flex items-center">
-        <button v-on:click="changeEdit">Edit</button>
+    </article>
+
+    <!-- IMAGE ONLINE / READY -->
+
+    <article v-if="!isUploading" class="flex items-center">
+      <figure class="flex gap-8 items-center">
+        <img :src="thumbImage" class="w-16 md:w-32 lg:w-48" />
+        <figcaption>{{ imageController.images.raw.name }}</figcaption>
+      </figure>
+
+      <div class="ml-auto">
+        <button v-on:click="changeEdit">
+          <EditIcon class="icon-small icon-primary" />
+        </button>
       </div>
-    </div>
-  </div>
+    </article>
+  </section>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType, ref } from 'vue';
 import ImageEditor from './ImageEditor.vue';
 import { ControlledImage } from '../types/images';
+import { CloseIcon, ExportIcon, Edit2Icon as EditIcon } from '@fusion-icons/vue/interface';
 
 import { getImageUrlFromFile } from '../utils/image-processing';
 
@@ -52,6 +72,9 @@ export default defineComponent({
   name: 'ImageRow',
   components: {
     ImageEditor,
+    EditIcon,
+    CloseIcon,
+    ExportIcon,
   },
   props: {
     imageController: {

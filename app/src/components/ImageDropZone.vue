@@ -3,17 +3,19 @@
     <label
       v-on:dragover="fileDragOver($event)"
       v-on:drop="fileDrop($event)"
-      class="flex flex-col bg-white items-center block px-6 py-8 border border-grey-400 cursor-pointer"
+      class="flex items-center justify-center cursor-pointer border-dropzone"
     >
-      <span>Choose or Drop an image to upload</span>
+      <ImportIcon class="icon-small icon-primary mx-8 my-16" />
       <input type="file" @input="onInput" class="hidden" />
     </label>
+
     <div v-if="!isValid" class="bg-pink p-4 text-white" :id="`${id}-error`">{{ errorMsg }}</div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import { ImportIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
   name: 'ImageDropZone',
@@ -36,7 +38,7 @@ export default defineComponent({
       default: () => true,
     },
   },
-  components: {},
+  components: { ImportIcon },
 
   setup(_, context) {
     const isValid = ref(true);

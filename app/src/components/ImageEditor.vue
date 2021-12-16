@@ -1,23 +1,68 @@
 <template>
-  <div
-    :id="`image-container@${imageId}`"
-    :class="`relative border overflow-hidden border-current ${isGrabbing ? 'cursor-move' : ''}`"
-    :style="`width: 640px; height: ${640 / desiredRatio}px`"
-  >
-    <img :id="`selected-image@${imageId}`" :src="selectedImage" class="max-w-none absolute" />
-  </div>
-  <hr />
-  <button type="button" @click="draw">Crop</button>
-  <button class="mx-8" type="button" @click="discard">Discard</button>
-  <button class="mx-8" type="button" @click="cancel">Cancel</button>
-  <button class="mx-8" type="button" @click="zoomIn">Zoom In</button>
-  <div>Zoom Ratio: {{ zoomRatio.toFixed(1) }}x</div>
-  <button class="mx-8" type="button" @click="zoomOut">Zoom Out</button>
-  <div :id="`canvas-container@${imageId}`"></div>
+  <section class="">
+    <!-- MANIPULATOR AREA -->
+    <figure
+      :id="`image-container@${imageId}`"
+      :class="`relative overflow-hidden  ${isGrabbing ? 'cursor-move' : ''}`"
+      class="w-full aspect-w-16 aspect-h-9"
+    >
+      <img :id="`selected-image@${imageId}`" :src="selectedImage" class="max-w-none absolute" />
+    </figure>
+
+    <!-- INTERFACE -->
+    <nav class="flex justify-between py-4 border-b border-grey-100">
+      <!-- discard ( exist edit mode without any changes ) -->
+      <button @click="discard">
+        <ArrowLeftIcon class="icon-small icon-primary" />
+      </button>
+
+      <!-- zoom image-->
+      <div class="flex gap-8 items-center">
+        <button @click="zoomOut">
+          <ZoomOutIcon class="icon-small icon-primary" />
+        </button>
+
+        <span>{{ zoomRatio.toFixed(1) }}</span>
+
+        <button @click="zoomIn">
+          <ZoomInIcon class="icon-small icon-primary" />
+        </button>
+      </div>
+
+      <!-- delete image -->
+      <button>
+        <TrashIcon class="icon-small icon-primary" />
+      </button>
+
+      <!-- @ajand old buttons - can be removed after you put the draw
+      <button type="button" @click="draw">Crop</button>
+      <button class="mx-8" type="button" @click="discard">Discard</button>
+      <button class="mx-8" type="button" @click="cancel">Cancel</button>
+      -->
+    </nav>
+
+    <!-- @ajand : i dont know what this is for - 
+      what to do with it ? please comment what this is -->
+    <div :id="`canvas-container@${imageId}`"></div>
+
+    <!-- instructions -->
+    <p class="mt-8 text-grey-400">
+      <!-- show this text when editor "auto-open"-->
+      We just converted this image to an ideal 16:9 format.
+      <!-- this text should be always there-->
+      Please finetune positions and scale, then save via the export Icon.
+    </p>
+  </section>
 </template>
 
 <script lang="ts">
 import { defineComponent, watch, ref } from 'vue';
+import {
+  ArrowLeftIcon,
+  Remove2Icon as ZoomOutIcon,
+  Add2Icon as ZoomInIcon,
+  TrashIcon,
+} from '@fusion-icons/vue/interface';
 
 import {
   findImageHeightBasedOnRatio,
@@ -32,6 +77,13 @@ import {
 
 export default defineComponent({
   name: 'ImageEditor',
+
+  components: {
+    ArrowLeftIcon,
+    ZoomOutIcon,
+    ZoomInIcon,
+    TrashIcon,
+  },
 
   props: {
     selectedImage: {

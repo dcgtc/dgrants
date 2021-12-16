@@ -9,7 +9,13 @@
   <InputRow v-if="controllerList.length < limit">
     <template v-slot:label>{{ title }}:</template>
     <template v-slot:input>
-      <ImageDropZone v-on:addImage="addImage" />
+      <div>
+        <ImageDropZone v-on:addImage="addImage" />
+        <!-- this TEXT need to be variable on various places it will be different! -->
+        <p class="mt-4 text-grey-400">
+          Drag 1-15 Images for your Grant’s Slideshow. Recommended a 16:9 Images (1920x1080) saved as *.png
+        </p>
+      </div>
     </template>
   </InputRow>
 </template>
