@@ -7,7 +7,7 @@ import { Event } from 'ethers';
 import { BigNumber, BigNumberish, commify, Contract, ContractTransaction, isAddress, Logger } from 'src/utils/ethers';
 import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
-import { Grant, GrantRound, MetaPtr } from '@dgrants/types';
+import { Grant, GrantRound, MetaPtr, ContributionsDetail } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
 import { ETH_ADDRESS } from 'src/utils/constants';
 import {
@@ -406,6 +406,14 @@ export const sortByStartTime = (a: GrantRound, b: GrantRound) => {
     ? 0
     : 1;
 };
+
+/**
+ * @notice sort contributions by amount
+ * @param contributions ContributionsDetail
+ */
+export function sortContributionsByAmount(contributions: ContributionsDetail[]) {
+  return contributions.sort((c1, c2) => c2.amount - c1.amount);
+}
 
 /**
  * @notice Encode all HTML in a given string

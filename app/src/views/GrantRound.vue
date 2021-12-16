@@ -190,6 +190,7 @@ import {
   isValidUrl,
   metadataId,
   watchTransaction,
+  sortContributionsByAmount,
 } from 'src/utils/utils';
 
 import { filterMatchingPoolContributions } from 'src/utils/data/contributions';
@@ -297,11 +298,13 @@ function useGrantRoundDetail() {
 
   // get grantRound contributions
   const roundContributions = computed(() =>
-    filterMatchingPoolContributions(
-      grantRound.value,
-      grantRoundsDonations.value,
-      grantRoundMetadata.value?.name,
-      grantRoundMetadata.value?.logoPtr
+    sortContributionsByAmount(
+      filterMatchingPoolContributions(
+        grantRound.value,
+        grantRoundsDonations.value,
+        grantRoundMetadata.value?.name,
+        grantRoundMetadata.value?.logoPtr
+      )
     )
   );
 
