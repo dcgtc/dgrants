@@ -18,12 +18,12 @@
                 </figure>
               </div>
               <div v-if="contribution.grantName && contribution.roundName" class="col-span-4 lg:col-span-3">
-                <a href="#" class="link">{{ contribution.grantName }}</a>
+                <a :href="'#/dgrants/' + contribution.grantId" class="link">{{ contribution.grantName }}</a>
                 <br /><span class="mr-2">via</span>
                 <a href="#" class="link">{{ contribution.roundName }}</a>
               </div>
               <div v-else class="col-span-4 lg:col-span-3">
-                <a href="#" class="link">{{ contribution.grantName }}</a>
+                <a :href="'#/dgrants/' + contribution.grantId" class="link">{{ contribution.grantName }}</a>
               </div>
             </div>
           </article>

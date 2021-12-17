@@ -250,7 +250,7 @@ export function filterContributionsByGrantId(grantId: number, contributions: Con
  * @notice given a grantRound and the contributions return only contributions for the grantRound
  */
 export function filterContributionsByGrantRound(round: GrantRound, contributions: Contribution[]) {
-  // filter contributions that are for this grantId
+  // filter contributions that are for this grantRound
   return contributions.filter((contribution: Contribution) => {
     // check that the contribution is valid
     const forThisGrantRound = contribution.inRounds?.includes(round.address);
@@ -389,7 +389,7 @@ function filterContributionsByUserAddress(userAddress: string, contributions: Co
 }
 
 /**
- * @notice filters through the grantrounds and returns the necessary attributes for  contribution detail screens
+ * @notice filters through the grantrounds and returns the necessary attributes for contribution detail screens
  * @param grantRounds
  * @param grantId
  * @param grantRoundMeta
@@ -412,6 +412,60 @@ function filterGrantRoundsForContributions(
   }
 
   return roundName;
+}
+
+/***
+ * @notice
+ * @param round
+ * @param contributions
+ * @param grants
+ * @param grantMetaData
+ * @param grantRounds
+ * @param grantRoundsMetaData
+ */
+export function filterContributionsForGrantRound(
+  round: GrantRound,
+  contributions: Contribution[] | undefined,
+  grants: Grant[] | undefined,
+  grantMetaData?: Record<string, GrantMetadata>
+): ContributionsDetail[] | null {
+  if (!grants || !round || !contributions || contributions.length === 0) {
+    return [];
+  }
+  const myContributions = filterContributionsByGrantRound(round, contributions);
+  if (myContributions?.length === 0 || !myContributions) {
+    return [];
+  }
+  return myContributions?.map((contribution) => {
+    let grantLogo = '/placeholder_grant.svg';
+    let grantName = '...';
+
+    const grantData = grants.find((grant) => grant.id === contribution.grantId);
+    if (grantData && grantMetaData && Object.keys(grantMetaData).length) {
+      const metaDataVersionId = metadataId(grantData.metaPtr);
+      const { logoPtr, name } = grantMetaData[metaDataVersionId];
+      grantLogo = (logoPtr && logoPtr.protocol === 1 ? ptrToURI(logoPtr) : false) || grantLogo;
+      grantName = name || grantName;
+    }
+
+    const date = contribution.createdAt ? new Date(BigNumber.from(contribution.createdAt).toNumber() * 1000) : null;
+    const contributionDate = date ? `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}` : null;
+
+    return {
+      grantId: contribution.grantId,
+      grantAddress: contribution.grantAddress,
+      grantName: grantName,
+      grantLogoURI: grantLogo,
+      address: contribution.address,
+      amount: contribution.amount,
+      tokenIn: contribution.tokenIn,
+      inRounds: contribution.inRounds,
+      donationToken: contribution.donationToken,
+      createdAt: contributionDate,
+      txHash: contribution.txHash,
+      blockNumber: contribution.blockNumber,
+    } as ContributionsDetail;
+  });
 }
 
 /***
