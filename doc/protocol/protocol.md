@@ -17,11 +17,40 @@ This protocol is broken up into a few logical pieces representing the composable
 ### Architecture Overview
 
 ## Terminology
-Quadratic Funding
+Protocol - The ...
+dGTC: Decentralized Gitcoin
+dGrants: Decentralized Grants
+cGrants: Centralized Grants
+Category: The highest level categorization for a Grant
+Sub Category: A category that is under the hierarchy of a Category
+Theme: The description of what a Grant Round is aimed at funding and set of categories for that Grant Round
+List - A set of Grants individually selected or based on a filter
+Can contain a pointer to the filter to enable updating
+Should support adding/deleting grants
+Collection: One or more grants chosen by a user of the explorer and saved and a named group
+Can be used for sharing and creating a grant round based on the list of grants it references
+Sub-List - A list that has been added to a list
+Filter (theme based / curation based) - A programmatic query that produces a list containing a sub set of grants (potentially grant rounds in the future)
+Inclusive/exclusive is a choice
+Results of filters can be applied to a list
+Filters can be stacked so that the results from one filter feed into another filter
+Grant Round Facilitator / Provider: The name of the Entity running a round
+Grant Round: A collection of grants generally fitting into one or more categories that will receive a match for each donation from a pool of funds
+Participation Policy: The default set of requirements that an entity decides to apply to Grant content, theme, and team
+QF: Quadratic Funding
+QV: Quadratic Voting
+Entity: Single person or group of people that are grouped (non decentralized)
+Decentralized Curator: (opposite of entity)
+Quadratic Weighted Staking: 
+Linear Matching: [define this]
+Ecosystem: 
+
 
 
 ## dGrants Core
 The dGrants Core modules form the primary components of the dGrants protocol.
+
+#### Donations - [define and point to relevant section]
 
 ### Grant Registry
 - GrantRegistry contracts can be deployed to one or more EVM compatible blockchains
@@ -30,6 +59,11 @@ The dGrants Core modules form the primary components of the dGrants protocol.
 - Grants in the grant registry contract should be able to be created by anyone and should contain the following
     - [identify contents and format of grants]
 - Grant eligibility should not be done in the GrantRegistry contracts and is covered under Grant Curation - Eligibility & Discovery
+
+#### Grant Registry Contract Specification
+- Contract Interfaces
+- Data Formats
+- Update/Change Guidelines
 
 ### Grant Rounds
 Grant rounds add the ability for a single pool of funds to be distributed to a group of grants at the end of the round based on various factors.
@@ -64,6 +98,23 @@ Sybil resistance is necessary when utilizing quadratic funding due to fact that 
 - Proactive Sybil Resistance
     - Before 
 - Reactive Sybil Resistance
+
+#### Sybil Score
+Request
+1) Check if the user has a DID or dPOPP connected to their sign in address
+2) If so, check them for sybil score data packet
+```
+ID: ????
+```
+
+Response
+```
+Score: [0-99]
+Signature: XXX
+
+```
+
+#### Profiles (package the sybil score and unique ID)
 
 ### Matching Calculation & Payouts
 After a Grant Round has ended, the matching funds must be distributed to the qualified grants (define) in the round based on the desired mechanism. While one could choose any method of payout calculation, the dGrants protocol focuses on implementing various approaches to quadratic funding (define) which we will outline here.
