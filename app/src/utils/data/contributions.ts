@@ -158,7 +158,11 @@ export async function getContributions(
         }
 
         // return sorted Contributions[]
-        return contributions;
+        //return contributions;
+        return {
+          ...contributions,
+          contributions: contributions.contributions.filter((x) => Number(x.blockNumber) <= 22016624),
+        };
       }
     )) || {}
   );

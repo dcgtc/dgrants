@@ -86,7 +86,7 @@ const config: HardhatUserConfig = {
       initialBaseFeePerGas: 0, // required for solidity-coverage: https://github.com/sc-forks/solidity-coverage/issues/652#issuecomment-896330136
       forking: {
         url: `${forkNodeURL}${alchemyApiKey}`,
-        blockNumber: forkNetwork === 'polygon' ? 20913000 : 13186295,
+        blockNumber: forkNetwork === 'polygon' ? 22610354 : 22610354,
       },
       accounts: {
         mnemonic,

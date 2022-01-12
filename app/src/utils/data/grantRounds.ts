@@ -380,7 +380,7 @@ export async function getGrantRoundGrantData(
 ) {
   const clr = new CLR({
     calcAlgo: linear,
-    includePayouts: false,
+    includePayouts: true,
   } as InitArgs);
 
   return await syncStorage(
@@ -400,6 +400,30 @@ export async function getGrantRoundGrantData(
       // add new donations/predictions to ls state
       let _lsGrantDonations: Contribution[] = roundGrantData?.contributions || [];
       let _lsGrantPredictions = roundGrantData?.predictions || {};
+
+      /*
+ // scores are to be presented in an array
+      const trustBonusScores = Object.keys(trustBonus).map((address) => {
+        return {
+          address: address,
+          score: trustBonus[address],
+        };
+      });
+
+      console.log(JSON.stringify(await clr.calculate({
+        grantRound: roundAddress,
+        totalPot: totalPot,
+        matchingTokenDecimals: matchingTokenDecimals,
+        contributions: _lsGrantDonations,
+      }, {trustBonusScores:trustBonusScores}), 4));
+
+      console.log(await clr.verify({
+        grantRound: roundAddress,
+        totalPot: totalPot,
+        matchingTokenDecimals: matchingTokenDecimals,
+        contributions: _lsGrantDonations,
+      }, '', "0x443b2765cf0b2fdc2054ac818f2b44ed0f125684798d1ba3aea4d8d39668ee40"));
+*/
 
       // every block
       if (
@@ -464,6 +488,34 @@ export async function getGrantRoundGrantData(
             }
             return predictions;
           }, {} as Record<string, GrantPrediction>);
+
+          console.log(
+            JSON.stringify(
+              await clr.calculate(
+                {
+                  grantRound: roundAddress,
+                  totalPot: totalPot,
+                  matchingTokenDecimals: matchingTokenDecimals,
+                  contributions: _lsGrantDonations,
+                },
+                { trustBonusScores: trustBonusScores }
+              ),
+              4
+            )
+          );
+
+          console.log(
+            await clr.verify(
+              {
+                grantRound: roundAddress,
+                totalPot: totalPot,
+                matchingTokenDecimals: matchingTokenDecimals,
+                contributions: _lsGrantDonations,
+              },
+              '',
+              '0x4628602df03c0405bf04b88dd4e7702070d1f88a364432c0e8353d816b02a2f7'
+            )
+          );
         }
       }
 

@@ -48,9 +48,11 @@ task('execute-payouts', 'Configures the match payouts for the specified round')
 
     if (network.name === 'hardhat') {
       await network.provider.request({ method: 'hardhat_impersonateAccount', params: [payoutAdmin] });
+      console.log('Network configured to: %s', network.name);
       signer = await ethers.getSigner(payoutAdmin);
       round = round.connect(signer);
     } else if (signer.address !== payoutAdmin) {
+      console.log('WARNING - this is for real...');
       throw new Error(`Signer's address of ${signer.address} did not match the round's payout admin address of ${payoutAdmin}`); // prettier-ignore
     }
 
