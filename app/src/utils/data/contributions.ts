@@ -161,7 +161,7 @@ export async function getContributions(
         //return contributions;
         return {
           ...contributions,
-          contributions: contributions.contributions.filter((x) => Number(x.blockNumber) <= 22016624),
+          contributions: contributions.contributions.filter((x) => Number(x.blockNumber) <= 22610354),
         };
       }
     )) || {}

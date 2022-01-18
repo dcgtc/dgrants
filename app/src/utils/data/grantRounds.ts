@@ -513,7 +513,7 @@ export async function getGrantRoundGrantData(
                 contributions: _lsGrantDonations,
               },
               '',
-              '0x4628602df03c0405bf04b88dd4e7702070d1f88a364432c0e8353d816b02a2f7'
+              '0xbd064ad79c8240f5ed6062530825e4f27e6258cf9051a70b0b5901a8fd3578a7'
             )
           );
         }
