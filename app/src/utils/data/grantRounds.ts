@@ -203,7 +203,15 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         matchingToken = SUPPORTED_TOKENS_MAPPING[matchingTokenAddress];
         donationToken = SUPPORTED_TOKENS_MAPPING[donationTokenAddress];
         // record the funds as a human readable number
-        funds = parseFloat(formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals));
+        try {
+          funds = parseFloat(
+            formatUnits(BigNumber.from(funds), SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)
+          );
+        } catch {
+          // If parsing funds for the round fails, ignore the round
+          console.log('Failed to parse funds for round');
+          return undefined;
+        }
       } else if (LocalForageData && _lsBlockNumber < blockNumber) {
         // get updated metadata
         const [newMetaPtr, balance] = await Promise.all([
@@ -213,7 +221,13 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         // update to the new metaPtr
         metaPtr = newMetaPtr;
         // update to the new balance
-        funds = parseFloat(formatUnits(balance, SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)).toString();
+        try {
+          funds = parseFloat(formatUnits(balance, SUPPORTED_TOKENS_MAPPING[matchingTokenAddress].decimals)).toString();
+        } catch {
+          // If parsing funds for the round fails, ignore the round
+          console.log('Failed to update funds from metadata');
+          return undefined;
+        }
       }
       // build status against now (unix)
       const now = Date.now() / 1000;
