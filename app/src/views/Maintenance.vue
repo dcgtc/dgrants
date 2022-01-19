@@ -1,10 +1,16 @@
 <template>
   <section class="px-4 md:px-12 py-4 md:py-12">
     <div class="grid justify-center text-center">
-      <h1 class="text-grey-500">503</h1>
       <h1>Maintenance</h1>
       <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
-        dGrants is currently unavailable, but will be back soon. Learn more on Twitter.
+        dGrants is currently down while we undergo the next phase of protocol development but will be back soon.
+      </p>
+      <p class="mt-4 italic text-grey-400 mx-auto max-w-6xl">
+        Learn more by visiting the
+        <a href="https://wiki.dgitcoin.co/learn/progress-and-updates"
+          >dGitcoin Wiki (https://wiki.dgitcion.co/learn/progress-and-updates)</a
+        >
+        or on Twitter.
       </p>
 
       <!-- button row container -->
@@ -25,7 +31,7 @@ import { defineComponent } from 'vue';
 import { TwitterIcon } from '@fusion-icons/vue/interface';
 
 export default defineComponent({
-  name: 'ErrorMaintenance',
+  name: 'Maintenance',
   components: { TwitterIcon },
 });
 </script>

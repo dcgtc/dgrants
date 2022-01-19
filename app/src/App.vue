@@ -1,6 +1,6 @@
 <template>
   <div v-if="isMaintenanceMode">
-    <ErrorMaintenance />
+    <Maintenance />
   </div>
   <div v-else>
     <About :showAbout="showAbout" @toggle-about="toggleAbout" />
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import ErrorMaintenance from './views/ErrorMaintenance.vue';
+import Maintenance from './views/Maintenance.vue';
 import About from './components/About.vue';
 import NetworkSelector from './components/NetworkSelector.vue';
 import LayoutHeader from './components/LayoutHeader.vue';
@@ -27,7 +27,7 @@ import useWalletStore from 'src/store/wallet';
 
 export default defineComponent({
   name: 'App',
-  components: { About, ErrorMaintenance, LayoutHeader, LayoutFooter, NetworkSelector },
+  components: { About, Maintenance, LayoutHeader, LayoutFooter, NetworkSelector },
   setup() {
     const showAbout = ref(false);
 
