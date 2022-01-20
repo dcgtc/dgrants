@@ -210,7 +210,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         } catch {
           // If parsing funds for the round fails, ignore the round
           console.log('Failed to parse funds for round');
-          return undefined;
+          return {};
         }
       } else if (LocalForageData && _lsBlockNumber < blockNumber) {
         // get updated metadata
@@ -226,7 +226,7 @@ export async function getGrantRound(blockNumber: number, grantRoundAddress: stri
         } catch {
           // If parsing funds for the round fails, ignore the round
           console.log('Failed to update funds from metadata');
-          return undefined;
+          return {};
         }
       }
       // build status against now (unix)
