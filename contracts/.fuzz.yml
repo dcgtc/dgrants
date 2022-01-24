@@ -1,0 +1,38 @@
+# .fuzz_token.yml
+
+analyze:
+    # We need to know where the dependencies live
+    remappings:
+      - "@openzeppelin=../node_modules/@openzeppelin"
+      - "@uniswap=../node_modules/@uniswap"
+fuzz:
+    # Tell the CLI where to find the compiled contracts and compilation artifacts
+    build_directory: artifacts
+    
+    # The following address is going to be the main target for the fuzzing campaign
+    deployed_contract_address: "0x67B5656d60a809915323Bf2C40A8bEF15A152e3e" # GrantRoundManager
+    
+    other_contract_addresses:
+        - "0xe78A0F7E598Cc8b0Bb87894B0F60dD2a88d6a8Ab" # MatchingToken
+        - "0x5b1869D9A4C187F2EAa108f3062412ecf0526b24" # DonationToken
+        - "0xCfEB869F69431e42cdB54A4F4f105C19C080A601" # WETH
+        - "0x9b1f7F645351AF3631a656421eD2e40f2802E6c0" # GrantRegistry
+
+    # We'll do fuzzing with 1 core 🚀
+    number_of_cores: 1
+    
+    # When the campaign is created it'll get a name <prefix>_<random_characters>
+    campaign_name_prefix: "Gitcoin Grants"
+        
+    # Point to your ganache node which holds the seed 🌱
+    faas_url: "https://fuzzing-staging.diligence.tools"
+    rpc_url: "http://localhost:8545"
+    
+    # This is the contract that the campaign will show coverage for, map issues to, etc.
+    # It's a list of all the relevant contracts (don't worry about dependencies, we'll get those automatically 🙌)
+    targets:
+        - "contracts/GrantRegistry.sol"
+        - "contracts/GrantRound.sol"
+        - "contracts/GrantRoundManager.sol"
+        - "contracts/MerkleGrantRoundPayout.sol"
+        - "contracts/SwapRouter.sol"
