@@ -33,9 +33,9 @@ const params: DeployParams = {
     metadataJson,
   },
   polygon: {
-    roundAddress: '0x6c7B74D7640f401271208186e5CbBc6e7E2C73F4',
+    roundAddress: '0xa94E824ac0907c1Db5145F7fDb326A8bBfCa5599',
     ipfsRetrievalEndpoint: 'https://scopelift.b-cdn.net/ipfs',
-    roundLogoPath: './scripts/config/assets/moonshot-round.svg',
+    roundLogoPath: './scripts/config/assets/gr12_round.svg',
     metadataJson,
   },
 };
