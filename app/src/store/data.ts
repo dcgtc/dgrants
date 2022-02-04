@@ -28,7 +28,7 @@ import {
   GrantRoundMetadataResolution,
   GrantRoundDonation,
 } from '@dgrants/types';
-import { fetchMetaPtrs } from 'src/utils/data/ipfs';
+import { fetchMetaPtrs } from 'src/utils/data/metaPtrs';
 import { TokenInfo } from '@uniswap/token-lists';
 import {
   GRANT_REGISTRY_ADDRESS,

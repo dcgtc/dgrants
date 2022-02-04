@@ -13,7 +13,7 @@ import { batchFilterCall, recursiveGraphFetch } from '../utils';
 import { DGRANTS_CHAIN_ID } from '../chains';
 import { Ref } from 'vue';
 import { getAddress } from '../ethers';
-import { getMetadata, fetchMetaPtrs } from './ipfs';
+import { fetchMetaPtrs, getMetadata } from './metaPtrs';
 
 // --- pull in the registry contract
 const { grantRegistry } = useWalletStore();

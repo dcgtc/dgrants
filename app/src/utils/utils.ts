@@ -9,7 +9,7 @@ import { BatchFilterQuery, EtherscanGroup } from 'src/types';
 import useWalletStore from 'src/store/wallet';
 import { Grant, GrantRound, MetaPtr, ContributionsDetail } from '@dgrants/types';
 import { formatUnits } from 'src/utils/ethers';
-import { ETH_ADDRESS } from 'src/utils/constants';
+import { ETH_ADDRESS, retrievalEndpoint } from 'src/utils/constants';
 import {
   DEFAULT_PROVIDER,
   ETHERSCAN_BASE_URL,
@@ -17,7 +17,6 @@ import {
   SUPPORTED_TOKENS_MAPPING,
   WETH_ADDRESS,
 } from 'src/utils/chains';
-import { getMetaPtr } from 'src/utils/data/ipfs';
 import { Ref } from 'vue';
 
 // --- Formatters ---
@@ -487,4 +486,37 @@ Promise<any[]> => {
     // return the result combined with the next page
     return await recursiveGraphFetch(url, key, query, fromBlock, additionalFilter, [...before, ...json.data[key]]);
   }
+};
+
+const supportedProtocols = ['1'];
+const isSupportedProtocol = (protocol: string) => supportedProtocols.includes(protocol);
+
+export function assertIPFSPointer(logoPtr: MetaPtr | undefined) {
+  if (!logoPtr) throw new Error('assertIPFSPointer: logoPtr is undefined');
+  const protocol = BigNumber.from(logoPtr.protocol).toString();
+
+  if (!isSupportedProtocol(protocol))
+    throw new Error(`assertIPFSPointer: Expected protocol ID of 0 or 1, found ${protocol}`);
+}
+
+/**
+ * Creates a url for a MetaPtr
+ * @param obj
+ * @param obj.cid CID of the grant
+ * @returns string
+ */
+export const getMetaPtr = ({ cid }: { cid: string | undefined }) => {
+  return `${retrievalEndpoint}/${cid}`;
+};
+
+/**
+ * Given a CID, formats the metadata pointer for compatibility with the contracts
+ * @param cid CID of the grant
+ * @returns string
+ */
+export const formatMetaPtr = (cid: string): MetaPtr => {
+  return {
+    protocol: 1, // IPFS has a protocol ID of 1
+    pointer: cid,
+  };
 };
